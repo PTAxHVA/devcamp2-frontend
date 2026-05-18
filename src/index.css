@@ -1,1 +1,85 @@
 @import 'tailwindcss';
+
+@theme {
+  /* ===============FONT STYLE=================== */
+  --font-primary: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-secondary: 'Roboto', sans-serif;
+
+  /* ===============FONT SIZE==================== */
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+
+  /* ===============BRAND COLORS==================*/
+  --color-brand-navy-900: #061a35;
+  --color-brand-navy-800: #082a5e;
+  --color-brand-navy-700: #003b71;
+  --color-brand-navy-600: #064b8a;
+
+  --color-brand-purple-700: #5b21d9;
+  --color-brand-purple-600: #6d28d9;
+  --color-brand-purple-500: #7c3aed;
+  --color-brand-purple-400: #8b5cf6;
+  --color-brand-purple-300: #a78bfa;
+
+  /* ===============TEXT COLORS=================== */
+  --color-text-primary: #061a35;
+  --color-text-secondary: #334155;
+  --color-text-muted: #64748b;
+  --color-text-placeholder: #94a3b8;
+  --color-text-disabled: #cbd5e1;
+  --color-text-white: #ffffff;
+
+  /* ===============BACKGROUND COLORS=================== */
+  --color-bg-white: #ffffff;
+  --color-bg-soft: #fbfcff;
+  --color-bg-lavender: #f7f4ff;
+  --color-bg-blue-soft: #f5f8ff;
+  --color-bg-section: #f8fafc;
+  --color-bg-card: #ffffff;
+
+  /* ===============BORDER COLORS=================== */
+  --color-border-default: #d8dee9;
+  --color-border-soft: #e2e8f0;
+  --color-border-input: #cbd5e1;
+  --color-border-focus: #7c3aed;
+  --color-border-navy: #003b71;
+  --color-border-purple: #8b5cf6;
+
+  /* ===============BUTTON COLORS=================== */
+  --color-btn-primary-bg: #003b71;
+  --color-btn-primary-hover: #082a5e;
+  --color-btn-primary-text: #ffffff;
+
+  --color-btn-secondary-bg: #ffffff;
+  --color-btn-secondary-border: #8b5cf6;
+  --color-btn-secondary-text: #5b21d9;
+
+  --color-btn-disabled-bg: #e2e8f0;
+  --color-btn-disabled-text: #94a3b8;
+
+  /* ===============FORM & ALERT COLORS=================== */
+  --color-input-bg: #ffffff;
+  --color-input-border: #cbd5e1;
+  --color-input-focus-border: #7c3aed;
+  --color-input-icon: #64748b;
+  --color-input-icon-active: #6d28d9;
+  --color-input-placeholder: #94a3b8;
+
+  --color-checkbox-border: #7c3aed;
+  --color-checkbox-checked-bg: #7c3aed;
+  --color-checkbox-checked-icon: #ffffff;
+
+  --color-error-bg: #fef2f2;
+  --color-error-border: #fca5a5;
+  --color-error-text: #991b1b;
+  --color-error-icon: #dc2626;
+}
+@layer base {
+  body {
+    font-family: var(--font-primary);
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-soft);
+  }
+}
