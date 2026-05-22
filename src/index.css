@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @plugin "daisyui/index.js";
+
 @theme {
   /* ===============FONT STYLE=================== */
   --font-primary: 'Inter', system-ui, -apple-system, sans-serif;
