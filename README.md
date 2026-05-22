@@ -8,7 +8,7 @@ Personalized Code Learning Platform. Frontend cho sản phẩm giúp beginner pr
 - **React Router v7** — client-side routing
 - **TanStack Query v5** — server state
 - **React Hook Form + Zod** — form + validation
-- **Tailwind CSS v4** — styling
+- **Tailwind CSS v4 + daisyUI** — styling & component library
 - **React Flow** (@xyflow/react) — roadmap visualization
 - **Axios** — HTTP client
 - **ESLint + Prettier + Husky + commitlint + lint-staged** — code quality
@@ -68,7 +68,7 @@ src/
 │   ├── ai/              # F9 Gemini Socratic
 │   └── dashboard/       # F10
 ├── components/
-│   ├── ui/      # primitives (Button, Input, ...)
+│   ├── ui/      # primitives (Button, Input, daisyUI wrappers...)
 │   └── shared/  # composed (AppHeader, AppLayout, ...)
 ├── lib/         # axios, query, utils
 ├── hooks/       # global hooks
