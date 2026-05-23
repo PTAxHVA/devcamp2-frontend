@@ -52,7 +52,7 @@ export const HeroSection = () => {
                 <div key={index} className={`flex items-start gap-3 ${index !== 0 && 'sm:pl-4'}`}>
                   <div className="shrink-0 flex items-center justify-center mt-1">{item.icon}</div>
                   <div className="flex flex-col">
-                    <h4 className="text-base font-bold leading-tight whitespace-nowrap text-text-primary">
+                    <h4 className="text-base font-bold leading-tight text-text-primary">
                       {item.title}
                     </h4>
                     <p className="text-sm text-text-muted mt-1">{item.desc}</p>
@@ -65,19 +65,19 @@ export const HeroSection = () => {
 
         {/* Roadmap Preview */}
         <div className="w-full lg:w-1/2 h-125 lg:h-150 rounded-xl overflow-hidden shadow-sm border border-border-soft bg-bg-card flex flex-col">
-          <div className="h-16 border-b border-border-soft flex items-center justify-between px-6 bg-bg-section shrink-0">
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-3">
-                <h3 className="font-bold text-lg hidden sm:block text-text-primary">
+          <div className="h-16 border-b border-border-soft flex items-center justify-between px-4 sm:px-6 gap-2 overflow-hidden">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex items-center gap-2 min-w-0 shrink">
+                <h3 className="font-bold text-lg hidden sm:block text-text-primary whitespace-nowrap">
                   Your Roadmap
                 </h3>
-                <span className="badge badge-primary badge-outline badge-sm font-semibold px-3 py-2">
+                <span className="badge badge-primary badge-outline badge-sm font-semibold px-2 py-1 truncate max-w-32">
                   Frontend Developer
                 </span>
               </div>
             </div>
 
-            <div className="flex items-center gap-4 text-sm font-medium text-text-secondary sm:flex">
+            <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-xs sm:text-sm font-medium text-text-secondary shrink-0">
               <div className="flex items-center gap-1.5">
                 <div className="w-5 h-5 rounded-full bg-brand-navy-900 flex items-center justify-center text-white">
                   <RiCheckLine className="w-3 h-3" />
