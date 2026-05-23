@@ -8,14 +8,7 @@ import LandingPage from './pages/landing-page'
 export function AppRoutes() {
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          <div>
-            <LandingPage />
-          </div>
-        }
-      />
+      <Route path="/" element={<LandingPage />} />
       <Route path="*" element={<div>404 Not Found</div>} />
     </Routes>
   )

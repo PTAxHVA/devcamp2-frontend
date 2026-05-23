@@ -1,6 +1,6 @@
 import { ReactFlow, Controls, Background } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import RoadmapNode from './RoadmapNode'
+import RoadmapNode from './roadmap-node'
 
 const nodeTypes = {
   roadmapNode: RoadmapNode,
