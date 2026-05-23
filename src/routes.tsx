@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router'
+import LandingPage from './pages/landing-page'
 
 /**
  * Central route config for the app.
@@ -7,7 +8,14 @@ import { Routes, Route } from 'react-router'
 export function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<div>Home</div>} />
+      <Route
+        path="/"
+        element={
+          <div>
+            <LandingPage />
+          </div>
+        }
+      />
       <Route path="*" element={<div>404 Not Found</div>} />
     </Routes>
   )
