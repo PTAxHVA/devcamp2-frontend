@@ -67,7 +67,7 @@ export const MainContent = () => {
   }
 
   return (
-    <main className="relative flex-1 flex flex-col max-w-5xl w-full mx-auto px-6 py-12 overflow-x-hidden min-h-screen">
+    <main className="relative flex-1 flex flex-col max-w-325 w-full mx-auto px-6 py-12 overflow-x-hidden min-h-screen">
       <div className="fixed top-[-10%] left-[-5%] w-125 h-125 bg-indigo-200/20 rounded-full blur-[120px] pointer-events-none -z-10"></div>
       <div className="fixed bottom-[-10%] right-[-5%] w-150 h-150 bg-purple-200/20 rounded-full blur-[150px] pointer-events-none -z-10"></div>
 

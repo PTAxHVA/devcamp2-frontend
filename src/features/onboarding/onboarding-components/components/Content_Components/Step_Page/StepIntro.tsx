@@ -10,11 +10,11 @@ export const StepIntro = ({ onStart }: { onStart: () => void }) => {
     <div className="w-full flex flex-col lg:flex-row gap-16 items-center animate-in fade-in duration-700">
       <div className="flex-1 flex flex-col gap-8">
         <div>
-          <h1 className="text-5xl font-extrabold text-slate-900 mb-4 leading-tight">
+          <h1 className="text-5xl font-extrabold text-text-primary mb-4 leading-tight">
             Let's build your
             <br /> learning roadmap
           </h1>
-          <p className="text-xl text-slate-500 max-w-md">
+          <p className="text-[20px] text-text-secondary">
             VORA creates a personalized web development roadmap based on your goals, experience, and
             preferences—so you learn the right skills in the right order.
           </p>
