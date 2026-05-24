@@ -1,5 +1,5 @@
 import { RiTimeLine } from 'react-icons/ri'
-import { roles } from '../onboardingData'
+import { roles } from '../../data/onboardingData'
 
 interface StepRoleProps {
   selectedRole: string

@@ -1,12 +1,13 @@
-import ReactFlow, {
+import {
+  ReactFlow,
   Background,
   Controls,
   Handle,
   Position,
   useNodesState,
   useEdgesState,
-} from 'reactflow'
-import 'reactflow/dist/style.css'
+} from '@xyflow/react'
+import '@xyflow/react/dist/style.css'
 import { RiCheckFill, RiTimeLine } from 'react-icons/ri'
 
 type BorderStyle = 'dark' | 'purple' | 'grey'

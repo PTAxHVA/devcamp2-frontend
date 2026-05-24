@@ -1,4 +1,4 @@
-import { levels } from '../onboardingData'
+import { levels } from '../../data/onboardingData'
 
 interface StepLevelProps {
   selectedLevel: string
