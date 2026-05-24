@@ -1,5 +1,5 @@
 import { RiArrowDownSLine } from 'react-icons/ri'
-import { PREFERENCE_QUESTIONS } from '../../data/onboardingData'
+import { PREFERENCE_QUESTIONS } from '../../data/onboarding-data'
 import { useWizardStore } from '../../onboarding-store'
 
 export const StepPreferences = () => {

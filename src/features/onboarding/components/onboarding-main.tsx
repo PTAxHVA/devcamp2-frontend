@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { RiArrowLeftLine, RiArrowRightLine } from 'react-icons/ri'
 import { NavBar, Footer } from '@/features/onboarding/components'
-import { Stepper } from './Stepper'
+import { Stepper } from './stepper'
 import {
   StepIntro,
   StepRole,
@@ -12,7 +12,7 @@ import {
   StepGenerating,
   StepCustomize,
 } from './steps'
-import { steps } from '../data/onboardingData'
+import { steps } from '../data/onboarding-data'
 import { useWizardStore } from '../onboarding-store'
 
 const OnboardingMain = () => {

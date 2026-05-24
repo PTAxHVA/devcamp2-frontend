@@ -1,4 +1,4 @@
-import { goals } from '../../data/onboardingData'
+import { goals } from '../../data/onboarding-data'
 
 interface StepGoalProps {
   selectedGoal: string
