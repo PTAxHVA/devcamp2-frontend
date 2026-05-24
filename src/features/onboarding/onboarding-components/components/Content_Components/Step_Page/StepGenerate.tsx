@@ -27,7 +27,6 @@ export const StepGenerating = () => {
 
   return (
     <div className="w-full flex flex-col lg:flex-row gap-12 items-start mt-8 animate-in fade-in duration-700">
-      {/* Cột Trái: Trạng thái xử lý */}
       <div className="flex-1 w-full">
         <h1 className="text-4xl md:text-5xl font-bold text-[#0B1528] mb-4 leading-tight">
           AI is creating your <br /> personalized roadmap
@@ -65,7 +64,6 @@ export const StepGenerating = () => {
         </div>
       </div>
 
-      {/* Cột Phải: Preview Roadmap */}
       <div className="flex-1 w-full lg:max-w-xl">
         <div className="border border-slate-200 rounded-2xl p-8 bg-white shadow-sm h-full">
           <h2 className="text-xl font-bold text-slate-900 mb-1">Your roadmap review</h2>
@@ -73,11 +71,7 @@ export const StepGenerating = () => {
             This is a preview. Final roadmap may adjust as we personalize it for you.
           </p>
 
-          {/* Vùng chứa ảnh Placeholder - Bạn có thể thay bằng thẻ <img> thật của bạn */}
           <div className="w-full aspect-4/3 border border-slate-100 bg-slate-50/50 rounded-xl flex items-center justify-center overflow-hidden">
-            {/* TODO: Thay thẻ div này bằng ảnh roadmap mờ mờ của bạn
-                Ví dụ: <img src="/images/roadmap-preview.png" alt="Preview" className="w-full h-full object-cover opacity-50" />
-             */}
             <div className="text-slate-300 font-medium text-sm flex flex-col items-center gap-2">
               <div className="w-64 h-32 border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center">
                 Roadmap Preview Image
