@@ -1,5 +1,5 @@
 import { RiCheckLine } from 'react-icons/ri'
-import { steps } from '../data/onboardingData'
+import { steps } from '../data/onboarding-data'
 
 interface StepperProps {
   currentStep: number
