@@ -13,5 +13,5 @@ export interface DashboardData {
     todayCompleted: boolean
   }
   stats: { roadmapProgress: number; completedTopics: number; quizAvg: number }
-  availableRolesForAdd: Array<{ roadmapID: string; roleName: string }>
+  availableRolesForAdd: Array<{ roadmapId: string; roleName: string }>
 }
