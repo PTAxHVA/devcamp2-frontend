@@ -12,7 +12,7 @@ export function DashboardPage() {
         id: '1',
         roleName: 'Frontend Developer',
         progressPercentage: 20,
-        sourceType: 'from_library',
+        sourceType: 'SUGGESTED',
       },
     ],
     streak: {

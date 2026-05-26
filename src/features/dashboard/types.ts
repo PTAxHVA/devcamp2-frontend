@@ -4,7 +4,7 @@ export interface DashboardData {
     id: string
     roleName: string
     progressPercentage: number
-    sourceType: 'suggested' | 'customized' | 'from_library'
+    sourceType: 'SUGGESTED' | 'CUSTOMIZED'
   }>
   streak: {
     currentStreak: number
@@ -13,5 +13,5 @@ export interface DashboardData {
     todayCompleted: boolean
   }
   stats: { roadmapProgress: number; completedTopics: number; quizAvg: number }
-  availableRolesForAdd: Array<{ masterRoadmapId: string; roleName: string }>
+  availableRolesForAdd: Array<{ roadmapID: string; roleName: string }>
 }
