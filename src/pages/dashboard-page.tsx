@@ -1,5 +1,5 @@
 import type { DashboardData } from '../features/dashboard/types'
-
+import { ContinueLearningCard } from '../features/dashboard/components/continue-learning-card'
 export function DashboardPage() {
   // Mock tĩnh để dev UI (sau này thay bằng hook useDashboard)
   const isLoading = false
@@ -49,9 +49,7 @@ export function DashboardPage() {
 
       <div className="flex flex-col gap-6">
         {/* TODO task 2-5,12,13 */}
-        <div className="p-8 border-2 border-dashed border-base-300 rounded-box flex items-center justify-center text-base-content/50">
-          Continue Learning card (Task 2)
-        </div>
+        <ContinueLearningCard continueLearning={mockData.continueLearning} />
 
         <div className="p-8 border-2 border-dashed border-base-300 rounded-box flex items-center justify-center text-base-content/50">
           Stats grid (Task 3)
