@@ -1,6 +1,6 @@
 import type { DashboardData } from '../features/dashboard/types'
 import { ContinueLearningCard } from '../features/dashboard/components/continue-learning-card'
-import { StatsGrid } from '@/features/dashboard/components/stats-grid'
+import { StatsGrid } from '../features/dashboard/components/stats-grid'
 export function DashboardPage() {
   const isLoading = false
   const isError = false
