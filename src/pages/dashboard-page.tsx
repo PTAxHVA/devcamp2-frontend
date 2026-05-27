@@ -1,8 +1,7 @@
 import type { DashboardData } from '../features/dashboard/types'
 import { ContinueLearningCard } from '../features/dashboard/components/continue-learning-card'
-
+import { StatsGrid } from '@/features/dashboard/components/stats-grid'
 export function DashboardPage() {
-  // Mock tĩnh để dev UI (sau này thay bằng hook useDashboard)
   const isLoading = false
   const isError = false
 
@@ -52,9 +51,12 @@ export function DashboardPage() {
         {/* TODO task 2-5,12,13 */}
         <ContinueLearningCard continueLearning={mockData.continueLearning} />
 
-        <div className="p-8 border-2 border-dashed border-base-300 rounded-box flex items-center justify-center text-base-content/50">
-          Stats grid (Task 3)
-        </div>
+        <StatsGrid
+          roadmapProgress={mockData.stats.roadmapProgress}
+          completedTopics={mockData.stats.completedTopics}
+          daysStreak={mockData.streak.currentStreak}
+          quizAvg={mockData.stats.quizAvg}
+        />
 
         <div className="p-8 border-2 border-dashed border-base-300 rounded-box flex items-center justify-center text-base-content/50">
           My Roadmaps card grid (Task 4)
