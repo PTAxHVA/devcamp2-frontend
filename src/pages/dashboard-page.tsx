@@ -1,6 +1,7 @@
 import type { DashboardData } from '../features/dashboard/types'
 import { ContinueLearningCard } from '../features/dashboard/components/continue-learning-card'
 import { StatsGrid } from '../features/dashboard/components/stats-grid'
+import { MyRoadmapsGrid } from '../features/dashboard/components/my-roadmaps-grid'
 export function DashboardPage() {
   const isLoading = false
   const isError = false
@@ -13,6 +14,12 @@ export function DashboardPage() {
         roleName: 'Frontend Developer',
         progressPercentage: 20,
         sourceType: 'SUGGESTED',
+      },
+      {
+        id: 'rm-backend-1',
+        roleName: 'Backend Development',
+        progressPercentage: 18,
+        sourceType: 'CUSTOMIZED',
       },
     ],
     streak: {
@@ -58,9 +65,7 @@ export function DashboardPage() {
           quizAvg={mockData.stats.quizAvg}
         />
 
-        <div className="p-8 border-2 border-dashed border-base-300 rounded-box flex items-center justify-center text-base-content/50">
-          My Roadmaps card grid (Task 4)
-        </div>
+        <MyRoadmapsGrid roadmaps={mockData.roadmaps} />
 
         <div className="p-8 border-2 border-dashed border-base-300 rounded-box flex items-center justify-center text-base-content/50">
           Chart & Calendar (Task 12, 13)
