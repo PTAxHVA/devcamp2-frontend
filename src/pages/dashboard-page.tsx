@@ -15,6 +15,12 @@ export function DashboardPage() {
         progressPercentage: 20,
         sourceType: 'SUGGESTED',
       },
+      {
+        id: 'rm-backend-1',
+        roleName: 'Backend Development',
+        progressPercentage: 18,
+        sourceType: 'CUSTOMIZED',
+      },
     ],
     streak: {
       currentStreak: 3,
