@@ -18,7 +18,7 @@ const formatBadge = (type: DashboardData['roadmaps'][number]['sourceType']) => {
   }
 }
 
-export function MyRoadmapsGrid({ roadmaps }: MyRoadmapsGridProps) {
+export function MyRoadmapsGrid({ roadmaps, hasAvailableRoles }: MyRoadmapsGridProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
       {roadmaps.map((roadmap) => {
@@ -67,17 +67,20 @@ export function MyRoadmapsGrid({ roadmaps }: MyRoadmapsGridProps) {
         )
       })}
 
-      <Link
-        to="/dashboard/add-role"
-        className="card bg-base-200/50 border-2 border-dashed border-base-300 hover:border-primary/60 hover:bg-primary/5 transition-all min-h-[160px] group no-underline focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-      >
-        <div className="card-body p-5 flex flex-col items-center justify-center text-base-content/60 group-hover:text-primary transition-colors">
-          <div className="w-12 h-12 rounded-full bg-base-200 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
-            <HiMiniPlus className="w-6 h-6" />
+      {/* MEDIUM Fix: Chỉ render nút Add Role khi hasAvailableRoles hợp lệ */}
+      {hasAvailableRoles && (
+        <Link
+          to="/dashboard/add-role"
+          className="card bg-base-200/50 border-2 border-dashed border-base-300 hover:border-primary/60 hover:bg-primary/5 transition-all min-h-[160px] group no-underline focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+        >
+          <div className="card-body p-5 flex flex-col items-center justify-center text-base-content/60 group-hover:text-primary transition-colors">
+            <div className="w-12 h-12 rounded-full bg-base-200 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
+              <HiMiniPlus className="w-6 h-6" />
+            </div>
+            <p className="font-medium text-sm">Add another role</p>
           </div>
-          <p className="font-medium text-sm">Add another role</p>
-        </div>
-      </Link>
+        </Link>
+      )}
     </div>
   )
 }
