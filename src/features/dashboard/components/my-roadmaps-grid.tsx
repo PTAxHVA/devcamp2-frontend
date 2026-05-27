@@ -4,6 +4,7 @@ import type { DashboardData } from '@/features/dashboard/types'
 
 interface MyRoadmapsGridProps {
   roadmaps: DashboardData['roadmaps']
+  hasAvailableRoles: boolean
 }
 
 const formatBadge = (type: DashboardData['roadmaps'][number]['sourceType']) => {

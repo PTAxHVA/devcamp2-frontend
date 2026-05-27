@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router'
 // import LandingPage from './pages/landing-page'
-import OnboardingMain from './features/onboarding/components/onboarding-main'
-import { DashboardPage } from './pages/dashboard-page'
+import OnboardingMain from '@/features/onboarding/components/onboarding-main'
+import DashboardPage from '@/pages/dashboard-page'
 /**
  * Central route config for the app.
  * Add new pages here as features come online.

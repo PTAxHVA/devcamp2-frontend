@@ -1,76 +1,52 @@
-import type { DashboardData } from '../features/dashboard/types'
-import { ContinueLearningCard } from '../features/dashboard/components/continue-learning-card'
-import { StatsGrid } from '../features/dashboard/components/stats-grid'
-import { MyRoadmapsGrid } from '../features/dashboard/components/my-roadmaps-grid'
-export function DashboardPage() {
-  const isLoading = false
-  const isError = false
+import { useDashboard } from '@/features/dashboard/hooks/use-dashboard'
+import { StatsGrid } from '@/features/dashboard/components/stats-grid'
+import { MyRoadmapsGrid } from '@/features/dashboard/components/my-roadmaps-grid'
 
-  const mockData: DashboardData = {
-    continueLearning: null,
-    roadmaps: [
-      {
-        id: '1',
-        roleName: 'Frontend Developer',
-        progressPercentage: 20,
-        sourceType: 'SUGGESTED',
-      },
-      {
-        id: 'rm-backend-1',
-        roleName: 'Backend Development',
-        progressPercentage: 18,
-        sourceType: 'CUSTOMIZED',
-      },
-    ],
-    streak: {
-      currentStreak: 3,
-      longestStreak: 5,
-      lastActivityDate: '2026-05-25',
-      todayCompleted: true,
-    },
-    stats: { roadmapProgress: 20, completedTopics: 4, quizAvg: 85 },
-    availableRolesForAdd: [],
-  }
+const DashboardPage = () => {
+  const { data, isLoading, isError } = useDashboard()
 
-  // 3 nhánh xử lý bắt buộc theo Task 1
   if (isLoading) {
-    return <div className="p-6">Đang tải... {/* <DashboardSkeleton/> task 19 */}</div>
-  }
-
-  if (isError) {
     return (
-      <div className="p-6">
-        <button className="btn btn-error">Thử lại</button>
+      <div className="min-h-screen flex items-center justify-center bg-base-100">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
       </div>
     )
   }
 
-  if (mockData.roadmaps.length === 0) {
-    return <div className="p-6">Chưa có roadmap nào {/* <EmptyDashboard/> task 6 */}</div>
+  if (isError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-base-100 text-error">
+        Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại!
+      </div>
+    )
   }
 
-  // Khung UI chính
+  if (!data) return null
+
   return (
-    <div className="p-6 max-w-7xl mx-auto flex flex-col gap-8">
-      <h1 className="text-3xl font-bold">Chào mừng quay lại!</h1>
+    <div className="min-h-screen flex flex-col bg-base-100 text-base-content p-8">
+      <h1 className="text-3xl font-bold mb-8">Chào mừng quay lại!</h1>
 
-      <div className="flex flex-col gap-6">
-        {/* TODO task 2-5,12,13 */}
-        <ContinueLearningCard continueLearning={mockData.continueLearning} />
+      <StatsGrid
+        roadmapProgress={data.stats.roadmapProgress}
+        completedTopics={data.stats.completedTopics}
+        daysStreak={data.streak.currentStreak}
+        quizAvg={data.stats.quizAvg}
+      />
 
-        <StatsGrid
-          roadmapProgress={mockData.stats.roadmapProgress}
-          completedTopics={mockData.stats.completedTopics}
-          daysStreak={mockData.streak.currentStreak}
-          quizAvg={mockData.stats.quizAvg}
+      <div className="mt-8">
+        <h2 className="text-xl font-bold mb-4">My Roadmaps</h2>
+        <MyRoadmapsGrid
+          roadmaps={data.roadmaps}
+          hasAvailableRoles={data.availableRolesForAdd.length > 0}
         />
+      </div>
 
-        <MyRoadmapsGrid roadmaps={mockData.roadmaps} />
-
-        <div className="p-8 border-2 border-dashed border-base-300 rounded-box flex items-center justify-center text-base-content/50">
-          Chart & Calendar (Task 12, 13)
-        </div>
+      <div className="p-8 border-2 border-dashed border-base-300 rounded-xl text-center mt-8 text-base-content/50">
+        Chart & Calendar (Task 12, 13)
       </div>
     </div>
   )
 }
+
+export default DashboardPage // Nhớ dòng export default này nhé
