@@ -19,7 +19,6 @@ import {
   RiExternalLinkLine,
 } from 'react-icons/ri'
 
-// Import Layout và Data (Nhớ sửa lại đường dẫn folder cho đúng dự án của bạn)
 import { SectionDetailComponent } from './section-detail-component'
 import { topic, type Status } from './section-topic-data'
 
