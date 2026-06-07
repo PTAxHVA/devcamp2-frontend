@@ -2,6 +2,18 @@
 
 Personalized Code Learning Platform. Frontend cho sản phẩm giúp beginner programmer học theo roadmap hand-crafted với quiz-verified progress và AI Socratic hints.
 
+## 🚀 Live Deployment
+
+| Môi trường           | URL                                                 |
+| -------------------- | --------------------------------------------------- |
+| Frontend (Vercel)    | https://devcamp2-frontend.vercel.app                |
+| Backend API (Render) | https://devcamp2-backend.onrender.com/api/v1/client |
+| Backend health check | https://devcamp2-backend.onrender.com/health        |
+
+- **Auto-deploy**: merge vào `main` là Vercel tự deploy production. Mỗi PR có sẵn 1 **preview deploy** riêng (xem check `Vercel` trên PR).
+- **Env**: `VITE_API_URL` được set trên Vercel (Settings → Environment Variables). Đổi env phải redeploy lại mới ăn.
+- Backend free tier ngủ sau ~15 phút không request → request đầu mất ~50s (cold start).
+
 ## Tech Stack
 
 - **React 19 + Vite 7 + TypeScript strict**
