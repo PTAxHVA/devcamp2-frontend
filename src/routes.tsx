@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router'
 import OnboardingMain from '@/features/onboarding/components/onboarding-main'
 import DashboardPage from '@/pages/dashboard-page'
 import SectionDetailPage from '@/features/section/section-detail-page'
+import DemoRoadmapPage from '@/pages/demo-roadmap-page'
 
 /**
  * Central route config for the app.
@@ -15,6 +16,9 @@ export function AppRoutes() {
       {/* <Route path="/" element={<LandingPage />} /> */}
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/sections/:id" element={<SectionDetailPage />} />
+
+      {/* Public, no-login demo roadmap preview (mentor #1) */}
+      <Route path="/demo-roadmap" element={<DemoRoadmapPage />} />
 
       <Route
         path="/roadmaps/browse"
