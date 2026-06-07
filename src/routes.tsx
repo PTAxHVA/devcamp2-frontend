@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router'
 // import LandingPage from './pages/landing-page'
 import OnboardingMain from '@/features/onboarding/components/onboarding-main'
 import DashboardPage from '@/pages/dashboard-page'
+import SectionDetailPage from '@/features/section/section-detail-page'
 import DemoRoadmapPage from '@/pages/demo-roadmap-page'
 
 /**
@@ -14,6 +15,7 @@ export function AppRoutes() {
       <Route path="/" element={<OnboardingMain />} />
       {/* <Route path="/" element={<LandingPage />} /> */}
       <Route path="/dashboard" element={<DashboardPage />} />
+      <Route path="/sections/:id" element={<SectionDetailPage />} />
 
       {/* Public, no-login demo roadmap preview (mentor #1) */}
       <Route path="/demo-roadmap" element={<DemoRoadmapPage />} />
@@ -35,6 +37,7 @@ export function AppRoutes() {
           </div>
         }
       />
+
       <Route
         path="/dashboard/add-role"
         element={
@@ -43,7 +46,15 @@ export function AppRoutes() {
           </div>
         }
       />
-      <Route path="*" element={<div>404 Not Found</div>} />
+
+      <Route
+        path="*"
+        element={
+          <div className="flex h-screen items-center justify-center text-2xl font-bold">
+            404 Not Found
+          </div>
+        }
+      />
     </Routes>
   )
 }
