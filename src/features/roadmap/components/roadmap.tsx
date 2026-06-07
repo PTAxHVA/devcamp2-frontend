@@ -1,4 +1,5 @@
 import { ReactFlow, Controls, Background } from '@xyflow/react'
+import type { Edge, Node } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import RoadmapNode from './roadmap-node'
 
@@ -6,7 +7,7 @@ const nodeTypes = {
   roadmapNode: RoadmapNode,
 }
 
-const initialNodes = [
+const initialNodes: Node[] = [
   {
     id: '1',
     type: 'roadmapNode',
@@ -51,7 +52,7 @@ const initialNodes = [
   },
 ]
 
-const initialEdges = [
+const initialEdges: Edge[] = [
   {
     id: 'e1-2',
     source: '1',
@@ -103,12 +104,18 @@ const initialEdges = [
   },
 ]
 
-const Roadmap = () => {
+interface RoadmapProps {
+  /** When omitted, renders the built-in static preview (used by the landing hero). */
+  nodes?: Node[]
+  edges?: Edge[]
+}
+
+const Roadmap = ({ nodes = initialNodes, edges = initialEdges }: RoadmapProps) => {
   return (
     <div className="w-full h-full bg-base-100">
       <ReactFlow
-        nodes={initialNodes}
-        edges={initialEdges}
+        nodes={nodes}
+        edges={edges}
         nodeTypes={nodeTypes}
         fitView
         nodesDraggable={false}
