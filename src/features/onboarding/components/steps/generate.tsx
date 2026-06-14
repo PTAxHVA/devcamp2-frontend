@@ -29,7 +29,6 @@ export const StepGenerating = () => {
     },
   ]
 
-  // --- Dữ liệu giả lập (Mock Data) cho bản đồ Preview ---
   const previewNodes: Node<TopicNodeData>[] = [
     {
       id: '1',
@@ -114,14 +113,11 @@ export const StepGenerating = () => {
             This is a preview. Final roadmap may adjust as we personalize it for you.
           </p>
 
-          {/* ===================== KHUNG PREVIEW MỚI ===================== */}
           <div className="w-full h-[380px] border border-slate-100 bg-slate-50/50 rounded-xl flex items-center justify-center overflow-hidden relative">
-            {/* Lớp pointer-events-none giúp khóa mọi tương tác (read-only) */}
             <div className="absolute inset-0 pointer-events-none opacity-60">
               <RoadmapTree nodes={previewNodes} edges={previewEdges} />
             </div>
 
-            {/* Lớp phủ Gradient làm mờ dần xuống dưới + Hiệu ứng Loading */}
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-50/40 to-slate-50 z-20 flex items-end justify-center pb-8 pointer-events-none">
               <span className="bg-white/90 backdrop-blur px-5 py-2.5 rounded-full text-xs font-bold text-brand-purple-600 border border-brand-purple-100 shadow-sm animate-pulse flex items-center gap-2">
                 <RiLightbulbFlashLine className="w-4 h-4" /> Generating topics...
