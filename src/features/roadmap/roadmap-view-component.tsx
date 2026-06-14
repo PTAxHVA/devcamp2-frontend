@@ -1,7 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router'
-import { ReactFlow, MiniMap, Controls, Background, type Node, type Edge } from '@xyflow/react'
-import '@xyflow/react/dist/style.css'
+import { type Node, type Edge } from '@xyflow/react'
 
 import {
   RiArrowLeftLine,
@@ -11,7 +10,6 @@ import {
   RiBarChartBoxLine,
   RiStarLine,
   RiCheckLine,
-  RiLockLine,
   RiCloseLine,
   RiCheckboxCircleFill,
   RiArrowRightLine,
@@ -20,15 +18,13 @@ import {
 } from 'react-icons/ri'
 
 import { roadmapInfo, selectedTopicDetails } from './roadmap-view-data'
-import TopicNode, { type TopicNodeData } from './components/topic-node'
+import { type TopicNodeData } from './components/topic-node'
+import RoadmapTree from './components/roadmap-tree'
 
 const RoadmapViewComponent = () => {
   const navigate = useNavigate()
 
   const [currentTopic, setCurrentTopic] = useState(selectedTopicDetails)
-
-  const nodeTypes = useMemo(() => ({ roadmapNode: TopicNode }), [])
-
   const initialNodes: Node<TopicNodeData>[] = [
     {
       id: '1',
@@ -198,59 +194,9 @@ const RoadmapViewComponent = () => {
           </div>
         </div>
 
-        {/* Xyflow Canvas */}
-        <div className="relative flex-1 rounded-2xl border border-slate-200 bg-slate-50/50 shadow-inner overflow-hidden">
-          <div className="absolute left-6 top-6 z-10 flex items-center gap-5 rounded-xl border border-slate-100 bg-white/90 backdrop-blur-sm p-3 shadow-sm text-xs font-semibold text-slate-600">
-            <div className="flex items-center gap-1.5">
-              <div className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-white">
-                <RiCheckLine className="text-[10px]" />
-              </div>{' '}
-              Completed
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="flex h-4 w-4 items-center justify-center rounded-full border-2 border-purple-600 bg-white">
-                <div className="h-1.5 w-1.5 rounded-full bg-purple-600" />
-              </div>{' '}
-              Current
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="h-4 w-4 rounded-full border-2 border-slate-300 bg-white" /> Available
-            </div>
-            <div className="flex items-center gap-1.5">
-              <RiLockLine className="text-base text-slate-400" /> Locked
-            </div>
-          </div>
-
-          <ReactFlow
-            nodes={initialNodes}
-            edges={initialEdges}
-            nodeTypes={nodeTypes}
-            fitView
-            fitViewOptions={{ padding: 0.2 }}
-            minZoom={0.5}
-            maxZoom={1.5}
-            nodesDraggable={true}
-            onNodeClick={handleNodeClick}
-          >
-            <Controls className="bottom-6! left-6! top-auto! flex! flex-col-reverse! gap-1! border-none! shadow-sm! [&>button]:bg-white! [&>button]:border! [&>button]:border-slate-200! [&>button]:rounded-lg! [&>button]:w-8! [&>button]:h-8!" />
-
-            <MiniMap
-              className="bottom-6! right-6! bg-white! border-2! border-purple-100! rounded-xl! shadow-sm! w-40! h-28!"
-              nodeColor={(node) => {
-                const data = node.data as TopicNodeData
-                if (data?.status === 'completed') return '#10b981'
-                if (data?.status === 'in_progress') return '#7c3aed'
-                return '#cbd5e1'
-              }}
-              maskColor="rgba(124, 58, 237, 0.04)"
-            />
-
-            <Background gap={16} size={1} color="#cbd5e1" />
-          </ReactFlow>
-        </div>
+        <RoadmapTree nodes={initialNodes} edges={initialEdges} onNodeClick={handleNodeClick} />
       </div>
 
-      {/* Right Panel */}
       <aside className="flex w-95 shrink-0 flex-col border-l border-slate-200 bg-white">
         <div className="flex items-center justify-between border-b border-slate-100 p-6 pb-4">
           <p className="text-xs font-bold uppercase tracking-wider text-purple-600">
