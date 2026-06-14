@@ -1,4 +1,8 @@
 import { RiSearchLine, RiLightbulbFlashLine, RiKey2Line } from 'react-icons/ri'
+import { type Node, type Edge } from '@xyflow/react'
+
+import RoadmapTree from '@/features/roadmap/components/roadmap-tree'
+import { type TopicNodeData } from '@/features/roadmap/components/topic-node'
 
 export const StepGenerating = () => {
   const processSteps = [
@@ -22,6 +26,45 @@ export const StepGenerating = () => {
       desc: 'Structuring the roadmap in the most effective learning order.',
       icon: <RiKey2Line className="w-7 h-7" />,
       status: 'Pending',
+    },
+  ]
+
+  // --- Dữ liệu giả lập (Mock Data) cho bản đồ Preview ---
+  const previewNodes: Node<TopicNodeData>[] = [
+    {
+      id: '1',
+      type: 'roadmapNode',
+      position: { x: 100, y: 30 },
+      data: { index: 1, label: 'Web Fundamentals', status: 'completed' },
+    },
+    {
+      id: '2',
+      type: 'roadmapNode',
+      position: { x: 100, y: 150 },
+      data: { index: 2, label: 'HTML & CSS', status: 'in_progress' },
+    },
+    {
+      id: '3',
+      type: 'roadmapNode',
+      position: { x: 100, y: 270 },
+      data: { index: 3, label: 'JavaScript Basics', status: 'locked' },
+    },
+  ]
+
+  const previewEdges: Edge[] = [
+    {
+      id: 'e1-2',
+      source: '1',
+      target: '2',
+      type: 'smoothstep',
+      style: { stroke: '#cbd5e1', strokeWidth: 2 },
+    },
+    {
+      id: 'e2-3',
+      source: '2',
+      target: '3',
+      type: 'smoothstep',
+      style: { stroke: '#cbd5e1', strokeWidth: 2, strokeDasharray: '5,5' },
     },
   ]
 
@@ -71,11 +114,18 @@ export const StepGenerating = () => {
             This is a preview. Final roadmap may adjust as we personalize it for you.
           </p>
 
-          <div className="w-full aspect-4/3 border border-slate-100 bg-slate-50/50 rounded-xl flex items-center justify-center overflow-hidden">
-            <div className="text-slate-300 font-medium text-sm flex flex-col items-center gap-2">
-              <div className="w-64 h-32 border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center">
-                Roadmap Preview Image
-              </div>
+          {/* ===================== KHUNG PREVIEW MỚI ===================== */}
+          <div className="w-full h-[380px] border border-slate-100 bg-slate-50/50 rounded-xl flex items-center justify-center overflow-hidden relative">
+            {/* Lớp pointer-events-none giúp khóa mọi tương tác (read-only) */}
+            <div className="absolute inset-0 pointer-events-none opacity-60">
+              <RoadmapTree nodes={previewNodes} edges={previewEdges} />
+            </div>
+
+            {/* Lớp phủ Gradient làm mờ dần xuống dưới + Hiệu ứng Loading */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-50/40 to-slate-50 z-20 flex items-end justify-center pb-8 pointer-events-none">
+              <span className="bg-white/90 backdrop-blur px-5 py-2.5 rounded-full text-xs font-bold text-brand-purple-600 border border-brand-purple-100 shadow-sm animate-pulse flex items-center gap-2">
+                <RiLightbulbFlashLine className="w-4 h-4" /> Generating topics...
+              </span>
             </div>
           </div>
         </div>
