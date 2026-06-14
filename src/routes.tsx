@@ -4,7 +4,8 @@ import OnboardingMain from '@/features/onboarding/components/onboarding-main'
 import DashboardPage from '@/pages/dashboard-page'
 import SectionDetailPage from '@/features/section/section-detail-page'
 import DemoRoadmapPage from '@/pages/demo-roadmap-page'
-
+import TopicDetailPage from '@/features/topic/topic-detail-page'
+import RoadmapViewPage from '@/features/roadmap/roadmap-view-page'
 /**
  * Central route config for the app.
  * Add new pages here as features come online.
@@ -16,6 +17,8 @@ export function AppRoutes() {
       {/* <Route path="/" element={<LandingPage />} /> */}
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/sections/:id" element={<SectionDetailPage />} />
+      <Route path="/topic/:id" element={<TopicDetailPage />} />
+      <Route path="/roadmaps/:id" element={<RoadmapViewPage />} />
 
       {/* Public, no-login demo roadmap preview (mentor #1) */}
       <Route path="/demo-roadmap" element={<DemoRoadmapPage />} />

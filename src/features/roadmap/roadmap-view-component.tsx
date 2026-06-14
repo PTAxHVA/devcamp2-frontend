@@ -1,14 +1,6 @@
-import { useMemo } from 'react'
-import {
-  ReactFlow,
-  MiniMap,
-  Controls,
-  Background,
-  Handle,
-  Position,
-  type Node,
-  type Edge,
-} from '@xyflow/react'
+import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router'
+import { ReactFlow, MiniMap, Controls, Background, type Node, type Edge } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 
 import {
@@ -28,71 +20,16 @@ import {
 } from 'react-icons/ri'
 
 import { roadmapInfo, selectedTopicDetails } from './roadmap-view-data'
-
-interface RoadmapNodeData extends Record<string, unknown> {
-  index: number
-  label: string
-  status: 'completed' | 'current' | 'available' | 'locked'
-}
-
-const RoadmapCustomNode = ({ data }: { data: RoadmapNodeData }) => {
-  const getStyles = () => {
-    switch (data.status) {
-      case 'completed':
-        return 'border-emerald-500 bg-emerald-50 text-emerald-800 border-solid'
-      case 'current':
-        return 'border-purple-500 bg-purple-50 text-purple-900 border-solid ring-4 ring-purple-100 font-bold'
-      case 'locked':
-        return 'border-slate-300 bg-slate-50 text-slate-400 border-dashed'
-      case 'available':
-      default:
-        return 'border-slate-200 bg-white text-slate-600 border-solid'
-    }
-  }
-
-  const getBadgeStyles = () => {
-    if (data.status === 'completed' || data.status === 'current') {
-      return data.status === 'completed' ? 'bg-emerald-500 text-white' : 'bg-purple-600 text-white'
-    }
-    return 'border border-slate-200 bg-slate-100 text-slate-500'
-  }
-
-  return (
-    <div
-      className={`relative flex w-[220px] items-center justify-center rounded-xl border-2 py-3.5 px-4 shadow-sm transition-all ${getStyles()}`}
-    >
-      <Handle type="target" position={Position.Top} className="!bg-slate-300 !w-2 !h-2" />
-
-      <div
-        className={`absolute -top-3 flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold shadow-sm ${getBadgeStyles()}`}
-      >
-        {data.index}
-      </div>
-
-      <span className="text-sm font-semibold tracking-wide">{data.label}</span>
-
-      {data.status === 'completed' && (
-        <RiCheckboxCircleFill className="absolute right-3 text-lg text-emerald-500" />
-      )}
-      {data.status === 'current' && (
-        <div className="absolute right-4 h-3.5 w-3.5 rounded-full border-[3px] border-purple-600 bg-white"></div>
-      )}
-      {data.status === 'available' && (
-        <div className="absolute right-4 h-3.5 w-3.5 rounded-full border-2 border-slate-300 bg-white"></div>
-      )}
-      {data.status === 'locked' && (
-        <RiLockLine className="absolute right-4 text-base text-slate-400" />
-      )}
-
-      <Handle type="source" position={Position.Bottom} className="!bg-slate-300 !w-2 !h-2" />
-    </div>
-  )
-}
+import TopicNode, { type TopicNodeData } from './components/topic-node'
 
 const RoadmapViewComponent = () => {
-  const nodeTypes = useMemo(() => ({ roadmapNode: RoadmapCustomNode }), [])
+  const navigate = useNavigate()
 
-  const initialNodes: Node<RoadmapNodeData>[] = [
+  const [currentTopic, setCurrentTopic] = useState(selectedTopicDetails)
+
+  const nodeTypes = useMemo(() => ({ roadmapNode: TopicNode }), [])
+
+  const initialNodes: Node<TopicNodeData>[] = [
     {
       id: '1',
       type: 'roadmapNode',
@@ -108,7 +45,7 @@ const RoadmapViewComponent = () => {
     {
       id: '3',
       type: 'roadmapNode',
-      data: { index: 3, label: 'JavaScript Basics', status: 'current' },
+      data: { index: 3, label: 'JavaScript Basics', status: 'in_progress' },
       position: { x: 420, y: 140 },
     },
     {
@@ -217,10 +154,24 @@ const RoadmapViewComponent = () => {
     },
   ]
 
+  const handleNodeClick = (_event: React.MouseEvent, node: Node) => {
+    const nodeData = node.data as TopicNodeData
+
+    setCurrentTopic({
+      ...selectedTopicDetails,
+      id: parseInt(node.id),
+      title: nodeData.label,
+      progress: nodeData.status === 'completed' ? 100 : nodeData.status === 'in_progress' ? 45 : 0,
+    })
+  }
+
+  const handleGoToTopic = () => {
+    navigate(`/topic/${currentTopic.id}`)
+  }
+
   return (
     <div className="flex h-full w-full">
       <div className="flex flex-1 flex-col overflow-hidden bg-white p-6 lg:p-8">
-        {/* Header */}
         <div className="w-full">
           <button className="mb-4 flex items-center gap-2 text-sm font-semibold text-purple-600 transition-colors hover:text-purple-800">
             <RiArrowLeftLine /> Back to all roadmaps
@@ -279,15 +230,16 @@ const RoadmapViewComponent = () => {
             minZoom={0.5}
             maxZoom={1.5}
             nodesDraggable={true}
+            onNodeClick={handleNodeClick}
           >
-            <Controls className="!bottom-6 !left-6 !top-auto !flex !flex-col-reverse !gap-1 !border-none !shadow-sm [&>button]:!bg-white [&>button]:!border [&>button]:!border-slate-200 [&>button]:!rounded-lg [&>button]:!w-8 [&>button]:!h-8" />
+            <Controls className="bottom-6! left-6! top-auto! flex! flex-col-reverse! gap-1! border-none! shadow-sm! [&>button]:bg-white! [&>button]:border! [&>button]:border-slate-200! [&>button]:rounded-lg! [&>button]:w-8! [&>button]:h-8!" />
 
             <MiniMap
-              className="!bottom-6 !right-6 !bg-white !border-2 !border-purple-100 !rounded-xl !shadow-sm !w-40 !h-28"
+              className="bottom-6! right-6! bg-white! border-2! border-purple-100! rounded-xl! shadow-sm! w-40! h-28!"
               nodeColor={(node) => {
-                const data = node.data as RoadmapNodeData
+                const data = node.data as TopicNodeData
                 if (data?.status === 'completed') return '#10b981'
-                if (data?.status === 'current') return '#7c3aed'
+                if (data?.status === 'in_progress') return '#7c3aed'
                 return '#cbd5e1'
               }}
               maskColor="rgba(124, 58, 237, 0.04)"
@@ -299,7 +251,7 @@ const RoadmapViewComponent = () => {
       </div>
 
       {/* Right Panel */}
-      <aside className="flex w-[380px] shrink-0 flex-col border-l border-slate-200 bg-white">
+      <aside className="flex w-95 shrink-0 flex-col border-l border-slate-200 bg-white">
         <div className="flex items-center justify-between border-b border-slate-100 p-6 pb-4">
           <p className="text-xs font-bold uppercase tracking-wider text-purple-600">
             Current Topic
@@ -310,17 +262,17 @@ const RoadmapViewComponent = () => {
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 pt-2">
-          <h2 className="mb-6 text-2xl font-bold text-slate-900">{selectedTopicDetails.title}</h2>
+          <h2 className="mb-6 text-2xl font-bold text-slate-900">{currentTopic.title}</h2>
 
           <div className="mb-8">
             <div className="mb-2 flex items-center justify-between text-sm font-semibold">
               <span className="text-slate-700">Progress</span>
-              <span className="text-slate-900">{selectedTopicDetails.progress}%</span>
+              <span className="text-slate-900">{currentTopic.progress}%</span>
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
               <div
                 className="h-full rounded-full bg-purple-600"
-                style={{ width: `${selectedTopicDetails.progress}%` }}
+                style={{ width: `${currentTopic.progress}%` }}
               ></div>
             </div>
           </div>
@@ -328,7 +280,7 @@ const RoadmapViewComponent = () => {
           <div className="mb-8">
             <h3 className="mb-3 text-sm font-bold text-slate-900">Prerequisites</h3>
             <ul className="space-y-2.5">
-              {selectedTopicDetails.prerequisites.map((req, idx) => (
+              {currentTopic.prerequisites.map((req, idx) => (
                 <li
                   key={idx}
                   className="flex items-center gap-3 text-sm font-medium text-slate-600"
@@ -344,15 +296,13 @@ const RoadmapViewComponent = () => {
 
           <div className="mb-8">
             <h3 className="mb-2 text-sm font-bold text-slate-900">About this topic</h3>
-            <p className="text-sm leading-relaxed text-slate-600">
-              {selectedTopicDetails.description}
-            </p>
+            <p className="text-sm leading-relaxed text-slate-600">{currentTopic.description}</p>
           </div>
 
           <div>
             <h3 className="mb-3 text-sm font-bold text-slate-900">You'll learn</h3>
             <ul className="space-y-3">
-              {selectedTopicDetails.learningOutcomes.map((outcome, idx) => (
+              {currentTopic.learningOutcomes.map((outcome, idx) => (
                 <li key={idx} className="flex items-start gap-3 text-sm text-slate-600">
                   <RiCheckboxCircleFill className="mt-0.5 text-base text-purple-600 shrink-0" />
                   <span className="font-medium">{outcome}</span>
@@ -363,10 +313,16 @@ const RoadmapViewComponent = () => {
         </div>
 
         <div className="border-t border-slate-100 p-6 space-y-3 bg-white">
-          <button className="flex w-full items-center justify-between rounded-xl bg-[#0B1528] px-5 py-3.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-slate-800">
+          <button
+            onClick={handleGoToTopic}
+            className="flex w-full items-center justify-between rounded-xl bg-[#0B1528] px-5 py-3.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-slate-800"
+          >
             Continue learning <RiArrowRightLine className="text-lg" />
           </button>
-          <button className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50">
+          <button
+            onClick={handleGoToTopic}
+            className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50"
+          >
             View lessons <RiExternalLinkLine className="text-lg text-slate-400" />
           </button>
           <button className="mt-2 flex w-full items-center justify-center gap-2 text-sm font-medium text-slate-500 hover:text-purple-600 transition-colors pt-2">
