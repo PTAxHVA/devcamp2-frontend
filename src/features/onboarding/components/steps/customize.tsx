@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
+import { buildFlowGraph } from '@/lib/build-flow-graph'
 import { BaseRoadmapNode, type BaseNodeData } from '@/features/roadmap/components/base-roadmap-node'
 import { logger } from '@/lib/logger'
 import {
@@ -29,6 +30,8 @@ interface CustomizeProps {
 const nodeTypes = { roadmapNode: BaseRoadmapNode }
 
 export default function StepCustomize({ onComplete }: CustomizeProps) {
+  const [aiError, setAiError] = useState<string | null>(null)
+
   const initialNodes: Node<BaseNodeData>[] = [
     {
       id: '1',
@@ -94,14 +97,27 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
 
   const aiFeedbackMutation = useMutation({
     mutationFn: async (userFeedback: string) => {
+      setAiError(null)
       const response = await apiClient.post('/ai/roadmap-feedback', { feedback: userFeedback })
       return response.data
     },
     onSuccess: (data) => {
       logger.info('AI Refined Roadmap Successfully', data)
-      if (data?.nodes && data?.edges) {
-        setNodes(data.nodes)
-        setEdges(data.edges)
+
+      try {
+        const rawTopics = Array.isArray(data) ? data : data?.topics || []
+
+        if (rawTopics.length > 0) {
+          const { nodes: mappedNodes, edges: mappedEdges } = buildFlowGraph(rawTopics)
+          setNodes(mappedNodes)
+          setEdges(mappedEdges)
+        }
+      } catch (error) {
+        logger.error(
+          'Failed to map domain data to UI:',
+          error instanceof Error ? error.message : String(error),
+        )
+        setAiError('Please try again!')
       }
     },
     onError: (error) => {
@@ -109,6 +125,7 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
         'Failed to apply AI feedback:',
         error instanceof Error ? error.message : String(error),
       )
+      setAiError('The AI Assistant is currently unavailable. Please try again in a few moments.')
     },
   })
 
@@ -274,13 +291,19 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
                 />
 
                 <div
-                  className={`absolute bottom-4 right-4 flex items-center gap-2 rounded-full bg-purple-50 px-3 py-1.5 text-xs font-bold text-purple-600 transition-opacity duration-300 ${
+                  className={`absolute bottom-4 right-4 flex items-center gap-2 rounded-full bg-brand-purple-50 px-3 py-1.5 text-xs font-bold text-brand-purple-600 transition-opacity duration-300 ${
                     aiFeedbackMutation.isPending ? 'opacity-100' : 'opacity-0'
                   }`}
                 >
                   <RiLoader4Line className="animate-spin text-base" /> Thinking...
                 </div>
               </div>
+
+              {aiError && (
+                <div className="mt-3 rounded-xl border border-red-100 bg-red-50 p-3 text-xs font-medium text-red-600 animate-in fade-in slide-in-from-top-1">
+                  {aiError}
+                </div>
+              )}
             </div>
           )}
           {activeTab === 'manual' && (

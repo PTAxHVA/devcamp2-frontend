@@ -1,8 +1,7 @@
 import { RiSearchLine, RiLightbulbFlashLine, RiKey2Line } from 'react-icons/ri'
 import { type Node, type Edge } from '@xyflow/react'
-
-import RoadmapTree from '@/features/roadmap/components/roadmap-tree'
-import { type TopicNodeData } from '@/features/roadmap/components/topic-node'
+import { RoadmapGraph } from '@/features/roadmap/components/roadmap-graph'
+import { type BaseNodeData } from '@/features/roadmap/components/base-roadmap-node'
 
 export const StepGenerating = () => {
   const processSteps = [
@@ -29,24 +28,24 @@ export const StepGenerating = () => {
     },
   ]
 
-  const previewNodes: Node<TopicNodeData>[] = [
+  const previewNodes: Node<BaseNodeData>[] = [
     {
       id: '1',
       type: 'roadmapNode',
       position: { x: 100, y: 30 },
-      data: { index: 1, label: 'Web Fundamentals', status: 'completed' },
+      data: { number: '1', label: 'Web Fundamentals', status: 'completed', variant: 'onboarding' },
     },
     {
       id: '2',
       type: 'roadmapNode',
       position: { x: 100, y: 150 },
-      data: { index: 2, label: 'HTML & CSS', status: 'in_progress' },
+      data: { number: '2', label: 'HTML & CSS', status: 'current', variant: 'onboarding' },
     },
     {
       id: '3',
       type: 'roadmapNode',
       position: { x: 100, y: 270 },
-      data: { index: 3, label: 'JavaScript Basics', status: 'locked' },
+      data: { number: '3', label: 'JavaScript Basics', status: 'upcoming', variant: 'onboarding' },
     },
   ]
 
@@ -114,8 +113,13 @@ export const StepGenerating = () => {
           </p>
 
           <div className="w-full h-95 border border-slate-100 bg-slate-50/50 rounded-xl flex items-center justify-center overflow-hidden relative">
-            <div className="absolute inset-0 pointer-events-none opacity-60">
-              <RoadmapTree nodes={previewNodes} edges={previewEdges} />
+            <div className="absolute inset-0 pointer-events-none opacity-60 grayscale transition-all duration-1000">
+              <RoadmapGraph
+                nodes={previewNodes}
+                edges={previewEdges}
+                isReadOnly={true}
+                withUI={false}
+              />
             </div>
 
             <div className="absolute inset-0 bg-linear-to-b from-transparent via-slate-50/40 to-slate-50 z-20 flex items-end justify-center pb-8 pointer-events-none">

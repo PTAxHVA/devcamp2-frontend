@@ -17,66 +17,67 @@ import {
 } from 'react-icons/ri'
 
 import { roadmapInfo, selectedTopicDetails } from './roadmap-view-data'
-import { type TopicNodeData } from './components/topic-node'
-import RoadmapTree from './components/roadmap-tree'
+import { type BaseNodeData } from './components/base-roadmap-node'
+import { RoadmapGraph } from './components/roadmap-graph'
 
 const RoadmapViewPage = () => {
   const navigate = useNavigate()
 
   const [currentTopic, setCurrentTopic] = useState(selectedTopicDetails)
-  const initialNodes: Node<TopicNodeData>[] = [
+
+  const initialNodes: Node<BaseNodeData>[] = [
     {
       id: '1',
       type: 'roadmapNode',
-      data: { index: 1, label: 'Web Fundamentals', status: 'completed' },
+      data: { number: '1', label: 'Web Fundamentals', status: 'completed' },
       position: { x: 250, y: 20 },
     },
     {
       id: '2',
       type: 'roadmapNode',
-      data: { index: 2, label: 'HTML & CSS', status: 'completed' },
+      data: { number: '2', label: 'HTML & CSS', status: 'completed' },
       position: { x: 80, y: 140 },
     },
     {
       id: '3',
       type: 'roadmapNode',
-      data: { index: 3, label: 'JavaScript Basics', status: 'in_progress' },
+      data: { number: '3', label: 'JavaScript Basics', status: 'current' },
       position: { x: 420, y: 140 },
     },
     {
       id: '4',
       type: 'roadmapNode',
-      data: { index: 4, label: 'DOM & Events', status: 'available' },
+      data: { number: '4', label: 'DOM & Events', status: 'upcoming' },
       position: { x: 250, y: 260 },
     },
     {
       id: '5',
       type: 'roadmapNode',
-      data: { index: 5, label: 'Git & GitHub', status: 'available' },
+      data: { number: '5', label: 'Git & GitHub', status: 'upcoming' },
       position: { x: -80, y: 380 },
     },
     {
       id: '6',
       type: 'roadmapNode',
-      data: { index: 6, label: 'React Basics', status: 'available' },
+      data: { number: '6', label: 'React Basics', status: 'upcoming' },
       position: { x: 250, y: 380 },
     },
     {
       id: '7',
       type: 'roadmapNode',
-      data: { index: 7, label: 'Components & Props', status: 'available' },
+      data: { number: '7', label: 'Components & Props', status: 'upcoming' },
       position: { x: 580, y: 380 },
     },
     {
       id: '8',
       type: 'roadmapNode',
-      data: { index: 8, label: 'API Fetching', status: 'locked' },
+      data: { number: '8', label: 'API Fetching', status: 'upcoming' },
       position: { x: 250, y: 500 },
     },
     {
       id: '9',
       type: 'roadmapNode',
-      data: { index: 9, label: 'Mini Project', status: 'locked' },
+      data: { number: '9', label: 'Mini Project', status: 'upcoming' },
       position: { x: 250, y: 620 },
     },
   ]
@@ -150,13 +151,13 @@ const RoadmapViewPage = () => {
   ]
 
   const handleNodeClick = (_event: React.MouseEvent, node: Node) => {
-    const nodeData = node.data as TopicNodeData
+    const nodeData = node.data as BaseNodeData
 
     setCurrentTopic({
       ...selectedTopicDetails,
       id: parseInt(node.id),
-      title: nodeData.label,
-      progress: nodeData.status === 'completed' ? 100 : nodeData.status === 'in_progress' ? 45 : 0,
+      title: nodeData.label as string,
+      progress: nodeData.status === 'completed' ? 100 : nodeData.status === 'current' ? 45 : 0,
     })
   }
 
@@ -193,7 +194,13 @@ const RoadmapViewPage = () => {
           </div>
         </div>
 
-        <RoadmapTree nodes={initialNodes} edges={initialEdges} onNodeClick={handleNodeClick} />
+        <RoadmapGraph
+          nodes={initialNodes}
+          edges={initialEdges}
+          onNodeClick={handleNodeClick}
+          isReadOnly={false}
+          withUI={true}
+        />
       </div>
 
       <aside className="flex w-95 shrink-0 flex-col border-l border-slate-200 bg-white">
