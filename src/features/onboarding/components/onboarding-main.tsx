@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { RiArrowLeftLine, RiArrowRightLine } from 'react-icons/ri'
+import { useNavigate } from 'react-router'
 import { NavBar, Footer } from '@/features/onboarding/components'
 import { Stepper } from './stepper'
 import {
@@ -10,12 +11,13 @@ import {
   StepPreferences,
   StepLearningPath,
   StepGenerating,
-  StepCustomize,
 } from './steps'
+import StepCustomize from './steps/customize'
 import { steps } from '../data/onboarding-data'
 import { useWizardStore } from '../onboarding-store'
 
 const OnboardingMain = () => {
+  const navigate = useNavigate()
   const { step: currentStep, answers, setAnswer, nextStep, prevStep, goToStep } = useWizardStore()
   const [direction, setDirection] = useState('next')
   const [subStep, setSubStep] = useState(1)
@@ -134,7 +136,7 @@ const OnboardingMain = () => {
           {currentStep === 5 && subStep === 1 && <StepPreferences />}
           {currentStep === 5 && subStep === 2 && <StepLearningPath />}
           {currentStep === 6 && <StepGenerating />}
-          {currentStep === 7 && <StepCustomize />}
+          {currentStep === 7 && <StepCustomize onComplete={() => navigate('/dashboard')} />}
         </div>
 
         {currentStep !== 1 && (

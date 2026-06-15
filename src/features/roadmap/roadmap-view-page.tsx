@@ -161,7 +161,7 @@ const RoadmapViewPage = () => {
   }
 
   const handleGoToTopic = () => {
-    navigate(`/topic/${currentTopic.id}`)
+    navigate(`/my-learning/topics/${currentTopic.id}`)
   }
 
   return (

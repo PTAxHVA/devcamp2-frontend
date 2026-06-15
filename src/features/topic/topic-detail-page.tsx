@@ -10,8 +10,9 @@ import {
   RiArrowRightLine,
   RiSparklingFill,
 } from 'react-icons/ri'
-
+import DOMPurify from 'dompurify'
 import { TopicDataMock } from './topic-detail-data'
+import { QUIZ_PASS_THRESHOLD } from '@/constants/learning'
 
 const TopicDetailPage = () => {
   const { stats, outcomes, materials, navigation } = TopicDataMock
@@ -90,9 +91,11 @@ const TopicDetailPage = () => {
                 <span
                   className="text-sm font-medium text-slate-700"
                   dangerouslySetInnerHTML={{
-                    __html: outcome.replace(
-                      /<([a-z]+)>/g,
-                      '<code class="bg-slate-100 text-slate-800 px-1 py-0.5 rounded text-xs">&lt;$1&gt;</code>',
+                    __html: DOMPurify.sanitize(
+                      outcome.replace(
+                        /<([a-z]+)>/g,
+                        '<code class="bg-slate-100 text-slate-800 px-1 py-0.5 rounded text-xs">&lt;$1&gt;</code>',
+                      ),
                     ),
                   }}
                 />
@@ -137,15 +140,14 @@ const TopicDetailPage = () => {
       </div>
 
       {/* Info Banner */}
-      <div className="mb-10 flex items-center gap-3 rounded-xl border border-purple-100 bg-purple-50/50 p-4 text-purple-800">
-        <RiInformationLine className="shrink-0 text-xl" />
+      <div className="mb-10 flex items-center gap-3 rounded-xl border border-brand-purple-100 bg-brand-purple-50/50 p-4 text-brand-purple-800">
+        <RiInformationLine className="shrink-0 text-xl text-brand-purple-600" />
         <p className="text-sm font-medium">
-          You must pass the quiz with at least 70% to complete this Topic and continue to the next
-          one.
+          You must pass the quiz with at least {QUIZ_PASS_THRESHOLD}% to complete this Topic and
+          continue to the next one.
         </p>
       </div>
 
-      {/* Footer Navigation */}
       <div className="flex flex-col items-center justify-between gap-6 border-t border-slate-200 pb-10 pt-6 sm:flex-row">
         {/* Previous */}
         <button className="group flex w-full items-center gap-4 text-left sm:w-auto">
@@ -166,7 +168,6 @@ const TopicDetailPage = () => {
           </div>
         </button>
 
-        {/* Next & Quiz */}
         <div className="flex w-full items-center justify-between gap-6 sm:w-auto sm:justify-end">
           <div className="hidden text-right md:block">
             <p className="mb-0.5 text-xs font-bold uppercase tracking-wider text-slate-500">

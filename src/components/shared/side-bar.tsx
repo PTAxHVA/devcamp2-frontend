@@ -33,7 +33,7 @@ export const Sidebar = () => {
       isCollapsed ? 'justify-center' : 'gap-3 px-4'
     } py-3 rounded-xl transition-all ${
       isActive
-        ? 'bg-purple-50 text-purple-700 font-semibold'
+        ? 'bg-brand-purple-50 text-brand-purple-700 font-semibold' // 👉 Đã sửa thành brand-purple
         : 'text-slate-500 hover:bg-slate-50 font-medium'
     }`
   }
@@ -56,17 +56,13 @@ export const Sidebar = () => {
           </h1>
         </div>
 
-        {/* Navigation */}
         <nav className="space-y-1 overflow-hidden px-4 py-4">
           <NavLink to="/dashboard" className={getNavClass('/dashboard')}>
             <RiHome6Line className="h-5 w-5 shrink-0" />
             {!isCollapsed && <span>Dashboard</span>}
           </NavLink>
 
-          <NavLink
-            to="/roadmaps/roadmap-view-page"
-            className={getNavClass(['/roadmaps', '/edit-roadmap'])}
-          >
+          <NavLink to="/roadmaps" className={getNavClass(['/roadmaps', '/edit-roadmap'])}>
             <RiMapPinLine className="h-5 w-5 shrink-0" />
             {!isCollapsed && <span>Roadmaps</span>}
           </NavLink>
@@ -77,7 +73,7 @@ export const Sidebar = () => {
           </NavLink>
 
           <NavLink
-            to="/my-learning/sections/:id"
+            to="/my-learning"
             className={getNavClass(['/my-learning', '/sections', '/topic'])}
           >
             <RiBookOpenLine className="h-5 w-5 shrink-0" />
@@ -96,12 +92,11 @@ export const Sidebar = () => {
         </nav>
       </div>
 
-      {/* Footer Sidebar */}
       <div className="mb-4 flex flex-col gap-2 p-4">
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-          className="absolute -right-3.5 top-17 z-20 grid h-7 w-7 place-items-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-md transition-all duration-200 ease-out hover:scale-110 hover:border-purple-600 hover:bg-purple-600 hover:text-white active:scale-95"
+          className="absolute -right-3.5 top-17 z-20 grid h-7 w-7 place-items-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-md transition-all duration-200 ease-out hover:scale-110 hover:border-brand-purple-600 hover:bg-brand-purple-600 hover:text-white active:scale-95" // 👉 Đã sửa thành brand-purple
         >
           <RiArrowLeftSLine
             className={`h-5 w-5 transition-transform duration-300 ${

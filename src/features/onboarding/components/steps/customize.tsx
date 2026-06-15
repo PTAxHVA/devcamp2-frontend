@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
+import { useMutation } from '@tanstack/react-query'
+import { apiClient } from '@/lib/api-client'
+import { BaseRoadmapNode, type BaseNodeData } from '@/features/roadmap/components/base-roadmap-node'
+import { logger } from '@/lib/logger'
 import {
   ReactFlow,
   Background,
   Controls,
-  Handle,
-  Position,
   useNodesState,
   useEdgesState,
   type Node,
@@ -12,7 +14,6 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import {
-  RiCheckFill,
   RiSparklingFill,
   RiLoader4Line,
   RiMagicLine,
@@ -21,96 +22,55 @@ import {
   RiAddLine,
 } from 'react-icons/ri'
 
-type BorderStyle = 'dark' | 'purple' | 'grey'
-
-interface RoadmapNodeData extends Record<string, unknown> {
-  label: string
-  number: string
-  borderStyle: BorderStyle
+interface CustomizeProps {
+  onComplete?: () => void
 }
 
-const RoadmapNode = ({ data }: { data: RoadmapNodeData }) => {
-  return (
-    <div
-      className={`flex h-14 w-56 cursor-pointer items-center rounded-xl border-2 bg-white px-4 shadow-[0_2px_8px_rgba(0,0,0,0.05)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg
-      ${data.borderStyle === 'dark' ? 'border-slate-800' : ''}
-      ${data.borderStyle === 'purple' ? 'border-purple-600 ring-2 ring-purple-100' : ''}
-      ${data.borderStyle === 'grey' ? 'border-slate-200' : ''}
-    `}
-    >
-      <Handle type="target" position={Position.Top} className="opacity-0" />
+const nodeTypes = { roadmapNode: BaseRoadmapNode }
 
-      {data.borderStyle !== 'grey' ? (
-        <div
-          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold
-          ${data.borderStyle === 'purple' ? 'bg-purple-600 text-white' : 'bg-slate-900 text-white'}
-        `}
-        >
-          {data.number}
-        </div>
-      ) : (
-        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-400">
-          <RiCheckFill className="h-3.5 w-3.5" />
-        </div>
-      )}
-
-      <div
-        className={`ml-2 flex-1 text-center text-sm font-bold
-        ${data.borderStyle === 'purple' ? 'text-purple-700' : 'text-slate-800'}
-      `}
-      >
-        {data.label}
-      </div>
-
-      <Handle type="source" position={Position.Bottom} className="opacity-0" />
-    </div>
-  )
-}
-
-const nodeTypes = { roadmapNode: RoadmapNode }
-export const StepCustomize = () => {
-  const initialNodes: Node<RoadmapNodeData>[] = [
+export default function StepCustomize({ onComplete }: CustomizeProps) {
+  const initialNodes: Node<BaseNodeData>[] = [
     {
       id: '1',
       type: 'roadmapNode',
       position: { x: 300, y: 50 },
-      data: { label: 'Web Fundamentals', number: '1', borderStyle: 'dark' },
+      data: { label: 'Web Fundamentals', number: '1', status: 'completed', variant: 'onboarding' },
     },
     {
       id: '2',
       type: 'roadmapNode',
       position: { x: 100, y: 180 },
-      data: { label: 'HTML & CSS', number: '2', borderStyle: 'dark' },
+      data: { label: 'HTML & CSS', number: '2', status: 'completed', variant: 'onboarding' },
     },
     {
       id: '3',
       type: 'roadmapNode',
       position: { x: 500, y: 180 },
-      data: { label: 'JavaScript Basics', number: '3', borderStyle: 'purple' },
+      data: { label: 'JavaScript Basics', number: '3', status: 'current', variant: 'onboarding' },
     },
     {
       id: '4',
       type: 'roadmapNode',
       position: { x: 300, y: 310 },
-      data: { label: 'DOM & Events', number: '4', borderStyle: 'grey' },
+      data: { label: 'DOM & Events', number: '4', status: 'upcoming', variant: 'onboarding' },
     },
     {
       id: '5',
       type: 'roadmapNode',
       position: { x: 50, y: 440 },
-      data: { label: 'Git & GitHub', number: '5', borderStyle: 'grey' },
+      data: { label: 'Git & GitHub', number: '5', status: 'upcoming', variant: 'onboarding' },
     },
     {
       id: '6',
       type: 'roadmapNode',
       position: { x: 300, y: 440 },
-      data: { label: 'React Basics', number: '6', borderStyle: 'grey' },
+      data: { label: 'React Basics', number: '6', status: 'upcoming', variant: 'onboarding' },
     },
     {
       id: '7',
       type: 'roadmapNode',
       position: { x: 550, y: 440 },
-      data: { label: 'Components', number: '7', borderStyle: 'grey' },
+      data: { label: 'Components', number: '7', status: 'upcoming', variant: 'onboarding' },
     },
   ]
 
@@ -130,74 +90,121 @@ export const StepCustomize = () => {
 
   const [activeTab, setActiveTab] = useState<'ai' | 'manual'>('ai')
   const [newTopicTitle, setNewTopicTitle] = useState('')
-
   const [feedback, setFeedback] = useState('')
-  const [isProcessing, setIsProcessing] = useState(false)
+
+  const aiFeedbackMutation = useMutation({
+    mutationFn: async (userFeedback: string) => {
+      const response = await apiClient.post('/ai/roadmap-feedback', { feedback: userFeedback })
+      return response.data
+    },
+    onSuccess: (data) => {
+      logger.info('AI Refined Roadmap Successfully', data)
+      if (data?.nodes && data?.edges) {
+        setNodes(data.nodes)
+        setEdges(data.edges)
+      }
+    },
+    onError: (error) => {
+      logger.error(
+        'Failed to apply AI feedback:',
+        error instanceof Error ? error.message : String(error),
+      )
+    },
+  })
 
   useEffect(() => {
     if (!feedback.trim()) return
 
-    const delayDebounceFn = setTimeout(async () => {
-      setIsProcessing(true)
-      try {
-        const response = await fetch('/ai/roadmap-feedback', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ feedback }),
-        })
-        if (!response.ok) throw new Error('API error')
-        const data = await response.json()
-        console.log('AI Updated Roadmap:', data)
-      } catch (error) {
-        console.error('Failed to update roadmap:', error)
-      } finally {
-        setIsProcessing(false)
-      }
+    const delayDebounceFn = setTimeout(() => {
+      aiFeedbackMutation.mutate(feedback)
     }, 500)
 
     return () => clearTimeout(delayDebounceFn)
-  }, [feedback])
+  }, [aiFeedbackMutation, feedback])
 
-  const rebuildEdgesAndNumbers = (currentNodes: Node<RoadmapNodeData>[]) => {
+  const rebuildEdgesAndNumbers = (
+    currentNodes: Node<BaseNodeData>[],
+    latestEdges: Edge[] = edges,
+  ) => {
     const updatedNodes = currentNodes.map((n, i) => ({
       ...n,
       data: { ...n.data, number: (i + 1).toString() },
     }))
 
-    const newEdges: Edge[] = []
-    for (let i = 0; i < updatedNodes.length - 1; i++) {
-      newEdges.push({
-        id: `e${updatedNodes[i].id}-${updatedNodes[i + 1].id}`,
-        source: updatedNodes[i].id,
-        target: updatedNodes[i + 1].id,
-        type: 'smoothstep',
-        style: edgeStyle,
-      })
-    }
+    const nodeIds = new Set(updatedNodes.map((n) => n.id))
+
+    const filteredEdges = latestEdges.filter((e) => nodeIds.has(e.source) && nodeIds.has(e.target))
+
+    updatedNodes.forEach((node, index) => {
+      if (index === 0) return
+      const hasIncomingEdge = filteredEdges.some((e) => e.target === node.id)
+      if (!hasIncomingEdge) {
+        const previousNode = updatedNodes[index - 1]
+        filteredEdges.push({
+          id: `e${previousNode.id}-${node.id}`,
+          source: previousNode.id,
+          target: node.id,
+          type: 'smoothstep',
+          style: edgeStyle,
+        })
+      }
+    })
 
     setNodes(updatedNodes)
-    setEdges(newEdges)
+    setEdges(filteredEdges)
   }
 
   const handleAddTopic = () => {
     if (!newTopicTitle.trim()) return
 
-    const lastNodeY = nodes.length > 0 ? nodes[nodes.length - 1].position.y : 50
+    const lastNode = nodes[nodes.length - 1]
+    const lastNodeY = lastNode ? lastNode.position.y : 50
     const nextId = nodes.length > 0 ? Math.max(...nodes.map((n) => parseInt(n.id) || 0)) + 1 : 1
-    const newNode: Node<RoadmapNodeData> = {
+
+    const newNode: Node<BaseNodeData> = {
       id: nextId.toString(),
       type: 'roadmapNode',
       position: { x: 300, y: lastNodeY + 130 },
-      data: { label: newTopicTitle, number: '', borderStyle: 'grey' },
+      data: { label: newTopicTitle, number: '', status: 'upcoming', variant: 'onboarding' },
     }
 
-    rebuildEdgesAndNumbers([...nodes, newNode])
+    const updatedNodes = [...nodes, newNode]
+
+    const newEdge: Edge = {
+      id: `e${lastNode?.id || '1'}-${nextId}`,
+      source: lastNode?.id || '1',
+      target: nextId.toString(),
+      type: 'smoothstep',
+      style: edgeStyle,
+    }
+
+    rebuildEdgesAndNumbers(updatedNodes, [...edges, newEdge])
     setNewTopicTitle('')
   }
 
   const handleRemoveTopic = (idToRemove: string) => {
+    if (idToRemove === '1') return
+
     const filteredNodes = nodes.filter((n) => n.id !== idToRemove)
-    rebuildEdgesAndNumbers(filteredNodes)
+    const incomingSources = edges.filter((e) => e.target === idToRemove).map((e) => e.source)
+    const outgoingTargets = edges.filter((e) => e.source === idToRemove).map((e) => e.target)
+    const remainingEdges = edges.filter((e) => e.source !== idToRemove && e.target !== idToRemove)
+
+    incomingSources.forEach((source) => {
+      outgoingTargets.forEach((target) => {
+        if (!remainingEdges.some((e) => e.source === source && e.target === target)) {
+          remainingEdges.push({
+            id: `e${source}-${target}`,
+            source: source,
+            target: target,
+            type: 'smoothstep',
+            style: edgeStyle,
+          })
+        }
+      })
+    })
+
+    rebuildEdgesAndNumbers(filteredNodes, remainingEdges)
   }
 
   return (
@@ -229,7 +236,7 @@ export const StepCustomize = () => {
               onClick={() => setActiveTab('ai')}
               className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold transition-all ${
                 activeTab === 'ai'
-                  ? 'bg-white text-purple-600 shadow-sm'
+                  ? 'bg-white text-brand-purple-600 shadow-sm'
                   : 'text-slate-500 hover:text-slate-700'
               }`}
             >
@@ -247,10 +254,9 @@ export const StepCustomize = () => {
             </button>
           </div>
 
-          {/* TAB 1: AI ASSISTANT */}
           {activeTab === 'ai' && (
             <div className="flex flex-1 flex-col fade-in">
-              <div className="mb-4 flex w-fit items-center gap-2 rounded-full bg-purple-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-purple-600">
+              <div className="mb-4 flex w-fit items-center gap-2 rounded-full bg-brand-purple-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-brand-purple-600">
                 <RiSparklingFill /> AI Refinement
               </div>
               <h2 className="mb-2 text-3xl font-extrabold text-slate-900">Talk to AI</h2>
@@ -264,12 +270,12 @@ export const StepCustomize = () => {
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
                   placeholder="e.g., 'Make it more advanced', or 'I only have 2 hours a week'."
-                  className="h-full w-full resize-none rounded-2xl border border-slate-200 bg-slate-50/50 p-4 text-sm text-slate-800 transition-all placeholder:text-slate-400 focus:border-purple-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                  className="h-full w-full resize-none rounded-2xl border border-slate-200 bg-slate-50/50 p-4 text-sm text-slate-800 transition-all placeholder:text-slate-400 focus:border-brand-purple-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple-500/50"
                 />
 
                 <div
                   className={`absolute bottom-4 right-4 flex items-center gap-2 rounded-full bg-purple-50 px-3 py-1.5 text-xs font-bold text-purple-600 transition-opacity duration-300 ${
-                    isProcessing ? 'opacity-100' : 'opacity-0'
+                    aiFeedbackMutation.isPending ? 'opacity-100' : 'opacity-0'
                   }`}
                 >
                   <RiLoader4Line className="animate-spin text-base" /> Thinking...
@@ -277,8 +283,6 @@ export const StepCustomize = () => {
               </div>
             </div>
           )}
-
-          {/* TAB 2: MANUAL EDIT */}
           {activeTab === 'manual' && (
             <div className="flex flex-1 flex-col overflow-hidden fade-in">
               <h2 className="mb-2 text-xl font-extrabold text-slate-900">Manage Topics</h2>
@@ -321,7 +325,7 @@ export const StepCustomize = () => {
                     onChange={(e) => setNewTopicTitle(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddTopic()}
                     placeholder="E.g. Next.js App Router"
-                    className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm focus:border-purple-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm focus:border-brand-purple-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-purple-500"
                   />
                   <button
                     onClick={handleAddTopic}
@@ -335,7 +339,10 @@ export const StepCustomize = () => {
           )}
 
           <div className="mt-6 flex flex-col gap-3 pt-4 border-t border-slate-100">
-            <button className="w-full rounded-xl bg-slate-900 py-4 font-bold text-white transition-all hover:bg-slate-800 active:scale-95">
+            <button
+              onClick={onComplete}
+              className="w-full rounded-xl bg-slate-900 py-4 font-bold text-white transition-all hover:bg-slate-800 active:scale-95"
+            >
               Confirm & Generate
             </button>
           </div>

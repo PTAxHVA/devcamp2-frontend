@@ -7,7 +7,6 @@ import DemoRoadmapPage from '@/pages/demo-roadmap-page'
 import TopicDetailPage from '@/features/topic/topic-detail-page'
 import RoadmapViewPage from '@/features/roadmap/roadmap-view-page'
 import EditCurrentRoadmapPage from '@/features/customize/edit-current-roadmap-page'
-
 import { MainLayout } from '@/components/layout/main_layout'
 
 /**
@@ -25,8 +24,8 @@ export function AppRoutes() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/my-learning/sections/:id" element={<SectionDetailPage />} />
         <Route path="/my-learning/topics/:id" element={<TopicDetailPage />} />
-        <Route path="/roadmaps/roadmap-view-page" element={<RoadmapViewPage />} />
-        <Route path="/roadmaps/edit-roadmap" element={<EditCurrentRoadmapPage />} />
+        <Route path="/roadmaps/:id" element={<RoadmapViewPage />} />
+        <Route path="/roadmaps/:id/edit" element={<EditCurrentRoadmapPage />} />
 
         <Route
           path="/roadmaps"
