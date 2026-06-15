@@ -207,7 +207,7 @@ export const StepCustomize = () => {
         <p className="font-medium text-slate-500">Review and adjust the topics tailored for you.</p>
       </div>
 
-      <div className="mb-8 flex h-[600px] w-full flex-col gap-6 lg:flex-row">
+      <div className="mb-8 flex h-150 w-full flex-col gap-6 lg:flex-row">
         <div className="relative flex h-full flex-1 overflow-hidden rounded-3xl border border-slate-200 bg-slate-50/50 shadow-inner">
           <ReactFlow
             nodes={nodes}
@@ -219,11 +219,11 @@ export const StepCustomize = () => {
             proOptions={{ hideAttribution: true }}
           >
             <Background color="#94a3b8" gap={20} size={1} />
-            <Controls className="!bottom-4 !right-4 !border-0 !shadow-none" />
+            <Controls className="bottom-4! right-4! border-0! shadow-none!" />
           </ReactFlow>
         </div>
 
-        <div className="flex w-full flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm lg:w-[420px]">
+        <div className="flex w-full flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm lg:w-105">
           <div className="mb-6 flex rounded-xl bg-slate-100 p-1">
             <button
               onClick={() => setActiveTab('ai')}
