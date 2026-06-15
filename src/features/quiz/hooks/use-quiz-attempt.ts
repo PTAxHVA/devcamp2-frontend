@@ -13,7 +13,7 @@ export function useQuizAttempt(quizId: string) {
       .post(`/quizzes/${quizId}/attempts`)
       .then((res) => {
         if (!cancelled) {
-          const { attemptId, questions } = res.data.data // Unwrap envelope [cite: 57, 212]
+          const { attemptId, questions } = res.data.data
           setAttempt(attemptId, questions)
         }
       })
@@ -23,10 +23,9 @@ export function useQuizAttempt(quizId: string) {
       .finally(() => {
         if (!cancelled) setIsLoading(false)
       })
-
     return () => {
       cancelled = true
-    } // Cleanup tránh setState khi unmount [cite: 215, 216]
+    }
   }, [quizId, setAttempt])
 
   return { isLoading, error }

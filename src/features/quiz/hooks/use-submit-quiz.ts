@@ -10,7 +10,7 @@ export function useSubmitQuiz(attemptId: string) {
       answers: Array<{ questionId: string; selectedOptionId?: string; userInput?: string }>,
     ) => {
       const res = await apiClient.post(`/attempts/${attemptId}/submit`, { answers })
-      return res.data.data // Unwrap envelope [cite: 57, 224]
+      return res.data.data
     },
     onSuccess: (r) => {
       if (r.isPassed) {
