@@ -1,6 +1,9 @@
 import { useMemo } from 'react'
+import { type Node } from '@xyflow/react'
+import { type BaseNodeData } from '@/features/roadmap/components/base-roadmap-node'
 import { useDemoRoadmap } from '@/features/roadmap/hooks/use-demo-roadmap'
 import { buildFlowGraph } from '@/features/roadmap/lib/build-flow-graph'
+
 import Roadmap from '@/features/roadmap/components/roadmap'
 
 /**
@@ -35,7 +38,7 @@ const DemoRoadmapPage = () => {
         <p className="text-sm text-slate-500">{data.roadmap.description}</p>
       </header>
       <div className="min-h-0 flex-1">
-        <Roadmap nodes={graph.nodes} edges={graph.edges} />
+        <Roadmap nodes={graph.nodes as Node<BaseNodeData>[]} edges={graph.edges} />
       </div>
     </div>
   )
