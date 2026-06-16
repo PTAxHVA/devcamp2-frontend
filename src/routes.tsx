@@ -1,5 +1,6 @@
-import { Routes, Route } from 'react-router'
+import { Routes, Route, Navigate } from 'react-router'
 import LandingPage from './pages/landing-page'
+import { isAuthenticated } from '@/lib/auth'
 import OnboardingMain from '@/features/onboarding/components/onboarding-main'
 import DashboardPage from '@/pages/dashboard-page'
 import SectionDetailPage from '@/features/section/section-detail-page'
@@ -20,7 +21,12 @@ import { BrowseRoadmapsPage } from '@/pages/browse-roadmaps-page'
 export function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<OnboardingMain />} />
+      {/* First visit / not logged in -> Landing. Returning logged-in user -> Dashboard. */}
+      <Route
+        path="/"
+        element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <LandingPage />}
+      />
+      <Route path="/onboarding" element={<OnboardingMain />} />
       <Route path="/LandingPage" element={<LandingPage />} />
       <Route path="/demo-roadmap" element={<DemoRoadmapPage />} />
 

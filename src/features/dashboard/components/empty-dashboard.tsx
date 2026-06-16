@@ -15,7 +15,7 @@ export function EmptyDashboard() {
       </p>
 
       <div className="flex flex-col sm:flex-row gap-4">
-        <Link to="/" className="btn btn-primary">
+        <Link to="/onboarding" className="btn btn-primary">
           Create my roadmap
         </Link>
         <Link to="/roadmaps/browse" className="btn btn-outline">

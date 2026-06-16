@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router'
 import { RiAccountCircleLine, RiArrowRightLine, RiCheckLine } from 'react-icons/ri'
 import { LuShieldCheck } from 'react-icons/lu'
 import { FaCode } from 'react-icons/fa6'
@@ -5,6 +6,8 @@ import Roadmap from '@/features/roadmap/components/roadmap'
 import FloatingTechIcons from './floating-tech-icons'
 
 export const HeroSection = () => {
+  const navigate = useNavigate()
+
   return (
     <section className="max-w-450 mx-auto px-6 lg:px-16 py-16 lg:py-10">
       <FloatingTechIcons />
@@ -22,10 +25,10 @@ export const HeroSection = () => {
           </p>
 
           <div className="flex flex-wrap items-center gap-4 pt-2">
-            <button className="btn btn-primary px-8">
+            <button className="btn btn-primary px-8" onClick={() => navigate('/onboarding')}>
               Get Started <RiArrowRightLine className="ml-1" />
             </button>
-            <button className="btn btn-outline px-8">
+            <button className="btn btn-outline px-8" onClick={() => navigate('/demo-roadmap')}>
               <span>▶</span> View Demo Roadmap
             </button>
           </div>
