@@ -14,6 +14,6 @@ export const useBrowseStore = create<BrowseFilterStore>((set) => ({
   difficulty: '',
   duration: '',
   search: '',
-  setFilter: (key, value) => set((state) => ({ ...state, [key]: value })),
+  setFilter: (key, value) => set({ [key]: value }),
   reset: () => set({ role: '', difficulty: '', duration: '', search: '' }),
 }))

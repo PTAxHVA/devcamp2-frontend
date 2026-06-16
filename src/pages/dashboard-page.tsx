@@ -57,8 +57,8 @@ const DashboardPage = () => {
               hasAvailableRoles={data.availableRolesForAdd.length > 0}
             />
           </div>
-          {}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* TODO: wire to real API — dashboard endpoint does not yet return weekly quiz counts */}
             <WeeklyProgressChart counts={[2, 5, 3, 0, 4, 1, 6]} />
             <StreakCalendar
               streak={data.streak} // Truyền data thật từ API của dashboard vào đây

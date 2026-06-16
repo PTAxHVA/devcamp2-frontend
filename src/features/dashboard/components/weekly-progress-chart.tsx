@@ -12,7 +12,7 @@ export function WeeklyProgressChart({ counts = [0, 0, 0, 0, 0, 0, 0] }: { counts
       </div>
       <div className="flex items-end justify-between h-32 gap-2">
         {counts.map((count, i) => (
-          <div key={i} className="flex flex-col items-center w-full group">
+          <div key={days[i]} className="flex flex-col items-center w-full group">
             <div
               className="w-full bg-primary/20 rounded-t-sm transition-all duration-500 group-hover:bg-primary group-hover:scale-105"
               style={{ height: `${(count / max) * 100}%`, minHeight: '4px' }}

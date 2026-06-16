@@ -33,11 +33,11 @@ export function AppRoutes() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/my-learning/sections/:id" element={<SectionDetailPage />} />
         <Route path="/my-learning/topics/:id" element={<TopicDetailPage />} />
+        {/* Browse Roadmaps — must come before /roadmaps/:id to avoid :id="browse" */}
+        <Route path="/roadmaps/browse" element={<BrowseRoadmapsPage />} />
+
         <Route path="/roadmaps/:id" element={<RoadmapViewPage />} />
         <Route path="/roadmaps/:id/edit" element={<EditCurrentRoadmapPage />} />
-
-        {/* Browse Roadmaps (Task 14) */}
-        <Route path="/roadmaps/browse" element={<BrowseRoadmapsPage />} />
 
         <Route
           path="/roadmaps"

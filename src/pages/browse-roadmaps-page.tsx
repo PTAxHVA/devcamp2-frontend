@@ -1,16 +1,16 @@
-import { useBrowseRoadmaps } from '@/features/roadmap-discovery/hooks/use-browse-roadmaps'
-import { useBrowseStore } from '@/features/roadmap-discovery/browse-store'
 import {
-  RoadmapCard,
-  type RoadmapCardProps,
-} from '@/features/roadmap-discovery/components/roadmap-card'
+  useBrowseRoadmaps,
+  type MasterRoadmapItem,
+} from '@/features/roadmap-discovery/hooks/use-browse-roadmaps'
+import { useBrowseStore } from '@/features/roadmap-discovery/browse-store'
+import { RoadmapCard } from '@/features/roadmap-discovery/components/roadmap-card'
 import { FiSearch } from 'react-icons/fi'
 
 export function BrowseRoadmapsPage() {
-  const { data: items, isLoading } = useBrowseRoadmaps()
+  const { data: items, isLoading, isError } = useBrowseRoadmaps()
   const { search, setFilter } = useBrowseStore()
 
-  const filteredItems = items?.filter((item: RoadmapCardProps) =>
+  const filteredItems = items?.filter((item: MasterRoadmapItem) =>
     item.roleName.toLowerCase().includes(search.toLowerCase()),
   )
 
@@ -31,6 +31,12 @@ export function BrowseRoadmapsPage() {
         </div>
       </div>
 
+      {isError && (
+        <div className="alert alert-error mb-6">
+          <span>Failed to load roadmaps. Please refresh and try again.</span>
+        </div>
+      )}
+
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
@@ -39,7 +45,7 @@ export function BrowseRoadmapsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredItems?.map((item: RoadmapCardProps) => (
+          {filteredItems?.map((item: MasterRoadmapItem) => (
             <RoadmapCard key={item.id} {...item} />
           ))}
         </div>
