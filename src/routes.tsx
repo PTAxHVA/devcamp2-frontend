@@ -9,6 +9,9 @@ import RoadmapViewPage from '@/features/roadmap/roadmap-view-page'
 import EditCurrentRoadmapPage from '@/features/customize/edit-current-roadmap-page'
 import { QuizMCQPage } from '@/features/quiz/quiz-mcq-page'
 import { MainLayout } from '@/components/layout/main_layout'
+import { QuizResultPassPage } from '@/features/quiz/quiz-result-pass-page'
+import { QuizResultFailPage } from '@/features/quiz/quiz-result-fail-page'
+import { BrowseRoadmapsPage } from '@/pages/browse-roadmaps-page'
 
 /**
  * Central route config for the app.
@@ -21,8 +24,10 @@ export function AppRoutes() {
       <Route path="/LandingPage" element={<LandingPage />} />
       <Route path="/demo-roadmap" element={<DemoRoadmapPage />} />
 
-      {/* Full-screen section quiz (no sidebar/navbar) */}
+      {/* Full-screen section quiz & results (no sidebar/navbar) */}
       <Route path="/quizzes/:quizId/attempt" element={<QuizMCQPage />} />
+      <Route path="/quizzes/:attemptId/result/pass" element={<QuizResultPassPage />} />
+      <Route path="/quizzes/:attemptId/result/fail" element={<QuizResultFailPage />} />
 
       <Route element={<MainLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
@@ -30,6 +35,9 @@ export function AppRoutes() {
         <Route path="/my-learning/topics/:id" element={<TopicDetailPage />} />
         <Route path="/roadmaps/:id" element={<RoadmapViewPage />} />
         <Route path="/roadmaps/:id/edit" element={<EditCurrentRoadmapPage />} />
+
+        {/* Browse Roadmaps (Task 14) */}
+        <Route path="/roadmaps/browse" element={<BrowseRoadmapsPage />} />
 
         <Route
           path="/roadmaps"
@@ -81,15 +89,6 @@ export function AppRoutes() {
           element={
             <div className="flex h-full items-center justify-center text-2xl font-bold text-slate-400">
               🚧 Trang Help & Support (Đang xây dựng)
-            </div>
-          }
-        />
-
-        <Route
-          path="/roadmaps/browse"
-          element={
-            <div className="flex h-full items-center justify-center text-2xl font-bold text-slate-400">
-              🚧 Trang Browse Roadmaps (Task 14 sẽ làm)
             </div>
           }
         />

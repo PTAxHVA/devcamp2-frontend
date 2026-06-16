@@ -3,6 +3,8 @@ import { StatsGrid } from '@/features/dashboard/components/stats-grid'
 import { MyRoadmapsGrid } from '@/features/dashboard/components/my-roadmaps-grid'
 import { ContinueLearningCard } from '@/features/dashboard/components/continue-learning-card'
 import { EmptyDashboard } from '@/features/dashboard/components/empty-dashboard'
+import { WeeklyProgressChart } from '@/features/dashboard/components/weekly-progress-chart'
+import { StreakCalendar } from '@/features/dashboard/components/streak-calendar'
 import { HiMiniSparkles, HiMiniMap } from 'react-icons/hi2'
 
 const DashboardPage = () => {
@@ -55,8 +57,12 @@ const DashboardPage = () => {
               hasAvailableRoles={data.availableRolesForAdd.length > 0}
             />
           </div>
-          <div className="p-8 border-2 border-dashed border-base-300 rounded-xl text-center text-base-content/50">
-            Chart & Calendar (Task 12, 13)
+          {}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <WeeklyProgressChart counts={[2, 5, 3, 0, 4, 1, 6]} />
+            <StreakCalendar
+              streak={data.streak} // Truyền data thật từ API của dashboard vào đây
+            />
           </div>
         </div>
       )}
