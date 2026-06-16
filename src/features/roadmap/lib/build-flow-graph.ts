@@ -1,5 +1,5 @@
 import type { Edge, Node } from '@xyflow/react'
-import type { DemoRoadmap, RoadmapTopicStatus } from '../types'
+import type { DemoRoadmap, RoadmapGraphTopic, RoadmapTopicStatus } from '../types'
 
 /** Visual states supported by RoadmapNode. */
 type NodeStatus = 'done' | 'current' | 'upcoming'
@@ -10,6 +10,39 @@ const STATUS_MAP: Record<RoadmapTopicStatus, NodeStatus> = {
   in_progress: 'current',
   available: 'current',
   locked: 'upcoming',
+}
+
+const isTopicCompleted = (t: RoadmapGraphTopic) =>
+  t.sectionTotal > 0 && t.sectionCompleted >= t.sectionTotal
+
+/**
+ * Derive each topic's 4-state status from SECTION progress + prerequisites,
+ * independent of the backend `status` field — progress lives in section
+ * completion (a section is completed when its quiz is passed). Mirrors the
+ * backend graph builder so the FE owns its own status logic.
+ * - completed   : has sections and every section is completed
+ * - in_progress : at least one section completed, but not all
+ * - available   : no section progress and every in-roadmap prerequisite is completed
+ * - locked      : no section progress and at least one in-roadmap prerequisite is not completed
+ */
+export function deriveTopicStatuses(topics: RoadmapGraphTopic[]): Map<string, RoadmapTopicStatus> {
+  const idSet = new Set(topics.map((t) => t.masterTopicId))
+  const completed = new Set(topics.filter(isTopicCompleted).map((t) => t.masterTopicId))
+
+  const result = new Map<string, RoadmapTopicStatus>()
+  for (const t of topics) {
+    let status: RoadmapTopicStatus
+    if (isTopicCompleted(t)) {
+      status = 'completed'
+    } else if (t.sectionCompleted > 0) {
+      status = 'in_progress'
+    } else {
+      const prereqs = t.prerequisiteTopicIds.filter((id) => idSet.has(id))
+      status = prereqs.every((id) => completed.has(id)) ? 'available' : 'locked'
+    }
+    result.set(t.masterTopicId, status)
+  }
+  return result
 }
 
 const VERTICAL_GAP = 140
@@ -28,6 +61,7 @@ export interface FlowGraph {
  */
 export function buildFlowGraph(data: DemoRoadmap): FlowGraph {
   const ordered = [...data.topics].sort((a, b) => a.orderIndex - b.orderIndex)
+  const statusById = deriveTopicStatuses(data.topics)
 
   const nodes: Node[] = ordered.map((topic, index) => ({
     id: topic.masterTopicId,
@@ -36,7 +70,7 @@ export function buildFlowGraph(data: DemoRoadmap): FlowGraph {
     data: {
       number: String(index + 1),
       label: topic.name,
-      status: STATUS_MAP[topic.status],
+      status: STATUS_MAP[statusById.get(topic.masterTopicId) ?? topic.status],
     },
   }))
 
