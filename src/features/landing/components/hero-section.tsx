@@ -1,6 +1,7 @@
 import { RiAccountCircleLine, RiArrowRightLine, RiCheckLine } from 'react-icons/ri'
 import { LuShieldCheck } from 'react-icons/lu'
 import { FaCode } from 'react-icons/fa6'
+import { Link } from 'react-router'
 import Roadmap from '@/features/roadmap/components/roadmap'
 import FloatingTechIcons from './floating-tech-icons'
 
@@ -22,12 +23,12 @@ export const HeroSection = () => {
           </p>
 
           <div className="flex flex-wrap items-center gap-4 pt-2">
-            <button className="btn btn-primary px-8">
+            <Link to="/signup" className="btn btn-primary px-8">
               Get Started <RiArrowRightLine className="ml-1" />
-            </button>
-            <button className="btn btn-outline px-8">
+            </Link>
+            <Link to="/demo-roadmap" className="btn btn-outline px-8">
               <span>▶</span> View Demo Roadmap
-            </button>
+            </Link>
           </div>
 
           <div className="pt-10">
