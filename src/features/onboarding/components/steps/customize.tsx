@@ -95,7 +95,7 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
   const [newTopicTitle, setNewTopicTitle] = useState('')
   const [feedback, setFeedback] = useState('')
 
-  const aiFeedbackMutation = useMutation({
+  const { mutate: refineRoadmap, isPending: isRefining } = useMutation({
     mutationFn: async (userFeedback: string) => {
       setAiError(null)
       const response = await apiClient.post('/ai/roadmap-feedback', { feedback: userFeedback })
@@ -129,15 +129,18 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
     },
   })
 
+  // Debounce gọi AI khi feedback đổi. Phụ thuộc `refineRoadmap` (reference ổn định
+  // từ useMutation) thay vì cả object mutation (đổi mỗi render) để tránh effect
+  // re-run mỗi render và bắn lặp vô hạn endpoint AI.
   useEffect(() => {
     if (!feedback.trim()) return
 
     const delayDebounceFn = setTimeout(() => {
-      aiFeedbackMutation.mutate(feedback)
+      refineRoadmap(feedback)
     }, 500)
 
     return () => clearTimeout(delayDebounceFn)
-  }, [aiFeedbackMutation, feedback])
+  }, [feedback, refineRoadmap])
 
   const rebuildEdgesAndNumbers = (
     currentNodes: Node<BaseNodeData>[],
@@ -292,7 +295,7 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
 
                 <div
                   className={`absolute bottom-4 right-4 flex items-center gap-2 rounded-full bg-brand-purple-50 px-3 py-1.5 text-xs font-bold text-brand-purple-600 transition-opacity duration-300 ${
-                    aiFeedbackMutation.isPending ? 'opacity-100' : 'opacity-0'
+                    isRefining ? 'opacity-100' : 'opacity-0'
                   }`}
                 >
                   <RiLoader4Line className="animate-spin text-base" /> Thinking...
