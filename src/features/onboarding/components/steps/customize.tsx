@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
-import { buildFlowGraph } from '@/lib/build-flow-graph'
+import { buildFlowGraph } from '@/features/roadmap/lib/build-flow-graph'
 import { BaseRoadmapNode, type BaseNodeData } from '@/features/roadmap/components/base-roadmap-node'
 import { logger } from '@/lib/logger'
 import {
@@ -109,7 +109,7 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
 
         if (rawTopics.length > 0) {
           const { nodes: mappedNodes, edges: mappedEdges } = buildFlowGraph(rawTopics)
-          setNodes(mappedNodes)
+          setNodes(mappedNodes as Node<BaseNodeData>[])
           setEdges(mappedEdges)
         }
       } catch (error) {
