@@ -7,6 +7,7 @@ import DemoRoadmapPage from '@/pages/demo-roadmap-page'
 import TopicDetailPage from '@/features/topic/topic-detail-page'
 import RoadmapViewPage from '@/features/roadmap/roadmap-view-page'
 import EditCurrentRoadmapPage from '@/features/customize/edit-current-roadmap-page'
+import { QuizMCQPage } from '@/features/quiz/quiz-mcq-page'
 import { MainLayout } from '@/components/layout/main_layout'
 
 /**
@@ -19,6 +20,9 @@ export function AppRoutes() {
       <Route path="/" element={<OnboardingMain />} />
       <Route path="/LandingPage" element={<LandingPage />} />
       <Route path="/demo-roadmap" element={<DemoRoadmapPage />} />
+
+      {/* Full-screen section quiz (no sidebar/navbar) */}
+      <Route path="/quizzes/:quizId/attempt" element={<QuizMCQPage />} />
 
       <Route element={<MainLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
