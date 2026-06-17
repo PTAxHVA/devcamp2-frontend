@@ -26,7 +26,11 @@ export function ContinueLearningCard({ continueLearning }: ContinueLearningCardP
         <div className="card-actions justify-end mt-4">
           <button
             className="btn btn-primary"
-            onClick={() => navigate(`/sections/${continueLearning.sectionId}`)}
+            onClick={() =>
+              navigate(
+                `/my-learning/topics/${continueLearning.topicId}/sections/${continueLearning.sectionId}?roadmapId=${continueLearning.roadmapId}`,
+              )
+            }
           >
             Tiếp tục học
           </button>

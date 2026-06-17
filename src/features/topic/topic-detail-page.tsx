@@ -1,193 +1,489 @@
+import React from 'react'
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router'
+import type { IconType } from 'react-icons'
 import {
-  RiArrowRightSLine,
-  RiTimeLine,
-  RiBarChartBoxLine,
-  RiBookOpenLine,
-  RiCheckboxCircleLine,
-  RiExternalLinkLine,
-  RiInformationLine,
   RiArrowLeftLine,
   RiArrowRightLine,
-  RiSparklingFill,
+  RiArrowRightSLine,
+  RiListUnordered,
+  RiFileList2Line,
+  RiBarChart2Line,
+  RiStarLine,
+  RiCheckboxCircleFill,
+  RiCheckboxBlankCircleLine,
+  RiDraggable,
+  RiQuestionLine,
+  RiBookOpenLine,
+  RiFocus3Line,
+  RiTimeLine,
+  RiExternalLinkLine,
+  RiFileTextLine,
+  RiPlayCircleLine,
+  RiCodeSSlashLine,
+  RiAlertLine,
 } from 'react-icons/ri'
-import DOMPurify from 'dompurify'
-import { TopicDataMock } from './topic-detail-data'
-import { QUIZ_PASS_THRESHOLD } from '@/constants/learning'
 
-const TopicDetailPage = () => {
-  const { stats, outcomes, materials, navigation } = TopicDataMock
+import { useTopicDetail } from './hooks/use-topic-detail'
+
+/* --------------------------- Vòng tròn % ---------------------------- */
+interface CircularProgressProps {
+  value: number
+  size?: number
+  stroke?: number
+}
+
+const CircularProgress = ({ value, size = 84, stroke = 8 }: CircularProgressProps) => {
+  const r = (size - stroke) / 2
+  const c = 2 * Math.PI * r
+  const offset = c - (value / 100) * c
+  return (
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke="#ede9fe"
+          strokeWidth={stroke}
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke="#7c3aed"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={offset}
+          className="transition-[stroke-dashoffset] duration-700 ease-out"
+        />
+      </svg>
+      <span className="absolute inset-0 flex items-center justify-center text-base font-bold text-slate-800">
+        {value}%
+      </span>
+    </div>
+  )
+}
+
+/* ------------------------- Badge & icon trạng thái ------------------------- */
+export type Status = 'Completed' | 'In Progress' | 'Not Started'
+
+const statusStyles: Record<Status, string> = {
+  Completed: 'bg-emerald-50 text-emerald-600',
+  'In Progress': 'bg-indigo-50 text-indigo-600',
+  'Not Started': 'bg-slate-100 text-slate-500',
+}
+
+const StatusBadge = ({ status }: { status: Status }) => (
+  <span
+    className={`inline-flex justify-center rounded-md px-2.5 py-1 text-xs font-medium ${statusStyles[status]}`}
+  >
+    {status}
+  </span>
+)
+
+const StatusIcon = ({ status }: { status: Status }) => {
+  if (status === 'Completed') return <RiCheckboxCircleFill className="h-5 w-5 text-emerald-500" />
+  if (status === 'In Progress')
+    return <span className="block h-5 w-5 rounded-full border-2 border-dashed border-indigo-400" />
+  return <RiCheckboxBlankCircleLine className="h-5 w-5 text-slate-300" />
+}
+
+/* --------------------------------- Card ---------------------------------- */
+interface CardProps {
+  className?: string
+  children: React.ReactNode
+}
+
+const Card = ({ className = '', children }: CardProps) => (
+  <div className={`rounded-2xl border border-slate-200 bg-white ${className}`}>{children}</div>
+)
+
+interface StatRowProps {
+  icon: IconType
+  label: string
+  value: string | number
+}
+
+const StatRow = ({ icon: Icon, label, value }: StatRowProps) => (
+  <div className="flex items-center justify-between py-2.5">
+    <div className="flex items-center gap-3 text-slate-500">
+      <Icon className="h-4.5 w-4.5" />
+      <span className="text-sm">{label}</span>
+    </div>
+    <span className="text-sm font-semibold text-slate-800">{value}</span>
+  </div>
+)
+
+// Resource Icon helper
+const getResourceIcon = (type: string): IconType => {
+  switch (type.toLowerCase()) {
+    case 'video':
+      return RiPlayCircleLine
+    case 'docs':
+    case 'documentation':
+      return RiBookOpenLine
+    case 'interactive':
+    case 'project':
+      return RiCodeSSlashLine
+    case 'article':
+    default:
+      return RiFileTextLine
+  }
+}
+
+// Fallback logic for Topic Prerequisites
+const getPrerequisites = (topicName: string): string[] => {
+  const name = topicName.toLowerCase()
+  if (name.includes('dom') || name.includes('event')) {
+    return ['HTML & CSS', 'JavaScript Basics']
+  }
+  if (name.includes('react') || name.includes('component')) {
+    return ['JavaScript Basics', 'HTML & CSS', 'Git & GitHub']
+  }
+  return ['Basic Web Development']
+}
+
+// Fallback logic for Topic Objectives
+const getObjectives = (topicName: string): string[] => {
+  const name = topicName.toLowerCase()
+  if (name.includes('dom') || name.includes('event')) {
+    return [
+      'Understand the structure of the DOM tree',
+      'Select and manipulate DOM elements',
+      'Handle user events effectively',
+      'Build interactive UI components',
+    ]
+  }
+  return [
+    'Understand core foundational concepts',
+    'Apply practical learning materials and guides',
+    'Build fully functioning mini projects',
+  ]
+}
+
+/* ================================ MAIN PAGE ================================== */
+export default function TopicDetailPage() {
+  const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const roadmapId = searchParams.get('roadmapId')
+
+  const { data, isLoading, isError } = useTopicDetail(id ?? '')
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-4">
+          <span className="loading loading-spinner loading-lg text-purple-600"></span>
+          <p className="text-sm font-medium text-slate-500">Loading topic details...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="flex h-screen flex-col items-center justify-center gap-4 bg-slate-50 text-center">
+        <RiAlertLine className="text-5xl text-red-500 animate-pulse" />
+        <p className="text-lg font-bold text-slate-800">Failed to load topic details.</p>
+        <button className="btn btn-primary" onClick={() => navigate('/dashboard')}>
+          Back to Dashboard
+        </button>
+      </div>
+    )
+  }
+
+  const topicName = data.name || 'Untitled Topic'
+  const topicDescription = data.description || 'No description available for this topic.'
+  const orderIndex = data.orderIndex || 0
+  const sections = data.sectionList || []
+  const userProgress = data.userProgress || []
+
+  // Sibling calculations
+  const totalSections = sections.length
+  const completedSections = sections.filter((s) =>
+    userProgress.some((p) => p.sectionId === s._id && p.isCompleted),
+  ).length
+  const progressPercent =
+    totalSections > 0 ? Math.round((completedSections / totalSections) * 100) : 0
+
+  // Flat-map resources across sections
+  const resources = sections.flatMap((sec) =>
+    (sec.resourceList || []).map((r) => ({
+      title: r.title,
+      url: r.url,
+      type: r.type,
+      estimatedMinutes: r.estimatedMinutes,
+      sectionId: sec._id,
+    })),
+  )
+
+  // Calculations for Summary
+  const totalMinutes = sections.reduce((acc, s) => {
+    return acc + (s.resourceList || []).reduce((sum, r) => sum + (r.estimatedMinutes || 0), 0)
+  }, 0)
+  const estimatedTimeText =
+    totalMinutes > 60 ? `${Math.round(totalMinutes / 60)} hours` : `${totalMinutes || 45} min`
+
+  const objectives = getObjectives(topicName)
+  const prerequisites = getPrerequisites(topicName)
+
+  const cols = 'grid-cols-[20px_22px_1fr_72px_104px_24px]'
+
+  const getSectionStatus = (secId: string): Status => {
+    const progress = userProgress.find((p) => p.sectionId === secId)
+    if (!progress) return 'Not Started'
+    return progress.isCompleted ? 'Completed' : 'In Progress'
+  }
+
+  const handleContinueTopic = () => {
+    const nextIncomplete =
+      sections.find((s) => getSectionStatus(s._id) !== 'Completed') || sections[0]
+    if (nextIncomplete) {
+      const q = roadmapId ? `?roadmapId=${roadmapId}` : ''
+      navigate(`/my-learning/topics/${id}/sections/${nextIncomplete._id}${q}`)
+    }
+  }
+
+  const handleBackToRoadmap = () => {
+    if (roadmapId) {
+      navigate(`/roadmaps/${roadmapId}`)
+    } else {
+      navigate('/dashboard')
+    }
+  }
 
   return (
-    <div className="mx-auto w-full max-w-400">
-      {/* Breadcrumbs */}
-      <div className="mt-8 mb-8 flex flex-wrap items-center gap-2 text-sm font-medium">
-        <button className="text-purple-600 transition-colors hover:text-purple-800">Learn</button>
-        <RiArrowRightSLine className="text-slate-400" />
-        <button className="text-purple-600 transition-colors hover:text-purple-800">
-          Web Fundamentals
-        </button>
-        <RiArrowRightSLine className="text-slate-400" />
-        <button className="text-purple-600 transition-colors hover:text-purple-800">
-          HTML & CSS
-        </button>
-        <RiArrowRightSLine className="text-slate-400" />
-        <span className="text-slate-600">Section {TopicDataMock.TopicNumber}</span>
-      </div>
-
-      {/* Header */}
-      <div className="mb-8 flex flex-col items-start justify-between gap-8 lg:flex-row">
-        <div className="flex flex-1 gap-5">
-          <div className="flex h-20 w-20 shrink-0 flex-col items-center justify-center rounded-full border-2 border-purple-200 bg-purple-50 text-purple-700">
-            <span className="text-3xl font-bold">{TopicDataMock.TopicNumber}</span>
-          </div>
-          <div>
-            <h1 className="mb-2 text-3xl font-bold text-slate-900">{TopicDataMock.title}</h1>
-            <p className="max-w-2xl text-sm leading-relaxed text-slate-600 md:text-base">
-              {TopicDataMock.description}
-            </p>
-          </div>
-        </div>
-
-        {/* Stats Card */}
-        <div className="w-full shrink-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:w-80 xl:w-96">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-3 text-slate-600">
-                <RiTimeLine className="text-lg text-purple-600" />
-                <span className="font-medium">Duration</span>
-              </div>
-              <span className="font-semibold text-slate-900">{stats.duration}</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-3 text-slate-600">
-                <RiBarChartBoxLine className="text-lg text-purple-600" />
-                <span className="font-medium">Difficulty</span>
-              </div>
-              <span className="font-semibold text-slate-900">{stats.difficulty}</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-3 text-slate-600">
-                <RiBookOpenLine className="text-lg text-purple-600" />
-                <span className="font-medium">Topic</span>
-              </div>
-              <span className="font-semibold text-slate-900">{stats.topic}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Split Content */}
-      <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
-        {/* Outcomes */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-          <h2 className="mb-2 text-lg font-bold text-slate-900">Learning outcomes</h2>
-          <p className="mb-6 text-sm text-slate-600">
-            By the end of this Topic, you will be able to:
-          </p>
-          <ul className="space-y-5">
-            {outcomes.map((outcome, idx) => (
-              <li key={idx} className="flex items-start gap-3">
-                <RiCheckboxCircleLine className="mt-0.5 shrink-0 text-xl text-purple-600" />
-                <span
-                  className="text-sm font-medium text-slate-700"
-                  dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(
-                      outcome.replace(
-                        /<([a-z]+)>/g,
-                        '<code class="bg-slate-100 text-slate-800 px-1 py-0.5 rounded text-xs">&lt;$1&gt;</code>',
-                      ),
-                    ),
-                  }}
-                />
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Materials */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-          <h2 className="mb-2 text-lg font-bold text-slate-900">Learning materials</h2>
-          <p className="mb-6 text-sm text-slate-600">
-            Review the resources below to prepare for the quiz.
-          </p>
-          <div className="space-y-3">
-            {materials.map((mat, idx) => {
-              const Icon = mat.icon
-              return (
-                <a
-                  key={idx}
-                  href="#"
-                  className="group flex items-center gap-4 rounded-xl border border-slate-200 p-4 transition-all hover:border-purple-300 hover:shadow-sm"
-                >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
-                    <Icon className="text-xl" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="mb-0.5 text-xs font-medium text-slate-500">{mat.type}</p>
-                    <p className="text-sm font-bold text-slate-900 transition-colors group-hover:text-purple-700">
-                      {mat.title}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-medium text-slate-500">{mat.duration}</span>
-                    <RiExternalLinkLine className="text-slate-400 transition-colors group-hover:text-purple-600" />
-                  </div>
-                </a>
-              )
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Info Banner */}
-      <div className="mb-10 flex items-center gap-3 rounded-xl border border-brand-purple-100 bg-brand-purple-50/50 p-4 text-brand-purple-800">
-        <RiInformationLine className="shrink-0 text-xl text-brand-purple-600" />
-        <p className="text-sm font-medium">
-          You must pass the quiz with at least {QUIZ_PASS_THRESHOLD}% to complete this Topic and
-          continue to the next one.
-        </p>
-      </div>
-
-      <div className="flex flex-col items-center justify-between gap-6 border-t border-slate-200 pb-10 pt-6 sm:flex-row">
-        {/* Previous */}
-        <button className="group flex w-full items-center gap-4 text-left sm:w-auto">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition-colors group-hover:border-slate-300">
-            <RiArrowLeftLine />
-          </div>
-          <div>
-            <p className="mb-0.5 text-xs font-bold uppercase tracking-wider text-slate-500">
-              Previous Topic
-            </p>
-            <p className="text-sm font-semibold text-slate-900 transition-colors group-hover:text-purple-700">
-              {navigation.previous.Topic}
-              <br />
-              <span className="font-medium text-slate-600 transition-colors group-hover:text-purple-600">
-                {navigation.previous.title}
-              </span>
-            </p>
-          </div>
+    <div className="p-6 lg:p-8">
+      <div className="mx-auto max-w-360">
+        {/* Back */}
+        <button
+          onClick={handleBackToRoadmap}
+          className="flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-slate-900 cursor-pointer"
+        >
+          <RiArrowLeftLine className="h-4 w-4" />
+          Back to Roadmap
         </button>
 
-        <div className="flex w-full items-center justify-between gap-6 sm:w-auto sm:justify-end">
-          <div className="hidden text-right md:block">
-            <p className="mb-0.5 text-xs font-bold uppercase tracking-wider text-slate-500">
-              {navigation.next.Topic}
-            </p>
-            <p className="text-sm font-medium text-slate-600">{navigation.next.title}</p>
-          </div>
+        <div className="mt-6 flex flex-col gap-6 lg:flex-row">
+          {/* ============================ MAIN ============================ */}
+          <main className="flex-1 space-y-5">
+            {/* Header */}
+            <div className="flex items-start gap-4">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-purple-100 text-xl font-bold text-purple-700">
+                {orderIndex + 1}
+              </div>
+              <div className="flex-1">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h1 className="text-3xl font-bold text-slate-800">{topicName}</h1>
+                  <span className="rounded-md bg-purple-50 px-2.5 py-1 text-xs font-semibold text-purple-700">
+                    Required
+                  </span>
+                </div>
+                {/* Progress */}
+                <div className="mt-3 flex items-center gap-4">
+                  <span className="text-sm font-medium text-slate-600">Progress</span>
+                  <div className="h-2 w-full max-w-75 overflow-hidden rounded-full bg-slate-200">
+                    <div
+                      className="h-full rounded-full bg-purple-600 transition-all duration-700"
+                      style={{ width: `${progressPercent}%` }}
+                    />
+                  </div>
+                  <span className="whitespace-nowrap text-sm text-slate-500">
+                    {progressPercent}% complete
+                  </span>
+                </div>
+              </div>
+            </div>
 
-          <div className="flex w-full flex-col gap-2 sm:w-auto">
-            <button className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 sm:w-auto">
-              Next Section <RiArrowRightLine />
-            </button>
-            <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0B1221] px-6 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-slate-800 sm:w-auto">
-              <RiSparklingFill className="text-brand-purple-300" /> Start Quiz
-            </button>
-          </div>
+            <p className="max-w-3xl leading-relaxed text-slate-600">{topicDescription}</p>
+
+            {/* Objectives + Prerequisites */}
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <Card className="p-6">
+                <div className="mb-4 flex items-center gap-2">
+                  <RiFocus3Line className="h-5 w-5 text-purple-600" />
+                  <h3 className="font-semibold text-slate-800">Learning objectives</h3>
+                </div>
+                <ul className="space-y-2.5">
+                  {objectives.map((o) => (
+                    <li key={o} className="flex items-start gap-2.5 text-sm text-slate-600">
+                      <span className="mt-1.75 h-1.5 w-1.5 shrink-0 rounded-full bg-purple-400" />
+                      {o}
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+
+              <Card className="p-6">
+                <div className="mb-4 flex items-center gap-2">
+                  <RiBookOpenLine className="h-5 w-5 text-purple-600" />
+                  <h3 className="font-semibold text-slate-800">Prerequisites</h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {prerequisites.map((p) => (
+                    <span
+                      key={p}
+                      className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600"
+                    >
+                      {p}
+                    </span>
+                  ))}
+                </div>
+              </Card>
+            </div>
+
+            {/* Resources */}
+            {resources.length > 0 && (
+              <Card className="p-6">
+                <h3 className="mb-4 font-semibold text-slate-800">Resources</h3>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  {resources.slice(0, 8).map((r, index) => {
+                    const Icon = getResourceIcon(r.type)
+                    return (
+                      <Link
+                        key={index}
+                        to={`/my-learning/topics/${id}/sections/${r.sectionId}${roadmapId ? `?roadmapId=${roadmapId}` : ''}`}
+                        className="flex min-h-31 flex-col justify-between rounded-xl border border-slate-200 p-4 text-left transition hover:border-purple-300 hover:shadow-sm"
+                      >
+                        <div className="flex gap-3">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
+                            <Icon className="h-5 w-5" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-slate-400 uppercase font-semibold">
+                              {r.type}
+                            </p>
+                            <p className="text-sm font-semibold leading-snug text-slate-800">
+                              {r.title}
+                            </p>
+                          </div>
+                        </div>
+                        <p className="mt-3 flex items-center gap-1 text-xs text-slate-400">
+                          {r.estimatedMinutes ? `${r.estimatedMinutes} min` : 'External link'}
+                          <RiExternalLinkLine className="h-3.5 w-3.5" />
+                        </p>
+                      </Link>
+                    )
+                  })}
+                </div>
+              </Card>
+            )}
+
+            {/* Sections */}
+            <Card className="p-6">
+              <h3 className="mb-3 font-semibold text-slate-800">Sections</h3>
+              <div
+                className={`grid ${cols} items-center gap-4 px-2 pb-1 text-xs font-medium text-slate-400`}
+              >
+                <span />
+                <span>#</span>
+                <span>Section</span>
+                <span>Duration</span>
+                <span className="text-center">Status</span>
+                <span />
+              </div>
+              {sections.map((sec, idx) => {
+                const status = getSectionStatus(sec._id)
+                const secMinutes = (sec.resourceList || []).reduce(
+                  (sum, r) => sum + (r.estimatedMinutes || 0),
+                  0,
+                )
+                return (
+                  <div
+                    key={sec._id}
+                    onClick={() =>
+                      navigate(
+                        `/my-learning/topics/${id}/sections/${sec._id}${roadmapId ? `?roadmapId=${roadmapId}` : ''}`,
+                      )
+                    }
+                    className={`grid ${cols} items-center gap-4 border-t border-slate-100 px-2 py-4 transition hover:bg-slate-50/60 cursor-pointer`}
+                  >
+                    <RiDraggable className="h-4 w-4 text-slate-300" />
+                    <span className="text-sm text-slate-400">{idx + 1}</span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-slate-800 truncate">{sec.name}</p>
+                      <p className="mt-0.5 text-xs text-slate-400 truncate">
+                        {sec.contentOverview
+                          ? sec.contentOverview
+                              .split('\n')
+                              .find((o) => o.trim().length > 0)
+                              ?.replace(/[*`]/g, '')
+                              ?.replace(/^[0-9.]+\s*/, '')
+                              ?.trim() || 'Understand the core concepts of this section.'
+                          : 'Understand the core concepts of this section.'}
+                      </p>
+                    </div>
+                    <span className="text-sm text-slate-500">
+                      {secMinutes ? `${secMinutes} min` : '15 min'}
+                    </span>
+                    <StatusBadge status={status} />
+                    <StatusIcon status={status} />
+                  </div>
+                )
+              })}
+            </Card>
+          </main>
+
+          {/* ============================ RAIL ============================ */}
+          <aside className="w-full shrink-0 space-y-5 lg:w-90">
+            {/* Topic summary */}
+            <Card className="p-6">
+              <h3 className="mb-4 font-semibold text-slate-800">Topic summary</h3>
+
+              <div className="flex items-center gap-4">
+                <CircularProgress value={progressPercent} />
+                <div>
+                  <p className="font-semibold text-slate-800">Your progress</p>
+                  <p className="text-sm text-slate-500">
+                    {completedSections} of {totalSections} sections completed
+                  </p>
+                  <div className="mt-2 h-1.5 w-32 overflow-hidden rounded-full bg-slate-200">
+                    <div
+                      className="h-full rounded-full bg-purple-600"
+                      style={{ width: `${progressPercent}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="my-5 border-t border-slate-100" />
+
+              <div className="divide-y divide-slate-50">
+                <StatRow icon={RiTimeLine} label="Estimated time" value={estimatedTimeText} />
+                <StatRow icon={RiListUnordered} label="Sections" value={totalSections} />
+                <StatRow icon={RiFileList2Line} label="Resources" value={resources.length} />
+                <StatRow icon={RiBarChart2Line} label="Difficulty" value="Intermediate" />
+                <StatRow icon={RiStarLine} label="Importance" value="High" />
+              </div>
+
+              <button
+                onClick={handleContinueTopic}
+                className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-[#0B1221] py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800 cursor-pointer"
+              >
+                Continue topic <RiArrowRightLine className="h-4 w-4" />
+              </button>
+            </Card>
+
+            {/* Need help */}
+            <Card className="cursor-pointer p-5 transition hover:border-purple-200">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-600">
+                  <RiQuestionLine className="h-5 w-5" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-slate-800">Need help?</p>
+                  <p className="text-xs text-slate-400">Ask AI Assistant about this topic</p>
+                </div>
+                <RiArrowRightSLine className="h-5 w-5 text-slate-400" />
+              </div>
+            </Card>
+          </aside>
         </div>
       </div>
     </div>
   )
 }
-
-export default TopicDetailPage
