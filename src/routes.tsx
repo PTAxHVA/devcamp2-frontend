@@ -37,7 +37,10 @@ export function AppRoutes() {
 
       <Route element={<MainLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/my-learning/sections/:id" element={<SectionDetailPage />} />
+        <Route
+          path="/my-learning/topics/:topicId/sections/:sectionId"
+          element={<SectionDetailPage />}
+        />
         <Route path="/my-learning/topics/:id" element={<TopicDetailPage />} />
         {/* Browse Roadmaps — must come before /roadmaps/:id to avoid :id="browse" */}
         <Route path="/roadmaps/browse" element={<BrowseRoadmapsPage />} />
