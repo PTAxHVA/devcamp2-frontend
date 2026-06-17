@@ -28,7 +28,7 @@ export function ContinueLearningCard({ continueLearning }: ContinueLearningCardP
             className="btn btn-primary"
             onClick={() =>
               navigate(
-                `/my-learning/topics/${continueLearning.topicId}/sections/${continueLearning.sectionId}?roadmapId=${continueLearning.roadmapId}`,
+                `/my-learning/topics/${continueLearning.topicId}/sections/${continueLearning.sectionId}?roadmapId=${continueLearning.userRoadmapId}`,
               )
             }
           >

@@ -25,7 +25,7 @@ export function StatsGrid({
     {
       id: 'completed',
       label: 'Completed Topics',
-      value: completedTopics,
+      value: completedTopics === -1 ? '--' : completedTopics,
       Icon: HiMiniBookOpen,
       bgClass: 'bg-success/10',
       textClass: 'text-success',
@@ -41,7 +41,7 @@ export function StatsGrid({
     {
       id: 'quiz',
       label: 'Quiz Avg',
-      value: `${quizAvg}%`,
+      value: quizAvg === -1 ? '--' : `${quizAvg}%`,
       Icon: HiMiniSparkles,
       bgClass: 'bg-secondary/10',
       textClass: 'text-secondary',

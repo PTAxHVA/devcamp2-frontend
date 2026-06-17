@@ -68,11 +68,23 @@ export function useDashboard() {
       let continueLearning = null
       const clItem = dashData.continueLearningList?.find((c) => c.currentSection)
       if (clItem && clItem.currentSection && clItem.currentTopicId) {
+        let topicName = 'Current Topic'
+        try {
+          const topicRes = await apiClient.get<{ data: { name: string } }>(
+            `/topics/${clItem.currentTopicId}`,
+          )
+          if (topicRes.data?.data?.name) {
+            topicName = topicRes.data.data.name
+          }
+        } catch (err) {
+          console.error('Failed to fetch topic name for continue learning card:', err)
+        }
+
         continueLearning = {
           sectionId: clItem.currentSection.sectionId,
           topicId: clItem.currentTopicId,
-          roadmapId: clItem.userRoadmapId,
-          topicName: 'Current Topic',
+          userRoadmapId: clItem.userRoadmapId,
+          topicName,
           sectionName: clItem.currentSection.name,
         }
       }
@@ -98,8 +110,10 @@ export function useDashboard() {
         },
         stats: {
           roadmapProgress: avgProgress,
-          completedTopics: 0,
-          quizAvg: 0,
+          // TODO: completedTopics and quizAvg are not returned by the backend /dashboard yet.
+          // Need to supplement BE. For now, setting to -1 so UI doesn't mislead with "0".
+          completedTopics: -1,
+          quizAvg: -1,
         },
         availableRolesForAdd: (dashData.availableRolesForAdd || []).map((r) => ({
           roadmapId: r.id,

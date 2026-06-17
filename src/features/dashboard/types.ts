@@ -2,7 +2,7 @@ export interface DashboardData {
   continueLearning: {
     sectionId: string
     topicId: string
-    roadmapId: string
+    userRoadmapId: string
     topicName: string
     sectionName: string
   } | null
