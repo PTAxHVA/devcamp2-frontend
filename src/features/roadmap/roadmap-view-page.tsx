@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router'
-import { type Node, type Edge } from '@xyflow/react'
-import dagre from 'dagre'
+import type { Node } from '@xyflow/react'
+import toast from 'react-hot-toast'
 
 import {
   RiArrowLeftLine,
@@ -17,39 +17,9 @@ import {
   RiBookmark2Line,
 } from 'react-icons/ri'
 
-import { type BaseNodeData } from './components/base-roadmap-node'
 import { RoadmapGraph } from './components/roadmap-graph'
+import { buildFlowGraph } from './lib/build-flow-graph'
 import { useRoadmapDetail } from './hooks/use-roadmap-detail'
-
-// Helper to layout graph using dagre
-const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => {
-  const dagreGraph = new dagre.graphlib.Graph()
-  dagreGraph.setDefaultEdgeLabel(() => ({}))
-  dagreGraph.setGraph({ rankdir: direction, nodesep: 100, edgesep: 10, ranksep: 100 })
-
-  nodes.forEach((node) => {
-    dagreGraph.setNode(node.id, { width: 300, height: 80 })
-  })
-
-  edges.forEach((edge) => {
-    dagreGraph.setEdge(edge.source, edge.target)
-  })
-
-  dagre.layout(dagreGraph)
-
-  const newNodes = nodes.map((node) => {
-    const nodeWithPosition = dagreGraph.node(node.id)
-    return {
-      ...node,
-      position: {
-        x: nodeWithPosition.x - 150,
-        y: nodeWithPosition.y - 40,
-      },
-    }
-  })
-
-  return { nodes: newNodes, edges }
-}
 
 const RoadmapViewPage = () => {
   const { id } = useParams()
@@ -61,28 +31,8 @@ const RoadmapViewPage = () => {
 
   const { layoutedNodes, layoutedEdges } = useMemo(() => {
     if (!roadmapDetail) return { layoutedNodes: [], layoutedEdges: [] }
-
-    const rawNodes: Node<BaseNodeData>[] = roadmapDetail.topics.map((t) => ({
-      id: t.masterTopicId,
-      type: 'roadmapNode',
-      data: {
-        number: (t.orderIndex + 1).toString(),
-        label: t.name,
-        status: t.status,
-      },
-      position: { x: 0, y: 0 },
-    }))
-
-    const rawEdges: Edge[] = roadmapDetail.edges.map((e) => ({
-      id: `e${e.source}-${e.target}`,
-      source: e.source,
-      target: e.target,
-      type: 'smoothstep',
-      style: { stroke: '#cbd5e1', strokeWidth: 2 },
-    }))
-
-    const layouted = getLayoutedElements(rawNodes, rawEdges, 'TB')
-    return { layoutedNodes: layouted.nodes as Node<BaseNodeData>[], layoutedEdges: layouted.edges }
+    const { nodes, edges } = buildFlowGraph(roadmapDetail)
+    return { layoutedNodes: nodes, layoutedEdges: edges }
   }, [roadmapDetail])
 
   useEffect(() => {
@@ -209,9 +159,9 @@ const RoadmapViewPage = () => {
             <h3 className="mb-3 text-sm font-bold text-slate-900">Prerequisites</h3>
             {prereqNames.length > 0 ? (
               <ul className="space-y-2.5">
-                {prereqNames.map((req, idx) => (
+                {prereqNames.map((req) => (
                   <li
-                    key={idx}
+                    key={req}
                     className="flex items-center gap-3 text-sm font-medium text-slate-600"
                   >
                     <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white shrink-0">
@@ -260,7 +210,10 @@ const RoadmapViewPage = () => {
           >
             View topic details <RiExternalLinkLine className="text-lg text-slate-400" />
           </button>
-          <button className="mt-2 flex w-full items-center justify-center gap-2 text-sm font-medium text-slate-500 hover:text-purple-600 transition-colors pt-2 cursor-pointer">
+          <button
+            onClick={() => toast.success('Saved to your bookmarks!')}
+            className="mt-2 flex w-full items-center justify-center gap-2 text-sm font-medium text-slate-500 hover:text-purple-600 transition-colors pt-2 cursor-pointer"
+          >
             <RiBookmark2Line className="text-lg" /> Save for later
           </button>
         </div>

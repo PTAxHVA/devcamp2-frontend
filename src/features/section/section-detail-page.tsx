@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState } from 'react'
 import { useParams, useNavigate, Link, useSearchParams } from 'react-router'
 import type { IconType } from 'react-icons'
 import {
@@ -92,6 +92,8 @@ export default function SectionDetailPage() {
   const isLoading = isSecLoading || isTopicLoading
   const isError = isSecError || !section || !topic
 
+  const [isCompleting, setIsCompleting] = useState(false)
+
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-50">
@@ -137,12 +139,6 @@ export default function SectionDetailPage() {
   ]
 
   // Mock materials as requested
-  const mockMaterials = [
-    { type: 'lesson', title: 'HTML Document Structure (Text)', estimatedMinutes: 8, url: '#' },
-    { type: 'video', title: 'Anatomy of an HTML Page', estimatedMinutes: 12, url: '#' },
-    { type: 'interactive', title: 'Explore HTML Structure', estimatedMinutes: 10, url: '#' },
-    { type: 'cheat sheet', title: 'HTML Basic Tags Reference', estimatedMinutes: 2, url: '#' },
-  ]
 
   // Duration
   const totalMinutes = (section.resourceList || []).reduce(
@@ -159,8 +155,15 @@ export default function SectionDetailPage() {
     navigate(`/quizzes/${quiz.quizId}/attempt`)
   }
 
-  const handleMarkAsComplete = () => {
-    toast.success('Section completed successfully!')
+  const handleMarkAsComplete = async () => {
+    setIsCompleting(true)
+    try {
+      // Simulate API call as backend endpoint is not yet available
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      toast.success('Section completed successfully! (Mocked)')
+    } finally {
+      setIsCompleting(false)
+    }
   }
 
   return (
@@ -235,8 +238,8 @@ export default function SectionDetailPage() {
             By the end of this section, you will be able to:
           </p>
           <ul className="space-y-5">
-            {outcomes.map((outcome, idx) => (
-              <li key={idx} className="flex items-start gap-3">
+            {outcomes.map((outcome) => (
+              <li key={outcome} className="flex items-start gap-3">
                 <RiCheckboxCircleLine className="mt-0.5 shrink-0 text-xl text-purple-600" />
                 <span
                   className="text-sm font-medium text-slate-700"
@@ -261,11 +264,11 @@ export default function SectionDetailPage() {
             Review the resources below to prepare for the quiz.
           </p>
           <div className="space-y-3">
-            {mockMaterials.map((mat, idx) => {
+            {(section.resourceList || []).map((mat) => {
               const Icon = getResourceIcon(mat.type)
               return (
                 <a
-                  key={idx}
+                  key={mat.url || mat.title}
                   href={mat.url}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -383,9 +386,15 @@ export default function SectionDetailPage() {
             ) : (
               <button
                 onClick={handleMarkAsComplete}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0B1221] px-6 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-slate-800 sm:w-auto cursor-pointer"
+                disabled={isCompleting}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0B1221] px-6 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-slate-800 sm:w-auto cursor-pointer disabled:opacity-50"
               >
-                <RiCheckboxCircleLine className="text-emerald-400" /> Complete Section
+                {isCompleting ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : (
+                  <RiCheckboxCircleLine className="text-emerald-400" />
+                )}
+                {isCompleting ? 'Completing...' : 'Complete Section'}
               </button>
             )}
           </div>

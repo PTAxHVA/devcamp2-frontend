@@ -1,18 +1,18 @@
 import type { Edge, Node } from '@xyflow/react'
-import type { DemoRoadmap, RoadmapGraphTopic, RoadmapTopicStatus } from '../types'
+import type { BERoadmapDetail, BEGraphTopic } from '../hooks/use-roadmap-detail'
+import type { BaseNodeData, NodeStatus } from '../components/base-roadmap-node'
 
-/** Visual states supported by RoadmapNode. */
-type NodeStatus = 'done' | 'current' | 'upcoming'
+type BackendStatus = 'completed' | 'in_progress' | 'available' | 'locked'
 
-/** Backend 4-state status -> RoadmapNode 3-state visual status. */
-const STATUS_MAP: Record<RoadmapTopicStatus, NodeStatus> = {
-  completed: 'done',
+/** Backend 4-state status -> RoadmapNode 4-state visual status. */
+const STATUS_MAP: Record<BackendStatus, NodeStatus> = {
+  completed: 'completed',
   in_progress: 'current',
-  available: 'current',
-  locked: 'upcoming',
+  available: 'upcoming',
+  locked: 'locked',
 }
 
-const isTopicCompleted = (t: RoadmapGraphTopic) =>
+const isTopicCompleted = (t: BEGraphTopic) =>
   t.sectionTotal > 0 && t.sectionCompleted >= t.sectionTotal
 
 /**
@@ -25,13 +25,13 @@ const isTopicCompleted = (t: RoadmapGraphTopic) =>
  * - available   : no section progress and every in-roadmap prerequisite is completed
  * - locked      : no section progress and at least one in-roadmap prerequisite is not completed
  */
-export function deriveTopicStatuses(topics: RoadmapGraphTopic[]): Map<string, RoadmapTopicStatus> {
+export function deriveTopicStatuses(topics: BEGraphTopic[]): Map<string, BackendStatus> {
   const idSet = new Set(topics.map((t) => t.masterTopicId))
   const completed = new Set(topics.filter(isTopicCompleted).map((t) => t.masterTopicId))
 
-  const result = new Map<string, RoadmapTopicStatus>()
+  const result = new Map<string, BackendStatus>()
   for (const t of topics) {
-    let status: RoadmapTopicStatus
+    let status: BackendStatus
     if (isTopicCompleted(t)) {
       status = 'completed'
     } else if (t.sectionCompleted > 0) {
@@ -50,7 +50,7 @@ const COLUMN_X = 0
 const EDGE_COLOR = '#CBD5E1'
 
 export interface FlowGraph {
-  nodes: Node[]
+  nodes: Node<BaseNodeData>[]
   edges: Edge[]
 }
 
@@ -59,11 +59,11 @@ export interface FlowGraph {
  * Layout is a single vertical column ordered by `orderIndex` (the backend
  * does not send coordinates). Edges follow the prerequisite graph as-is.
  */
-export function buildFlowGraph(data: DemoRoadmap): FlowGraph {
+export function buildFlowGraph(data: BERoadmapDetail): FlowGraph {
   const ordered = [...data.topics].sort((a, b) => a.orderIndex - b.orderIndex)
   const statusById = deriveTopicStatuses(data.topics)
 
-  const nodes: Node[] = ordered.map((topic, index) => ({
+  const nodes: Node<BaseNodeData>[] = ordered.map((topic, index) => ({
     id: topic.masterTopicId,
     type: 'roadmapNode',
     position: { x: COLUMN_X, y: index * VERTICAL_GAP },
