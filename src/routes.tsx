@@ -8,7 +8,7 @@ import DemoRoadmapPage from '@/pages/demo-roadmap-page'
 import TopicDetailPage from '@/features/topic/topic-detail-page'
 import RoadmapViewPage from '@/features/roadmap/roadmap-view-page'
 import EditCurrentRoadmapPage from '@/features/customize/edit-current-roadmap-page'
-import { QuizMCQPage } from '@/features/quiz/quiz-mcq-page'
+import { QuizAttemptPage } from '@/features/quiz/quiz-attempt-page'
 import { MainLayout } from '@/components/layout/main_layout'
 import { QuizResultPassPage } from '@/features/quiz/quiz-result-pass-page'
 import { QuizResultFailPage } from '@/features/quiz/quiz-result-fail-page'
@@ -31,7 +31,7 @@ export function AppRoutes() {
       <Route path="/demo-roadmap" element={<DemoRoadmapPage />} />
 
       {/* Full-screen section quiz & results (no sidebar/navbar) */}
-      <Route path="/quizzes/:quizId/attempt" element={<QuizMCQPage />} />
+      <Route path="/quizzes/:quizId/attempt" element={<QuizAttemptPage />} />
       <Route path="/quizzes/:attemptId/result/pass" element={<QuizResultPassPage />} />
       <Route path="/quizzes/:attemptId/result/fail" element={<QuizResultFailPage />} />
 
