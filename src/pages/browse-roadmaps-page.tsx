@@ -7,7 +7,6 @@ type Tab = 'recommended' | 'all' | 'popular' | 'new'
 export default function BrowseRoadmapsPage() {
   const [search, setSearch] = useState('')
   const [role, setRole] = useState('all')
-  const [difficulty, setDifficulty] = useState('all')
   const [tab, setTab] = useState<Tab>('recommended')
 
   const { data: rawRoadmaps = [], isLoading, isError } = useBrowseRoadmaps()
@@ -15,7 +14,6 @@ export default function BrowseRoadmapsPage() {
   const clearFilters = () => {
     setSearch('')
     setRole('all')
-    setDifficulty('all')
   }
 
   const filteredRoadmaps = useMemo(() => {
@@ -23,11 +21,9 @@ export default function BrowseRoadmapsPage() {
     return rawRoadmaps.filter((r) => {
       const matchSearch = !search || r.roleName.toLowerCase().includes(lowerSearch)
       const matchRole = role === 'all' || r.roleName.toLowerCase().includes(role.toLowerCase())
-      // difficulty not provided by API yet — filter is pass-through
-      const matchDifficulty = difficulty === 'all'
-      return matchSearch && matchRole && matchDifficulty
+      return matchSearch && matchRole
     })
-  }, [rawRoadmaps, search, role, difficulty])
+  }, [rawRoadmaps, search, role])
 
   const displayRoadmaps = useMemo(() => {
     const arr = [...filteredRoadmaps]
@@ -58,16 +54,6 @@ export default function BrowseRoadmapsPage() {
           <option value="all">All Roles</option>
           <option value="frontend">Frontend</option>
           <option value="backend">Backend</option>
-        </select>
-
-        <select
-          value={difficulty}
-          onChange={(e) => setDifficulty(e.target.value)}
-          className="focus:border-brand-purple-500 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium outline-none"
-        >
-          <option value="all">All Levels</option>
-          <option value="beginner">Beginner</option>
-          <option value="intermediate">Intermediate</option>
         </select>
 
         <input

@@ -91,20 +91,28 @@ export default function RoadmapCard({ data }: RoadmapCardProps) {
       </div>
 
       <div className="mt-auto">
-        <div className="mb-5 flex items-center justify-between text-xs font-bold text-slate-600">
-          <span className="flex items-center gap-1">
-            <RiBarChartBoxLine size={16} className="text-slate-400" />
-            {data.difficulty ?? 'Beginner'}
-          </span>
-          <span className="flex items-center gap-1">
-            <RiTimeLine size={16} className="text-slate-400" />
-            {data.duration ?? '8–10 weeks'}
-          </span>
-          <span className="flex items-center gap-1">
-            <RiListUnordered size={16} className="text-slate-400" />
-            {data.topicsCount ?? 0} topics
-          </span>
-        </div>
+        {(data.difficulty || data.duration || !!data.topicsCount) && (
+          <div className="mb-5 flex items-center justify-between text-xs font-bold text-slate-600">
+            {data.difficulty && (
+              <span className="flex items-center gap-1">
+                <RiBarChartBoxLine size={16} className="text-slate-400" />
+                {data.difficulty}
+              </span>
+            )}
+            {data.duration && (
+              <span className="flex items-center gap-1">
+                <RiTimeLine size={16} className="text-slate-400" />
+                {data.duration}
+              </span>
+            )}
+            {!!data.topicsCount && (
+              <span className="flex items-center gap-1">
+                <RiListUnordered size={16} className="text-slate-400" />
+                {data.topicsCount} topics
+              </span>
+            )}
+          </div>
+        )}
 
         <div className="flex gap-2">
           <button
