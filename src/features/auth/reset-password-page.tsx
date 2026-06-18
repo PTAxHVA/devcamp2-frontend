@@ -49,20 +49,20 @@ export default function ResetPasswordPage() {
   // Token không hợp lệ
   if (!token) {
     return (
-      <div className="w-full max-w-5xl flex flex-col md:flex-row rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="w-full md:w-1/2 bg-white px-10 py-16 flex flex-col gap-4">
-          <h1 className="text-3xl font-extrabold text-gray-900">Link không hợp lệ</h1>
+      <div className="flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-gray-200 shadow-sm md:flex-row">
+        <div className="flex w-full flex-col gap-4 bg-white px-10 py-16 md:w-1/2">
+          <h1 className="text-3xl font-extrabold text-gray-900">The link is invalid.</h1>
           <p className="text-sm text-gray-500">
-            Link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.
+            The password reset link is invalid or has expired.
           </p>
           <Link
             to="/forgot-password"
-            className="text-sm text-indigo-600 font-semibold hover:underline mt-2"
+            className="mt-2 text-sm font-semibold text-indigo-600 hover:underline"
           >
-            → Xin link mới
+            → Request a new link
           </Link>
         </div>
-        <div className="hidden md:flex w-1/2 bg-[#f9f9fb] items-center justify-center px-10 py-12">
+        <div className="hidden w-1/2 items-center justify-center bg-[#f9f9fb] px-10 py-12 md:flex">
           <img
             src={ResetPasswordImg}
             alt="Reset password"
@@ -74,11 +74,11 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="w-full max-w-5xl flex flex-col md:flex-row rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-      <div className="w-full md:w-1/2 bg-white px-10 py-12 flex flex-col justify-between">
+    <div className="flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-gray-200 shadow-sm md:flex-row">
+      <div className="flex w-full flex-col justify-between bg-white px-10 py-12 md:w-1/2">
         <div className="flex-1">
-          <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Reset your password</h1>
-          <p className="text-sm text-indigo-500 font-medium mb-8">
+          <h1 className="mb-2 text-3xl font-extrabold text-gray-900">Reset your password</h1>
+          <p className="mb-8 text-sm font-medium text-indigo-500">
             Create a new password for your account.
             <br />
             Make sure it's strong and unique.
@@ -93,7 +93,7 @@ export default function ResetPasswordPage() {
                 id="newPassword"
                 type="password"
                 placeholder="••••••••"
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm outline-none focus:border-indigo-400 transition"
+                className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('newPassword')}
               />
               {errors.newPassword && (
@@ -107,12 +107,12 @@ export default function ResetPasswordPage() {
                   return (
                     <div key={rule.label} className="flex items-center gap-2">
                       <div
-                        className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
+                        className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
                           passed ? 'border-indigo-500 bg-indigo-500' : 'border-gray-300 bg-white'
                         }`}
                       >
                         {passed && (
-                          <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 8 8">
+                          <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 8 8">
                             <path
                               d="M1 4l2 2 4-4"
                               stroke="currentColor"
@@ -142,7 +142,7 @@ export default function ResetPasswordPage() {
                 id="confirmPassword"
                 type="password"
                 placeholder="••••••••"
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm outline-none focus:border-indigo-400 transition"
+                className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('confirmPassword')}
               />
               {errors.confirmPassword && (
@@ -153,25 +153,25 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={reset.isPending}
-              className="w-full py-2.5 rounded-lg bg-[#001a57] text-white text-sm font-semibold hover:bg-[#002080] transition disabled:opacity-60"
+              className="w-full rounded-lg bg-[#001a57] py-2.5 text-sm font-semibold text-white transition hover:bg-[#002080] disabled:opacity-60"
             >
-              {reset.isPending ? 'Đang xử lý...' : 'Reset password'}
+              {reset.isPending ? 'Processing...' : 'Reset password'}
             </button>
           </form>
 
-          <div className="flex items-center gap-3 my-5">
-            <div className="flex-1 h-px bg-gray-200" />
+          <div className="my-5 flex items-center gap-3">
+            <div className="h-px flex-1 bg-gray-200" />
             <span className="text-xs text-gray-400">or</span>
-            <div className="flex-1 h-px bg-gray-200" />
+            <div className="h-px flex-1 bg-gray-200" />
           </div>
 
-          <Link to="/login" className="text-sm text-indigo-600 font-semibold hover:underline">
+          <Link to="/login" className="text-sm font-semibold text-indigo-600 hover:underline">
             ← Back to login
           </Link>
         </div>
       </div>
 
-      <div className="hidden md:flex w-1/2 bg-[#f9f9fb] items-center justify-center px-10 py-12">
+      <div className="hidden w-1/2 items-center justify-center bg-[#f9f9fb] px-10 py-12 md:flex">
         <img
           src={ResetPasswordImg}
           alt="Reset password"

@@ -1,14 +1,20 @@
+import { Link } from 'react-router'
 import Logo from '@/assets/Logo.svg'
+
 export const Navbar = () => {
   return (
-    <header className="border-b border-base-200 bg-base-100 sticky top-0 z-50">
-      <div className="navbar max-w-450 mx-auto px-4 h-20">
+    <header className="border-base-200 bg-base-100 sticky top-0 z-50 border-b">
+      <div className="navbar mx-auto h-20 max-w-450 px-4">
         <div className="flex-1">
-          <img src={Logo} alt="VORA Logo" className="w-48 h-auto object-contain" />
+          <img src={Logo} alt="VORA Logo" className="h-auto w-48 object-contain" />
         </div>
         <div className="flex-none gap-2 sm:gap-4">
-          <button className="btn btn-ghost font-semibold">Login</button>
-          <button className="btn btn-primary font-semibold">Get Started</button>
+          <Link to="/login" className="btn btn-ghost font-semibold">
+            Login
+          </Link>
+          <Link to="/signup" className="btn btn-primary font-semibold">
+            Get Started
+          </Link>
         </div>
       </div>
     </header>
