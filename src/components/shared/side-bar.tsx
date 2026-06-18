@@ -33,7 +33,7 @@ export const Sidebar = () => {
       isCollapsed ? 'justify-center' : 'gap-3 px-4'
     } py-3 rounded-xl transition-all ${
       isActive
-        ? 'bg-brand-purple-50 text-brand-purple-700 font-semibold' // 👉 Đã sửa thành brand-purple
+        ? 'bg-brand-purple-50 text-brand-purple-700 font-semibold'
         : 'text-slate-500 hover:bg-slate-50 font-medium'
     }`
   }

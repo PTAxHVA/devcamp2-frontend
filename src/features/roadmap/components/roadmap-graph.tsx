@@ -88,12 +88,12 @@ export const RoadmapGraph = ({
         proOptions={{ hideAttribution: true }}
       >
         {withUI && !isReadOnly && (
-          <Controls className="!bottom-6 !left-6 !top-auto !flex !flex-col-reverse !gap-1 !border-none !shadow-sm [&>button]:!h-8 [&>button]:!w-8 [&>button]:!rounded-lg [&>button]:!border [&>button]:!border-slate-200 [&>button]:!bg-white" />
+          <Controls className="bottom-6! left-6! top-auto! flex! flex-col-reverse! gap-1! border-none! shadow-sm! [&>button]:h-8! [&>button]:w-8! [&>button]:rounded-lg! [&>button]:border! [&>button]:border-slate-200! [&>button]:bg-white!" />
         )}
 
         {withUI && (
           <MiniMap
-            className="!bottom-6 !right-6 !h-28 !w-40 !rounded-xl !border-2 !border-brand-purple-100 !bg-white !shadow-sm"
+            className="bottom-6! right-6! h-28! w-40! rounded-xl! border-2! border-brand-purple-100! bg-white! shadow-sm!"
             nodeColor={(node) => {
               const data = node.data as BaseNodeData
               if (data?.status === 'completed') return '#10b981'

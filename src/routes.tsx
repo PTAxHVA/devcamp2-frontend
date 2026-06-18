@@ -12,7 +12,8 @@ import { QuizAttemptPage } from '@/features/quiz/quiz-attempt-page'
 import { MainLayout } from '@/components/layout/main_layout'
 import { QuizResultPassPage } from '@/features/quiz/quiz-result-pass-page'
 import { QuizResultFailPage } from '@/features/quiz/quiz-result-fail-page'
-import { BrowseRoadmapsPage } from '@/pages/browse-roadmaps-page'
+import BrowseRoadmapsPage from '@/pages/browse-roadmaps-page'
+import MylearningJourneyPage from '@/pages/my-learning-page'
 
 /**
  * Central route config for the app.
@@ -48,23 +49,9 @@ export function AppRoutes() {
         <Route path="/roadmaps/:id" element={<RoadmapViewPage />} />
         <Route path="/roadmaps/:id/edit" element={<EditCurrentRoadmapPage />} />
 
-        <Route
-          path="/roadmaps"
-          element={
-            <div className="flex h-full items-center justify-center text-2xl font-bold text-slate-400">
-              🚧 Trang All Roadmaps (Đang xây dựng)
-            </div>
-          }
-        />
+        <Route path="/roadmaps" element={<BrowseRoadmapsPage />} />
 
-        <Route
-          path="/my-learning"
-          element={
-            <div className="flex h-full items-center justify-center text-2xl font-bold text-slate-400">
-              🚧 Trang My Learning (Đang xây dựng)
-            </div>
-          }
-        />
+        <Route path="/my-learning" element={<MylearningJourneyPage />} />
 
         <Route
           path="/goals"
