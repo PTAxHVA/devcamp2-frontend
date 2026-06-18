@@ -19,9 +19,13 @@ const formatBadge = (type: DashboardData['roadmaps'][number]['sourceType']) => {
 }
 
 export function MyRoadmapsGrid({ roadmaps, hasAvailableRoles }: MyRoadmapsGridProps) {
+  // 1. Chỉ lấy tối đa 2 roadmaps để hiển thị
+  const displayedRoadmaps = roadmaps.slice(0, 2)
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-      {roadmaps.map((roadmap) => {
+    // 2. Chỉnh lại lưới thành tối đa 2 cột
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      {displayedRoadmaps.map((roadmap) => {
         const badgeInfo = formatBadge(roadmap.sourceType)
 
         return (
@@ -67,8 +71,8 @@ export function MyRoadmapsGrid({ roadmaps, hasAvailableRoles }: MyRoadmapsGridPr
         )
       })}
 
-      {/* MEDIUM Fix: Chỉ render nút Add Role khi hasAvailableRoles hợp lệ */}
-      {hasAvailableRoles && (
+      {/* 3. Render nút Add Role khi có ÍT HƠN 2 roadmaps */}
+      {hasAvailableRoles && roadmaps.length < 2 && (
         <Link
           to="/dashboard/add-role"
           className="card bg-base-200/50 border-2 border-dashed border-base-300 hover:border-primary/60 hover:bg-primary/5 transition-all min-h-[160px] group no-underline focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
