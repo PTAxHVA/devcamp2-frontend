@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
+import { logger } from '@/lib/logger'
 import type { DashboardData } from '@/features/dashboard/types'
 
 interface BEProgressStat {
@@ -50,7 +51,6 @@ export function useDashboard() {
       const dashRes = await apiClient.get<{ data: BEDashboardRes }>('/dashboard')
       const dashData = dashRes.data.data
 
-      // Use roadmaps from dashboard payload directly
       const activeRoadmaps = dashData.roadmaps || []
 
       const roadmaps = activeRoadmaps.map((r) => {
@@ -77,7 +77,10 @@ export function useDashboard() {
             topicName = topicRes.data.data.name
           }
         } catch (err) {
-          console.error('Failed to fetch topic name for continue learning card:', err)
+          logger.error(
+            'Failed to fetch topic name for continue learning card:',
+            err instanceof Error ? err.message : String(err),
+          )
         }
 
         continueLearning = {
@@ -110,8 +113,6 @@ export function useDashboard() {
         },
         stats: {
           roadmapProgress: avgProgress,
-          // TODO: completedTopics and quizAvg are not returned by the backend /dashboard yet.
-          // Need to supplement BE. For now, setting to -1 so UI doesn't mislead with "0".
           completedTopics: -1,
           quizAvg: -1,
         },

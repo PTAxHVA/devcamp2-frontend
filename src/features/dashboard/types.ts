@@ -1,4 +1,5 @@
 export interface DashboardData {
+  userName?: string
   continueLearning: {
     sectionId: string
     topicId: string
