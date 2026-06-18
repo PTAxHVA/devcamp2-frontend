@@ -87,6 +87,11 @@ export function QuizAttemptPage() {
         return { questionId: q.id, userInput: value }
       })
 
+    if (submitAnswers.length === 0) {
+      toast.error('Vui lòng trả lời ít nhất 1 câu hỏi trước khi nộp bài.')
+      return
+    }
+
     submitMutation.mutate(submitAnswers, {
       onSuccess: (result: SubmitQuizResult) => {
         if (result.isPassed) {
