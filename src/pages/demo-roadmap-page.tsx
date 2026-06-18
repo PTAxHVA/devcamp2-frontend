@@ -13,7 +13,10 @@ import Roadmap from '@/features/roadmap/components/roadmap'
 const DemoRoadmapPage = () => {
   const { data, isLoading, isError } = useDemoRoadmap()
 
-  const graph = useMemo(() => (data ? buildFlowGraph(data) : null), [data])
+  const graph = useMemo(
+    () => (data ? buildFlowGraph(data as unknown as Parameters<typeof buildFlowGraph>[0]) : null),
+    [data],
+  )
 
   if (isLoading) {
     return (

@@ -1,5 +1,11 @@
 export interface DashboardData {
-  continueLearning: { sectionId: string; topicName: string; sectionName: string } | null
+  continueLearning: {
+    sectionId: string
+    topicId: string
+    userRoadmapId: string
+    topicName: string
+    sectionName: string
+  } | null
   roadmaps: Array<{
     id: string
     roleName: string

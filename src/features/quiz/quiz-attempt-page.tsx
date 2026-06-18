@@ -13,7 +13,7 @@ import {
   HiOutlineLightBulb,
 } from 'react-icons/hi2'
 
-export function QuizMCQPage() {
+export function QuizAttemptPage() {
   const { quizId } = useParams<{ quizId: string }>()
   const navigate = useNavigate()
 
@@ -77,13 +77,20 @@ export function QuizMCQPage() {
   const handleSubmit = () => {
     if (!attemptId) return
 
-    const submitAnswers = questions.map((q) => {
-      const value = answers[q.id] ?? ''
-      if (q.type === 'mcq') {
-        return { questionId: q.id, selectedOptionId: value }
-      }
-      return { questionId: q.id, userInput: value }
-    })
+    const submitAnswers = questions
+      .filter((q) => answers[q.id] !== undefined && answers[q.id] !== '')
+      .map((q) => {
+        const value = answers[q.id]!
+        if (q.type === 'mcq') {
+          return { questionId: q.id, selectedOptionId: value }
+        }
+        return { questionId: q.id, userInput: value }
+      })
+
+    if (submitAnswers.length === 0) {
+      toast.error('Vui lòng trả lời ít nhất 1 câu hỏi trước khi nộp bài.')
+      return
+    }
 
     submitMutation.mutate(submitAnswers, {
       onSuccess: (result: SubmitQuizResult) => {
