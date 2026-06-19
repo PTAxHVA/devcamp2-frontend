@@ -12,26 +12,26 @@ interface FillQuestionProps {
 export function FillQuestion({ question, value, onChange }: FillQuestionProps) {
   const hasValue = value.trim().length > 0
   return (
-    <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <h3 className="text-xl font-bold mb-6 text-base-content leading-relaxed">
+    <div className="animate-in fade-in slide-in-from-bottom-4 w-full duration-500">
+      <h3 className="text-base-content mb-6 text-xl leading-relaxed font-bold">
         {question.content}
       </h3>
       <div className="flex flex-col gap-3">
         <label
-          className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-text transition-all duration-300 hover:shadow-md focus-within:shadow-md ${
+          className={`flex cursor-text items-center gap-4 rounded-xl border-2 p-4 transition-all duration-300 focus-within:shadow-md hover:shadow-md ${
             hasValue
-              ? 'border-primary bg-primary/10 shadow-sm scale-[1.02]'
+              ? 'border-primary bg-primary/10 scale-[1.02] shadow-sm'
               : 'border-base-300 hover:border-primary/40'
           }`}
         >
-          <div className="relative flex-1 flex items-center">
+          <div className="relative flex flex-1 items-center">
             <HiOutlinePencilSquare
-              className={`w-6 h-6 mr-3 transition-colors duration-300 ${hasValue ? 'text-primary' : 'text-base-content/40'}`}
+              className={`mr-3 h-6 w-6 transition-colors duration-300 ${hasValue ? 'text-primary' : 'text-base-content/40'}`}
             />
             <input
               type="text"
               placeholder="Nhập câu trả lời của bạn..."
-              className="bg-transparent outline-none w-full text-base font-medium placeholder:text-base-content/30"
+              className="placeholder:text-base-content/30 w-full bg-transparent text-base font-medium outline-none"
               value={value}
               onChange={(e) => onChange(e.target.value)}
             />

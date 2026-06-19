@@ -65,7 +65,7 @@ interface RoadmapProps {
 
 const Roadmap = ({ nodes = initialNodes, edges = initialEdges }: RoadmapProps) => {
   return (
-    <div className="h-full w-full bg-base-100">
+    <div className="bg-base-100 h-full w-full">
       <RoadmapGraph nodes={nodes} edges={edges} isReadOnly={true} withUI={false} />
     </div>
   )

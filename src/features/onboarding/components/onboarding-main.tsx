@@ -65,11 +65,11 @@ const OnboardingMain = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 font-sans flex flex-col">
+    <div className="flex min-h-screen flex-col bg-white font-sans text-slate-900">
       <NavBar />
-      <main className="relative flex-1 flex flex-col max-w-300 w-full mx-auto px-6 py-12 overflow-x-hidden min-h-screen">
-        <div className="fixed top-[-10%] left-[-5%] w-125 h-125 bg-indigo-200/20 rounded-full blur-[120px] pointer-events-none -z-10"></div>
-        <div className="fixed bottom-[-10%] right-[-5%] w-150 h-150 bg-purple-200/20 rounded-full blur-[150px] pointer-events-none -z-10"></div>
+      <main className="relative mx-auto flex min-h-screen w-full max-w-300 flex-1 flex-col overflow-x-hidden px-6 py-12">
+        <div className="pointer-events-none fixed top-[-10%] left-[-5%] -z-10 h-125 w-125 rounded-full bg-indigo-200/20 blur-[120px]"></div>
+        <div className="pointer-events-none fixed right-[-5%] bottom-[-10%] -z-10 h-150 w-150 rounded-full bg-purple-200/20 blur-[150px]"></div>
 
         <style>{`
           @keyframes slideInRight { 0% { opacity: 0; transform: translateX(80px); } 100% { opacity: 1; transform: translateX(0); } }
@@ -87,15 +87,15 @@ const OnboardingMain = () => {
         )}
 
         {currentStep > 1 && currentStep < 5 && (
-          <div key={`heading-${currentStep}`} className="text-center mb-10 fade-only">
-            <h1 className="text-4xl font-bold text-slate-900 mb-4">
+          <div key={`heading-${currentStep}`} className="fade-only mb-10 text-center">
+            <h1 className="mb-4 text-4xl font-bold text-slate-900">
               {currentStep === 2
                 ? "What's your starting point?"
                 : currentStep === 3
                   ? "What's your main goal?"
                   : 'What’s your current level?'}
             </h1>
-            <p className="text-lg text-slate-500 font-medium">
+            <p className="text-lg font-medium text-slate-500">
               {currentStep === 2
                 ? 'Choose the role that best matches your goals.'
                 : currentStep === 3
@@ -140,20 +140,20 @@ const OnboardingMain = () => {
         </div>
 
         {currentStep !== 1 && (
-          <div className="flex items-center justify-between mt-16 pt-8 border-t border-slate-200/60">
+          <div className="mt-16 flex items-center justify-between border-t border-slate-200/60 pt-8">
             <button
               onClick={handleBack}
-              className="btn btn-ghost px-8 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50 font-semibold text-base h-12 transition-all active:scale-95"
+              className="btn btn-ghost h-12 rounded-xl border border-slate-200 px-8 text-base font-semibold text-slate-700 transition-all hover:bg-slate-50 active:scale-95"
             >
-              <RiArrowLeftLine className="mr-2 w-5 h-5" /> Back
+              <RiArrowLeftLine className="mr-2 h-5 w-5" /> Back
             </button>
             {currentStep !== 6 && currentStep !== 7 && (
               <button
                 onClick={handleNext}
-                className="btn px-10 rounded-xl bg-[#0B1528] hover:bg-[#15233e] text-white border-none font-semibold text-base h-12 transition-all active:scale-95 hover:shadow-lg"
+                className="btn h-12 rounded-xl border-none bg-[#0B1528] px-10 text-base font-semibold text-white transition-all hover:bg-[#15233e] hover:shadow-lg active:scale-95"
               >
                 {currentStep === 5 && subStep === 2 ? 'Generate Your Roadmap' : 'Continue'}
-                <RiArrowRightLine className="ml-2 w-5 h-5" />
+                <RiArrowRightLine className="ml-2 h-5 w-5" />
               </button>
             )}
           </div>

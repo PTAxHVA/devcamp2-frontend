@@ -13,7 +13,7 @@ const DashboardPage = () => {
 
   if (isLoading) {
     return (
-      <div className="h-full w-full flex items-center justify-center">
+      <div className="flex h-full w-full items-center justify-center">
         <span className="loading loading-spinner loading-lg text-primary"></span>
       </div>
     )
@@ -21,7 +21,7 @@ const DashboardPage = () => {
 
   if (isError) {
     return (
-      <div className="h-full w-full flex items-center justify-center text-error">
+      <div className="text-error flex h-full w-full items-center justify-center">
         An error occurred while loading data. Please try again!
       </div>
     )
@@ -32,11 +32,11 @@ const DashboardPage = () => {
   const displayName = (data as typeof data & { userName?: string }).userName || 'Student'
 
   return (
-    <div className="w-full h-full p-6 lg:p-8 fade-in animate-in duration-500 max-w-[1400px] mx-auto">
+    <div className="fade-in animate-in mx-auto h-full w-full max-w-[1400px] p-6 duration-500 lg:p-8">
       {/* 1. Header Khu vực Lời chào */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
             Welcome back, {displayName}!
           </h1>
           <p className="text-base-content/60 mt-2 font-medium">
@@ -45,7 +45,7 @@ const DashboardPage = () => {
         </div>
         <Link
           to="/roadmaps/browse"
-          className="btn btn-outline btn-sm bg-white rounded-full px-4 border-slate-300 shadow-sm hover:bg-slate-50"
+          className="btn btn-outline btn-sm rounded-full border-slate-300 bg-white px-4 shadow-sm hover:bg-slate-50"
         >
           Browse all Roadmaps <FiExternalLink className="ml-1" />
         </Link>
@@ -55,9 +55,9 @@ const DashboardPage = () => {
         <EmptyDashboard />
       ) : (
         /* 2. Cấu trúc 2 cột chính */
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 gap-8 xl:grid-cols-12">
           {/* CỘT TRÁI (Chiếm 7/12 chiều rộng) */}
-          <div className="xl:col-span-7 flex flex-col gap-8">
+          <div className="flex flex-col gap-8 xl:col-span-7">
             {data.continueLearning && (
               <div className="flex flex-col gap-3">
                 <h2 className="text-xl font-bold text-slate-900">Continue Learning</h2>
@@ -66,11 +66,11 @@ const DashboardPage = () => {
             )}
 
             <div className="flex flex-col gap-3">
-              <div className="flex justify-between items-end">
+              <div className="flex items-end justify-between">
                 <h2 className="text-xl font-bold text-slate-900">My Roadmaps</h2>
                 <Link
                   to="/roadmaps/browse"
-                  className="text-primary text-sm font-bold hover:underline flex items-center gap-1"
+                  className="text-primary flex items-center gap-1 text-sm font-bold hover:underline"
                 >
                   View all <span className="text-lg leading-none">›</span>
                 </Link>
@@ -83,7 +83,7 @@ const DashboardPage = () => {
           </div>
 
           {/* CỘT PHẢI (Chiếm 5/12 chiều rộng) */}
-          <div className="xl:col-span-5 flex flex-col gap-6">
+          <div className="flex flex-col gap-6 xl:col-span-5">
             <StatsGrid
               roadmapProgress={data.stats.roadmapProgress}
               completedTopics={data.stats.completedTopics}
@@ -92,7 +92,7 @@ const DashboardPage = () => {
             />
 
             <div className="flex flex-col gap-3">
-              <div className="flex justify-between items-center">
+              <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-slate-900">Weekly Progress</h2>
                 <select className="select select-bordered select-sm rounded-full bg-white font-medium">
                   <option>This week</option>
@@ -103,7 +103,7 @@ const DashboardPage = () => {
             </div>
 
             <div className="flex flex-col gap-3">
-              <div className="flex justify-between items-center">
+              <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-slate-900">Learning Streak</h2>
                 <div className="flex items-center gap-2 text-sm font-bold">
                   This week <span className="text-warning text-lg">🔥</span>

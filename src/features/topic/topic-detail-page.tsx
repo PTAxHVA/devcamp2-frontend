@@ -187,7 +187,7 @@ export default function TopicDetailPage() {
   if (isError || !data) {
     return (
       <div className="flex h-screen flex-col items-center justify-center gap-4 bg-slate-50 text-center">
-        <RiAlertLine className="text-5xl text-red-500 animate-pulse" />
+        <RiAlertLine className="animate-pulse text-5xl text-red-500" />
         <p className="text-lg font-bold text-slate-800">Failed to load topic details.</p>
         <button className="btn btn-primary" onClick={() => navigate('/dashboard')}>
           Back to Dashboard
@@ -262,7 +262,7 @@ export default function TopicDetailPage() {
         {/* Back */}
         <button
           onClick={handleBackToRoadmap}
-          className="flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-slate-900 cursor-pointer"
+          className="flex cursor-pointer items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-slate-900"
         >
           <RiArrowLeftLine className="h-4 w-4" />
           Back to Roadmap
@@ -292,7 +292,7 @@ export default function TopicDetailPage() {
                       style={{ width: `${progressPercent}%` }}
                     />
                   </div>
-                  <span className="whitespace-nowrap text-sm text-slate-500">
+                  <span className="text-sm whitespace-nowrap text-slate-500">
                     {progressPercent}% complete
                   </span>
                 </div>
@@ -354,10 +354,10 @@ export default function TopicDetailPage() {
                             <Icon className="h-5 w-5" />
                           </div>
                           <div>
-                            <p className="text-xs text-slate-400 uppercase font-semibold">
+                            <p className="text-xs font-semibold text-slate-400 uppercase">
                               {r.type}
                             </p>
-                            <p className="text-sm font-semibold leading-snug text-slate-800">
+                            <p className="text-sm leading-snug font-semibold text-slate-800">
                               {r.title}
                             </p>
                           </div>
@@ -400,13 +400,13 @@ export default function TopicDetailPage() {
                         `/my-learning/topics/${id}/sections/${sec._id}${roadmapId ? `?roadmapId=${roadmapId}` : ''}`,
                       )
                     }
-                    className={`grid ${cols} items-center gap-4 border-t border-slate-100 px-2 py-4 transition hover:bg-slate-50/60 cursor-pointer`}
+                    className={`grid ${cols} cursor-pointer items-center gap-4 border-t border-slate-100 px-2 py-4 transition hover:bg-slate-50/60`}
                   >
                     <RiDraggable className="h-4 w-4 text-slate-300" />
                     <span className="text-sm text-slate-400">{idx + 1}</span>
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-slate-800 truncate">{sec.name}</p>
-                      <p className="mt-0.5 text-xs text-slate-400 truncate">
+                      <p className="truncate text-sm font-semibold text-slate-800">{sec.name}</p>
+                      <p className="mt-0.5 truncate text-xs text-slate-400">
                         {sec.contentOverview
                           ? sec.contentOverview
                               .split('\n')
@@ -462,7 +462,7 @@ export default function TopicDetailPage() {
 
               <button
                 onClick={handleContinueTopic}
-                className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-[#0B1221] py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800 cursor-pointer"
+                className="mt-5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#0B1221] py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
                 Continue topic <RiArrowRightLine className="h-4 w-4" />
               </button>

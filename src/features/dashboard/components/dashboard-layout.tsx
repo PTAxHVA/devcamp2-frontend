@@ -6,10 +6,10 @@ interface DashboardLayoutProps {
 
 export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
-    <div className="h-full w-full flex flex-col bg-slate-50 overflow-hidden">
-      <div className="flex-1 flex overflow-hidden">
-        <main className="flex-1 overflow-y-auto p-6 md:p-10 relative">
-          <div className="max-w-6xl mx-auto w-full">{children}</div>
+    <div className="flex h-full w-full flex-col overflow-hidden bg-slate-50">
+      <div className="flex flex-1 overflow-hidden">
+        <main className="relative flex-1 overflow-y-auto p-6 md:p-10">
+          <div className="mx-auto w-full max-w-6xl">{children}</div>
         </main>
       </div>
     </div>

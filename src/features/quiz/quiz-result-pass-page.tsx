@@ -17,7 +17,7 @@ export function QuizResultPassPage() {
 
   if (!attemptId) {
     return (
-      <div className="flex flex-col items-center justify-center p-10 gap-4">
+      <div className="flex flex-col items-center justify-center gap-4 p-10">
         <p className="text-error font-semibold">Invalid result link — no attempt ID found.</p>
         <button className="btn btn-ghost" onClick={() => navigate('/dashboard')}>
           Go to Dashboard
@@ -36,7 +36,7 @@ export function QuizResultPassPage() {
 
   if (isError || !data) {
     return (
-      <div className="flex flex-col items-center justify-center p-10 gap-4">
+      <div className="flex flex-col items-center justify-center gap-4 p-10">
         <p className="text-error font-semibold">Failed to load result.</p>
         <button className="btn btn-ghost" onClick={() => navigate('/dashboard')}>
           Go to Dashboard
@@ -48,12 +48,12 @@ export function QuizResultPassPage() {
   const { quizAttempt, questions } = data
 
   return (
-    <div className="max-w-2xl mx-auto p-6 animate-fade-in">
-      <div className="card bg-green-50 shadow-xl border border-green-200 transition-all duration-500 hover:shadow-2xl">
+    <div className="animate-fade-in mx-auto max-w-2xl p-6">
+      <div className="card border border-green-200 bg-green-50 shadow-xl transition-all duration-500 hover:shadow-2xl">
         <div className="card-body items-center text-center">
-          <FiCheckCircle className="w-20 h-20 text-green-500 animate-bounce" />
-          <h2 className="card-title text-3xl font-bold text-green-700 mt-4">You passed!</h2>
-          <p className="text-xl mt-2 font-semibold">Score: {quizAttempt.score}%</p>
+          <FiCheckCircle className="h-20 w-20 animate-bounce text-green-500" />
+          <h2 className="card-title mt-4 text-3xl font-bold text-green-700">You passed!</h2>
+          <p className="mt-2 text-xl font-semibold">Score: {quizAttempt.score}%</p>
           <div className="card-actions mt-6">
             <button
               className="btn btn-primary transition-transform hover:scale-105"
@@ -66,7 +66,7 @@ export function QuizResultPassPage() {
       </div>
 
       <div className="mt-8 space-y-4">
-        <h3 className="font-bold text-xl mb-4">Review Answers</h3>
+        <h3 className="mb-4 text-xl font-bold">Review Answers</h3>
         {questions.map((q, i) => {
           const selectedId = q.userAnswer?.selectedOptionId
           const userInput = q.userAnswer?.userInput
@@ -76,7 +76,7 @@ export function QuizResultPassPage() {
             q.type === 'MULTIPLE_CHOICE' ? selectedId === correctOption?._id : undefined
 
           return (
-            <div key={q._id} className="p-4 rounded-lg bg-base-100 shadow border border-base-200">
+            <div key={q._id} className="bg-base-100 border-base-200 rounded-lg border p-4 shadow">
               <p className="font-semibold">
                 Question {i + 1}: {q.content}
               </p>
@@ -87,7 +87,7 @@ export function QuizResultPassPage() {
                 </p>
               )}
               {q.type === 'FILL_IN_BLANK' && userInput !== undefined && (
-                <p className="mt-2 text-sm text-base-content/70">Your answer: "{userInput}"</p>
+                <p className="text-base-content/70 mt-2 text-sm">Your answer: "{userInput}"</p>
               )}
             </div>
           )

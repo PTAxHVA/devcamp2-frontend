@@ -7,7 +7,7 @@ export const MainLayout = () => {
       <Sidebar />
       <div className="relative flex flex-1 flex-col overflow-hidden">
         <Navbar />
-        <main className="flex-1 overflow-y-auto overflow-x-hidden">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto">
           <Outlet />
         </main>
       </div>

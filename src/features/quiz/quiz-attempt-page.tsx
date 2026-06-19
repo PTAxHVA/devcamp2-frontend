@@ -47,7 +47,7 @@ export function QuizAttemptPage() {
 
   if (attemptLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <span className="loading loading-spinner loading-lg text-primary"></span>
       </div>
     )
@@ -55,7 +55,7 @@ export function QuizAttemptPage() {
 
   if (attemptError || !quizId) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4">
         <p className="text-error text-lg font-semibold">Failed to start the quiz.</p>
         <button className="btn btn-ghost" onClick={() => navigate(-1)}>
           Go back
@@ -104,25 +104,25 @@ export function QuizAttemptPage() {
   }
 
   return (
-    <div className="min-h-screen bg-base-200/50 flex flex-col items-center py-12 px-4">
-      <div className="w-full max-w-2xl flex flex-col gap-8">
+    <div className="bg-base-200/50 flex min-h-screen flex-col items-center px-4 py-12">
+      <div className="flex w-full max-w-2xl flex-col gap-8">
         <div className="space-y-4">
-          <div className="flex justify-between items-center text-sm font-bold text-base-content/70">
+          <div className="text-base-content/70 flex items-center justify-between text-sm font-bold">
             <span className="flex items-center gap-2">
-              <HiOutlineLightBulb className="w-5 h-5 text-warning animate-pulse" />
+              <HiOutlineLightBulb className="text-warning h-5 w-5 animate-pulse" />
               Câu hỏi {currentIndex + 1} / {questions.length}
             </span>
-            <span className="opacity-60 font-mono text-xs">Quiz ID: {quizId}</span>
+            <span className="font-mono text-xs opacity-60">Quiz ID: {quizId}</span>
           </div>
           <progress
-            className="progress progress-primary w-full h-3 transition-all duration-500"
+            className="progress progress-primary h-3 w-full transition-all duration-500"
             value={currentIndex + 1}
             max={questions.length}
           ></progress>
         </div>
 
-        <div key={currentQuestion.id} className="card bg-base-100 shadow-xl border border-base-200">
-          <div className="card-body p-8 min-h-[300px]">
+        <div key={currentQuestion.id} className="card bg-base-100 border-base-200 border shadow-xl">
+          <div className="card-body min-h-[300px] p-8">
             {currentQuestion.type === 'mcq' ? (
               <McqQuestion
                 question={currentQuestion}
@@ -139,18 +139,18 @@ export function QuizAttemptPage() {
           </div>
         </div>
 
-        <div className="flex justify-between items-center mt-4">
+        <div className="mt-4 flex items-center justify-between">
           <button
             className="btn btn-ghost hover:bg-base-200"
             onClick={prev}
             disabled={isFirstQuestion}
           >
-            <HiMiniArrowLeft className="w-5 h-5" /> Quay lại
+            <HiMiniArrowLeft className="h-5 w-5" /> Quay lại
           </button>
 
           {isLastQuestion ? (
             <button
-              className="btn btn-primary px-8 shadow-lg hover:shadow-primary/50 transition-all active:scale-95"
+              className="btn btn-primary hover:shadow-primary/50 px-8 shadow-lg transition-all active:scale-95"
               onClick={handleSubmit}
               disabled={submitMutation.isPending}
             >
@@ -158,7 +158,7 @@ export function QuizAttemptPage() {
                 <span className="loading loading-spinner"></span>
               ) : (
                 <>
-                  Nộp bài <HiMiniPaperAirplane className="w-5 h-5" />
+                  Nộp bài <HiMiniPaperAirplane className="h-5 w-5" />
                 </>
               )}
             </button>
@@ -167,7 +167,7 @@ export function QuizAttemptPage() {
               className="btn btn-primary px-8 shadow-md transition-all active:scale-95"
               onClick={next}
             >
-              Tiếp tục <HiMiniArrowRight className="w-5 h-5" />
+              Tiếp tục <HiMiniArrowRight className="h-5 w-5" />
             </button>
           )}
         </div>

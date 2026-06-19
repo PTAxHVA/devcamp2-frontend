@@ -20,7 +20,7 @@ const DemoRoadmapPage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-base-100">
+      <div className="bg-base-100 flex h-screen w-full items-center justify-center">
         <span className="loading loading-spinner loading-lg text-primary" />
       </div>
     )
@@ -28,14 +28,14 @@ const DemoRoadmapPage = () => {
 
   if (isError || !data || !graph) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-base-100 text-error">
+      <div className="bg-base-100 text-error flex h-screen w-full items-center justify-center">
         Không tải được demo roadmap. Vui lòng thử lại.
       </div>
     )
   }
 
   return (
-    <div className="flex h-screen w-full flex-col bg-base-100">
+    <div className="bg-base-100 flex h-screen w-full flex-col">
       <header className="shrink-0 border-b border-slate-200 px-8 py-4">
         <h1 className="text-xl font-bold text-slate-900">{data.roadmap.roleName}</h1>
         <p className="text-sm text-slate-500">{data.roadmap.description}</p>

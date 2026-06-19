@@ -2,19 +2,19 @@ import { Link } from 'react-router'
 
 export function EmptyDashboard() {
   return (
-    <div className="flex flex-col items-center justify-center text-center py-20 px-4 bg-base-100 rounded-xl border-2 border-dashed border-base-300">
-      <div className="w-24 h-24 bg-base-200 rounded-full flex items-center justify-center mb-6">
+    <div className="bg-base-100 border-base-300 flex flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-20 text-center">
+      <div className="bg-base-200 mb-6 flex h-24 w-24 items-center justify-center rounded-full">
         <span className="text-4xl">🚀</span>
       </div>
-      <h2 className="text-2xl font-bold text-base-content mb-3">
+      <h2 className="text-base-content mb-3 text-2xl font-bold">
         You haven't started any roadmaps yet!
       </h2>
-      <p className="text-base-content/60 max-w-md mb-8">
+      <p className="text-base-content/60 mb-8 max-w-md">
         Start by creating a personalized learning path just for you, or explore the available
         roadmaps in our library.
       </p>
 
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row">
         <Link to="/onboarding" className="btn btn-primary">
           Create my roadmap
         </Link>

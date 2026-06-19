@@ -24,7 +24,7 @@ export function MyRoadmapsGrid({ roadmaps, hasAvailableRoles }: MyRoadmapsGridPr
 
   return (
     // 2. Chỉnh lại lưới thành tối đa 2 cột
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
       {displayedRoadmaps.map((roadmap) => {
         const badgeInfo = formatBadge(roadmap.sourceType)
 
@@ -32,22 +32,22 @@ export function MyRoadmapsGrid({ roadmaps, hasAvailableRoles }: MyRoadmapsGridPr
           <Link
             key={roadmap.id}
             to={`/roadmaps/${roadmap.id}`}
-            className="card bg-base-100 shadow-sm border border-base-200 hover:shadow-md hover:border-primary/40 transition-all duration-200 group no-underline focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="card bg-base-100 border-base-200 hover:border-primary/40 group focus:ring-primary border no-underline shadow-sm transition-all duration-200 hover:shadow-md focus:border-transparent focus:ring-2 focus:outline-none"
           >
-            <div className="card-body p-5 flex flex-col h-full gap-4">
-              <div className="flex justify-between items-start gap-3">
-                <div className="flex gap-3 items-start">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary transition-colors">
-                    <HiMiniAcademicCap className="w-6 h-6 text-primary group-hover:text-primary-content" />
+            <div className="card-body flex h-full flex-col gap-4 p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <div className="bg-primary/10 group-hover:bg-primary flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg transition-colors">
+                    <HiMiniAcademicCap className="text-primary group-hover:text-primary-content h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-base-content leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                    <h3 className="text-base-content group-hover:text-primary line-clamp-2 leading-tight font-semibold transition-colors">
                       {roadmap.roleName}
                     </h3>
                   </div>
                 </div>
                 <div
-                  className={`badge text-[10px] font-bold uppercase tracking-wider whitespace-nowrap ${badgeInfo.class}`}
+                  className={`badge text-[10px] font-bold tracking-wider whitespace-nowrap uppercase ${badgeInfo.class}`}
                 >
                   {badgeInfo.text}
                 </div>
@@ -56,12 +56,12 @@ export function MyRoadmapsGrid({ roadmaps, hasAvailableRoles }: MyRoadmapsGridPr
               <div className="flex-grow"></div>
 
               <div className="space-y-1.5">
-                <div className="flex justify-between items-end text-sm">
+                <div className="flex items-end justify-between text-sm">
                   <span className="text-base-content/70 font-medium">Progress</span>
-                  <span className="font-bold text-base-content">{roadmap.progressPercentage}%</span>
+                  <span className="text-base-content font-bold">{roadmap.progressPercentage}%</span>
                 </div>
                 <progress
-                  className="progress progress-primary w-full h-2"
+                  className="progress progress-primary h-2 w-full"
                   value={roadmap.progressPercentage}
                   max="100"
                 ></progress>
@@ -75,13 +75,13 @@ export function MyRoadmapsGrid({ roadmaps, hasAvailableRoles }: MyRoadmapsGridPr
       {hasAvailableRoles && roadmaps.length < 2 && (
         <Link
           to="/dashboard/add-role"
-          className="card bg-base-200/50 border-2 border-dashed border-base-300 hover:border-primary/60 hover:bg-primary/5 transition-all min-h-[160px] group no-underline focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          className="card bg-base-200/50 border-base-300 hover:border-primary/60 hover:bg-primary/5 group focus:ring-primary min-h-[160px] border-2 border-dashed no-underline transition-all focus:border-transparent focus:ring-2 focus:outline-none"
         >
-          <div className="card-body p-5 flex flex-col items-center justify-center text-base-content/60 group-hover:text-primary transition-colors">
-            <div className="w-12 h-12 rounded-full bg-base-200 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
-              <HiMiniPlus className="w-6 h-6" />
+          <div className="card-body text-base-content/60 group-hover:text-primary flex flex-col items-center justify-center p-5 transition-colors">
+            <div className="bg-base-200 group-hover:bg-primary/20 mb-2 flex h-12 w-12 items-center justify-center rounded-full transition-colors">
+              <HiMiniPlus className="h-6 w-6" />
             </div>
-            <p className="font-medium text-sm">Add another role</p>
+            <p className="text-sm font-medium">Add another role</p>
           </div>
         </Link>
       )}

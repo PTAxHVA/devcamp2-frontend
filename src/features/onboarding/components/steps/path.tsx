@@ -28,19 +28,19 @@ export const StepLearningPath = () => {
           id: 'react',
           title: 'React',
           desc: 'A popular library for building user interfaces.',
-          icon: <RiReactjsLine className="w-10 h-10 text-[#61DAFB]" />,
+          icon: <RiReactjsLine className="h-10 w-10 text-[#61DAFB]" />,
         },
         {
           id: 'vue',
           title: 'Vue',
           desc: 'A progressive framework for building modern web apps.',
-          icon: <LuCode className="w-10 h-10 text-[#41B883]" />,
+          icon: <LuCode className="h-10 w-10 text-[#41B883]" />,
         }, // Thay thế icon tùy ý
         {
           id: 'angular',
           title: 'Angular',
           desc: 'A full-featured framework for scalable applications.',
-          icon: <RiAngularjsLine className="w-10 h-10 text-[#DD0031]" />,
+          icon: <RiAngularjsLine className="h-10 w-10 text-[#DD0031]" />,
         },
       ],
     },
@@ -55,19 +55,19 @@ export const StepLearningPath = () => {
           id: 'css',
           title: 'CSS Fundamentals',
           desc: 'Core styling techniques for building web layouts.',
-          icon: <RiCss3Line className="w-10 h-10 text-[#264de4]" />,
+          icon: <RiCss3Line className="h-10 w-10 text-[#264de4]" />,
         },
         {
           id: 'tailwind',
           title: 'Tailwind CSS',
           desc: 'A utility-first framework for rapid UI development.',
-          icon: <RiLayout4Line className="w-10 h-10 text-[#38bdf8]" />,
+          icon: <RiLayout4Line className="h-10 w-10 text-[#38bdf8]" />,
         },
         {
           id: 'scss',
           title: 'SCSS/ Sass',
           desc: 'Advanced CSS with variables and reusable styles.',
-          icon: <RiFileCodeLine className="w-10 h-10 text-[#c6538c]" />,
+          icon: <RiFileCodeLine className="h-10 w-10 text-[#c6538c]" />,
         },
       ],
     },
@@ -82,19 +82,19 @@ export const StepLearningPath = () => {
           id: 'portfolio',
           title: 'Portfolio',
           desc: 'Build a personal website to showcase your work.',
-          icon: <RiProfileLine className="w-10 h-10 text-slate-700" />,
+          icon: <RiProfileLine className="h-10 w-10 text-slate-700" />,
         },
         {
           id: 'dashboard',
           title: 'Dashboard',
           desc: 'Create interactive interfaces for data visualization.',
-          icon: <RiDashboardLine className="w-10 h-10 text-slate-700" />,
+          icon: <RiDashboardLine className="h-10 w-10 text-slate-700" />,
         },
         {
           id: 'ecommerce',
           title: 'E-commerce',
           desc: 'Develop modern online shopping experiences.',
-          icon: <RiShoppingCartLine className="w-10 h-10 text-slate-700" />,
+          icon: <RiShoppingCartLine className="h-10 w-10 text-slate-700" />,
         },
       ],
     },
@@ -103,8 +103,8 @@ export const StepLearningPath = () => {
   return (
     <div className="w-full">
       <div className="mb-12 text-left">
-        <h1 className="text-4xl font-bold text-slate-900 mb-3">Choose your learning path</h1>
-        <p className="text-lg text-slate-600 font-medium max-w-2xl">
+        <h1 className="mb-3 text-4xl font-bold text-slate-900">Choose your learning path</h1>
+        <p className="max-w-2xl text-lg font-medium text-slate-600">
           Tell us your preferences so we can create a personalized frontend roadmap that matches
           your goals with internet
         </p>
@@ -113,45 +113,43 @@ export const StepLearningPath = () => {
       <div className="flex flex-col gap-10">
         {sections.map((section) => (
           <div key={section.id}>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-10 h-10 rounded-full bg-brand-purple-50 text-brand-purple-600 text-lg font-bold flex items-center justify-center shrink-0">
+            <div className="mb-6 flex items-center gap-4">
+              <div className="bg-brand-purple-50 text-brand-purple-600 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-bold">
                 {section.id}
               </div>
               <div>
                 <h2 className="text-xl font-bold text-slate-900">{section.title}</h2>
-                <p className="text-slate-500 text-sm">{section.subtitle}</p>
+                <p className="text-sm text-slate-500">{section.subtitle}</p>
               </div>
             </div>
 
             {/* Đã xóa max-w để dãn rộng ra 2 bên theo ý bạn */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:pl-14">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:pl-14">
               {section.options.map((option) => (
                 <div
                   key={option.id}
                   onClick={() => section.setState(option.id)}
-                  className={`relative cursor-pointer rounded-2xl p-6 bg-white transition-all duration-300 flex items-center gap-4 min-h-30
-                    ${
-                      section.state === option.id
-                        ? 'border-2 border-brand-purple-300 bg-brand-purple-50/10 shadow-[0_8px_30px_-4px_rgba(109,40,217,0.1)] ring-2 ring-brand-purple-300 -translate-y-1'
-                        : 'border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md hover:-translate-y-1'
-                    }
-                  `}
+                  className={`relative flex min-h-30 cursor-pointer items-center gap-4 rounded-2xl bg-white p-6 transition-all duration-300 ${
+                    section.state === option.id
+                      ? 'border-brand-purple-300 bg-brand-purple-50/10 ring-brand-purple-300 -translate-y-1 border-2 shadow-[0_8px_30px_-4px_rgba(109,40,217,0.1)] ring-2'
+                      : 'border border-slate-200 shadow-sm hover:-translate-y-1 hover:border-slate-300 hover:shadow-md'
+                  } `}
                 >
                   <div className="absolute top-4 right-4 flex items-center justify-center">
                     <div
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${section.state === option.id ? 'border-brand-purple-600' : 'border-slate-300'}`}
+                      className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all duration-300 ${section.state === option.id ? 'border-brand-purple-600' : 'border-slate-300'}`}
                     >
                       {section.state === option.id && (
-                        <div className="w-2.5 h-2.5 rounded-full bg-brand-purple-600"></div>
+                        <div className="bg-brand-purple-600 h-2.5 w-2.5 rounded-full"></div>
                       )}
                     </div>
                   </div>
                   <div className="shrink-0">{option.icon}</div>
                   <div className="flex-1 pr-4">
-                    <h3 className="text-lg font-bold text-slate-900 mb-1 leading-tight">
+                    <h3 className="mb-1 text-lg leading-tight font-bold text-slate-900">
                       {option.title}
                     </h3>
-                    <p className="text-xs text-slate-500 leading-relaxed">{option.desc}</p>
+                    <p className="text-xs leading-relaxed text-slate-500">{option.desc}</p>
                   </div>
                 </div>
               ))}

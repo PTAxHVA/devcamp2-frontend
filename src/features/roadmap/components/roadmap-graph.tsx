@@ -44,7 +44,7 @@ export const RoadmapGraph = ({
       }`}
     >
       {withUI && (
-        <div className="absolute left-6 top-6 z-10 flex items-center gap-5 rounded-xl border border-slate-100 bg-white/90 p-3 text-xs font-semibold text-slate-600 shadow-sm backdrop-blur-sm">
+        <div className="absolute top-6 left-6 z-10 flex items-center gap-5 rounded-xl border border-slate-100 bg-white/90 p-3 text-xs font-semibold text-slate-600 shadow-sm backdrop-blur-sm">
           <div className="flex items-center gap-1.5">
             <div className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-white">
               <RiCheckLine className="text-[10px]" />
@@ -52,8 +52,8 @@ export const RoadmapGraph = ({
             Completed
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="flex h-4 w-4 items-center justify-center rounded-full border-2 border-brand-purple-600 bg-white">
-              <div className="h-1.5 w-1.5 rounded-full bg-brand-purple-600" />
+            <div className="border-brand-purple-600 flex h-4 w-4 items-center justify-center rounded-full border-2 bg-white">
+              <div className="bg-brand-purple-600 h-1.5 w-1.5 rounded-full" />
             </div>
             Current
           </div>
@@ -88,12 +88,12 @@ export const RoadmapGraph = ({
         proOptions={{ hideAttribution: true }}
       >
         {withUI && !isReadOnly && (
-          <Controls className="bottom-6! left-6! top-auto! flex! flex-col-reverse! gap-1! border-none! shadow-sm! [&>button]:h-8! [&>button]:w-8! [&>button]:rounded-lg! [&>button]:border! [&>button]:border-slate-200! [&>button]:bg-white!" />
+          <Controls className="top-auto! bottom-6! left-6! flex! flex-col-reverse! gap-1! border-none! shadow-sm! [&>button]:h-8! [&>button]:w-8! [&>button]:rounded-lg! [&>button]:border! [&>button]:border-slate-200! [&>button]:bg-white!" />
         )}
 
         {withUI && (
           <MiniMap
-            className="bottom-6! right-6! h-28! w-40! rounded-xl! border-2! border-brand-purple-100! bg-white! shadow-sm!"
+            className="border-brand-purple-100! right-6! bottom-6! h-28! w-40! rounded-xl! border-2! bg-white! shadow-sm!"
             nodeColor={(node) => {
               const data = node.data as BaseNodeData
               if (data?.status === 'completed') return '#10b981'

@@ -12,8 +12,8 @@ interface McqQuestionProps {
 
 export function McqQuestion({ question, selectedId, onSelect }: McqQuestionProps) {
   return (
-    <div className="w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <h3 className="text-xl font-bold mb-6 text-base-content leading-relaxed">
+    <div className="animate-in fade-in slide-in-from-bottom-4 w-full duration-500">
+      <h3 className="text-base-content mb-6 text-xl leading-relaxed font-bold">
         {question.content}
       </h3>
       <div className="flex flex-col gap-3">
@@ -22,9 +22,9 @@ export function McqQuestion({ question, selectedId, onSelect }: McqQuestionProps
           return (
             <label
               key={option.id}
-              className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 hover:shadow-md ${
+              className={`flex cursor-pointer items-center gap-4 rounded-xl border-2 p-4 transition-all duration-300 hover:shadow-md ${
                 isSelected
-                  ? 'border-primary bg-primary/10 shadow-sm scale-[1.02]'
+                  ? 'border-primary bg-primary/10 scale-[1.02] shadow-sm'
                   : 'border-base-300 hover:border-primary/40'
               }`}
             >
@@ -35,10 +35,10 @@ export function McqQuestion({ question, selectedId, onSelect }: McqQuestionProps
                 checked={isSelected}
                 onChange={() => onSelect(option.id)}
               />
-              <span className="text-base font-medium flex-1">{option.content}</span>
+              <span className="flex-1 text-base font-medium">{option.content}</span>
 
               {isSelected && (
-                <HiOutlineCheckCircle className="w-7 h-7 text-primary animate-bounce" />
+                <HiOutlineCheckCircle className="text-primary h-7 w-7 animate-bounce" />
               )}
             </label>
           )

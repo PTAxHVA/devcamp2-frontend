@@ -7,29 +7,29 @@ export const StepPreferences = () => {
   return (
     <div className="w-full">
       <div className="mb-10 text-left">
-        <h1 className="text-4xl font-bold text-slate-900 mb-3">
+        <h1 className="mb-3 text-4xl font-bold text-slate-900">
           Personalize your learning experience
         </h1>
-        <p className="text-lg text-slate-600 font-medium max-w-2xl">
+        <p className="max-w-2xl text-lg font-medium text-slate-600">
           Answer a few questions so VORA can tailor your roadmap, recommend the right resources, and
           help you reach your goals faster.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+      <div className="grid grid-cols-1 gap-x-12 gap-y-8 md:grid-cols-2">
         {PREFERENCE_QUESTIONS.map((q) => (
           <div key={q.id} className="flex gap-4">
             {/* Icon Block */}
             <div className="mt-1">
-              <div className="w-12 h-12 rounded-xl bg-brand-purple-50 text-brand-purple-600 flex items-center justify-center">
+              <div className="bg-brand-purple-50 text-brand-purple-600 flex h-12 w-12 items-center justify-center rounded-xl">
                 {q.icon}
               </div>
             </div>
 
             {/* Content Block */}
             <div className="flex-1">
-              <label className="block text-lg font-bold text-slate-900 mb-1">{q.label}</label>
-              <p className="text-sm text-slate-400 mb-3">{q.desc}</p>
+              <label className="mb-1 block text-lg font-bold text-slate-900">{q.label}</label>
+              <p className="mb-3 text-sm text-slate-400">{q.desc}</p>
 
               <div className="relative">
                 {q.type === 'select' ? (
@@ -37,7 +37,7 @@ export const StepPreferences = () => {
                     <select
                       value={(answers?.[q.id] as string) || ''}
                       onChange={(e) => setAnswer(q.id, e.target.value)}
-                      className="w-full appearance-none rounded-lg border border-slate-200 px-4 py-3 text-slate-700 bg-white focus:outline-none focus:border-brand-purple-400 focus:ring-1 focus:ring-brand-purple-400 cursor-pointer"
+                      className="focus:border-brand-purple-400 focus:ring-brand-purple-400 w-full cursor-pointer appearance-none rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-700 focus:ring-1 focus:outline-none"
                     >
                       <option value="" disabled>
                         {q.placeholder}
@@ -48,7 +48,7 @@ export const StepPreferences = () => {
                         </option>
                       ))}
                     </select>
-                    <RiArrowDownSLine className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                    <RiArrowDownSLine className="pointer-events-none absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2 text-slate-400" />
                   </>
                 ) : (
                   <textarea
@@ -56,7 +56,7 @@ export const StepPreferences = () => {
                     value={(answers?.[q.id] as string) || ''}
                     onChange={(e) => setAnswer(q.id, e.target.value)}
                     placeholder={q.placeholder}
-                    className="w-full rounded-lg border border-slate-200 px-4 py-3 text-slate-700 bg-white focus:outline-none focus:border-brand-purple-400 focus:ring-1 focus:ring-brand-purple-400 resize-none"
+                    className="focus:border-brand-purple-400 focus:ring-brand-purple-400 w-full resize-none rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-700 focus:ring-1 focus:outline-none"
                   ></textarea>
                 )}
               </div>

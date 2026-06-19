@@ -96,7 +96,7 @@ export const Sidebar = () => {
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-          className="absolute -right-3.5 top-17 z-20 grid h-7 w-7 place-items-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-md transition-all duration-200 ease-out hover:scale-110 hover:border-brand-purple-600 hover:bg-brand-purple-600 hover:text-white active:scale-95" // 👉 Đã sửa thành brand-purple
+          className="hover:border-brand-purple-600 hover:bg-brand-purple-600 absolute top-17 -right-3.5 z-20 grid h-7 w-7 place-items-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-md transition-all duration-200 ease-out hover:scale-110 hover:text-white active:scale-95" // 👉 Đã sửa thành brand-purple
         >
           <RiArrowLeftSLine
             className={`h-5 w-5 transition-transform duration-300 ${

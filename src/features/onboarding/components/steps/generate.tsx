@@ -9,21 +9,21 @@ export const StepGenerating = () => {
       id: 1,
       title: 'Analyzing your profile',
       desc: 'Reviewing your goals, experience, and preferences.',
-      icon: <RiSearchLine className="w-7 h-7" />,
+      icon: <RiSearchLine className="h-7 w-7" />,
       status: 'Pending',
     },
     {
       id: 2,
       title: 'Matching the best roadmap',
       desc: 'Selecting the right skills and resources to reach your goals.',
-      icon: <RiLightbulbFlashLine className="w-7 h-7" />,
+      icon: <RiLightbulbFlashLine className="h-7 w-7" />,
       status: 'Pending',
     },
     {
       id: 3,
       title: 'Ordering topics and milestones',
       desc: 'Structuring the roadmap in the most effective learning order.',
-      icon: <RiKey2Line className="w-7 h-7" />,
+      icon: <RiKey2Line className="h-7 w-7" />,
       status: 'Pending',
     },
   ]
@@ -67,12 +67,12 @@ export const StepGenerating = () => {
   ]
 
   return (
-    <div className="w-full flex flex-col lg:flex-row gap-12 items-start mt-8 animate-in fade-in duration-700">
-      <div className="flex-1 w-full">
-        <h1 className="text-4xl md:text-5xl font-bold text-[#0B1528] mb-4 leading-tight">
+    <div className="animate-in fade-in mt-8 flex w-full flex-col items-start gap-12 duration-700 lg:flex-row">
+      <div className="w-full flex-1">
+        <h1 className="mb-4 text-4xl leading-tight font-bold text-[#0B1528] md:text-5xl">
           AI is creating your <br /> personalized roadmap
         </h1>
-        <p className="text-lg text-slate-500 mb-10 max-w-md">
+        <p className="mb-10 max-w-md text-lg text-slate-500">
           Our AI analyzes your profile, matches the best learning path, and organizes topics just
           for you.
         </p>
@@ -81,22 +81,22 @@ export const StepGenerating = () => {
           {processSteps.map((step) => (
             <div
               key={step.id}
-              className="flex items-center gap-6 p-6 border border-slate-200 rounded-2xl bg-white shadow-sm"
+              className="flex items-center gap-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
             >
               {/* Icon */}
-              <div className="w-16 h-16 rounded-full bg-brand-purple-50 text-brand-purple-600 flex items-center justify-center shrink-0">
+              <div className="bg-brand-purple-50 text-brand-purple-600 flex h-16 w-16 shrink-0 items-center justify-center rounded-full">
                 {step.icon}
               </div>
 
               {/* Text */}
               <div className="flex-1 pr-4">
-                <h3 className="text-lg font-bold text-slate-900 mb-1">{step.title}</h3>
-                <p className="text-sm text-slate-500 leading-relaxed">{step.desc}</p>
+                <h3 className="mb-1 text-lg font-bold text-slate-900">{step.title}</h3>
+                <p className="text-sm leading-relaxed text-slate-500">{step.desc}</p>
               </div>
 
               {/* Status Badge */}
               <div className="shrink-0">
-                <div className="px-6 py-2 border-2 border-slate-200 rounded-lg text-sm font-bold text-slate-900 bg-white">
+                <div className="rounded-lg border-2 border-slate-200 bg-white px-6 py-2 text-sm font-bold text-slate-900">
                   {step.status}
                 </div>
               </div>
@@ -105,15 +105,15 @@ export const StepGenerating = () => {
         </div>
       </div>
 
-      <div className="flex-1 w-full lg:max-w-xl">
-        <div className="border border-slate-200 rounded-2xl p-8 bg-white shadow-sm h-full">
-          <h2 className="text-xl font-bold text-slate-900 mb-1">Your roadmap review</h2>
-          <p className="text-sm text-slate-500 mb-8">
+      <div className="w-full flex-1 lg:max-w-xl">
+        <div className="h-full rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+          <h2 className="mb-1 text-xl font-bold text-slate-900">Your roadmap review</h2>
+          <p className="mb-8 text-sm text-slate-500">
             This is a preview. Final roadmap may adjust as we personalize it for you.
           </p>
 
-          <div className="w-full h-95 border border-slate-100 bg-slate-50/50 rounded-xl flex items-center justify-center overflow-hidden relative">
-            <div className="absolute inset-0 pointer-events-none opacity-60 grayscale transition-all duration-1000">
+          <div className="relative flex h-95 w-full items-center justify-center overflow-hidden rounded-xl border border-slate-100 bg-slate-50/50">
+            <div className="pointer-events-none absolute inset-0 opacity-60 grayscale transition-all duration-1000">
               <RoadmapGraph
                 nodes={previewNodes}
                 edges={previewEdges}
@@ -122,9 +122,9 @@ export const StepGenerating = () => {
               />
             </div>
 
-            <div className="absolute inset-0 bg-linear-to-b from-transparent via-slate-50/40 to-slate-50 z-20 flex items-end justify-center pb-8 pointer-events-none">
-              <span className="bg-white/90 backdrop-blur px-5 py-2.5 rounded-full text-xs font-bold text-brand-purple-600 border border-brand-purple-100 shadow-sm animate-pulse flex items-center gap-2">
-                <RiLightbulbFlashLine className="w-4 h-4" /> Generating topics...
+            <div className="pointer-events-none absolute inset-0 z-20 flex items-end justify-center bg-linear-to-b from-transparent via-slate-50/40 to-slate-50 pb-8">
+              <span className="text-brand-purple-600 border-brand-purple-100 flex animate-pulse items-center gap-2 rounded-full border bg-white/90 px-5 py-2.5 text-xs font-bold shadow-sm backdrop-blur">
+                <RiLightbulbFlashLine className="h-4 w-4" /> Generating topics...
               </span>
             </div>
           </div>

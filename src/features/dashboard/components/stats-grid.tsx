@@ -55,16 +55,16 @@ export function StatsGrid({
         return (
           <div
             key={stat.id}
-            className="card bg-base-100 shadow-sm border border-base-200 hover:shadow-md transition-shadow duration-200"
+            className="card bg-base-100 border-base-200 border shadow-sm transition-shadow duration-200 hover:shadow-md"
           >
-            <div className="card-body p-5 items-center text-center">
+            <div className="card-body items-center p-5 text-center">
               <div
-                className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${stat.bgClass}`}
+                className={`mb-2 flex h-12 w-12 items-center justify-center rounded-full ${stat.bgClass}`}
               >
-                <Icon className={`w-6 h-6 ${stat.textClass}`} />
+                <Icon className={`h-6 w-6 ${stat.textClass}`} />
               </div>
-              <h3 className="text-sm font-medium text-base-content/70">{stat.label}</h3>
-              <p className="text-3xl font-bold text-base-content mt-1">{stat.value}</p>
+              <h3 className="text-base-content/70 text-sm font-medium">{stat.label}</h3>
+              <p className="text-base-content mt-1 text-3xl font-bold">{stat.value}</p>
             </div>
           </div>
         )

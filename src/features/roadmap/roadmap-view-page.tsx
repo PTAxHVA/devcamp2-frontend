@@ -65,7 +65,7 @@ const RoadmapViewPage = () => {
 
   if (isError || !roadmapDetail) {
     return (
-      <div className="flex h-screen items-center justify-center bg-slate-50 text-red-500 font-bold">
+      <div className="flex h-screen items-center justify-center bg-slate-50 font-bold text-red-500">
         Failed to load roadmap.
       </div>
     )
@@ -95,7 +95,7 @@ const RoadmapViewPage = () => {
         <div className="w-full">
           <button
             onClick={() => navigate('/dashboard')}
-            className="mb-4 flex items-center gap-2 text-sm font-semibold text-purple-600 transition-colors hover:text-purple-800 cursor-pointer"
+            className="mb-4 flex cursor-pointer items-center gap-2 text-sm font-semibold text-purple-600 transition-colors hover:text-purple-800"
           >
             <RiArrowLeftLine /> Back to Dashboard
           </button>
@@ -117,7 +117,7 @@ const RoadmapViewPage = () => {
             <div className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-1.5 text-slate-600">
               <RiBarChartBoxLine /> Adaptive
             </div>
-            <div className="flex items-center gap-2 rounded-lg border border-purple-200 bg-purple-50 px-3 py-1.5 text-purple-700 uppercase tracking-wider">
+            <div className="flex items-center gap-2 rounded-lg border border-purple-200 bg-purple-50 px-3 py-1.5 tracking-wider text-purple-700 uppercase">
               <RiStarLine /> {roadmapDetail.roadmap.sourceType}
             </div>
           </div>
@@ -134,7 +134,7 @@ const RoadmapViewPage = () => {
 
       <aside className="flex w-95 shrink-0 flex-col border-l border-slate-200 bg-white">
         <div className="flex items-center justify-between border-b border-slate-100 p-6 pb-4">
-          <p className="text-xs font-bold uppercase tracking-wider text-purple-600">
+          <p className="text-xs font-bold tracking-wider text-purple-600 uppercase">
             Selected Topic
           </p>
         </div>
@@ -164,7 +164,7 @@ const RoadmapViewPage = () => {
                     key={req}
                     className="flex items-center gap-3 text-sm font-medium text-slate-600"
                   >
-                    <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white shrink-0">
+                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
                       <RiCheckLine className="text-xs" />
                     </div>
                     {req}
@@ -188,7 +188,7 @@ const RoadmapViewPage = () => {
             <h3 className="mb-3 text-sm font-bold text-slate-900">Sections Included</h3>
             <ul className="space-y-3">
               <li className="flex items-start gap-3 text-sm text-slate-600">
-                <RiCheckboxCircleFill className="mt-0.5 text-base text-purple-600 shrink-0" />
+                <RiCheckboxCircleFill className="mt-0.5 shrink-0 text-base text-purple-600" />
                 <span className="font-medium">
                   {selectedTopic.sectionTotal} Total Sections to complete
                 </span>
@@ -197,22 +197,22 @@ const RoadmapViewPage = () => {
           </div>
         </div>
 
-        <div className="border-t border-slate-100 p-6 space-y-3 bg-white">
+        <div className="space-y-3 border-t border-slate-100 bg-white p-6">
           <button
             onClick={handleGoToTopic}
-            className="flex w-full items-center justify-between rounded-xl bg-[#0B1528] px-5 py-3.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-slate-800 cursor-pointer"
+            className="flex w-full cursor-pointer items-center justify-between rounded-xl bg-[#0B1528] px-5 py-3.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-slate-800"
           >
             Continue learning <RiArrowRightLine className="text-lg" />
           </button>
           <button
             onClick={handleGoToTopic}
-            className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 cursor-pointer"
+            className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50"
           >
             View topic details <RiExternalLinkLine className="text-lg text-slate-400" />
           </button>
           <button
             onClick={() => toast.success('Saved to your bookmarks!')}
-            className="mt-2 flex w-full items-center justify-center gap-2 text-sm font-medium text-slate-500 hover:text-purple-600 transition-colors pt-2 cursor-pointer"
+            className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 pt-2 text-sm font-medium text-slate-500 transition-colors hover:text-purple-600"
           >
             <RiBookmark2Line className="text-lg" /> Save for later
           </button>

@@ -238,7 +238,7 @@ export default function EditCurrentRoadmapPage() {
   }
 
   return (
-    <div className="flex h-full w-full flex-col bg-white p-6 lg:p-8 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
+    <div className="animate-in fade-in slide-in-from-bottom-4 flex h-full w-full flex-col bg-white p-6 duration-500 ease-out lg:p-8">
       {/* Header */}
       <div className="mb-6">
         <button
@@ -273,7 +273,7 @@ export default function EditCurrentRoadmapPage() {
       )}
 
       {/* Main Container */}
-      <div className="flex flex-1 flex-col gap-6 lg:flex-row min-h-150">
+      <div className="flex min-h-150 flex-1 flex-col gap-6 lg:flex-row">
         {/* === CANVAS BÊN TRÁI === */}
         <div className="flex flex-1 flex-col rounded-2xl border border-slate-200 bg-white">
           {/* Toolbar xử lý Mutation thực sự */}
@@ -281,27 +281,27 @@ export default function EditCurrentRoadmapPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={handleAddTopic}
-                className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 border border-slate-200"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
               >
                 <RiAddLine className="text-purple-600" /> Add topic
               </button>
               <button
                 onClick={handleRemoveTopic}
                 disabled={!selectedNode || selectedNode.id === '1'}
-                className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 border border-slate-200 disabled:opacity-40"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-40"
               >
                 <RiSubtractLine className="text-red-500" /> Remove topic
               </button>
               <div className="mx-2 h-5 w-px bg-slate-200" />
               <button
                 onClick={() => handleMoveNode('up')}
-                className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 border border-slate-200"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
               >
                 <RiArrowUpLine className="text-purple-600" /> Move up
               </button>
               <button
                 onClick={() => handleMoveNode('down')}
-                className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 border border-slate-200"
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
               >
                 <RiArrowDownLine className="text-purple-600" /> Move down
               </button>
@@ -320,14 +320,14 @@ export default function EditCurrentRoadmapPage() {
               proOptions={{ hideAttribution: true }}
             >
               <Background color="#cbd5e1" gap={20} size={1} />
-              <Controls className="right-4! top-4! bottom-auto! flex! flex-row! gap-1! border-none! shadow-sm!" />
+              <Controls className="top-4! right-4! bottom-auto! flex! flex-row! gap-1! border-none! shadow-sm!" />
             </ReactFlow>
           </div>
         </div>
 
         {/* === CONTROLLED FORM BÊN PHẢI === */}
         <div className="flex w-full flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:w-100">
-          <h2 className="text-lg font-bold text-slate-900 mb-6">Topic details</h2>
+          <h2 className="mb-6 text-lg font-bold text-slate-900">Topic details</h2>
 
           {selectedNode ? (
             <div className="flex flex-1 flex-col gap-5">
@@ -340,7 +340,7 @@ export default function EditCurrentRoadmapPage() {
                     setFormTitle(e.target.value)
                     updateGraphNodeData('label', e.target.value)
                   }}
-                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-900 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-900 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none"
                 />
               </div>
 
@@ -353,7 +353,7 @@ export default function EditCurrentRoadmapPage() {
                     setFormDescription(e.target.value)
                     updateGraphNodeData('description', e.target.value)
                   }}
-                  className="w-full resize-none rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-900 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  className="w-full resize-none rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-900 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none"
                 />
               </div>
 
@@ -421,14 +421,14 @@ export default function EditCurrentRoadmapPage() {
 
       {/* Footer chứa nút bấm tích hợp Backend thật */}
       <div className="mt-6 flex flex-col items-end gap-6 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex flex-1 items-center gap-4 rounded-xl border border-purple-100 bg-purple-50/50 p-4 w-full lg:w-auto">
+        <div className="flex w-full flex-1 items-center gap-4 rounded-xl border border-purple-100 bg-purple-50/50 p-4 lg:w-auto">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-purple-600 shadow-sm">
             <RiSparklingFill className="text-xl" />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <h4 className="font-bold text-slate-900">AI feedback</h4>
-              <span className="rounded bg-purple-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-purple-700">
+              <span className="rounded bg-purple-100 px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-purple-700 uppercase">
                 Beta
               </span>
             </div>

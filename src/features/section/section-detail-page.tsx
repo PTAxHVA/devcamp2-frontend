@@ -108,7 +108,7 @@ export default function SectionDetailPage() {
   if (isError) {
     return (
       <div className="flex h-screen flex-col items-center justify-center gap-4 bg-slate-50 text-center">
-        <RiAlertLine className="text-5xl text-red-500 animate-pulse" />
+        <RiAlertLine className="animate-pulse text-5xl text-red-500" />
         <p className="text-lg font-bold text-slate-800">Failed to load section details.</p>
         <button className="btn btn-primary" onClick={() => navigate('/dashboard')}>
           Back to Dashboard
@@ -172,14 +172,14 @@ export default function SectionDetailPage() {
       <div className="mb-8 flex flex-wrap items-center gap-2 text-sm font-medium">
         <Link
           to="/dashboard"
-          className="text-purple-600 transition-colors hover:text-purple-800 cursor-pointer"
+          className="cursor-pointer text-purple-600 transition-colors hover:text-purple-800"
         >
           Learn
         </Link>
         <RiArrowRightSLine className="text-slate-400" />
         <Link
           to={`/my-learning/topics/${topicId}${qRoadmap}`}
-          className="text-purple-600 transition-colors hover:text-purple-800 cursor-pointer"
+          className="cursor-pointer text-purple-600 transition-colors hover:text-purple-800"
         >
           {topic.name}
         </Link>
@@ -278,7 +278,7 @@ export default function SectionDetailPage() {
                     <Icon className="text-xl" />
                   </div>
                   <div className="flex-1">
-                    <p className="mb-0.5 text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <p className="mb-0.5 text-xs font-bold tracking-wider text-slate-400 uppercase">
                       {getResourceTypeLabel(mat.type)}
                     </p>
                     <p className="text-sm font-bold text-slate-900 transition-colors group-hover:text-purple-700">
@@ -299,8 +299,8 @@ export default function SectionDetailPage() {
 
       {/* Info Banner */}
       {section.hasQuiz && (
-        <div className="mb-10 flex items-center gap-3 rounded-xl border border-brand-purple-100 bg-brand-purple-50/50 p-4 text-brand-purple-800">
-          <RiInformationLine className="shrink-0 text-xl text-brand-purple-600" />
+        <div className="border-brand-purple-100 bg-brand-purple-50/50 text-brand-purple-800 mb-10 flex items-center gap-3 rounded-xl border p-4">
+          <RiInformationLine className="text-brand-purple-600 shrink-0 text-xl" />
           <p className="text-sm font-medium">
             You must pass the quiz with at least {quiz?.minPassScore || QUIZ_PASS_THRESHOLD}% to
             complete this section and continue to the next one.
@@ -309,20 +309,20 @@ export default function SectionDetailPage() {
       )}
 
       {/* Navigation Footer */}
-      <div className="flex flex-col items-center justify-between gap-6 border-t border-slate-200 pb-10 pt-6 sm:flex-row">
+      <div className="flex flex-col items-center justify-between gap-6 border-t border-slate-200 pt-6 pb-10 sm:flex-row">
         {/* Previous */}
         {prevSection ? (
           <button
             onClick={() =>
               navigate(`/my-learning/topics/${topicId}/sections/${prevSection._id}${qRoadmap}`)
             }
-            className="group flex w-full items-center gap-4 text-left sm:w-auto cursor-pointer"
+            className="group flex w-full cursor-pointer items-center gap-4 text-left sm:w-auto"
           >
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition-colors group-hover:border-slate-300">
               <RiArrowLeftLine />
             </div>
             <div>
-              <p className="mb-0.5 text-xs font-bold uppercase tracking-wider text-slate-500">
+              <p className="mb-0.5 text-xs font-bold tracking-wider text-slate-500 uppercase">
                 Previous Section
               </p>
               <p className="text-sm font-semibold text-slate-900 transition-colors group-hover:text-purple-700">
@@ -337,13 +337,13 @@ export default function SectionDetailPage() {
         ) : (
           <Link
             to={`/my-learning/topics/${topicId}${qRoadmap}`}
-            className="group flex w-full items-center gap-4 text-left sm:w-auto cursor-pointer"
+            className="group flex w-full cursor-pointer items-center gap-4 text-left sm:w-auto"
           >
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition-colors group-hover:border-slate-300">
               <RiArrowLeftLine />
             </div>
             <div>
-              <p className="mb-0.5 text-xs font-bold uppercase tracking-wider text-slate-500">
+              <p className="mb-0.5 text-xs font-bold tracking-wider text-slate-500 uppercase">
                 Topic Details
               </p>
               <p className="text-sm font-semibold text-slate-900 transition-colors group-hover:text-purple-700">
@@ -356,7 +356,7 @@ export default function SectionDetailPage() {
         <div className="flex w-full items-center justify-between gap-6 sm:w-auto sm:justify-end">
           {nextSection && (
             <div className="hidden text-right md:block">
-              <p className="mb-0.5 text-xs font-bold uppercase tracking-wider text-slate-500">
+              <p className="mb-0.5 text-xs font-bold tracking-wider text-slate-500 uppercase">
                 Next Section
               </p>
               <p className="text-sm font-medium text-slate-600">{nextSection.name}</p>
@@ -369,7 +369,7 @@ export default function SectionDetailPage() {
                 onClick={() =>
                   navigate(`/my-learning/topics/${topicId}/sections/${nextSection._id}${qRoadmap}`)
                 }
-                className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 sm:w-auto cursor-pointer"
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 sm:w-auto"
               >
                 Next Section <RiArrowRightLine />
               </button>
@@ -379,7 +379,7 @@ export default function SectionDetailPage() {
               <button
                 onClick={handleStartQuiz}
                 disabled={isQuizLoading}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0B1221] px-6 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-slate-800 sm:w-auto cursor-pointer disabled:opacity-50"
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#0B1221] px-6 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-slate-800 disabled:opacity-50 sm:w-auto"
               >
                 <RiSparklingFill className="text-brand-purple-300 animate-pulse" /> Start Quiz
               </button>
@@ -387,7 +387,7 @@ export default function SectionDetailPage() {
               <button
                 onClick={handleMarkAsComplete}
                 disabled={isCompleting}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0B1221] px-6 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-slate-800 sm:w-auto cursor-pointer disabled:opacity-50"
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#0B1221] px-6 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-slate-800 disabled:opacity-50 sm:w-auto"
               >
                 {isCompleting ? (
                   <span className="loading loading-spinner loading-sm"></span>

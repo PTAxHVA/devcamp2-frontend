@@ -3,16 +3,16 @@ import Logo from '@/assets/Logo.svg'
 
 export const NavBar = () => {
   return (
-    <header className="px-8 lg:px-12 py-6 flex items-center justify-between">
+    <header className="flex items-center justify-between px-8 py-6 lg:px-12">
       <div className="text-2xl font-bold tracking-tight text-slate-900">
-        <img src={Logo} alt="VORA Logo" className="w-35 h-auto object-contain" />
+        <img src={Logo} alt="VORA Logo" className="h-auto w-35 object-contain" />
       </div>
       <div className="flex items-center gap-4 text-slate-500">
-        <button className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition">
-          <RiQuestionLine className="w-5 h-5" />
+        <button className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 transition hover:bg-slate-50">
+          <RiQuestionLine className="h-5 w-5" />
         </button>
-        <button className="w-10 h-10 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center hover:bg-purple-200 transition">
-          <RiUser3Line className="w-5 h-5" />
+        <button className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100 text-purple-700 transition hover:bg-purple-200">
+          <RiUser3Line className="h-5 w-5" />
         </button>
       </div>
     </header>

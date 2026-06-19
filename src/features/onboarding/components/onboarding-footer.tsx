@@ -1,20 +1,20 @@
 import { RiSunLine } from 'react-icons/ri'
 export const Footer = () => {
   return (
-    <footer className="px-8 lg:px-12 py-8 mt-8 flex flex-col sm:flex-row items-center justify-between text-sm text-slate-400 border-t border-slate-100">
+    <footer className="mt-8 flex flex-col items-center justify-between border-t border-slate-100 px-8 py-8 text-sm text-slate-400 sm:flex-row lg:px-12">
       <p>© 2025 VORA. All rights reserved.</p>
-      <div className="flex items-center gap-8 mt-4 sm:mt-0">
-        <a href="#" className="hover:text-slate-600 transition-colors">
+      <div className="mt-4 flex items-center gap-8 sm:mt-0">
+        <a href="#" className="transition-colors hover:text-slate-600">
           Privacy
         </a>
-        <a href="#" className="hover:text-slate-600 transition-colors">
+        <a href="#" className="transition-colors hover:text-slate-600">
           Terms
         </a>
-        <a href="#" className="hover:text-slate-600 transition-colors">
+        <a href="#" className="transition-colors hover:text-slate-600">
           Help
         </a>
-        <button className="hover:text-slate-600 transition-colors">
-          <RiSunLine className="w-5 h-5" />
+        <button className="transition-colors hover:text-slate-600">
+          <RiSunLine className="h-5 w-5" />
         </button>
       </div>
     </footer>

@@ -80,15 +80,15 @@ export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
     <div
       className={`flex h-14 w-56 cursor-pointer items-center rounded-xl border-2 px-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg ${getContainerStyles()}`}
     >
-      <Handle type="target" position={Position.Top} className="opacity-0 w-2 h-2" />
+      <Handle type="target" position={Position.Top} className="h-2 w-2 opacity-0" />
 
       {renderIndicator()}
 
-      <div className="flex-1 ml-2 text-center text-sm font-semibold truncate px-1">
+      <div className="ml-2 flex-1 truncate px-1 text-center text-sm font-semibold">
         {data.label}
       </div>
 
-      <Handle type="source" position={Position.Bottom} className="opacity-0 w-2 h-2" />
+      <Handle type="source" position={Position.Bottom} className="h-2 w-2 opacity-0" />
     </div>
   )
 }

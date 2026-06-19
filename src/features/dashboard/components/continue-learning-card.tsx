@@ -26,12 +26,12 @@ export function ContinueLearningCard({
   const total = continueLearning.totalTopics || 0
 
   return (
-    <div className="card bg-[#F4F0FF] border-none shadow-sm rounded-2xl overflow-hidden">
-      <div className="p-6 flex flex-col md:flex-row gap-6 items-center">
+    <div className="card overflow-hidden rounded-2xl border-none bg-[#F4F0FF] shadow-sm">
+      <div className="flex flex-col items-center gap-6 p-6 md:flex-row">
         {/* Vòng tròn Progress */}
         <div className="flex-shrink-0">
           <div
-            className="radial-progress bg-white text-primary border-[6px] border-[#EAE2FF] shadow-sm"
+            className="radial-progress text-primary border-[6px] border-[#EAE2FF] bg-white shadow-sm"
             style={
               {
                 '--value': progress,
@@ -40,9 +40,9 @@ export function ContinueLearningCard({
               } as React.CSSProperties
             }
           >
-            <div className="flex flex-col items-center justify-center h-full">
+            <div className="flex h-full flex-col items-center justify-center">
               <span className="text-2xl font-extrabold text-slate-800">{progress}%</span>
-              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">
+              <span className="mt-1 text-[10px] font-bold tracking-wider text-slate-500 uppercase">
                 Complete
               </span>
             </div>
@@ -50,30 +50,30 @@ export function ContinueLearningCard({
         </div>
 
         {/* Thông tin khóa học */}
-        <div className="flex-grow flex flex-col w-full">
-          <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">
+        <div className="flex w-full flex-grow flex-col">
+          <p className="text-primary mb-1 text-xs font-bold tracking-widest uppercase">
             Current roadmap
           </p>
           <h3
-            className="text-2xl font-bold text-slate-900 flex items-center gap-2 group cursor-pointer w-fit"
+            className="group flex w-fit cursor-pointer items-center gap-2 text-2xl font-bold text-slate-900"
             onClick={() => navigate(`/roadmaps/${continueLearning.userRoadmapId}`)}
           >
             {continueLearning.sectionName}
-            <FiExternalLink className="text-slate-400 w-5 h-5 group-hover:text-primary transition-colors" />
+            <FiExternalLink className="group-hover:text-primary h-5 w-5 text-slate-400 transition-colors" />
           </h3>
-          <div className="w-full h-px bg-slate-200/60 my-4"></div>
+          <div className="my-4 h-px w-full bg-slate-200/60"></div>
 
           <div>
-            <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">
+            <p className="mb-2 text-[11px] font-bold tracking-widest text-slate-500 uppercase">
               Next up
             </p>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-md bg-white shadow-sm flex items-center justify-center font-bold text-slate-700 border border-slate-100">
+              <div className="flex h-8 w-8 items-center justify-center rounded-md border border-slate-100 bg-white font-bold text-slate-700 shadow-sm">
                 {completed}
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-slate-800">{continueLearning.topicName}</span>
-                <span className="text-xs text-slate-500 font-medium">
+                <span className="text-xs font-medium text-slate-500">
                   {completed} of {total} topics completed
                 </span>
               </div>
@@ -83,22 +83,22 @@ export function ContinueLearningCard({
       </div>
 
       {/* Footer chứa Nút bấm */}
-      <div className="bg-[#EBE4FF] px-6 py-4 flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 bg-[#EBE4FF] px-6 py-4">
         <button
-          className="btn btn-primary rounded-lg shadow-sm border-none px-6"
+          className="btn btn-primary rounded-lg border-none px-6 shadow-sm"
           onClick={() =>
             navigate(
               `/my-learning/topics/${continueLearning.topicId}/sections/${continueLearning.sectionId}?roadmapId=${continueLearning.userRoadmapId}`,
             )
           }
         >
-          Continue Learning <FiArrowRight className="w-4 h-4 ml-1" />
+          Continue Learning <FiArrowRight className="ml-1 h-4 w-4" />
         </button>
         <button
-          className="btn btn-outline bg-white rounded-lg border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 px-5"
+          className="btn btn-outline rounded-lg border-slate-200 bg-white px-5 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
           onClick={() => navigate(`/roadmaps/${continueLearning.userRoadmapId}`)}
         >
-          View Roadmap <FiExternalLink className="w-4 h-4 ml-1" />
+          View Roadmap <FiExternalLink className="ml-1 h-4 w-4" />
         </button>
       </div>
     </div>
