@@ -1,7 +1,7 @@
 import { levels } from '../../data/onboarding-data'
 
 interface StepLevelProps {
-  selectedLevel: string
+  selectedLevel?: string
   setSelectedLevel: (id: string) => void
 }
 
