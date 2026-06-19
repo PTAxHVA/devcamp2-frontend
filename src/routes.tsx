@@ -45,13 +45,13 @@ export function AppRoutes() {
         <Route path="/auth/reset-password/success" element={<ResetPasswordSuccessPage />} />
       </Route>
 
-      {/* Onboarding */}
-      <Route path="/onboarding" element={<OnboardingMain />} />
-
-      {/* Full-screen quiz & results (no sidebar) */}
-      <Route path="/quizzes/:quizId/attempt" element={<QuizAttemptPage />} />
-      <Route path="/quizzes/:attemptId/result/pass" element={<QuizResultPassPage />} />
-      <Route path="/quizzes/:attemptId/result/fail" element={<QuizResultFailPage />} />
+      {/* Onboarding + full-screen quiz & results — cần đăng nhập (no sidebar) */}
+      <Route element={<ProtectedRoute />}>
+        <Route path="/onboarding" element={<OnboardingMain />} />
+        <Route path="/quizzes/:quizId/attempt" element={<QuizAttemptPage />} />
+        <Route path="/quizzes/:attemptId/result/pass" element={<QuizResultPassPage />} />
+        <Route path="/quizzes/:attemptId/result/fail" element={<QuizResultFailPage />} />
+      </Route>
 
       {/* App pages — cần đăng nhập (ProtectedRoute), dùng MainLayout của team */}
       <Route element={<ProtectedRoute />}>
