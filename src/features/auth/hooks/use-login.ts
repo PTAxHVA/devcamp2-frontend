@@ -28,11 +28,14 @@ export function useLogin() {
     onSuccess: async (payload) => {
       setAuth(payload.token, payload.user)
 
-      // /onboarding/status chưa ship — mock tạm; xoá mock khi BE xong
-      // const { data } = await apiClient.get('/onboarding/status')
-      // navigate(data.data.onboardingCompleted ? '/dashboard' : '/onboarding')
-      const mock = { data: { onboardingCompleted: false } }
-      navigate(mock.data.onboardingCompleted ? '/dashboard' : '/onboarding')
+      // BE GET /onboarding/status trả { success, data: { completed: boolean } }.
+      // User đã hoàn thành onboarding -> dashboard, ngược lại -> onboarding.
+      try {
+        const { data } = await apiClient.get('/onboarding/status')
+        navigate(data.data.completed ? '/dashboard' : '/onboarding')
+      } catch {
+        navigate('/dashboard')
+      }
     },
     onError: (err) => {
       const msg = axios.isAxiosError(err) ? err.response?.data?.error?.message : null
