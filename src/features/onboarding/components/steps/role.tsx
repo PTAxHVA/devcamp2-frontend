@@ -2,7 +2,7 @@ import { RiTimeLine } from 'react-icons/ri'
 import { roles } from '../../data/onboarding-data'
 
 interface StepRoleProps {
-  selectedRole: string
+  selectedRole?: string
   setSelectedRole: (id: string) => void
 }
 
