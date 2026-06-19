@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useWizardStore } from '../../onboarding-store'
 import { LuCode } from 'react-icons/lu'
 import {
   RiReactjsLine,
@@ -12,9 +12,11 @@ import {
 } from 'react-icons/ri'
 
 export const StepLearningPath = () => {
-  const [selectedFramework, setSelectedFramework] = useState('react')
-  const [selectedStyling, setSelectedStyling] = useState('tailwind')
-  const [selectedProject, setSelectedProject] = useState('portfolio')
+  const { answers, setAnswer } = useWizardStore()
+
+  const selectedFramework = answers?.learningFramework as string | undefined
+  const selectedStyling = answers?.styling as string | undefined
+  const selectedProject = answers?.projectDirection as string | undefined
 
   const sections = [
     {
@@ -22,7 +24,7 @@ export const StepLearningPath = () => {
       title: 'Choose your framework',
       subtitle: 'Select your framework you want to focus',
       state: selectedFramework,
-      setState: setSelectedFramework,
+      setState: (val: string) => setAnswer('learningFramework', val),
       options: [
         {
           id: 'react',
@@ -35,7 +37,7 @@ export const StepLearningPath = () => {
           title: 'Vue',
           desc: 'A progressive framework for building modern web apps.',
           icon: <LuCode className="h-10 w-10 text-[#41B883]" />,
-        }, // Thay thế icon tùy ý
+        },
         {
           id: 'angular',
           title: 'Angular',
@@ -49,7 +51,7 @@ export const StepLearningPath = () => {
       title: 'Choose your styling preferences',
       subtitle: 'Pick your preferred way to style your components and layouts',
       state: selectedStyling,
-      setState: setSelectedStyling,
+      setState: (val: string) => setAnswer('styling', val),
       options: [
         {
           id: 'css',
@@ -76,7 +78,7 @@ export const StepLearningPath = () => {
       title: 'Choose your project direction',
       subtitle: 'Pick the type of projects you want to build along way.',
       state: selectedProject,
-      setState: setSelectedProject,
+      setState: (val: string) => setAnswer('projectDirection', val),
       options: [
         {
           id: 'portfolio',
@@ -123,7 +125,6 @@ export const StepLearningPath = () => {
               </div>
             </div>
 
-            {/* Đã xóa max-w để dãn rộng ra 2 bên theo ý bạn */}
             <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:pl-14">
               {section.options.map((option) => (
                 <div

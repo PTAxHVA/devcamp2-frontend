@@ -20,6 +20,10 @@ import SignupPage from './features/auth/signup-page'
 import ForgotPasswordPage from './features/auth/forgot-password-page'
 import ResetPasswordPage from './features/auth/reset-password-page'
 import ResetPasswordSuccessPage from './features/auth/reset-password-success-page'
+import { ProtectedRoute } from '@/components/shared/protected-route'
+import NotFoundPage from '@/pages/not-found-page'
+import ProfilePage from '@/pages/profile-page'
+import SettingsPage from '@/pages/settings-page'
 
 export function AppRoutes() {
   return (
@@ -41,78 +45,67 @@ export function AppRoutes() {
         <Route path="/auth/reset-password/success" element={<ResetPasswordSuccessPage />} />
       </Route>
 
-      {/* Onboarding */}
-      <Route path="/onboarding" element={<OnboardingMain />} />
+      {/* Onboarding + full-screen quiz & results — cần đăng nhập (no sidebar) */}
+      <Route element={<ProtectedRoute />}>
+        <Route path="/onboarding" element={<OnboardingMain />} />
+        <Route path="/quizzes/:quizId/attempt" element={<QuizAttemptPage />} />
+        <Route path="/quizzes/:attemptId/result/pass" element={<QuizResultPassPage />} />
+        <Route path="/quizzes/:attemptId/result/fail" element={<QuizResultFailPage />} />
+      </Route>
 
-      {/* Full-screen quiz & results (no sidebar) */}
-      <Route path="/quizzes/:quizId/attempt" element={<QuizAttemptPage />} />
-      <Route path="/quizzes/:attemptId/result/pass" element={<QuizResultPassPage />} />
-      <Route path="/quizzes/:attemptId/result/fail" element={<QuizResultFailPage />} />
-
-      {/* App pages — dùng MainLayout của team */}
-      <Route element={<MainLayout />}>
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route
-          path="/my-learning/topics/:topicId/sections/:sectionId"
-          element={<SectionDetailPage />}
-        />
-        <Route path="/my-learning/topics/:id" element={<TopicDetailPage />} />
-        <Route path="/roadmaps/browse" element={<BrowseRoadmapsPage />} />
-        <Route path="/roadmaps/:id" element={<RoadmapViewPage />} />
-        <Route path="/roadmaps/:id/edit" element={<EditCurrentRoadmapPage />} />
-        <Route path="/roadmaps" element={<BrowseRoadmapsPage />} />
-        <Route path="/my-learning" element={<MylearningJourneyPage />} />
-        <Route
-          path="/goals"
-          element={
-            <div className="flex h-full items-center justify-center text-2xl font-bold text-slate-400">
-              🚧 Trang Goals (Đang xây dựng)
-            </div>
-          }
-        />
-        <Route
-          path="/ai-assistant"
-          element={
-            <div className="flex h-full items-center justify-center text-2xl font-bold text-slate-400">
-              🚧 Trang AI Assistant (Đang xây dựng)
-            </div>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <div className="flex h-full items-center justify-center text-2xl font-bold text-slate-400">
-              🚧 Trang Settings (Đang xây dựng)
-            </div>
-          }
-        />
-        <Route
-          path="/support"
-          element={
-            <div className="flex h-full items-center justify-center text-2xl font-bold text-slate-400">
-              🚧 Trang Help & Support (Đang xây dựng)
-            </div>
-          }
-        />
-        <Route
-          path="/dashboard/add-role"
-          element={
-            <div className="flex h-full items-center justify-center text-2xl font-bold text-slate-400">
-              🚧 Trang Add Role (Task 20 sẽ làm)
-            </div>
-          }
-        />
+      {/* App pages — cần đăng nhập (ProtectedRoute), dùng MainLayout của team */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<MainLayout />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route
+            path="/my-learning/topics/:topicId/sections/:sectionId"
+            element={<SectionDetailPage />}
+          />
+          <Route path="/my-learning/topics/:id" element={<TopicDetailPage />} />
+          <Route path="/roadmaps/browse" element={<BrowseRoadmapsPage />} />
+          <Route path="/roadmaps/:id" element={<RoadmapViewPage />} />
+          <Route path="/roadmaps/:id/edit" element={<EditCurrentRoadmapPage />} />
+          <Route path="/roadmaps" element={<BrowseRoadmapsPage />} />
+          <Route path="/my-learning" element={<MylearningJourneyPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route
+            path="/goals"
+            element={
+              <div className="flex h-full items-center justify-center text-2xl font-bold text-slate-400">
+                🚧 Trang Goals (Đang xây dựng)
+              </div>
+            }
+          />
+          <Route
+            path="/ai-assistant"
+            element={
+              <div className="flex h-full items-center justify-center text-2xl font-bold text-slate-400">
+                🚧 Trang AI Assistant (Đang xây dựng)
+              </div>
+            }
+          />
+          <Route
+            path="/support"
+            element={
+              <div className="flex h-full items-center justify-center text-2xl font-bold text-slate-400">
+                🚧 Trang Help & Support (Đang xây dựng)
+              </div>
+            }
+          />
+          <Route
+            path="/dashboard/add-role"
+            element={
+              <div className="flex h-full items-center justify-center text-2xl font-bold text-slate-400">
+                🚧 Trang Add Role (Task 20 sẽ làm)
+              </div>
+            }
+          />
+        </Route>
       </Route>
 
       {/* 404 */}
-      <Route
-        path="*"
-        element={
-          <div className="flex h-screen items-center justify-center text-2xl font-bold text-slate-800">
-            404 Not Found
-          </div>
-        }
-      />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )
 }

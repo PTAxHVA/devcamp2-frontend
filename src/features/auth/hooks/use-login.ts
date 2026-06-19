@@ -25,14 +25,12 @@ export function useLogin() {
       const { data } = await apiClient.post('/auth/login', input)
       return data.data // unwrap 2 lớp .data
     },
-    onSuccess: async (payload) => {
+    onSuccess: (payload) => {
       setAuth(payload.token, payload.user)
-
-      // /onboarding/status chưa ship — mock tạm; xoá mock khi BE xong
-      // const { data } = await apiClient.get('/onboarding/status')
-      // navigate(data.data.onboardingCompleted ? '/dashboard' : '/onboarding')
-      const mock = { data: { onboardingCompleted: false } }
-      navigate(mock.data.onboardingCompleted ? '/dashboard' : '/onboarding')
+      // Returning user -> dashboard (new user vào onboarding qua signup).
+      // TODO: khi onboarding đã POST /onboarding/questionnaire (persist `completed`),
+      // đổi sang điều hướng theo GET /onboarding/status để resume đúng chỗ.
+      navigate('/dashboard')
     },
     onError: (err) => {
       const msg = axios.isAxiosError(err) ? err.response?.data?.error?.message : null

@@ -1,7 +1,7 @@
 import { goals } from '../../data/onboarding-data'
 
 interface StepGoalProps {
-  selectedGoal: string
+  selectedGoal?: string
   setSelectedGoal: (id: string) => void
 }
 

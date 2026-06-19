@@ -194,5 +194,8 @@ export const PREFERENCE_QUESTIONS = [
     desc: 'Share anything else we should know to personalize your roadmap',
     type: 'textarea',
     placeholder: 'E.g., I have a background in design...',
+    required: false,
   },
 ]
+
+export const LEARNING_PATH_KEYS = ['learningFramework', 'styling', 'projectDirection'] as const
