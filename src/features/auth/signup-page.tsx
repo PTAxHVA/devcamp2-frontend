@@ -41,7 +41,7 @@ export default function SignupPage() {
     formState: { errors },
   } = useForm<SignupInput>({
     resolver: zodResolver(signupSchema),
-    defaultValues: { password: '' },
+    defaultValues: { password: '', terms: false },
   })
 
   const signup = useSignup(setError)
@@ -165,19 +165,26 @@ export default function SignupPage() {
             </div>
 
             {/* Terms */}
-            <label className="flex cursor-pointer items-start gap-2">
-              <input type="checkbox" className="mt-0.5 h-4 w-4 accent-indigo-600" />
-              <span className="text-sm text-gray-500">
-                I agree to VORA's{' '}
-                <span className="cursor-pointer text-indigo-600 hover:underline">
-                  Terms of Service
-                </span>{' '}
-                and{' '}
-                <span className="cursor-pointer text-indigo-600 hover:underline">
-                  Privacy Policy
+            <div className="flex flex-col gap-1">
+              <label className="flex cursor-pointer items-start gap-2">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 accent-indigo-600"
+                  {...register('terms')}
+                />
+                <span className="text-sm text-gray-500">
+                  I agree to VORA's{' '}
+                  <span className="cursor-pointer text-indigo-600 hover:underline">
+                    Terms of Service
+                  </span>{' '}
+                  and{' '}
+                  <span className="cursor-pointer text-indigo-600 hover:underline">
+                    Privacy Policy
+                  </span>
                 </span>
-              </span>
-            </label>
+              </label>
+              {errors.terms && <p className="text-xs text-red-500">{errors.terms.message}</p>}
+            </div>
 
             <button
               type="submit"

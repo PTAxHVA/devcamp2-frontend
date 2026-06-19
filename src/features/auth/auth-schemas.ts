@@ -13,6 +13,9 @@ export const signupSchema = z
     email: z.string().email('Email không hợp lệ'),
     password: z.string().min(8, 'Mật khẩu tối thiểu 8 ký tự'),
     confirmPassword: z.string(),
+    terms: z.boolean().refine((val) => val === true, {
+      message: 'Bạn cần đồng ý với Điều khoản dịch vụ và Chính sách bảo mật để tạo tài khoản',
+    }),
   })
   .refine((d) => d.password === d.confirmPassword, {
     message: 'Mật khẩu nhập lại không khớp',
