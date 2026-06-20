@@ -1,20 +1,45 @@
-import { useNavigate } from 'react-router'
+import { useParams, useNavigate } from 'react-router'
+import { FiX, FiRefreshCw, FiShield } from 'react-icons/fi'
+import { useQuizResult } from '@/features/quiz/hooks/use-quiz-result'
 import { useCooldownTimer } from '@/features/quiz/hooks/use-cooldown-timer'
-import { FiX, FiAlertCircle, FiBookOpen, FiRefreshCw, FiShield } from 'react-icons/fi'
+import { AnswerReview } from '@/features/quiz/components/answer-review'
 
-// Lôi biến này ra ngoài hàm để nó chỉ chạy 1 lần duy nhất khi load file
-// Nhờ vậy, component của bạn sẽ đạt chuẩn 100% "Pure" của React.
-// LƯU Ý: Khi nối API, bạn xóa biến này đi và lấy data?.quizAttempt?.cooldownUntil truyền vào hook bên dưới.
-const MOCK_COOLDOWN_TARGET = new Date(Date.now() + 60000)
+const PASS_THRESHOLD = 80
 
 export function QuizResultFailPage() {
+  const { attemptId } = useParams<{ attemptId: string }>()
   const navigate = useNavigate()
+  const { data, isLoading, isError } = useQuizResult(attemptId ?? '')
 
-  // Gọi hook và truyền biến ngoại lai vào
-  const { formatted, isExpired } = useCooldownTimer(MOCK_COOLDOWN_TARGET)
+  // Real cooldown from the attempt; null until loaded / when BE sets no cooldown.
+  const { formatted, isExpired } = useCooldownTimer(data?.quizAttempt?.cooldownUntil ?? null)
 
-  const score = 58
-  const passingScore = 70
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-32">
+        <span className="loading loading-spinner loading-lg text-indigo-600" />
+      </div>
+    )
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="mx-auto my-20 max-w-md rounded-2xl border border-red-100 bg-red-50 p-8 text-center">
+        <p className="font-semibold text-red-600">Không tải được kết quả.</p>
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="mt-4 rounded-xl border border-slate-200 bg-white px-5 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50"
+        >
+          Về Dashboard
+        </button>
+      </div>
+    )
+  }
+
+  const { score, quizId } = data.quizAttempt
+  const total = data.questions.length
+  const correct = Math.round((score / 100) * total)
+  const gap = Math.max(0, PASS_THRESHOLD - score)
 
   return (
     <div className="animate-in fade-in mx-auto max-w-5xl p-6 duration-500">
@@ -25,7 +50,7 @@ export function QuizResultFailPage() {
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">Quiz failed</h1>
           <p className="mt-1 font-medium text-slate-500">
-            Keep going! Review the concepts below and try again—you're improving.
+            Keep going! Review your answers below and try again—you're improving.
           </p>
         </div>
       </div>
@@ -38,43 +63,24 @@ export function QuizResultFailPage() {
                 Your score
               </p>
               <p className="mt-1 text-5xl font-black text-red-500">{score}%</p>
-              <p className="mt-2 text-sm font-medium text-slate-500">7 / 12 correct</p>
+              <p className="mt-2 text-sm font-medium text-slate-500">
+                {correct} / {total} correct
+              </p>
             </div>
             <div className="border-l pl-8">
               <p className="text-xs font-bold tracking-wider text-slate-400 uppercase">
                 Passing score
               </p>
-              <p className="mt-1 text-5xl font-black text-slate-800">{passingScore}%</p>
+              <p className="mt-1 text-5xl font-black text-slate-800">{PASS_THRESHOLD}%</p>
               <p className="mt-2 text-sm font-medium text-slate-500">
-                You're {passingScore - score}% away from passing
+                You're {gap}% away from passing
               </p>
-            </div>
-            {/* Vòng tròn phần trăm daisyUI */}
-            <div
-              className="radial-progress bg-red-50 font-bold text-red-500"
-              style={
-                { '--value': score, '--size': '6rem', '--thickness': '8px' } as React.CSSProperties
-              }
-            >
-              {score}%
             </div>
           </div>
 
           <div>
-            <h3 className="mb-4 text-lg font-bold text-slate-800">Weak areas (needs review)</h3>
-            <ul className="space-y-3">
-              {['DOM & Events', 'React Basics'].map((area, i) => (
-                <li
-                  key={i}
-                  className="flex items-center justify-between rounded-xl border border-red-100 bg-red-50/50 p-4 font-bold text-red-700"
-                >
-                  <span className="flex items-center gap-3">
-                    <FiAlertCircle className="h-5 w-5" /> {area}
-                  </span>
-                  <span className="text-sm font-medium opacity-80">2 incorrect</span>
-                </li>
-              ))}
-            </ul>
+            <h3 className="mb-4 text-lg font-bold text-slate-800">Review your answers</h3>
+            <AnswerReview questions={data.questions} />
           </div>
         </div>
 
@@ -84,51 +90,31 @@ export function QuizResultFailPage() {
               <FiShield className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-lg font-bold text-slate-800">Good news</p>
+              <p className="text-lg font-bold text-slate-800">Don't worry</p>
               <p className="font-medium text-slate-500">
-                Your progress is saved. You can retry the quiz anytime.
+                Your attempt was recorded. Review the questions and retry when you're ready.
               </p>
             </div>
           </div>
 
-          <h3 className="mb-4 text-lg font-bold text-slate-800">Recommended next steps</h3>
-          <div className="mb-10 space-y-4">
-            {['DOM & Events', 'React Basics'].map((topic, i) => (
-              <div
-                key={i}
-                className="group flex cursor-pointer items-center justify-between rounded-2xl border bg-white p-5 shadow-sm transition-colors hover:border-indigo-200"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="mt-1 rounded-lg bg-indigo-50 p-2 text-indigo-600 transition-colors group-hover:bg-indigo-100">
-                    <FiBookOpen className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-slate-800">Review: {topic}</p>
-                    <p className="mt-1 text-sm text-slate-500">
-                      Revisit key concepts and examples.
-                    </p>
-                  </div>
-                </div>
-                <button className="btn btn-sm rounded-lg border-slate-200 bg-white text-slate-700 hover:bg-slate-50">
-                  Review
-                </button>
-              </div>
-            ))}
-          </div>
-
           <div className="flex flex-col gap-3 border-t pt-6 sm:flex-row">
             <button
-              className={`btn h-14 flex-1 rounded-xl text-base font-bold transition-all ${isExpired ? 'btn-outline border-slate-300 text-slate-700 hover:border-slate-400 hover:bg-slate-100' : 'cursor-not-allowed border-none bg-slate-200 text-slate-400'}`}
+              className={`btn h-14 flex-1 rounded-xl text-base font-bold transition-all ${
+                isExpired
+                  ? 'border-none bg-slate-900 text-white hover:-translate-y-0.5 hover:bg-slate-800'
+                  : 'cursor-not-allowed border-none bg-slate-200 text-slate-400'
+              }`}
               disabled={!isExpired}
-              onClick={() => navigate(`/quizzes/retry`)}
+              onClick={() => navigate(`/quizzes/${quizId}/attempt`)}
             >
-              <FiRefreshCw
-                className={`mr-2 h-5 w-5 ${isExpired ? 'group-hover:rotate-180' : 'animate-spin-slow'}`}
-              />
+              <FiRefreshCw className="mr-2 h-5 w-5" />
               {isExpired ? 'Retry quiz' : `Retry in ${formatted}`}
             </button>
-            <button className="btn h-14 flex-1 rounded-xl bg-slate-900 text-base font-bold text-white shadow-md shadow-slate-900/20 transition-all hover:-translate-y-0.5 hover:bg-slate-800">
-              Review weak areas
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="btn h-14 flex-1 rounded-xl border-slate-200 bg-white text-base font-bold text-slate-700 hover:bg-slate-50"
+            >
+              Back to dashboard
             </button>
           </div>
         </div>

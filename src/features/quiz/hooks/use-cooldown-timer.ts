@@ -1,23 +1,27 @@
 import { useState, useEffect } from 'react'
 
+/** Whole seconds remaining until `target` (never negative). 0 when no target. */
+function secondsUntil(target: string | Date | null): number {
+  if (!target) return 0
+  return Math.max(0, Math.floor((new Date(target).getTime() - Date.now()) / 1000))
+}
+
+/**
+ * Counts down to `targetDate` (e.g. a quiz cooldown). Pass the real
+ * `cooldownUntil` from the API; `null` means no cooldown (immediately expired).
+ */
 export function useCooldownTimer(targetDate: string | Date | null) {
-  const [secondsLeft, setSecondsLeft] = useState(0)
+  // Lazy init from the target so the first render already shows the real
+  // remaining time — no "expired" flash before the first interval tick.
+  const [secondsLeft, setSecondsLeft] = useState(() => secondsUntil(targetDate))
 
   useEffect(() => {
+    // Reflect the current target right away (e.g. once cooldownUntil loads in),
+    // then refresh every second.
+    const sync = () => setSecondsLeft(secondsUntil(targetDate))
+    sync()
     if (!targetDate) return
-
-    const target = new Date(targetDate).getTime()
-
-    const tick = () => {
-      const now = Date.now()
-      const remaining = Math.max(0, Math.floor((target - now) / 1000))
-      setSecondsLeft(remaining)
-    }
-
-    // Chạy ngay lập tức lần đầu để UI không bị delay 1s
-    tick()
-    const id = setInterval(tick, 1000)
-
+    const id = setInterval(sync, 1000)
     return () => clearInterval(id)
   }, [targetDate])
 

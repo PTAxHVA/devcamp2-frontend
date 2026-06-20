@@ -4,14 +4,13 @@ export function useQuizTimer(initialSeconds: number) {
   const [secondsLeft, setSecondsLeft] = useState(initialSeconds)
 
   useEffect(() => {
-    if (secondsLeft <= 0) return
-
+    // One interval for the whole countdown; the functional update avoids
+    // re-subscribing a new interval on every tick.
     const id = setInterval(() => {
-      setSecondsLeft((prev) => Math.max(0, prev - 1))
+      setSecondsLeft((prev) => (prev <= 0 ? 0 : prev - 1))
     }, 1000)
-
     return () => clearInterval(id)
-  }, [secondsLeft])
+  }, [])
 
   const m = Math.floor(secondsLeft / 60)
   const s = secondsLeft % 60
