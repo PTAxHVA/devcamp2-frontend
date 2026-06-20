@@ -3,11 +3,11 @@ import { Link, Outlet } from 'react-router'
 
 export default function AuthLayout() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#f5f5f5]">
+    <div className="flex min-h-screen flex-col bg-[#f5f5f5]">
       {/* Header — logo góc trái, nhất quán mọi trang auth */}
-      <header className="px-8 py-4 bg-white border-b border-gray-100">
+      <header className="border-border-soft border-b bg-white px-8 py-4">
         <Link to="/">
-          <img src={Logo} alt="VORA" className="w-36 h-auto object-contain" />
+          <img src={Logo} alt="VORA" className="h-auto w-36 object-contain" />
         </Link>
       </header>
 

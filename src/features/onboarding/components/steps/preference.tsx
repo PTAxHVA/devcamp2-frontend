@@ -7,10 +7,10 @@ export const StepPreferences = () => {
   return (
     <div className="w-full">
       <div className="mb-10 text-left">
-        <h1 className="mb-3 text-4xl font-bold text-slate-900">
+        <h1 className="text-text-primary mb-3 text-4xl font-bold">
           Personalize your learning experience
         </h1>
-        <p className="max-w-2xl text-lg font-medium text-slate-600">
+        <p className="text-text-secondary max-w-2xl text-lg font-medium">
           Answer a few questions so VORA can tailor your roadmap, recommend the right resources, and
           help you reach your goals faster.
         </p>
@@ -21,15 +21,15 @@ export const StepPreferences = () => {
           <div key={q.id} className="flex gap-4">
             {/* Icon Block */}
             <div className="mt-1">
-              <div className="bg-brand-purple-50 text-brand-purple-600 flex h-12 w-12 items-center justify-center rounded-xl">
+              <div className="bg-bg-lavender text-brand-purple-600 flex h-12 w-12 items-center justify-center rounded-xl">
                 {q.icon}
               </div>
             </div>
 
             {/* Content Block */}
             <div className="flex-1">
-              <label className="mb-1 block text-lg font-bold text-slate-900">{q.label}</label>
-              <p className="mb-3 text-sm text-slate-400">{q.desc}</p>
+              <label className="text-text-primary mb-1 block text-lg font-bold">{q.label}</label>
+              <p className="text-text-placeholder mb-3 text-sm">{q.desc}</p>
 
               <div className="relative">
                 {q.type === 'select' ? (
@@ -37,7 +37,7 @@ export const StepPreferences = () => {
                     <select
                       value={(answers?.[q.id] as string) || ''}
                       onChange={(e) => setAnswer(q.id, e.target.value)}
-                      className="focus:border-brand-purple-400 focus:ring-brand-purple-400 w-full cursor-pointer appearance-none rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-700 focus:ring-1 focus:outline-none"
+                      className="focus:border-brand-purple-400 focus:ring-brand-purple-400 border-border-soft text-text-secondary w-full cursor-pointer appearance-none rounded-lg border bg-white px-4 py-3 focus:ring-1 focus:outline-none"
                     >
                       <option value="" disabled>
                         {q.placeholder}
@@ -48,7 +48,7 @@ export const StepPreferences = () => {
                         </option>
                       ))}
                     </select>
-                    <RiArrowDownSLine className="pointer-events-none absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                    <RiArrowDownSLine className="text-text-placeholder pointer-events-none absolute top-1/2 right-4 h-5 w-5 -translate-y-1/2" />
                   </>
                 ) : (
                   <textarea
@@ -56,7 +56,7 @@ export const StepPreferences = () => {
                     value={(answers?.[q.id] as string) || ''}
                     onChange={(e) => setAnswer(q.id, e.target.value)}
                     placeholder={q.placeholder}
-                    className="focus:border-brand-purple-400 focus:ring-brand-purple-400 w-full resize-none rounded-lg border border-slate-200 bg-white px-4 py-3 text-slate-700 focus:ring-1 focus:outline-none"
+                    className="focus:border-brand-purple-400 focus:ring-brand-purple-400 border-border-soft text-text-secondary w-full resize-none rounded-lg border bg-white px-4 py-3 focus:ring-1 focus:outline-none"
                   ></textarea>
                 )}
               </div>

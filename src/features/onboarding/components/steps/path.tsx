@@ -84,19 +84,19 @@ export const StepLearningPath = () => {
           id: 'portfolio',
           title: 'Portfolio',
           desc: 'Build a personal website to showcase your work.',
-          icon: <RiProfileLine className="h-10 w-10 text-slate-700" />,
+          icon: <RiProfileLine className="text-text-secondary h-10 w-10" />,
         },
         {
           id: 'dashboard',
           title: 'Dashboard',
           desc: 'Create interactive interfaces for data visualization.',
-          icon: <RiDashboardLine className="h-10 w-10 text-slate-700" />,
+          icon: <RiDashboardLine className="text-text-secondary h-10 w-10" />,
         },
         {
           id: 'ecommerce',
           title: 'E-commerce',
           desc: 'Develop modern online shopping experiences.',
-          icon: <RiShoppingCartLine className="h-10 w-10 text-slate-700" />,
+          icon: <RiShoppingCartLine className="text-text-secondary h-10 w-10" />,
         },
       ],
     },
@@ -105,8 +105,8 @@ export const StepLearningPath = () => {
   return (
     <div className="w-full">
       <div className="mb-12 text-left">
-        <h1 className="mb-3 text-4xl font-bold text-slate-900">Choose your learning path</h1>
-        <p className="max-w-2xl text-lg font-medium text-slate-600">
+        <h1 className="text-text-primary mb-3 text-4xl font-bold">Choose your learning path</h1>
+        <p className="text-text-secondary max-w-2xl text-lg font-medium">
           Tell us your preferences so we can create a personalized frontend roadmap that matches
           your goals with internet
         </p>
@@ -116,12 +116,12 @@ export const StepLearningPath = () => {
         {sections.map((section) => (
           <div key={section.id}>
             <div className="mb-6 flex items-center gap-4">
-              <div className="bg-brand-purple-50 text-brand-purple-600 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-bold">
+              <div className="bg-bg-lavender text-brand-purple-600 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-bold">
                 {section.id}
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-900">{section.title}</h2>
-                <p className="text-sm text-slate-500">{section.subtitle}</p>
+                <h2 className="text-text-primary text-xl font-bold">{section.title}</h2>
+                <p className="text-text-muted text-sm">{section.subtitle}</p>
               </div>
             </div>
 
@@ -132,13 +132,13 @@ export const StepLearningPath = () => {
                   onClick={() => section.setState(option.id)}
                   className={`relative flex min-h-30 cursor-pointer items-center gap-4 rounded-2xl bg-white p-6 transition-all duration-300 ${
                     section.state === option.id
-                      ? 'border-brand-purple-300 bg-brand-purple-50/10 ring-brand-purple-300 -translate-y-1 border-2 shadow-[0_8px_30px_-4px_rgba(109,40,217,0.1)] ring-2'
-                      : 'border border-slate-200 shadow-sm hover:-translate-y-1 hover:border-slate-300 hover:shadow-md'
+                      ? 'border-brand-purple-300 bg-bg-lavender/10 ring-brand-purple-300 -translate-y-1 border-2 shadow-[0_8px_30px_-4px_rgba(109,40,217,0.1)] ring-2'
+                      : 'border-border-soft hover:border-border-input border shadow-sm hover:-translate-y-1 hover:shadow-md'
                   } `}
                 >
                   <div className="absolute top-4 right-4 flex items-center justify-center">
                     <div
-                      className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all duration-300 ${section.state === option.id ? 'border-brand-purple-600' : 'border-slate-300'}`}
+                      className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all duration-300 ${section.state === option.id ? 'border-brand-purple-600' : 'border-border-input'}`}
                     >
                       {section.state === option.id && (
                         <div className="bg-brand-purple-600 h-2.5 w-2.5 rounded-full"></div>
@@ -147,10 +147,10 @@ export const StepLearningPath = () => {
                   </div>
                   <div className="shrink-0">{option.icon}</div>
                   <div className="flex-1 pr-4">
-                    <h3 className="mb-1 text-lg leading-tight font-bold text-slate-900">
+                    <h3 className="text-text-primary mb-1 text-lg leading-tight font-bold">
                       {option.title}
                     </h3>
-                    <p className="text-xs leading-relaxed text-slate-500">{option.desc}</p>
+                    <p className="text-text-muted text-xs leading-relaxed">{option.desc}</p>
                   </div>
                 </div>
               ))}

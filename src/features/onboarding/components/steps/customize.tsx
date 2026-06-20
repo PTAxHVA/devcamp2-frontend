@@ -230,12 +230,14 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
   return (
     <div className="animate-in fade-in flex w-full flex-col items-center duration-500">
       <div className="mb-8 text-center">
-        <h1 className="mb-2 text-4xl font-extrabold text-slate-900">Customize your Roadmap</h1>
-        <p className="font-medium text-slate-500">Review and adjust the topics tailored for you.</p>
+        <h1 className="text-text-primary mb-2 text-4xl font-extrabold">Customize your Roadmap</h1>
+        <p className="text-text-muted font-medium">
+          Review and adjust the topics tailored for you.
+        </p>
       </div>
 
       <div className="mb-8 flex h-150 w-full flex-col gap-6 lg:flex-row">
-        <div className="relative flex h-full flex-1 overflow-hidden rounded-3xl border border-slate-200 bg-slate-50/50 shadow-inner">
+        <div className="border-border-soft bg-bg-section/50 relative flex h-full flex-1 overflow-hidden rounded-3xl border shadow-inner">
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -250,14 +252,14 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
           </ReactFlow>
         </div>
 
-        <div className="flex w-full flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm lg:w-105">
-          <div className="mb-6 flex rounded-xl bg-slate-100 p-1">
+        <div className="border-border-soft flex w-full flex-col rounded-3xl border bg-white p-6 shadow-sm lg:w-105">
+          <div className="bg-bg-section mb-6 flex rounded-xl p-1">
             <button
               onClick={() => setActiveTab('ai')}
               className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold transition-all ${
                 activeTab === 'ai'
                   ? 'text-brand-purple-600 bg-white shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700'
+                  : 'text-text-muted hover:text-text-secondary'
               }`}
             >
               <RiMagicLine /> AI Assistant
@@ -266,8 +268,8 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
               onClick={() => setActiveTab('manual')}
               className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-bold transition-all ${
                 activeTab === 'manual'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700'
+                  ? 'text-text-primary bg-white shadow-sm'
+                  : 'text-text-muted hover:text-text-secondary'
               }`}
             >
               <RiListSettingsLine /> Manual Edit
@@ -276,11 +278,11 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
 
           {activeTab === 'ai' && (
             <div className="fade-in flex flex-1 flex-col">
-              <div className="bg-brand-purple-50 text-brand-purple-600 mb-4 flex w-fit items-center gap-2 rounded-full px-3 py-1 text-xs font-bold tracking-wide uppercase">
+              <div className="bg-bg-lavender text-brand-purple-600 mb-4 flex w-fit items-center gap-2 rounded-full px-3 py-1 text-xs font-bold tracking-wide uppercase">
                 <RiSparklingFill /> AI Refinement
               </div>
-              <h2 className="mb-2 text-3xl font-extrabold text-slate-900">Talk to AI</h2>
-              <p className="mb-6 text-sm leading-relaxed text-slate-600">
+              <h2 className="text-text-primary mb-2 text-3xl font-extrabold">Talk to AI</h2>
+              <p className="text-text-secondary mb-6 text-sm leading-relaxed">
                 Not quite right? Tell the AI what you want to change, add, or remove. The roadmap
                 will update automatically.
               </p>
@@ -290,11 +292,11 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
                   placeholder="e.g., 'Make it more advanced', or 'I only have 2 hours a week'."
-                  className="focus:border-brand-purple-500 focus:ring-brand-purple-500/50 h-full w-full resize-none rounded-2xl border border-slate-200 bg-slate-50/50 p-4 text-sm text-slate-800 transition-all placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:outline-none"
+                  className="focus:border-brand-purple-500 focus:ring-brand-purple-500/50 border-border-soft bg-bg-section/50 text-text-primary placeholder:text-text-placeholder h-full w-full resize-none rounded-2xl border p-4 text-sm transition-all focus:bg-white focus:ring-2 focus:outline-none"
                 />
 
                 <div
-                  className={`bg-brand-purple-50 text-brand-purple-600 absolute right-4 bottom-4 flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold transition-opacity duration-300 ${
+                  className={`bg-bg-lavender text-brand-purple-600 absolute right-4 bottom-4 flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold transition-opacity duration-300 ${
                     isRefining ? 'opacity-100' : 'opacity-0'
                   }`}
                 >
@@ -303,7 +305,7 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
               </div>
 
               {aiError && (
-                <div className="animate-in fade-in slide-in-from-top-1 mt-3 rounded-xl border border-red-100 bg-red-50 p-3 text-xs font-medium text-red-600">
+                <div className="animate-in fade-in slide-in-from-top-1 border-error-border bg-error-bg text-error-text mt-3 rounded-xl border p-3 text-xs font-medium">
                   {aiError}
                 </div>
               )}
@@ -311,8 +313,8 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
           )}
           {activeTab === 'manual' && (
             <div className="fade-in flex flex-1 flex-col overflow-hidden">
-              <h2 className="mb-2 text-xl font-extrabold text-slate-900">Manage Topics</h2>
-              <p className="mb-4 text-sm text-slate-500">
+              <h2 className="text-text-primary mb-2 text-xl font-extrabold">Manage Topics</h2>
+              <p className="text-text-muted mb-4 text-sm">
                 Drag on the canvas to reposition, or use the list below to add/remove topics.
               </p>
 
@@ -321,19 +323,19 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
                   {nodes.map((node) => (
                     <div
                       key={node.id}
-                      className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 p-3 transition-colors hover:bg-slate-100"
+                      className="border-border-soft bg-bg-section hover:bg-bg-section flex items-center justify-between rounded-xl border p-3 transition-colors"
                     >
                       <div className="flex items-center gap-3 overflow-hidden">
-                        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-600">
+                        <div className="text-text-secondary flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-bold">
                           {node.data.number}
                         </div>
-                        <span className="truncate text-sm font-semibold text-slate-800">
+                        <span className="text-text-primary truncate text-sm font-semibold">
                           {node.data.label}
                         </span>
                       </div>
                       <button
                         onClick={() => handleRemoveTopic(node.id)}
-                        className="rounded-lg p-2 text-slate-400 hover:bg-red-50 hover:text-red-500"
+                        className="text-text-placeholder hover:bg-error-bg hover:text-error-text rounded-lg p-2"
                         title="Remove Topic"
                       >
                         <RiDeleteBinLine className="text-base" />
@@ -343,7 +345,7 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
                 </div>
               </div>
 
-              <div className="mt-4 border-t border-slate-100 pt-4">
+              <div className="border-border-soft mt-4 border-t pt-4">
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -351,7 +353,7 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
                     onChange={(e) => setNewTopicTitle(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddTopic()}
                     placeholder="E.g. Next.js App Router"
-                    className="focus:border-brand-purple-500 focus:ring-brand-purple-500 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm focus:bg-white focus:ring-1 focus:outline-none"
+                    className="focus:border-brand-purple-500 focus:ring-brand-purple-500 border-border-soft bg-bg-section flex-1 rounded-xl border px-4 py-2 text-sm focus:bg-white focus:ring-1 focus:outline-none"
                   />
                   <button
                     onClick={handleAddTopic}
@@ -364,7 +366,7 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
             </div>
           )}
 
-          <div className="mt-6 flex flex-col gap-3 border-t border-slate-100 pt-4">
+          <div className="border-border-soft mt-6 flex flex-col gap-3 border-t pt-4">
             <button
               onClick={onComplete}
               className="w-full rounded-xl bg-slate-900 py-4 font-bold text-white transition-all hover:bg-slate-800 active:scale-95"

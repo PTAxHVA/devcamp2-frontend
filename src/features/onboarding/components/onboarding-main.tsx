@@ -100,7 +100,7 @@ const OnboardingMain = () => {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-white font-sans text-slate-900">
+    <div className="text-text-primary flex min-h-screen flex-col bg-white font-sans">
       <NavBar />
       <main className="relative mx-auto flex min-h-screen w-full max-w-300 flex-1 flex-col overflow-x-hidden px-6 py-12">
         <div className="pointer-events-none fixed top-[-10%] left-[-5%] -z-10 h-125 w-125 rounded-full bg-indigo-200/20 blur-[120px]"></div>
@@ -123,14 +123,14 @@ const OnboardingMain = () => {
 
         {currentStep > 1 && currentStep < 5 && (
           <div key={`heading-${currentStep}`} className="fade-only mb-10 text-center">
-            <h1 className="mb-4 text-4xl font-bold text-slate-900">
+            <h1 className="text-text-primary mb-4 text-4xl font-bold">
               {currentStep === 2
                 ? "What's your starting point?"
                 : currentStep === 3
                   ? "What's your main goal?"
                   : 'What’s your current level?'}
             </h1>
-            <p className="text-lg font-medium text-slate-500">
+            <p className="text-text-muted text-lg font-medium">
               {currentStep === 2
                 ? 'Choose the role that best matches your goals.'
                 : currentStep === 3
@@ -174,16 +174,16 @@ const OnboardingMain = () => {
         </div>
 
         {currentStep !== 1 && (
-          <div className="mt-16 flex flex-col border-t border-slate-200/60 pt-8">
+          <div className="border-border-soft/60 mt-16 flex flex-col border-t pt-8">
             {showValidationError && currentStep !== 6 && currentStep !== 7 && (
-              <p className="mb-4 text-right text-sm font-medium text-red-500">
+              <p className="text-error-text mb-4 text-right text-sm font-medium">
                 Please complete this step before continuing.
               </p>
             )}
             <div className="flex items-center justify-between">
               <button
                 onClick={handleBack}
-                className="btn btn-ghost h-12 rounded-xl border border-slate-200 px-8 text-base font-semibold text-slate-700 transition-all hover:bg-slate-50 active:scale-95"
+                className="btn btn-ghost border-border-soft text-text-secondary hover:bg-bg-section h-12 rounded-xl border px-8 text-base font-semibold transition-all active:scale-95"
               >
                 <RiArrowLeftLine className="mr-2 h-5 w-5" /> Back
               </button>

@@ -6,7 +6,8 @@ function mapApiTopic(t: {
   masterTopicId: string
   userTopicId: string | null
   name: string
-  status: LearningTopic['status']
+  // Backend still uses the 4-state contract; the learning UI is 3-state.
+  status: LearningTopic['status'] | 'available'
   orderIndex: number
   estimatedHours: number
   sectionTotal: number
@@ -17,7 +18,9 @@ function mapApiTopic(t: {
     masterTopicId: t.masterTopicId,
     userTopicId: t.userTopicId,
     title: t.name,
-    status: t.status,
+    // Collapse "available" -> "locked" so the rest of the learning UI only ever
+    // deals with the 3-state model (and never hits an undefined status lookup).
+    status: t.status === 'available' ? 'locked' : t.status,
     orderIndex: t.orderIndex,
     estimatedHours: t.estimatedHours,
     sectionTotal: t.sectionTotal,
