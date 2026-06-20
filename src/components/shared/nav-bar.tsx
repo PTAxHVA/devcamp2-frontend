@@ -1,7 +1,12 @@
 import { RiSearchLine, RiNotification3Line } from 'react-icons/ri'
+import { useMe } from '@/features/profile/hooks/use-profile'
 // import Logo from '@/assets/Logo.svg'
 
 export const Navbar = () => {
+  const { data: me } = useMe()
+  const initials = me?.username?.slice(0, 2).toUpperCase() ?? '??'
+  const displayName = me?.username ?? ''
+
   return (
     <header className="z-10 flex h-20 shrink-0 flex-row items-center justify-between border-b border-slate-200 bg-white px-8">
       {/* <div>
@@ -26,9 +31,9 @@ export const Navbar = () => {
         </button>
         <div className="flex cursor-pointer items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-purple-100 text-sm font-bold text-purple-700">
-            AD
+            {initials}
           </div>
-          <span className="text-sm font-semibold">Alex D.</span>
+          <span className="text-sm font-semibold">{displayName}</span>
         </div>
       </div>
     </header>

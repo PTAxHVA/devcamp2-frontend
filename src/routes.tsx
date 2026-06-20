@@ -67,6 +67,7 @@ export function AppRoutes() {
           <Route path="/roadmaps/:id/edit" element={<EditCurrentRoadmapPage />} />
           <Route path="/roadmaps" element={<BrowseRoadmapsPage />} />
           <Route path="/my-learning" element={<MylearningJourneyPage />} />
+          <Route path="/my-learning/:slug" element={<MylearningJourneyPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route

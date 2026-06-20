@@ -9,7 +9,7 @@ export default function BrowseRoadmapsPage() {
   const [role, setRole] = useState('all')
   const [tab, setTab] = useState<Tab>('recommended')
 
-  const { data: rawRoadmaps = [], isLoading, isError } = useBrowseRoadmaps()
+  const { data: rawRoadmaps = [], isLoading, isError, isFetching, refetch } = useBrowseRoadmaps()
 
   const clearFilters = () => {
     setSearch('')
@@ -98,9 +98,16 @@ export default function BrowseRoadmapsPage() {
           <span className="loading loading-spinner loading-lg text-brand-purple-600" />
         </div>
       ) : isError ? (
-        <div className="rounded-2xl border border-red-100 bg-red-50 py-16 text-center text-red-500">
+        <div className="flex flex-col items-center rounded-2xl border border-red-100 bg-red-50 py-16 text-center text-red-500">
           <p className="text-lg font-bold">Failed to load roadmaps</p>
-          <p className="text-sm">Please check your API connection and try again.</p>
+          <p className="mb-5 text-sm">Please check your API connection and try again.</p>
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="rounded-xl bg-red-500 px-5 py-2 text-sm font-bold text-white transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isFetching ? <span className="loading loading-spinner loading-xs" /> : 'Try again'}
+          </button>
         </div>
       ) : displayRoadmaps.length > 0 ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">

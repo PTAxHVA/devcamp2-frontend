@@ -1,8 +1,9 @@
-import { useNavigate } from 'react-router'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { RiTimeLine, RiListUnordered, RiBarChartBoxLine } from 'react-icons/ri'
 import { apiClient } from '@/lib/api-client'
+import { useEnrollRoadmap } from '../hooks/use-enroll-roadmap'
+import RoadmapPreviewModal from './roadmap-preview-modal'
 
 interface MasterBranch {
   _id: string
@@ -23,8 +24,9 @@ interface RoadmapCardProps {
 }
 
 export default function RoadmapCard({ data }: RoadmapCardProps) {
-  const navigate = useNavigate()
   const displayTitle = data.roleName ?? 'Roadmap'
+  const [previewOpen, setPreviewOpen] = useState(false)
+  const enroll = useEnrollRoadmap()
 
   const { data: branches = [] } = useQuery<MasterBranch[]>({
     queryKey: ['master-roadmap-branches', data._id],
@@ -35,31 +37,12 @@ export default function RoadmapCard({ data }: RoadmapCardProps) {
     staleTime: 5 * 60 * 1000,
   })
 
-  const enrollMutation = useMutation({
-    mutationFn: async () => {
-      if (branches.length === 0) throw new Error('No branches available.')
-      await apiClient.post('/roadmaps', {
-        masterRoadmapId: data._id,
-        branchSelections: branches.map((b) => b._id),
-        sourceType: 'SUGGESTED',
-      })
-    },
-    onSuccess: () => {
-      toast.success(`Enrolled in ${displayTitle}!`)
-      navigate('/my-learning')
-    },
-    onError: (err: unknown) => {
-      const code = (err as { response?: { data?: { error?: { code?: string } } } })?.response?.data
-        ?.error?.code
-      if (code === 'ROADMAP_CAP_REACHED') {
-        toast.error('You have reached the limit of 2 active roadmaps.')
-      } else if (code === 'ROADMAP_ALREADY_ACTIVE') {
-        toast.error('You are already enrolled in this roadmap.')
-      } else {
-        toast.error('Cannot enroll right now. Please try again.')
-      }
-    },
-  })
+  const handleEnroll = () =>
+    enroll.mutate({
+      masterRoadmapId: data._id,
+      roleName: displayTitle,
+      branchSelections: branches.map((b) => b._id),
+    })
 
   const gradientCls = displayTitle.toLowerCase().includes('frontend')
     ? 'bg-linear-to-br from-blue-50 to-indigo-100 border-indigo-200'
@@ -116,17 +99,17 @@ export default function RoadmapCard({ data }: RoadmapCardProps) {
 
         <div className="flex gap-2">
           <button
-            onClick={() => navigate(`/roadmaps/${data._id}`)}
+            onClick={() => setPreviewOpen(true)}
             className="border-brand-purple-600 text-brand-purple-600 hover:bg-brand-purple-50 flex-1 rounded-xl border-2 py-2 text-sm font-bold transition-colors"
           >
             Preview
           </button>
           <button
-            onClick={() => enrollMutation.mutate()}
-            disabled={enrollMutation.isPending || branches.length === 0}
+            onClick={handleEnroll}
+            disabled={enroll.isPending || branches.length === 0}
             className="flex-1 rounded-xl bg-[#0f3460] py-2 text-sm font-bold text-white transition-colors hover:bg-[#0a2545] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {enrollMutation.isPending ? (
+            {enroll.isPending ? (
               <span className="loading loading-spinner loading-xs" />
             ) : (
               'Use roadmap'
@@ -134,6 +117,14 @@ export default function RoadmapCard({ data }: RoadmapCardProps) {
           </button>
         </div>
       </div>
+
+      {previewOpen && (
+        <RoadmapPreviewModal
+          roadmapId={data._id}
+          roleName={displayTitle}
+          onClose={() => setPreviewOpen(false)}
+        />
+      )}
     </div>
   )
 }

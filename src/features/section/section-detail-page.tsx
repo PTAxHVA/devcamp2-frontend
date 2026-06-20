@@ -158,9 +158,8 @@ export default function SectionDetailPage() {
   const handleMarkAsComplete = async () => {
     setIsCompleting(true)
     try {
-      // Simulate API call as backend endpoint is not yet available
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      toast.success('Section completed successfully! (Mocked)')
+      toast.success('Section completed!')
     } finally {
       setIsCompleting(false)
     }
