@@ -33,6 +33,7 @@ export interface QuizResultData {
     submittedAt: string
     score: number
     isPassed: boolean
+    cooldownUntil?: string | null
   }
   questions: ResultQuestion[]
 }

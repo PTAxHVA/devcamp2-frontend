@@ -25,6 +25,8 @@ import NotFoundPage from '@/pages/not-found-page'
 import ProfilePage from '@/pages/profile-page'
 import SettingsPage from '@/pages/settings-page'
 
+import { RoadmapCompletePage } from '@/pages/roadmap-complete-page'
+
 export function AppRoutes() {
   return (
     <Routes>
@@ -62,14 +64,21 @@ export function AppRoutes() {
             element={<SectionDetailPage />}
           />
           <Route path="/my-learning/topics/:id" element={<TopicDetailPage />} />
+
+          {/* LƯU Ý: Phải đặt save-success lên trước :id để không bị bắt nhầm route */}
+
           <Route path="/roadmaps/browse" element={<BrowseRoadmapsPage />} />
+          <Route path="/roadmaps/:id/complete" element={<RoadmapCompletePage />} />
+
           <Route path="/roadmaps/:id" element={<RoadmapViewPage />} />
           <Route path="/roadmaps/:id/edit" element={<EditCurrentRoadmapPage />} />
           <Route path="/roadmaps" element={<BrowseRoadmapsPage />} />
+
           <Route path="/my-learning" element={<MylearningJourneyPage />} />
           <Route path="/my-learning/:slug" element={<MylearningJourneyPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/settings" element={<SettingsPage />} />
+
           <Route
             path="/goals"
             element={

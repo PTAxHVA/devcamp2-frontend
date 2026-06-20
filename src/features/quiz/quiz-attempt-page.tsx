@@ -1,175 +1,194 @@
 import { useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router'
+import { FiClock, FiZap } from 'react-icons/fi'
+import { HiMiniArrowLeft, HiMiniArrowRight, HiMiniPaperAirplane } from 'react-icons/hi2'
+import toast from 'react-hot-toast'
 import { McqQuestion } from '@/features/quiz/components/mcq-question'
 import { FillQuestion } from '@/features/quiz/components/fill-question'
 import { useQuizStore } from '@/features/quiz/quiz-store'
 import { useQuizAttempt } from '@/features/quiz/hooks/use-quiz-attempt'
-import { useSubmitQuiz, type SubmitQuizResult } from '@/features/quiz/hooks/use-submit-quiz'
-import toast from 'react-hot-toast'
-import {
-  HiMiniArrowLeft,
-  HiMiniArrowRight,
-  HiMiniPaperAirplane,
-  HiOutlineLightBulb,
-} from 'react-icons/hi2'
+import { useSubmitQuiz } from '@/features/quiz/hooks/use-submit-quiz'
+import { useQuizTimer } from '@/features/quiz/hooks/use-quiz-timer'
+
+// Section quizzes require >=80% to pass (product spec).
+const PASS_THRESHOLD = 80
+// Client-side time budget shown to the learner. Display only — it does not auto-submit.
+const QUIZ_DURATION_SECONDS = 10 * 60
 
 export function QuizAttemptPage() {
   const { quizId } = useParams<{ quizId: string }>()
   const navigate = useNavigate()
 
-  const { isLoading: attemptLoading, error: attemptError } = useQuizAttempt(quizId ?? '')
-
+  const { isLoading, error } = useQuizAttempt(quizId ?? '')
   const { attemptId, questions, currentIndex, answers, setAnswer, next, prev, reset } =
     useQuizStore()
+  const submit = useSubmitQuiz(attemptId ?? '')
+  const { formatted, isUrgent } = useQuizTimer(QUIZ_DURATION_SECONDS)
 
-  const submitMutation = useSubmitQuiz(attemptId ?? '')
+  // Clear the session on unmount so a stale attempt never bleeds into the next quiz.
+  useEffect(() => reset, [reset])
 
-  // Clean up store when leaving the quiz page
-  useEffect(() => {
-    return () => {
-      reset()
-    }
-  }, [reset])
-
-  // Surface start-attempt errors as a toast (side effect, never during render)
-  useEffect(() => {
-    if (!attemptError) return
-    const axiosErr = attemptError as { response?: { data?: { error?: { code?: string } } } }
-    const code = axiosErr?.response?.data?.error?.code
-    if (code === 'QUIZ_ALREADY_STARTED') {
-      toast.error('A quiz attempt is already in progress.')
-    } else if (code === 'COOLDOWN_ACTIVE') {
-      toast.error('You are in a cooldown period. Please try again later.')
-    } else {
-      toast.error('Failed to start the quiz.')
-    }
-  }, [attemptError])
-
-  if (attemptLoading) {
+  if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
+      <div className="flex h-full items-center justify-center py-32">
+        <span className="loading loading-spinner loading-lg text-indigo-600" />
       </div>
     )
   }
 
-  if (attemptError || !quizId) {
+  if (error || !quizId || questions.length === 0) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4">
-        <p className="text-error text-lg font-semibold">Failed to start the quiz.</p>
-        <button className="btn btn-ghost" onClick={() => navigate(-1)}>
-          Go back
+      <div className="mx-auto my-20 max-w-md rounded-2xl border border-red-100 bg-red-50 p-8 text-center">
+        <p className="text-lg font-bold text-red-600">Không tải được bài quiz</p>
+        <p className="mt-1 text-sm text-red-500">Vui lòng thử lại.</p>
+        <button
+          onClick={() => navigate(-1)}
+          className="mt-5 rounded-xl border border-slate-200 bg-white px-5 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50"
+        >
+          Quay lại
         </button>
       </div>
     )
   }
 
-  if (questions.length === 0) return null
-
-  const currentQuestion = questions[currentIndex]
-  const isFirstQuestion = currentIndex === 0
-  const isLastQuestion = currentIndex === questions.length - 1
-
-  const handleAnswer = (val: string) => {
-    setAnswer(currentQuestion.id, val)
-  }
+  const total = questions.length
+  const current = questions[currentIndex]
+  const isFirst = currentIndex === 0
+  const isLast = currentIndex === total - 1
+  const currentAnswer = answers[current.id]
 
   const handleSubmit = () => {
     if (!attemptId) return
-
-    const submitAnswers = questions
-      .filter((q) => answers[q.id] !== undefined && answers[q.id] !== '')
-      .map((q) => {
-        const value = answers[q.id]!
-        if (q.type === 'mcq') {
-          return { questionId: q.id, selectedOptionId: value }
-        }
-        return { questionId: q.id, userInput: value }
-      })
-
-    if (submitAnswers.length === 0) {
-      toast.error('Vui lòng trả lời ít nhất 1 câu hỏi trước khi nộp bài.')
+    const payload = questions.flatMap((q) => {
+      const val = answers[q.id]
+      if (val === undefined || val === '') return []
+      return [
+        q.type === 'mcq'
+          ? { questionId: q.id, selectedOptionId: val }
+          : { questionId: q.id, userInput: val },
+      ]
+    })
+    if (payload.length === 0) {
+      toast.error('Hãy trả lời ít nhất 1 câu trước khi nộp.')
       return
     }
-
-    submitMutation.mutate(submitAnswers, {
-      onSuccess: (result: SubmitQuizResult) => {
-        if (result.isPassed) {
-          navigate(`/quizzes/${result.quizAttemptId}/result/pass`)
-        } else {
-          navigate(`/quizzes/${result.quizAttemptId}/result/fail`)
-        }
-      },
+    submit.mutate(payload, {
+      onSuccess: (result) =>
+        navigate(`/quizzes/${result.quizAttemptId}/result/${result.isPassed ? 'pass' : 'fail'}`),
     })
   }
 
   return (
-    <div className="bg-base-200/50 flex min-h-screen flex-col items-center px-4 py-12">
-      <div className="flex w-full max-w-2xl flex-col gap-8">
-        <div className="space-y-4">
-          <div className="text-base-content/70 flex items-center justify-between text-sm font-bold">
-            <span className="flex items-center gap-2">
-              <HiOutlineLightBulb className="text-warning h-5 w-5 animate-pulse" />
-              Câu hỏi {currentIndex + 1} / {questions.length}
-            </span>
-            <span className="font-mono text-xs opacity-60">Quiz ID: {quizId}</span>
-          </div>
-          <progress
-            className="progress progress-primary h-3 w-full transition-all duration-500"
-            value={currentIndex + 1}
-            max={questions.length}
-          ></progress>
+    <div className="fade-in mx-auto flex h-full max-w-7xl flex-col p-6">
+      {/* Header */}
+      <div className="mb-6 flex items-end justify-between">
+        <div>
+          <button
+            onClick={() => navigate(-1)}
+            className="mb-2 flex items-center font-bold text-indigo-600 hover:underline"
+          >
+            ← Back to lesson
+          </button>
+          <h1 className="text-3xl font-extrabold text-slate-800">Quiz</h1>
         </div>
+        <p className="rounded-full bg-indigo-50 px-4 py-1 font-bold text-indigo-600">
+          Question {currentIndex + 1} of {total}
+        </p>
+      </div>
 
-        <div key={currentQuestion.id} className="card bg-base-100 border-base-200 border shadow-xl">
-          <div className="card-body min-h-[300px] p-8">
-            {currentQuestion.type === 'mcq' ? (
+      <progress
+        className="progress progress-primary mb-8 h-2 w-full"
+        value={currentIndex + 1}
+        max={total}
+      ></progress>
+
+      <div className="grid flex-1 grid-cols-1 gap-8 lg:grid-cols-3">
+        {/* Question */}
+        <div className="col-span-1 flex flex-col lg:col-span-2">
+          <div key={current.id} className="flex-1 rounded-2xl border bg-white p-8 shadow-sm">
+            {current.type === 'mcq' ? (
               <McqQuestion
-                question={currentQuestion}
-                selectedId={answers[currentQuestion.id]}
-                onSelect={handleAnswer}
+                question={current}
+                selectedId={currentAnswer}
+                onSelect={(val) => setAnswer(current.id, val)}
               />
             ) : (
               <FillQuestion
-                question={currentQuestion}
-                value={answers[currentQuestion.id] ?? ''}
-                onChange={handleAnswer}
+                question={current}
+                value={currentAnswer ?? ''}
+                onChange={(val) => setAnswer(current.id, val)}
               />
             )}
+
+            <div className="mt-10 flex items-center justify-between border-t pt-6">
+              <button
+                onClick={prev}
+                disabled={isFirst}
+                className="btn btn-ghost font-bold text-indigo-600 disabled:opacity-40"
+              >
+                <HiMiniArrowLeft className="h-5 w-5" /> Previous
+              </button>
+              {isLast ? (
+                <button
+                  onClick={handleSubmit}
+                  disabled={submit.isPending}
+                  className="btn h-12 rounded-xl bg-slate-900 px-8 text-white hover:bg-slate-800"
+                >
+                  {submit.isPending ? (
+                    <span className="loading loading-spinner loading-sm" />
+                  ) : (
+                    <>
+                      Submit answer <HiMiniPaperAirplane className="h-5 w-5" />
+                    </>
+                  )}
+                </button>
+              ) : (
+                <button
+                  onClick={next}
+                  className="btn h-12 rounded-xl bg-slate-900 px-8 text-white hover:bg-slate-800"
+                >
+                  Next <HiMiniArrowRight className="h-5 w-5" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="mt-4 flex items-center justify-between">
-          <button
-            className="btn btn-ghost hover:bg-base-200"
-            onClick={prev}
-            disabled={isFirstQuestion}
-          >
-            <HiMiniArrowLeft className="h-5 w-5" /> Quay lại
-          </button>
-
-          {isLastQuestion ? (
-            <button
-              className="btn btn-primary hover:shadow-primary/50 px-8 shadow-lg transition-all active:scale-95"
-              onClick={handleSubmit}
-              disabled={submitMutation.isPending}
-            >
-              {submitMutation.isPending ? (
-                <span className="loading loading-spinner"></span>
-              ) : (
-                <>
-                  Nộp bài <HiMiniPaperAirplane className="h-5 w-5" />
-                </>
-              )}
-            </button>
-          ) : (
-            <button
-              className="btn btn-primary px-8 shadow-md transition-all active:scale-95"
-              onClick={next}
-            >
-              Tiếp tục <HiMiniArrowRight className="h-5 w-5" />
-            </button>
-          )}
+        {/* Sidebar */}
+        <div className="col-span-1 space-y-6">
+          <div className="rounded-2xl border bg-white p-6 shadow-sm">
+            <h3 className="mb-6 font-bold text-slate-800">Quiz summary</h3>
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <div
+                  className={`rounded-lg p-2 ${isUrgent ? 'animate-pulse bg-red-100 text-red-500' : 'bg-indigo-50 text-indigo-500'}`}
+                >
+                  <FiClock className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold tracking-wider text-slate-500 uppercase">
+                    Time remaining
+                  </p>
+                  <p
+                    className={`text-2xl font-black ${isUrgent ? 'text-red-600' : 'text-slate-800'}`}
+                  >
+                    {formatted}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="rounded-lg bg-indigo-50 p-2 text-indigo-500">
+                  <FiZap className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold tracking-wider text-slate-500 uppercase">
+                    Score to pass
+                  </p>
+                  <p className="text-2xl font-black text-slate-800">{PASS_THRESHOLD}%</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
