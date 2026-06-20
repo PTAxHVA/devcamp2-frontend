@@ -156,10 +156,13 @@ export default function SectionDetailPage() {
   }
 
   const handleMarkAsComplete = async () => {
+    // NOTE: there is no section-complete API yet — this only simulates success.
+    // Keep the "(Mocked)" label so learners aren't misled into thinking their
+    // progress was persisted. Replace with the real endpoint once it exists.
     setIsCompleting(true)
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      toast.success('Section completed!')
+      toast.success('Section completed! (Mocked — progress not yet saved)')
     } finally {
       setIsCompleting(false)
     }

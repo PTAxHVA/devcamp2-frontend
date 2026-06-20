@@ -22,7 +22,7 @@ export default function ProgressHeader({ topics }: ProgressHeaderProps) {
         : `~${Math.round(remainingHours)}h left`
 
   const nextTopic =
-    topics.find((t) => t.status === 'in_progress') ?? topics.find((t) => t.status === 'available')
+    topics.find((t) => t.status === 'in_progress') ?? topics.find((t) => t.status !== 'completed')
 
   return (
     <div className="border-border-soft grid grid-cols-2 gap-4 rounded-2xl border bg-white p-5 shadow-sm md:grid-cols-4">

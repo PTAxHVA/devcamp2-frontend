@@ -29,14 +29,6 @@ const STATUS_CONFIG = {
     dot: 'bg-amber-500',
     bar: 'bg-amber-500',
   },
-  available: {
-    label: 'Available',
-    color: 'text-violet-600',
-    bg: 'bg-violet-50',
-    borderB: 'border-b-violet-200',
-    dot: 'bg-violet-500',
-    bar: 'bg-brand-purple-600',
-  },
   locked: {
     label: 'Locked',
     color: 'text-text-muted',
@@ -79,9 +71,7 @@ export default function TopicDetailSidebar({ topic }: TopicDetailSidebarProps) {
       ? 'Review Topic'
       : topic.status === 'in_progress'
         ? 'Continue Learning'
-        : topic.status === 'available'
-          ? 'Start Topic'
-          : 'Locked'
+        : 'Locked'
 
   return (
     <div className="border-border-soft sticky top-6 overflow-hidden rounded-2xl border bg-white shadow-sm">
