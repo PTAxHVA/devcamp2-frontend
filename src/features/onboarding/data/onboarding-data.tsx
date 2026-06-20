@@ -23,21 +23,21 @@ export const roles = [
     title: 'Frontend Development',
     desc: 'Build user interfaces and interactive experiences for the web.',
     time: '3–6 months',
-    icon: <LuLayoutTemplate className="h-16 w-16 stroke-[1.25] text-slate-400" />,
+    icon: <LuLayoutTemplate className="text-text-placeholder h-16 w-16 stroke-[1.25]" />,
   },
   {
     id: 'backend',
     title: 'Backend Development',
     desc: 'Build server-side logic, APIs, and databases that power applications.',
     time: '3–6 months',
-    icon: <LuDatabase className="h-16 w-16 stroke-[1.25] text-slate-400" />,
+    icon: <LuDatabase className="text-text-placeholder h-16 w-16 stroke-[1.25]" />,
   },
   {
     id: 'fullstack',
     title: 'Fullstack Development',
     desc: 'Work on both frontend and backend to build complete applications.',
     time: '6–9 months',
-    icon: <LuCode className="h-16 w-16 stroke-[1.25] text-slate-400" />,
+    icon: <LuCode className="text-text-placeholder h-16 w-16 stroke-[1.25]" />,
   },
 ]
 
@@ -194,5 +194,8 @@ export const PREFERENCE_QUESTIONS = [
     desc: 'Share anything else we should know to personalize your roadmap',
     type: 'textarea',
     placeholder: 'E.g., I have a background in design...',
+    required: false,
   },
 ]
+
+export const LEARNING_PATH_KEYS = ['learningFramework', 'styling', 'projectDirection'] as const

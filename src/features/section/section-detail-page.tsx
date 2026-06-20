@@ -96,10 +96,10 @@ export default function SectionDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-slate-50">
+      <div className="bg-bg-section flex h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <span className="loading loading-spinner loading-lg text-purple-600"></span>
-          <p className="text-sm font-medium text-slate-500">Loading section details...</p>
+          <span className="loading loading-spinner loading-lg text-brand-purple-600"></span>
+          <p className="text-text-muted text-sm font-medium">Loading section details...</p>
         </div>
       </div>
     )
@@ -107,9 +107,9 @@ export default function SectionDetailPage() {
 
   if (isError) {
     return (
-      <div className="flex h-screen flex-col items-center justify-center gap-4 bg-slate-50 text-center">
-        <RiAlertLine className="animate-pulse text-5xl text-red-500" />
-        <p className="text-lg font-bold text-slate-800">Failed to load section details.</p>
+      <div className="bg-bg-section flex h-screen flex-col items-center justify-center gap-4 text-center">
+        <RiAlertLine className="text-error-text animate-pulse text-5xl" />
+        <p className="text-text-primary text-lg font-bold">Failed to load section details.</p>
         <button className="btn btn-primary" onClick={() => navigate('/dashboard')}>
           Back to Dashboard
         </button>
@@ -156,11 +156,13 @@ export default function SectionDetailPage() {
   }
 
   const handleMarkAsComplete = async () => {
+    // NOTE: there is no section-complete API yet — this only simulates success.
+    // Keep the "(Mocked)" label so learners aren't misled into thinking their
+    // progress was persisted. Replace with the real endpoint once it exists.
     setIsCompleting(true)
     try {
-      // Simulate API call as backend endpoint is not yet available
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      toast.success('Section completed successfully! (Mocked)')
+      toast.success('Section completed! (Mocked — progress not yet saved)')
     } finally {
       setIsCompleting(false)
     }
@@ -172,58 +174,58 @@ export default function SectionDetailPage() {
       <div className="mb-8 flex flex-wrap items-center gap-2 text-sm font-medium">
         <Link
           to="/dashboard"
-          className="cursor-pointer text-purple-600 transition-colors hover:text-purple-800"
+          className="text-brand-purple-600 hover:text-brand-purple-700 cursor-pointer transition-colors"
         >
           Learn
         </Link>
-        <RiArrowRightSLine className="text-slate-400" />
+        <RiArrowRightSLine className="text-text-placeholder" />
         <Link
           to={`/my-learning/topics/${topicId}${qRoadmap}`}
-          className="cursor-pointer text-purple-600 transition-colors hover:text-purple-800"
+          className="text-brand-purple-600 hover:text-brand-purple-700 cursor-pointer transition-colors"
         >
           {topic.name}
         </Link>
-        <RiArrowRightSLine className="text-slate-400" />
-        <span className="text-slate-600">Section {sectionNumber}</span>
+        <RiArrowRightSLine className="text-text-placeholder" />
+        <span className="text-text-secondary">Section {sectionNumber}</span>
       </div>
 
       {/* Header */}
       <div className="mb-8 flex flex-col items-start justify-between gap-8 lg:flex-row">
         <div className="flex flex-1 gap-5">
-          <div className="flex h-20 w-20 shrink-0 flex-col items-center justify-center rounded-full border-2 border-purple-200 bg-purple-50 text-purple-700">
+          <div className="border-border-purple bg-bg-lavender text-brand-purple-700 flex h-20 w-20 shrink-0 flex-col items-center justify-center rounded-full border-2">
             <span className="text-3xl font-bold">{sectionNumber}</span>
           </div>
           <div>
-            <h1 className="mb-2 text-3xl font-bold text-slate-900">{section.title}</h1>
-            <p className="max-w-2xl text-sm leading-relaxed text-slate-600 md:text-base">
+            <h1 className="text-text-primary mb-2 text-3xl font-bold">{section.title}</h1>
+            <p className="text-text-secondary max-w-2xl text-sm leading-relaxed md:text-base">
               Understand the core specifications, methods, and practical aspects of this section.
             </p>
           </div>
         </div>
 
         {/* Stats Card */}
-        <div className="w-full shrink-0 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:w-80 xl:w-96">
+        <div className="border-border-soft w-full shrink-0 rounded-2xl border bg-white p-5 shadow-sm lg:w-80 xl:w-96">
           <div className="space-y-4">
             <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-3 text-slate-600">
-                <RiTimeLine className="text-lg text-purple-600" />
+              <div className="text-text-secondary flex items-center gap-3">
+                <RiTimeLine className="text-brand-purple-600 text-lg" />
                 <span className="font-medium">Duration</span>
               </div>
-              <span className="font-semibold text-slate-900">{durationText}</span>
+              <span className="text-text-primary font-semibold">{durationText}</span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-3 text-slate-600">
-                <RiBarChartBoxLine className="text-lg text-purple-600" />
+              <div className="text-text-secondary flex items-center gap-3">
+                <RiBarChartBoxLine className="text-brand-purple-600 text-lg" />
                 <span className="font-medium">Difficulty</span>
               </div>
-              <span className="font-semibold text-slate-900">Beginner</span>
+              <span className="text-text-primary font-semibold">Beginner</span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-3 text-slate-600">
-                <RiBookOpenLine className="text-lg text-purple-600" />
+              <div className="text-text-secondary flex items-center gap-3">
+                <RiBookOpenLine className="text-brand-purple-600 text-lg" />
                 <span className="font-medium">Topic</span>
               </div>
-              <span className="font-semibold text-slate-900">{topic.name}</span>
+              <span className="text-text-primary font-semibold">{topic.name}</span>
             </div>
           </div>
         </div>
@@ -232,22 +234,22 @@ export default function SectionDetailPage() {
       {/* Main Split Content */}
       <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
         {/* Outcomes */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-          <h2 className="mb-2 text-lg font-bold text-slate-900">Learning outcomes</h2>
-          <p className="mb-6 text-sm text-slate-600">
+        <div className="border-border-soft rounded-2xl border bg-white p-6 shadow-sm md:p-8">
+          <h2 className="text-text-primary mb-2 text-lg font-bold">Learning outcomes</h2>
+          <p className="text-text-secondary mb-6 text-sm">
             By the end of this section, you will be able to:
           </p>
           <ul className="space-y-5">
             {outcomes.map((outcome) => (
               <li key={outcome} className="flex items-start gap-3">
-                <RiCheckboxCircleLine className="mt-0.5 shrink-0 text-xl text-purple-600" />
+                <RiCheckboxCircleLine className="text-brand-purple-600 mt-0.5 shrink-0 text-xl" />
                 <span
-                  className="text-sm font-medium text-slate-700"
+                  className="text-text-secondary text-sm font-medium"
                   dangerouslySetInnerHTML={{
                     __html: DOMPurify.sanitize(
                       outcome.replace(
                         /<([a-z]+)>/g,
-                        '<code class="bg-slate-100 text-slate-800 px-1 py-0.5 rounded text-xs">&lt;$1&gt;</code>',
+                        '<code class="bg-bg-section text-text-primary px-1 py-0.5 rounded text-xs">&lt;$1&gt;</code>',
                       ),
                     ),
                   }}
@@ -258,9 +260,9 @@ export default function SectionDetailPage() {
         </div>
 
         {/* Materials */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
-          <h2 className="mb-2 text-lg font-bold text-slate-900">Learning materials</h2>
-          <p className="mb-6 text-sm text-slate-600">
+        <div className="border-border-soft rounded-2xl border bg-white p-6 shadow-sm md:p-8">
+          <h2 className="text-text-primary mb-2 text-lg font-bold">Learning materials</h2>
+          <p className="text-text-secondary mb-6 text-sm">
             Review the resources below to prepare for the quiz.
           </p>
           <div className="space-y-3">
@@ -272,21 +274,21 @@ export default function SectionDetailPage() {
                   href={mat.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-center gap-4 rounded-xl border border-slate-200 p-4 transition-all hover:border-purple-300 hover:shadow-sm"
+                  className="group border-border-soft hover:border-border-purple flex items-center gap-4 rounded-xl border p-4 transition-all hover:shadow-sm"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
+                  <div className="bg-bg-lavender text-brand-purple-600 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
                     <Icon className="text-xl" />
                   </div>
                   <div className="flex-1">
-                    <p className="mb-0.5 text-xs font-bold tracking-wider text-slate-400 uppercase">
+                    <p className="text-text-placeholder mb-0.5 text-xs font-bold tracking-wider uppercase">
                       {getResourceTypeLabel(mat.type)}
                     </p>
-                    <p className="text-sm font-bold text-slate-900 transition-colors group-hover:text-purple-700">
+                    <p className="text-text-primary group-hover:text-brand-purple-700 text-sm font-bold transition-colors">
                       {mat.title}
                     </p>
                   </div>
                   <div className="flex items-center">
-                    <span className="text-xs font-medium text-slate-500">
+                    <span className="text-text-muted text-xs font-medium">
                       {mat.estimatedMinutes ? `${mat.estimatedMinutes} min` : 'External'}
                     </span>
                   </div>
@@ -299,7 +301,7 @@ export default function SectionDetailPage() {
 
       {/* Info Banner */}
       {section.hasQuiz && (
-        <div className="border-brand-purple-100 bg-brand-purple-50/50 text-brand-purple-800 mb-10 flex items-center gap-3 rounded-xl border p-4">
+        <div className="border-brand-purple-100 bg-bg-lavender/50 text-brand-purple-800 mb-10 flex items-center gap-3 rounded-xl border p-4">
           <RiInformationLine className="text-brand-purple-600 shrink-0 text-xl" />
           <p className="text-sm font-medium">
             You must pass the quiz with at least {quiz?.minPassScore || QUIZ_PASS_THRESHOLD}% to
@@ -309,7 +311,7 @@ export default function SectionDetailPage() {
       )}
 
       {/* Navigation Footer */}
-      <div className="flex flex-col items-center justify-between gap-6 border-t border-slate-200 pt-6 pb-10 sm:flex-row">
+      <div className="border-border-soft flex flex-col items-center justify-between gap-6 border-t pt-6 pb-10 sm:flex-row">
         {/* Previous */}
         {prevSection ? (
           <button
@@ -318,17 +320,17 @@ export default function SectionDetailPage() {
             }
             className="group flex w-full cursor-pointer items-center gap-4 text-left sm:w-auto"
           >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition-colors group-hover:border-slate-300">
+            <div className="border-border-soft text-text-secondary group-hover:border-border-input flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border bg-white transition-colors">
               <RiArrowLeftLine />
             </div>
             <div>
-              <p className="mb-0.5 text-xs font-bold tracking-wider text-slate-500 uppercase">
+              <p className="text-text-muted mb-0.5 text-xs font-bold tracking-wider uppercase">
                 Previous Section
               </p>
-              <p className="text-sm font-semibold text-slate-900 transition-colors group-hover:text-purple-700">
+              <p className="text-text-primary group-hover:text-brand-purple-700 text-sm font-semibold transition-colors">
                 Section {currentIdx}
                 <br />
-                <span className="font-medium text-slate-600 transition-colors group-hover:text-purple-600">
+                <span className="text-text-secondary group-hover:text-brand-purple-600 font-medium transition-colors">
                   {prevSection.name}
                 </span>
               </p>
@@ -339,14 +341,14 @@ export default function SectionDetailPage() {
             to={`/my-learning/topics/${topicId}${qRoadmap}`}
             className="group flex w-full cursor-pointer items-center gap-4 text-left sm:w-auto"
           >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition-colors group-hover:border-slate-300">
+            <div className="border-border-soft text-text-secondary group-hover:border-border-input flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border bg-white transition-colors">
               <RiArrowLeftLine />
             </div>
             <div>
-              <p className="mb-0.5 text-xs font-bold tracking-wider text-slate-500 uppercase">
+              <p className="text-text-muted mb-0.5 text-xs font-bold tracking-wider uppercase">
                 Topic Details
               </p>
-              <p className="text-sm font-semibold text-slate-900 transition-colors group-hover:text-purple-700">
+              <p className="text-text-primary group-hover:text-brand-purple-700 text-sm font-semibold transition-colors">
                 Back to topic overview
               </p>
             </div>
@@ -356,10 +358,10 @@ export default function SectionDetailPage() {
         <div className="flex w-full items-center justify-between gap-6 sm:w-auto sm:justify-end">
           {nextSection && (
             <div className="hidden text-right md:block">
-              <p className="mb-0.5 text-xs font-bold tracking-wider text-slate-500 uppercase">
+              <p className="text-text-muted mb-0.5 text-xs font-bold tracking-wider uppercase">
                 Next Section
               </p>
-              <p className="text-sm font-medium text-slate-600">{nextSection.name}</p>
+              <p className="text-text-secondary text-sm font-medium">{nextSection.name}</p>
             </div>
           )}
 
@@ -369,7 +371,7 @@ export default function SectionDetailPage() {
                 onClick={() =>
                   navigate(`/my-learning/topics/${topicId}/sections/${nextSection._id}${qRoadmap}`)
                 }
-                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-2.5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50 sm:w-auto"
+                className="border-border-soft text-text-secondary hover:bg-bg-section flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border bg-white px-6 py-2.5 text-sm font-bold transition-colors sm:w-auto"
               >
                 Next Section <RiArrowRightLine />
               </button>

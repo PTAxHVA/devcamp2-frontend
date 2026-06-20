@@ -49,10 +49,10 @@ export default function ResetPasswordPage() {
   // Token không hợp lệ
   if (!token) {
     return (
-      <div className="flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-gray-200 shadow-sm md:flex-row">
+      <div className="border-border-soft flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border shadow-sm md:flex-row">
         <div className="flex w-full flex-col gap-4 bg-white px-10 py-16 md:w-1/2">
-          <h1 className="text-3xl font-extrabold text-gray-900">The link is invalid.</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-text-primary text-3xl font-extrabold">The link is invalid.</h1>
+          <p className="text-text-muted text-sm">
             The password reset link is invalid or has expired.
           </p>
           <Link
@@ -74,10 +74,10 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-gray-200 shadow-sm md:flex-row">
+    <div className="border-border-soft flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border shadow-sm md:flex-row">
       <div className="flex w-full flex-col justify-between bg-white px-10 py-12 md:w-1/2">
         <div className="flex-1">
-          <h1 className="mb-2 text-3xl font-extrabold text-gray-900">Reset your password</h1>
+          <h1 className="text-text-primary mb-2 text-3xl font-extrabold">Reset your password</h1>
           <p className="mb-8 text-sm font-medium text-indigo-500">
             Create a new password for your account.
             <br />
@@ -86,29 +86,31 @@ export default function ResetPasswordPage() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-gray-800" htmlFor="newPassword">
+              <label className="text-text-primary text-sm font-semibold" htmlFor="newPassword">
                 New password
               </label>
               <input
                 id="newPassword"
                 type="password"
                 placeholder="••••••••"
-                className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
+                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('newPassword')}
               />
               {errors.newPassword && (
-                <p className="text-xs text-red-500">{errors.newPassword.message}</p>
+                <p className="text-error-text text-xs">{errors.newPassword.message}</p>
               )}
 
               <div className="mt-2 flex flex-col gap-1.5">
-                <p className="text-xs font-semibold text-gray-600">Password must:</p>
+                <p className="text-text-secondary text-xs font-semibold">Password must:</p>
                 {passwordRules.map((rule) => {
                   const passed = rule.test(passwordValue)
                   return (
                     <div key={rule.label} className="flex items-center gap-2">
                       <div
                         className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                          passed ? 'border-indigo-500 bg-indigo-500' : 'border-gray-300 bg-white'
+                          passed
+                            ? 'border-indigo-500 bg-indigo-500'
+                            : 'border-border-input bg-white'
                         }`}
                       >
                         {passed && (
@@ -124,7 +126,7 @@ export default function ResetPasswordPage() {
                         )}
                       </div>
                       <span
-                        className={`text-xs transition-colors ${passed ? 'text-indigo-600' : 'text-gray-400'}`}
+                        className={`text-xs transition-colors ${passed ? 'text-indigo-600' : 'text-text-placeholder'}`}
                       >
                         {rule.label}
                       </span>
@@ -135,18 +137,18 @@ export default function ResetPasswordPage() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-gray-800" htmlFor="confirmPassword">
+              <label className="text-text-primary text-sm font-semibold" htmlFor="confirmPassword">
                 Confirm new password
               </label>
               <input
                 id="confirmPassword"
                 type="password"
                 placeholder="••••••••"
-                className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
+                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('confirmPassword')}
               />
               {errors.confirmPassword && (
-                <p className="text-xs text-red-500">{errors.confirmPassword.message}</p>
+                <p className="text-error-text text-xs">{errors.confirmPassword.message}</p>
               )}
             </div>
 
@@ -161,7 +163,7 @@ export default function ResetPasswordPage() {
 
           <div className="my-5 flex items-center gap-3">
             <div className="h-px flex-1 bg-gray-200" />
-            <span className="text-xs text-gray-400">or</span>
+            <span className="text-text-placeholder text-xs">or</span>
             <div className="h-px flex-1 bg-gray-200" />
           </div>
 

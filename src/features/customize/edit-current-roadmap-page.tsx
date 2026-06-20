@@ -243,13 +243,13 @@ export default function EditCurrentRoadmapPage() {
       <div className="mb-6">
         <button
           onClick={() => navigate(-1)}
-          className="mb-3 flex items-center gap-2 text-sm font-semibold text-purple-600 transition hover:text-purple-800"
+          className="text-brand-purple-600 hover:text-brand-purple-700 mb-3 flex items-center gap-2 text-sm font-semibold transition"
         >
           <RiArrowLeftLine /> Back
         </button>
         <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-bold text-slate-900">Edit current roadmap</h1>
-          <RiBookmarkLine className="text-2xl text-purple-600" />
+          <h1 className="text-text-primary text-3xl font-bold">Edit current roadmap</h1>
+          <RiBookmarkLine className="text-brand-purple-600 text-2xl" />
         </div>
       </div>
 
@@ -275,40 +275,40 @@ export default function EditCurrentRoadmapPage() {
       {/* Main Container */}
       <div className="flex min-h-150 flex-1 flex-col gap-6 lg:flex-row">
         {/* === CANVAS BÊN TRÁI === */}
-        <div className="flex flex-1 flex-col rounded-2xl border border-slate-200 bg-white">
+        <div className="border-border-soft flex flex-1 flex-col rounded-2xl border bg-white">
           {/* Toolbar xử lý Mutation thực sự */}
-          <div className="flex flex-wrap items-center justify-between border-b border-slate-100 p-4">
+          <div className="border-border-soft flex flex-wrap items-center justify-between border-b p-4">
             <div className="flex items-center gap-2">
               <button
                 onClick={handleAddTopic}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                className="border-border-soft text-text-secondary hover:bg-bg-section flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold"
               >
-                <RiAddLine className="text-purple-600" /> Add topic
+                <RiAddLine className="text-brand-purple-600" /> Add topic
               </button>
               <button
                 onClick={handleRemoveTopic}
                 disabled={!selectedNode || selectedNode.id === '1'}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-40"
+                className="border-border-soft text-text-secondary hover:bg-bg-section flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold disabled:opacity-40"
               >
-                <RiSubtractLine className="text-red-500" /> Remove topic
+                <RiSubtractLine className="text-error-text" /> Remove topic
               </button>
               <div className="mx-2 h-5 w-px bg-slate-200" />
               <button
                 onClick={() => handleMoveNode('up')}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                className="border-border-soft text-text-secondary hover:bg-bg-section flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold"
               >
-                <RiArrowUpLine className="text-purple-600" /> Move up
+                <RiArrowUpLine className="text-brand-purple-600" /> Move up
               </button>
               <button
                 onClick={() => handleMoveNode('down')}
-                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                className="border-border-soft text-text-secondary hover:bg-bg-section flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold"
               >
-                <RiArrowDownLine className="text-purple-600" /> Move down
+                <RiArrowDownLine className="text-brand-purple-600" /> Move down
               </button>
             </div>
           </div>
 
-          <div className="relative flex-1 bg-slate-50/50">
+          <div className="bg-bg-section/50 relative flex-1">
             <ReactFlow
               nodes={nodes}
               edges={edges}
@@ -326,13 +326,15 @@ export default function EditCurrentRoadmapPage() {
         </div>
 
         {/* === CONTROLLED FORM BÊN PHẢI === */}
-        <div className="flex w-full flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:w-100">
-          <h2 className="mb-6 text-lg font-bold text-slate-900">Topic details</h2>
+        <div className="border-border-soft flex w-full flex-col rounded-2xl border bg-white p-6 shadow-sm lg:w-100">
+          <h2 className="text-text-primary mb-6 text-lg font-bold">Topic details</h2>
 
           {selectedNode ? (
             <div className="flex flex-1 flex-col gap-5">
               <div>
-                <label className="mb-1.5 block text-sm font-bold text-slate-700">Title *</label>
+                <label className="text-text-secondary mb-1.5 block text-sm font-bold">
+                  Title *
+                </label>
                 <input
                   type="text"
                   value={formTitle}
@@ -340,12 +342,14 @@ export default function EditCurrentRoadmapPage() {
                     setFormTitle(e.target.value)
                     updateGraphNodeData('label', e.target.value)
                   }}
-                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-900 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none"
+                  className="border-border-soft text-text-primary focus:border-border-purple w-full rounded-xl border px-4 py-2.5 text-sm focus:ring-1 focus:ring-purple-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="mb-1.5 block text-sm font-bold text-slate-700">Description</label>
+                <label className="text-text-secondary mb-1.5 block text-sm font-bold">
+                  Description
+                </label>
                 <textarea
                   rows={4}
                   value={formDescription}
@@ -353,27 +357,27 @@ export default function EditCurrentRoadmapPage() {
                     setFormDescription(e.target.value)
                     updateGraphNodeData('description', e.target.value)
                   }}
-                  className="w-full resize-none rounded-xl border border-slate-200 px-4 py-2.5 text-sm text-slate-900 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 focus:outline-none"
+                  className="border-border-soft text-text-primary focus:border-border-purple w-full resize-none rounded-xl border px-4 py-2.5 text-sm focus:ring-1 focus:ring-purple-500 focus:outline-none"
                 />
               </div>
 
               <div className="flex gap-4">
                 <div className="flex-1">
-                  <label className="mb-1.5 block text-sm font-bold text-slate-700">Type</label>
+                  <label className="text-text-secondary mb-1.5 block text-sm font-bold">Type</label>
                   <select
                     value={formType}
                     onChange={(e) => {
                       setFormType(e.target.value)
                       updateGraphNodeData('type', e.target.value)
                     }}
-                    className="w-full appearance-none rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm"
+                    className="border-border-soft w-full appearance-none rounded-xl border bg-white px-4 py-2.5 text-sm"
                   >
                     <option>Core Topic</option>
                     <option>Optional</option>
                   </select>
                 </div>
                 <div className="flex-1">
-                  <label className="mb-1.5 block text-sm font-bold text-slate-700">
+                  <label className="text-text-secondary mb-1.5 block text-sm font-bold">
                     Estimated time
                   </label>
                   <select
@@ -382,7 +386,7 @@ export default function EditCurrentRoadmapPage() {
                       setFormTime(e.target.value)
                       updateGraphNodeData('estimatedTime', e.target.value)
                     }}
-                    className="w-full appearance-none rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm"
+                    className="border-border-soft w-full appearance-none rounded-xl border bg-white px-4 py-2.5 text-sm"
                   >
                     <option>4-6 weeks</option>
                     <option>1-2 weeks</option>
@@ -390,10 +394,10 @@ export default function EditCurrentRoadmapPage() {
                 </div>
               </div>
 
-              <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-5">
+              <div className="border-border-soft mt-2 flex items-center justify-between border-t pt-5">
                 <div>
-                  <p className="text-sm font-bold text-slate-900">Required</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-text-primary text-sm font-bold">Required</p>
+                  <p className="text-text-muted text-xs">
                     Mark as required to keep this topic in path.
                   </p>
                 </div>
@@ -403,7 +407,7 @@ export default function EditCurrentRoadmapPage() {
                     setFormRequired(nextVal)
                     updateGraphNodeData('status', nextVal ? 'upcoming' : 'locked')
                   }}
-                  className={`flex h-6 w-11 cursor-pointer items-center rounded-full p-1 transition-colors ${formRequired ? 'bg-purple-600' : 'bg-slate-200'}`}
+                  className={`flex h-6 w-11 cursor-pointer items-center rounded-full p-1 transition-colors ${formRequired ? 'bg-brand-purple-600' : 'bg-slate-200'}`}
                 >
                   <div
                     className={`h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${formRequired ? 'translate-x-5' : 'translate-x-0'}`}
@@ -412,7 +416,7 @@ export default function EditCurrentRoadmapPage() {
               </div>
             </div>
           ) : (
-            <div className="flex flex-1 items-center justify-center text-sm text-slate-400">
+            <div className="text-text-placeholder flex flex-1 items-center justify-center text-sm">
               Select a topic on the canvas to configure.
             </div>
           )}
@@ -421,18 +425,18 @@ export default function EditCurrentRoadmapPage() {
 
       {/* Footer chứa nút bấm tích hợp Backend thật */}
       <div className="mt-6 flex flex-col items-end gap-6 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex w-full flex-1 items-center gap-4 rounded-xl border border-purple-100 bg-purple-50/50 p-4 lg:w-auto">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-purple-600 shadow-sm">
+        <div className="border-border-purple bg-bg-lavender/50 flex w-full flex-1 items-center gap-4 rounded-xl border p-4 lg:w-auto">
+          <div className="text-brand-purple-600 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-sm">
             <RiSparklingFill className="text-xl" />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <h4 className="font-bold text-slate-900">AI feedback</h4>
-              <span className="rounded bg-purple-100 px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-purple-700 uppercase">
+              <h4 className="text-text-primary font-bold">AI feedback</h4>
+              <span className="bg-bg-lavender text-brand-purple-700 rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">
                 Beta
               </span>
             </div>
-            <p className="text-xs text-slate-600">
+            <p className="text-text-secondary text-xs">
               Edits look valid. Structure has been automatically synchronized.
             </p>
           </div>
@@ -441,7 +445,7 @@ export default function EditCurrentRoadmapPage() {
         <div className="flex shrink-0 gap-3">
           <button
             onClick={() => navigate(-1)}
-            className="rounded-xl border border-slate-200 bg-white px-6 py-2.5 font-bold text-slate-700 transition hover:bg-slate-50"
+            className="border-border-soft text-text-secondary hover:bg-bg-section rounded-xl border bg-white px-6 py-2.5 font-bold transition"
           >
             Cancel
           </button>

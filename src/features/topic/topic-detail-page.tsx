@@ -60,7 +60,7 @@ const CircularProgress = ({ value, size = 84, stroke = 8 }: CircularProgressProp
           className="transition-[stroke-dashoffset] duration-700 ease-out"
         />
       </svg>
-      <span className="absolute inset-0 flex items-center justify-center text-base font-bold text-slate-800">
+      <span className="text-text-primary absolute inset-0 flex items-center justify-center text-base font-bold">
         {value}%
       </span>
     </div>
@@ -73,7 +73,7 @@ export type Status = 'Completed' | 'In Progress' | 'Not Started'
 const statusStyles: Record<Status, string> = {
   Completed: 'bg-emerald-50 text-emerald-600',
   'In Progress': 'bg-indigo-50 text-indigo-600',
-  'Not Started': 'bg-slate-100 text-slate-500',
+  'Not Started': 'bg-bg-section text-text-muted',
 }
 
 const StatusBadge = ({ status }: { status: Status }) => (
@@ -88,7 +88,7 @@ const StatusIcon = ({ status }: { status: Status }) => {
   if (status === 'Completed') return <RiCheckboxCircleFill className="h-5 w-5 text-emerald-500" />
   if (status === 'In Progress')
     return <span className="block h-5 w-5 rounded-full border-2 border-dashed border-indigo-400" />
-  return <RiCheckboxBlankCircleLine className="h-5 w-5 text-slate-300" />
+  return <RiCheckboxBlankCircleLine className="text-text-disabled h-5 w-5" />
 }
 
 /* --------------------------------- Card ---------------------------------- */
@@ -98,7 +98,7 @@ interface CardProps {
 }
 
 const Card = ({ className = '', children }: CardProps) => (
-  <div className={`rounded-2xl border border-slate-200 bg-white ${className}`}>{children}</div>
+  <div className={`border-border-soft rounded-2xl border bg-white ${className}`}>{children}</div>
 )
 
 interface StatRowProps {
@@ -109,11 +109,11 @@ interface StatRowProps {
 
 const StatRow = ({ icon: Icon, label, value }: StatRowProps) => (
   <div className="flex items-center justify-between py-2.5">
-    <div className="flex items-center gap-3 text-slate-500">
+    <div className="text-text-muted flex items-center gap-3">
       <Icon className="h-4.5 w-4.5" />
       <span className="text-sm">{label}</span>
     </div>
-    <span className="text-sm font-semibold text-slate-800">{value}</span>
+    <span className="text-text-primary text-sm font-semibold">{value}</span>
   </div>
 )
 
@@ -175,10 +175,10 @@ export default function TopicDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-slate-50">
+      <div className="bg-bg-section flex h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <span className="loading loading-spinner loading-lg text-purple-600"></span>
-          <p className="text-sm font-medium text-slate-500">Loading topic details...</p>
+          <span className="loading loading-spinner loading-lg text-brand-purple-600"></span>
+          <p className="text-text-muted text-sm font-medium">Loading topic details...</p>
         </div>
       </div>
     )
@@ -186,9 +186,9 @@ export default function TopicDetailPage() {
 
   if (isError || !data) {
     return (
-      <div className="flex h-screen flex-col items-center justify-center gap-4 bg-slate-50 text-center">
-        <RiAlertLine className="animate-pulse text-5xl text-red-500" />
-        <p className="text-lg font-bold text-slate-800">Failed to load topic details.</p>
+      <div className="bg-bg-section flex h-screen flex-col items-center justify-center gap-4 text-center">
+        <RiAlertLine className="text-error-text animate-pulse text-5xl" />
+        <p className="text-text-primary text-lg font-bold">Failed to load topic details.</p>
         <button className="btn btn-primary" onClick={() => navigate('/dashboard')}>
           Back to Dashboard
         </button>
@@ -262,7 +262,7 @@ export default function TopicDetailPage() {
         {/* Back */}
         <button
           onClick={handleBackToRoadmap}
-          className="flex cursor-pointer items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-slate-900"
+          className="text-text-secondary hover:text-text-primary flex cursor-pointer items-center gap-2 text-sm font-medium transition"
         >
           <RiArrowLeftLine className="h-4 w-4" />
           Back to Roadmap
@@ -273,45 +273,45 @@ export default function TopicDetailPage() {
           <main className="flex-1 space-y-5">
             {/* Header */}
             <div className="flex items-start gap-4">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-purple-100 text-xl font-bold text-purple-700">
+              <div className="bg-bg-lavender text-brand-purple-700 flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xl font-bold">
                 {orderIndex + 1}
               </div>
               <div className="flex-1">
                 <div className="flex flex-wrap items-center gap-3">
-                  <h1 className="text-3xl font-bold text-slate-800">{topicName}</h1>
-                  <span className="rounded-md bg-purple-50 px-2.5 py-1 text-xs font-semibold text-purple-700">
+                  <h1 className="text-text-primary text-3xl font-bold">{topicName}</h1>
+                  <span className="bg-bg-lavender text-brand-purple-700 rounded-md px-2.5 py-1 text-xs font-semibold">
                     Required
                   </span>
                 </div>
                 {/* Progress */}
                 <div className="mt-3 flex items-center gap-4">
-                  <span className="text-sm font-medium text-slate-600">Progress</span>
+                  <span className="text-text-secondary text-sm font-medium">Progress</span>
                   <div className="h-2 w-full max-w-75 overflow-hidden rounded-full bg-slate-200">
                     <div
-                      className="h-full rounded-full bg-purple-600 transition-all duration-700"
+                      className="bg-brand-purple-600 h-full rounded-full transition-all duration-700"
                       style={{ width: `${progressPercent}%` }}
                     />
                   </div>
-                  <span className="text-sm whitespace-nowrap text-slate-500">
+                  <span className="text-text-muted text-sm whitespace-nowrap">
                     {progressPercent}% complete
                   </span>
                 </div>
               </div>
             </div>
 
-            <p className="max-w-3xl leading-relaxed text-slate-600">{topicDescription}</p>
+            <p className="text-text-secondary max-w-3xl leading-relaxed">{topicDescription}</p>
 
             {/* Objectives + Prerequisites */}
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
               <Card className="p-6">
                 <div className="mb-4 flex items-center gap-2">
-                  <RiFocus3Line className="h-5 w-5 text-purple-600" />
-                  <h3 className="font-semibold text-slate-800">Learning objectives</h3>
+                  <RiFocus3Line className="text-brand-purple-600 h-5 w-5" />
+                  <h3 className="text-text-primary font-semibold">Learning objectives</h3>
                 </div>
                 <ul className="space-y-2.5">
                   {objectives.map((o) => (
-                    <li key={o} className="flex items-start gap-2.5 text-sm text-slate-600">
-                      <span className="mt-1.75 h-1.5 w-1.5 shrink-0 rounded-full bg-purple-400" />
+                    <li key={o} className="text-text-secondary flex items-start gap-2.5 text-sm">
+                      <span className="bg-brand-purple-400 mt-1.75 h-1.5 w-1.5 shrink-0 rounded-full" />
                       {o}
                     </li>
                   ))}
@@ -320,14 +320,14 @@ export default function TopicDetailPage() {
 
               <Card className="p-6">
                 <div className="mb-4 flex items-center gap-2">
-                  <RiBookOpenLine className="h-5 w-5 text-purple-600" />
-                  <h3 className="font-semibold text-slate-800">Prerequisites</h3>
+                  <RiBookOpenLine className="text-brand-purple-600 h-5 w-5" />
+                  <h3 className="text-text-primary font-semibold">Prerequisites</h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {prerequisites.map((p) => (
                     <span
                       key={p}
-                      className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600"
+                      className="border-border-soft text-text-secondary rounded-lg border px-3 py-1.5 text-sm"
                     >
                       {p}
                     </span>
@@ -339,7 +339,7 @@ export default function TopicDetailPage() {
             {/* Resources */}
             {resources.length > 0 && (
               <Card className="p-6">
-                <h3 className="mb-4 font-semibold text-slate-800">Resources</h3>
+                <h3 className="text-text-primary mb-4 font-semibold">Resources</h3>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                   {resources.slice(0, 8).map((r, index) => {
                     const Icon = getResourceIcon(r.type)
@@ -347,22 +347,22 @@ export default function TopicDetailPage() {
                       <Link
                         key={index}
                         to={`/my-learning/topics/${id}/sections/${r.sectionId}${roadmapId ? `?roadmapId=${roadmapId}` : ''}`}
-                        className="flex min-h-31 flex-col justify-between rounded-xl border border-slate-200 p-4 text-left transition hover:border-purple-300 hover:shadow-sm"
+                        className="border-border-soft hover:border-border-purple flex min-h-31 flex-col justify-between rounded-xl border p-4 text-left transition hover:shadow-sm"
                       >
                         <div className="flex gap-3">
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
+                          <div className="bg-bg-lavender text-brand-purple-600 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
                             <Icon className="h-5 w-5" />
                           </div>
                           <div>
-                            <p className="text-xs font-semibold text-slate-400 uppercase">
+                            <p className="text-text-placeholder text-xs font-semibold uppercase">
                               {r.type}
                             </p>
-                            <p className="text-sm leading-snug font-semibold text-slate-800">
+                            <p className="text-text-primary text-sm leading-snug font-semibold">
                               {r.title}
                             </p>
                           </div>
                         </div>
-                        <p className="mt-3 flex items-center gap-1 text-xs text-slate-400">
+                        <p className="text-text-placeholder mt-3 flex items-center gap-1 text-xs">
                           {r.estimatedMinutes ? `${r.estimatedMinutes} min` : 'External link'}
                           <RiExternalLinkLine className="h-3.5 w-3.5" />
                         </p>
@@ -375,9 +375,9 @@ export default function TopicDetailPage() {
 
             {/* Sections */}
             <Card className="p-6">
-              <h3 className="mb-3 font-semibold text-slate-800">Sections</h3>
+              <h3 className="text-text-primary mb-3 font-semibold">Sections</h3>
               <div
-                className={`grid ${cols} items-center gap-4 px-2 pb-1 text-xs font-medium text-slate-400`}
+                className={`grid ${cols} text-text-placeholder items-center gap-4 px-2 pb-1 text-xs font-medium`}
               >
                 <span />
                 <span>#</span>
@@ -400,13 +400,13 @@ export default function TopicDetailPage() {
                         `/my-learning/topics/${id}/sections/${sec._id}${roadmapId ? `?roadmapId=${roadmapId}` : ''}`,
                       )
                     }
-                    className={`grid ${cols} cursor-pointer items-center gap-4 border-t border-slate-100 px-2 py-4 transition hover:bg-slate-50/60`}
+                    className={`grid ${cols} border-border-soft hover:bg-bg-section/60 cursor-pointer items-center gap-4 border-t px-2 py-4 transition`}
                   >
-                    <RiDraggable className="h-4 w-4 text-slate-300" />
-                    <span className="text-sm text-slate-400">{idx + 1}</span>
+                    <RiDraggable className="text-text-disabled h-4 w-4" />
+                    <span className="text-text-placeholder text-sm">{idx + 1}</span>
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-slate-800">{sec.name}</p>
-                      <p className="mt-0.5 truncate text-xs text-slate-400">
+                      <p className="text-text-primary truncate text-sm font-semibold">{sec.name}</p>
+                      <p className="text-text-placeholder mt-0.5 truncate text-xs">
                         {sec.contentOverview
                           ? sec.contentOverview
                               .split('\n')
@@ -417,7 +417,7 @@ export default function TopicDetailPage() {
                           : 'Understand the core concepts of this section.'}
                       </p>
                     </div>
-                    <span className="text-sm text-slate-500">
+                    <span className="text-text-muted text-sm">
                       {secMinutes ? `${secMinutes} min` : '15 min'}
                     </span>
                     <StatusBadge status={status} />
@@ -432,25 +432,25 @@ export default function TopicDetailPage() {
           <aside className="w-full shrink-0 space-y-5 lg:w-90">
             {/* Topic summary */}
             <Card className="p-6">
-              <h3 className="mb-4 font-semibold text-slate-800">Topic summary</h3>
+              <h3 className="text-text-primary mb-4 font-semibold">Topic summary</h3>
 
               <div className="flex items-center gap-4">
                 <CircularProgress value={progressPercent} />
                 <div>
-                  <p className="font-semibold text-slate-800">Your progress</p>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-text-primary font-semibold">Your progress</p>
+                  <p className="text-text-muted text-sm">
                     {completedSections} of {totalSections} sections completed
                   </p>
                   <div className="mt-2 h-1.5 w-32 overflow-hidden rounded-full bg-slate-200">
                     <div
-                      className="h-full rounded-full bg-purple-600"
+                      className="bg-brand-purple-600 h-full rounded-full"
                       style={{ width: `${progressPercent}%` }}
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="my-5 border-t border-slate-100" />
+              <div className="border-border-soft my-5 border-t" />
 
               <div className="divide-y divide-slate-50">
                 <StatRow icon={RiTimeLine} label="Estimated time" value={estimatedTimeText} />
@@ -469,16 +469,16 @@ export default function TopicDetailPage() {
             </Card>
 
             {/* Need help */}
-            <Card className="cursor-pointer p-5 transition hover:border-purple-200">
+            <Card className="hover:border-border-purple cursor-pointer p-5 transition">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-600">
+                <div className="bg-bg-lavender text-brand-purple-600 flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
                   <RiQuestionLine className="h-5 w-5" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-slate-800">Need help?</p>
-                  <p className="text-xs text-slate-400">Ask AI Assistant about this topic</p>
+                  <p className="text-text-primary text-sm font-semibold">Need help?</p>
+                  <p className="text-text-placeholder text-xs">Ask AI Assistant about this topic</p>
                 </div>
-                <RiArrowRightSLine className="h-5 w-5 text-slate-400" />
+                <RiArrowRightSLine className="text-text-placeholder h-5 w-5" />
               </div>
             </Card>
           </aside>

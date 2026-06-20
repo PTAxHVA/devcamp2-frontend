@@ -29,18 +29,10 @@ const STATUS_CONFIG = {
     dot: 'bg-amber-500',
     bar: 'bg-amber-500',
   },
-  available: {
-    label: 'Available',
-    color: 'text-violet-600',
-    bg: 'bg-violet-50',
-    borderB: 'border-b-violet-200',
-    dot: 'bg-violet-500',
-    bar: 'bg-brand-purple-600',
-  },
   locked: {
     label: 'Locked',
-    color: 'text-slate-500',
-    bg: 'bg-slate-50',
+    color: 'text-text-muted',
+    bg: 'bg-bg-section',
     borderB: 'border-b-slate-200',
     dot: 'bg-slate-400',
     bar: 'bg-slate-300',
@@ -52,9 +44,9 @@ export default function TopicDetailSidebar({ topic }: TopicDetailSidebarProps) {
 
   if (!topic) {
     return (
-      <div className="rounded-2xl border border-slate-100 bg-white p-8 text-center shadow-sm">
-        <RiBookOpenLine className="mx-auto mb-3 text-4xl text-slate-200" />
-        <p className="text-sm font-medium text-slate-400">
+      <div className="border-border-soft rounded-2xl border bg-white p-8 text-center shadow-sm">
+        <RiBookOpenLine className="text-text-disabled mx-auto mb-3 text-4xl" />
+        <p className="text-text-placeholder text-sm font-medium">
           Click a topic on the map to see details
         </p>
       </div>
@@ -79,12 +71,10 @@ export default function TopicDetailSidebar({ topic }: TopicDetailSidebarProps) {
       ? 'Review Topic'
       : topic.status === 'in_progress'
         ? 'Continue Learning'
-        : topic.status === 'available'
-          ? 'Start Topic'
-          : 'Locked'
+        : 'Locked'
 
   return (
-    <div className="sticky top-6 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm">
+    <div className="border-border-soft sticky top-6 overflow-hidden rounded-2xl border bg-white shadow-sm">
       {/* Status banner */}
       <div className={`flex items-center gap-2 border-b px-5 py-2.5 ${cfg.bg} ${cfg.borderB}`}>
         <span className={`h-2 w-2 shrink-0 rounded-full ${cfg.dot}`} />
@@ -94,19 +84,21 @@ export default function TopicDetailSidebar({ topic }: TopicDetailSidebarProps) {
       </div>
 
       <div className="p-5">
-        <p className="mb-1 text-xs font-bold tracking-wider text-slate-400 uppercase">Topic</p>
-        <h2 className="mb-4 text-xl leading-tight font-black text-slate-800">{topic.title}</h2>
+        <p className="text-text-placeholder mb-1 text-xs font-bold tracking-wider uppercase">
+          Topic
+        </p>
+        <h2 className="text-text-primary mb-4 text-xl leading-tight font-black">{topic.title}</h2>
 
         {/* Section progress */}
         {topic.sectionTotal > 0 && (
           <div className="mb-5">
-            <div className="mb-1.5 flex justify-between text-xs font-bold text-slate-500">
+            <div className="text-text-muted mb-1.5 flex justify-between text-xs font-bold">
               <span>Sections completed</span>
               <span>
                 {topic.sectionCompleted}/{topic.sectionTotal}
               </span>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+            <div className="bg-bg-section h-2 w-full overflow-hidden rounded-full">
               <div
                 className={`h-full transition-all duration-300 ${cfg.bar}`}
                 style={{ width: `${sectionProgress}%` }}
@@ -116,30 +108,30 @@ export default function TopicDetailSidebar({ topic }: TopicDetailSidebarProps) {
         )}
 
         {/* Stats */}
-        <div className="mb-4 space-y-2.5 border-b border-slate-100 pb-4">
+        <div className="border-border-soft mb-4 space-y-2.5 border-b pb-4">
           <div className="flex items-center gap-2 text-sm">
-            <RiTimeLine className="shrink-0 text-slate-400" />
-            <span className="font-semibold text-slate-600">Estimated time</span>
-            <span className="ml-auto font-medium text-slate-500">{estimateLabel}</span>
+            <RiTimeLine className="text-text-placeholder shrink-0" />
+            <span className="text-text-secondary font-semibold">Estimated time</span>
+            <span className="text-text-muted ml-auto font-medium">{estimateLabel}</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <RiBookOpenLine className="shrink-0 text-slate-400" />
-            <span className="font-semibold text-slate-600">Sections</span>
-            <span className="ml-auto font-medium text-slate-500">{topic.sectionTotal}</span>
+            <RiBookOpenLine className="text-text-placeholder shrink-0" />
+            <span className="text-text-secondary font-semibold">Sections</span>
+            <span className="text-text-muted ml-auto font-medium">{topic.sectionTotal}</span>
           </div>
         </div>
 
         {/* Prerequisites */}
         {topic.prerequisiteTopicIds.length > 0 && (
           <div className="mb-4">
-            <h4 className="mb-2 text-xs font-black tracking-wider text-slate-700 uppercase">
+            <h4 className="text-text-secondary mb-2 text-xs font-black tracking-wider uppercase">
               Prerequisites
             </h4>
             <div className="space-y-1.5">
               {topic.prerequisiteTopicIds.map((id) => (
-                <div key={id} className="flex items-center gap-2 text-xs text-slate-500">
+                <div key={id} className="text-text-muted flex items-center gap-2 text-xs">
                   <RiCheckFill className="shrink-0 text-sm text-emerald-500" />
-                  <span className="truncate font-mono text-[11px] text-slate-400">
+                  <span className="text-text-placeholder truncate font-mono text-[11px]">
                     {id.slice(-8)}
                   </span>
                 </div>
@@ -154,7 +146,7 @@ export default function TopicDetailSidebar({ topic }: TopicDetailSidebarProps) {
           onClick={() => canNavigate && navigate(`/my-learning/topics/${topic.masterTopicId}`)}
           className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all ${
             !canNavigate
-              ? 'cursor-not-allowed bg-slate-100 text-slate-400'
+              ? 'bg-bg-section text-text-placeholder cursor-not-allowed'
               : topic.status === 'completed'
                 ? 'border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
                 : 'bg-brand-purple-600 hover:bg-brand-purple-700 text-white shadow-lg shadow-violet-200/60'

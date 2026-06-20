@@ -17,15 +17,15 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-bg-soft">
-          <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+        <div className="bg-bg-soft flex min-h-screen flex-col items-center justify-center gap-4">
+          <div className="bg-error-bg flex h-16 w-16 items-center justify-center rounded-full">
             <span className="text-2xl">⚠️</span>
           </div>
-          <h1 className="text-xl font-bold text-text-primary">Có lỗi xảy ra</h1>
-          <p className="text-sm text-text-muted">Vui lòng tải lại trang.</p>
+          <h1 className="text-text-primary text-xl font-bold">Có lỗi xảy ra</h1>
+          <p className="text-text-muted text-sm">Vui lòng tải lại trang.</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-5 py-2.5 rounded-xl bg-[#003B71] text-white text-sm font-semibold hover:bg-[#082A5E] transition"
+            className="bg-btn-primary-bg hover:bg-btn-primary-hover rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition"
           >
             Tải lại trang
           </button>

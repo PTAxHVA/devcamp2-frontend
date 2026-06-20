@@ -13,7 +13,7 @@ import {
   StepGenerating,
 } from './steps'
 import StepCustomize from './steps/customize'
-import { steps } from '../data/onboarding-data'
+import { steps, PREFERENCE_QUESTIONS, LEARNING_PATH_KEYS } from '../data/onboarding-data'
 import { useWizardStore } from '../onboarding-store'
 
 const OnboardingMain = () => {
@@ -21,6 +21,12 @@ const OnboardingMain = () => {
   const { step: currentStep, answers, setAnswer, nextStep, prevStep, goToStep } = useWizardStore()
   const [direction, setDirection] = useState('next')
   const [subStep, setSubStep] = useState(1)
+
+  // Lưu lại step+substep lúc bị bấm Continue mà chưa hợp lệ.
+  // Không dùng useEffect để reset — so sánh trực tiếp lúc render,
+  // tự động hết hiệu lực khi currentStep/subStep đổi, tránh setState trong effect.
+  const [errorStepKey, setErrorStepKey] = useState<string | null>(null)
+  const showValidationError = errorStepKey === `${currentStep}-${subStep}`
 
   useEffect(() => {
     if (currentStep === 6) {
@@ -32,7 +38,35 @@ const OnboardingMain = () => {
     }
   }, [currentStep, goToStep])
 
+  const isCurrentStepValid = (): boolean => {
+    switch (currentStep) {
+      case 2:
+        return !!answers?.role
+      case 3:
+        return !!answers?.goal
+      case 4:
+        return !!answers?.level
+      case 5:
+        if (subStep === 1) {
+          return PREFERENCE_QUESTIONS.every((q) => {
+            if (q.required === false) return true
+            const val = answers?.[q.id]
+            return typeof val === 'string' ? val.trim().length > 0 : !!val
+          })
+        }
+        return LEARNING_PATH_KEYS.every((key) => !!answers?.[key])
+      default:
+        return true
+    }
+  }
+
   const handleNext = () => {
+    if (!isCurrentStepValid()) {
+      setErrorStepKey(`${currentStep}-${subStep}`)
+      return
+    }
+    setErrorStepKey(null)
+
     if (currentStep === 5 && subStep === 1) {
       setDirection('next')
       setSubStep(2)
@@ -48,6 +82,7 @@ const OnboardingMain = () => {
   }
 
   const handleBack = () => {
+    setErrorStepKey(null)
     if (currentStep === 7) {
       setDirection('back')
       goToStep(2)
@@ -65,7 +100,7 @@ const OnboardingMain = () => {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-white font-sans text-slate-900">
+    <div className="text-text-primary flex min-h-screen flex-col bg-white font-sans">
       <NavBar />
       <main className="relative mx-auto flex min-h-screen w-full max-w-300 flex-1 flex-col overflow-x-hidden px-6 py-12">
         <div className="pointer-events-none fixed top-[-10%] left-[-5%] -z-10 h-125 w-125 rounded-full bg-indigo-200/20 blur-[120px]"></div>
@@ -88,14 +123,14 @@ const OnboardingMain = () => {
 
         {currentStep > 1 && currentStep < 5 && (
           <div key={`heading-${currentStep}`} className="fade-only mb-10 text-center">
-            <h1 className="mb-4 text-4xl font-bold text-slate-900">
+            <h1 className="text-text-primary mb-4 text-4xl font-bold">
               {currentStep === 2
                 ? "What's your starting point?"
                 : currentStep === 3
                   ? "What's your main goal?"
                   : 'What’s your current level?'}
             </h1>
-            <p className="text-lg font-medium text-slate-500">
+            <p className="text-text-muted text-lg font-medium">
               {currentStep === 2
                 ? 'Choose the role that best matches your goals.'
                 : currentStep === 3
@@ -105,7 +140,6 @@ const OnboardingMain = () => {
           </div>
         )}
 
-        {/* GRIDS NỘI DUNG */}
         <div
           key={`grid-${currentStep}-${subStep}`}
           className={direction === 'next' ? 'slide-next' : 'slide-back'}
@@ -114,21 +148,21 @@ const OnboardingMain = () => {
 
           {currentStep === 2 && (
             <StepRole
-              selectedRole={(answers?.role as string) || 'backend'}
+              selectedRole={answers?.role as string | undefined}
               setSelectedRole={(val) => setAnswer('role', val)}
             />
           )}
 
           {currentStep === 3 && (
             <StepGoal
-              selectedGoal={(answers?.goal as string) || 'school'}
+              selectedGoal={answers?.goal as string | undefined}
               setSelectedGoal={(val) => setAnswer('goal', val)}
             />
           )}
 
           {currentStep === 4 && (
             <StepLevel
-              selectedLevel={(answers?.level as string) || 'beginner'}
+              selectedLevel={answers?.level as string | undefined}
               setSelectedLevel={(val) => setAnswer('level', val)}
             />
           )}
@@ -140,22 +174,29 @@ const OnboardingMain = () => {
         </div>
 
         {currentStep !== 1 && (
-          <div className="mt-16 flex items-center justify-between border-t border-slate-200/60 pt-8">
-            <button
-              onClick={handleBack}
-              className="btn btn-ghost h-12 rounded-xl border border-slate-200 px-8 text-base font-semibold text-slate-700 transition-all hover:bg-slate-50 active:scale-95"
-            >
-              <RiArrowLeftLine className="mr-2 h-5 w-5" /> Back
-            </button>
-            {currentStep !== 6 && currentStep !== 7 && (
-              <button
-                onClick={handleNext}
-                className="btn h-12 rounded-xl border-none bg-[#0B1528] px-10 text-base font-semibold text-white transition-all hover:bg-[#15233e] hover:shadow-lg active:scale-95"
-              >
-                {currentStep === 5 && subStep === 2 ? 'Generate Your Roadmap' : 'Continue'}
-                <RiArrowRightLine className="ml-2 h-5 w-5" />
-              </button>
+          <div className="border-border-soft/60 mt-16 flex flex-col border-t pt-8">
+            {showValidationError && currentStep !== 6 && currentStep !== 7 && (
+              <p className="text-error-text mb-4 text-right text-sm font-medium">
+                Please complete this step before continuing.
+              </p>
             )}
+            <div className="flex items-center justify-between">
+              <button
+                onClick={handleBack}
+                className="btn btn-ghost border-border-soft text-text-secondary hover:bg-bg-section h-12 rounded-xl border px-8 text-base font-semibold transition-all active:scale-95"
+              >
+                <RiArrowLeftLine className="mr-2 h-5 w-5" /> Back
+              </button>
+              {currentStep !== 6 && currentStep !== 7 && (
+                <button
+                  onClick={handleNext}
+                  className="btn h-12 rounded-xl border-none bg-[#0B1528] px-10 text-base font-semibold text-white transition-all hover:bg-[#15233e] hover:shadow-lg active:scale-95"
+                >
+                  {currentStep === 5 && subStep === 2 ? 'Generate Your Roadmap' : 'Continue'}
+                  <RiArrowRightLine className="ml-2 h-5 w-5" />
+                </button>
+              )}
+            </div>
           </div>
         )}
       </main>

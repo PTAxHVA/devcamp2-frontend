@@ -33,14 +33,14 @@ export const Sidebar = () => {
       isCollapsed ? 'justify-center' : 'gap-3 px-4'
     } py-3 rounded-xl transition-all ${
       isActive
-        ? 'bg-brand-purple-50 text-brand-purple-700 font-semibold'
-        : 'text-slate-500 hover:bg-slate-50 font-medium'
+        ? 'bg-bg-lavender text-brand-purple-700 font-semibold'
+        : 'text-text-muted hover:bg-bg-section font-medium'
     }`
   }
 
   return (
     <aside
-      className={`relative flex h-full shrink-0 flex-col justify-between border-r border-slate-200 bg-white transition-all duration-300 ease-in-out md:flex ${
+      className={`border-border-soft relative flex h-full shrink-0 flex-col justify-between border-r bg-white transition-all duration-300 ease-in-out md:flex ${
         isCollapsed ? 'w-22' : 'w-65'
       }`}
     >
@@ -49,7 +49,7 @@ export const Sidebar = () => {
         <div className={`flex h-20 items-center ${isCollapsed ? 'justify-center' : 'px-8'}`}>
           <h1 className="overflow-hidden text-2xl font-bold">
             {isCollapsed ? (
-              <p className="text-purple-600">V</p>
+              <p className="text-brand-purple-600">V</p>
             ) : (
               <img src={Logo} alt="VORA Logo" className="h-auto w-35 object-contain" />
             )}
@@ -96,7 +96,7 @@ export const Sidebar = () => {
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-          className="hover:border-brand-purple-600 hover:bg-brand-purple-600 absolute top-17 -right-3.5 z-20 grid h-7 w-7 place-items-center rounded-full border border-slate-200 bg-white text-slate-400 shadow-md transition-all duration-200 ease-out hover:scale-110 hover:text-white active:scale-95" // 👉 Đã sửa thành brand-purple
+          className="hover:border-brand-purple-600 hover:bg-brand-purple-600 border-border-soft text-text-placeholder absolute top-17 -right-3.5 z-20 grid h-7 w-7 place-items-center rounded-full border bg-white shadow-md transition-all duration-200 ease-out hover:scale-110 hover:text-white active:scale-95" // 👉 Đã sửa thành brand-purple
         >
           <RiArrowLeftSLine
             className={`h-5 w-5 transition-transform duration-300 ${

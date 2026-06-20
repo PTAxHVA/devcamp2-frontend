@@ -40,14 +40,14 @@ export const StepIntro = ({ onStart }: { onStart: () => void }) => {
           ].map((item, idx) => (
             <div
               key={idx}
-              className="flex gap-4 rounded-xl border border-slate-100 p-4 transition-all hover:bg-white hover:shadow-sm"
+              className="border-border-soft flex gap-4 rounded-xl border p-4 transition-all hover:bg-white hover:shadow-sm"
             >
-              <div className="bg-brand-purple-50 text-brand-purple-600 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
+              <div className="bg-bg-lavender text-brand-purple-600 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
                 <item.icon className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="font-bold text-slate-900">{item.title}</h3>
-                <p className="text-sm text-slate-500">{item.desc}</p>
+                <h3 className="text-text-primary font-bold">{item.title}</h3>
+                <p className="text-text-muted text-sm">{item.desc}</p>
               </div>
             </div>
           ))}
@@ -61,16 +61,18 @@ export const StepIntro = ({ onStart }: { onStart: () => void }) => {
         </button>
       </div>
 
-      <div className="w-full flex-1 rounded-3xl border border-slate-100 bg-slate-50 p-8 shadow-inner">
-        <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-          <h4 className="mb-6 text-center font-bold text-slate-900">Your personalized roadmap</h4>
+      <div className="border-border-soft bg-bg-section w-full flex-1 rounded-3xl border p-8 shadow-inner">
+        <div className="border-border-soft rounded-2xl border bg-white p-6 shadow-sm">
+          <h4 className="text-text-primary mb-6 text-center font-bold">
+            Your personalized roadmap
+          </h4>
           <div className="flex flex-col items-center gap-4">
-            <div className="border-brand-purple-200 bg-brand-purple-50 flex h-10 w-32 items-center justify-center rounded border text-xs font-bold">
+            <div className="border-brand-purple-200 bg-bg-lavender flex h-10 w-32 items-center justify-center rounded border text-xs font-bold">
               Web Fundamentals
             </div>
             <div className="h-8 w-px bg-slate-200"></div>
             <div className="flex gap-4">
-              <div className="flex h-10 w-28 items-center justify-center rounded border border-slate-200 text-xs font-bold">
+              <div className="border-border-soft flex h-10 w-28 items-center justify-center rounded border text-xs font-bold">
                 HTML & CSS
               </div>
               <div className="border-brand-purple-600 text-brand-purple-700 ring-brand-purple-100 flex h-10 w-28 items-center justify-center rounded border text-xs font-bold ring-2">
@@ -78,11 +80,11 @@ export const StepIntro = ({ onStart }: { onStart: () => void }) => {
               </div>
             </div>
             <div className="h-8 w-px bg-slate-200"></div>
-            <div className="flex h-10 w-32 items-center justify-center rounded border border-slate-200 text-xs font-bold">
+            <div className="border-border-soft flex h-10 w-32 items-center justify-center rounded border text-xs font-bold">
               DOM & Events
             </div>
           </div>
-          <div className="mt-8 flex justify-center gap-4 text-xs font-medium text-slate-500">
+          <div className="text-text-muted mt-8 flex justify-center gap-4 text-xs font-medium">
             <span className="flex items-center gap-1">
               <div className="h-3 w-3 rounded-full bg-green-500"></div> Completed
             </span>

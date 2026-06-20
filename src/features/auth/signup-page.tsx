@@ -16,17 +16,17 @@ const passwordRules = [
 
 const features = [
   {
-    icon: <RiMapPinLine className="w-5 h-5 text-indigo-600" />,
+    icon: <RiMapPinLine className="h-5 w-5 text-indigo-600" />,
     title: 'Personalized roadmaps',
     desc: 'Get a learning path tailored to your goals, level, and interests.',
   },
   {
-    icon: <RiLineChartLine className="w-5 h-5 text-indigo-600" />,
+    icon: <RiLineChartLine className="h-5 w-5 text-indigo-600" />,
     title: 'Track your progress',
     desc: 'See your growth and stay motivated with clear progress tracking.',
   },
   {
-    icon: <RiLightbulbLine className="w-5 h-5 text-indigo-600" />,
+    icon: <RiLightbulbLine className="h-5 w-5 text-indigo-600" />,
     title: 'Learn smarter',
     desc: 'Focus on what matters and build real skills with hands-on projects.',
   },
@@ -41,7 +41,7 @@ export default function SignupPage() {
     formState: { errors },
   } = useForm<SignupInput>({
     resolver: zodResolver(signupSchema),
-    defaultValues: { password: '' },
+    defaultValues: { password: '', terms: false },
   })
 
   const signup = useSignup(setError)
@@ -56,75 +56,81 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="w-full max-w-5xl flex flex-col md:flex-row rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+    <div className="border-border-soft flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border shadow-sm md:flex-row">
       {/* ── Left: Form ── */}
-      <div className="w-full md:w-1/2 bg-white px-10 py-12 flex flex-col justify-between">
+      <div className="flex w-full flex-col justify-between bg-white px-10 py-12 md:w-1/2">
         <div className="flex-1">
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-2">Create your account</h1>
-          <p className="text-sm text-indigo-500 font-medium mb-8">
+          <h1 className="text-text-primary mb-2 text-4xl font-extrabold">Create your account</h1>
+          <p className="mb-8 text-sm font-medium text-indigo-500">
             Start your personalized learning journey. It's free to get started.
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
             {/* Full name */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-gray-800" htmlFor="username">
+              <label className="text-text-primary text-sm font-semibold" htmlFor="username">
                 Full name
               </label>
               <input
                 id="username"
                 type="text"
                 placeholder="Your name"
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm outline-none focus:border-indigo-400 transition"
+                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('username')}
               />
-              {errors.username && <p className="text-xs text-red-500">{errors.username.message}</p>}
+              {errors.username && (
+                <p className="text-error-text text-xs">{errors.username.message}</p>
+              )}
             </div>
 
             {/* Email */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-gray-800" htmlFor="email">
+              <label className="text-text-primary text-sm font-semibold" htmlFor="email">
                 Email
               </label>
               <input
                 id="email"
                 type="email"
                 placeholder="Enter your email"
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm outline-none focus:border-indigo-400 transition"
+                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('email')}
               />
-              {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
+              {errors.email && <p className="text-error-text text-xs">{errors.email.message}</p>}
             </div>
 
             {/* Password */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-gray-800" htmlFor="password">
+              <label className="text-text-primary text-sm font-semibold" htmlFor="password">
                 Password
               </label>
               <input
                 id="password"
                 type="password"
                 placeholder="••••••••"
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm outline-none focus:border-indigo-400 transition"
+                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('password')}
               />
-              {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
+              {errors.password && (
+                <p className="text-error-text text-xs">{errors.password.message}</p>
+              )}
 
               {/* Live password rules */}
               {passwordValue.length > 0 && (
                 <div className="mt-2 flex flex-col gap-1.5">
-                  <p className="text-xs font-semibold text-gray-600">Password must:</p>
+                  <p className="text-text-secondary text-xs font-semibold">Password must:</p>
                   {passwordRules.map((rule) => {
                     const passed = rule.test(passwordValue)
                     return (
                       <div key={rule.label} className="flex items-center gap-2">
                         <div
-                          className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
-                            passed ? 'border-indigo-500 bg-indigo-500' : 'border-gray-300 bg-white'
+                          className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+                            passed
+                              ? 'border-indigo-500 bg-indigo-500'
+                              : 'border-border-input bg-white'
                           }`}
                         >
                           {passed && (
-                            <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 8 8">
+                            <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 8 8">
                               <path
                                 d="M1 4l2 2 4-4"
                                 stroke="currentColor"
@@ -136,7 +142,7 @@ export default function SignupPage() {
                           )}
                         </div>
                         <span
-                          className={`text-xs transition-colors ${passed ? 'text-indigo-600' : 'text-gray-400'}`}
+                          className={`text-xs transition-colors ${passed ? 'text-indigo-600' : 'text-text-placeholder'}`}
                         >
                           {rule.label}
                         </span>
@@ -149,78 +155,85 @@ export default function SignupPage() {
 
             {/* Confirm password */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-gray-800" htmlFor="confirmPassword">
+              <label className="text-text-primary text-sm font-semibold" htmlFor="confirmPassword">
                 Confirm new password
               </label>
               <input
                 id="confirmPassword"
                 type="password"
                 placeholder="••••••••"
-                className="w-full px-4 py-2.5 rounded-lg border border-gray-200 text-sm outline-none focus:border-indigo-400 transition"
+                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('confirmPassword')}
               />
               {errors.confirmPassword && (
-                <p className="text-xs text-red-500">{errors.confirmPassword.message}</p>
+                <p className="text-error-text text-xs">{errors.confirmPassword.message}</p>
               )}
             </div>
 
             {/* Terms */}
-            <label className="flex items-start gap-2 cursor-pointer">
-              <input type="checkbox" className="w-4 h-4 accent-indigo-600 mt-0.5" />
-              <span className="text-sm text-gray-500">
-                I agree to VORA's{' '}
-                <span className="text-indigo-600 hover:underline cursor-pointer">
-                  Terms of Service
-                </span>{' '}
-                and{' '}
-                <span className="text-indigo-600 hover:underline cursor-pointer">
-                  Privacy Policy
+            <div className="flex flex-col gap-1">
+              <label className="flex cursor-pointer items-start gap-2">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 accent-indigo-600"
+                  {...register('terms')}
+                />
+                <span className="text-text-muted text-sm">
+                  I agree to VORA's{' '}
+                  <span className="cursor-pointer text-indigo-600 hover:underline">
+                    Terms of Service
+                  </span>{' '}
+                  and{' '}
+                  <span className="cursor-pointer text-indigo-600 hover:underline">
+                    Privacy Policy
+                  </span>
                 </span>
-              </span>
-            </label>
+              </label>
+              {errors.terms && <p className="text-error-text text-xs">{errors.terms.message}</p>}
+            </div>
 
             <button
               type="submit"
               disabled={signup.isPending}
-              className="w-full py-2.5 rounded-lg bg-[#001a57] text-white text-sm font-semibold hover:bg-[#002080] transition disabled:opacity-60"
+              className="w-full rounded-lg bg-[#001a57] py-2.5 text-sm font-semibold text-white transition hover:bg-[#002080] disabled:opacity-60"
             >
               {signup.isPending ? 'Creating account...' : 'Create account'}
             </button>
           </form>
 
-          <div className="flex items-center gap-3 my-5">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-gray-400">or</span>
-            <div className="flex-1 h-px bg-gray-200" />
+          <div className="my-5 flex items-center gap-3">
+            <div className="h-px flex-1 bg-gray-200" />
+            <span className="text-text-placeholder text-xs">or</span>
+            <div className="h-px flex-1 bg-gray-200" />
           </div>
 
-          <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+          <button className="border-border-soft text-text-secondary hover:bg-bg-section flex w-full items-center justify-center gap-2 rounded-lg border py-2.5 text-sm font-medium transition">
             <img
               src="https://www.svgrepo.com/show/475656/google-color.svg"
-              className="w-5 h-5"
+              className="h-5 w-5"
               alt="Google"
             />
             Continue with Google
           </button>
 
-          <p className="text-sm text-center text-gray-400 mt-6">
+          <p className="text-text-placeholder mt-6 text-center text-sm">
             Already have an account?{' '}
-            <Link to="/login" className="text-indigo-600 font-semibold hover:underline">
+            <Link to="/login" className="font-semibold text-indigo-600 hover:underline">
               Login
             </Link>
           </p>
         </div>
 
-        <p className="text-xs text-gray-300 mt-10">2025 VORA. All rights reserved.</p>
+        <p className="text-text-disabled mt-10 text-xs">2025 VORA. All rights reserved.</p>
       </div>
 
       {/* ── Right: Info panel ── */}
-      <div className="hidden md:flex w-1/2 bg-[#f9f9fb] flex-col px-10 py-12 gap-8">
+      <div className="hidden w-1/2 flex-col gap-8 bg-[#f9f9fb] px-10 py-12 md:flex">
         <div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">
+          <h2 className="text-text-primary mb-2 text-xl font-bold">
             Personalized. Focused. Effective.
           </h2>
-          <p className="text-sm text-gray-600 max-w-xs">
+          <p className="text-text-secondary max-w-xs text-sm">
             VORA creates a roadmap just for you and helps you track progress every step of the way.
           </p>
         </div>
@@ -228,18 +241,18 @@ export default function SignupPage() {
         <img
           src={RoadmapSignup}
           alt="Dashboard preview"
-          className="w-full rounded-xl border border-gray-200 shadow-sm object-cover"
+          className="border-border-soft w-full rounded-xl border object-cover shadow-sm"
         />
 
         <div className="flex flex-col gap-4">
           {features.map((item) => (
             <div key={item.title} className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-indigo-100 bg-indigo-50">
                 {item.icon}
               </div>
               <div>
-                <p className="text-sm font-bold text-gray-800">{item.title}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
+                <p className="text-text-primary text-sm font-bold">{item.title}</p>
+                <p className="text-text-muted mt-0.5 text-xs">{item.desc}</p>
               </div>
             </div>
           ))}

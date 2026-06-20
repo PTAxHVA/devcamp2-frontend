@@ -72,7 +72,7 @@ export const StepGenerating = () => {
         <h1 className="mb-4 text-4xl leading-tight font-bold text-[#0B1528] md:text-5xl">
           AI is creating your <br /> personalized roadmap
         </h1>
-        <p className="mb-10 max-w-md text-lg text-slate-500">
+        <p className="text-text-muted mb-10 max-w-md text-lg">
           Our AI analyzes your profile, matches the best learning path, and organizes topics just
           for you.
         </p>
@@ -81,22 +81,22 @@ export const StepGenerating = () => {
           {processSteps.map((step) => (
             <div
               key={step.id}
-              className="flex items-center gap-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+              className="border-border-soft flex items-center gap-6 rounded-2xl border bg-white p-6 shadow-sm"
             >
               {/* Icon */}
-              <div className="bg-brand-purple-50 text-brand-purple-600 flex h-16 w-16 shrink-0 items-center justify-center rounded-full">
+              <div className="bg-bg-lavender text-brand-purple-600 flex h-16 w-16 shrink-0 items-center justify-center rounded-full">
                 {step.icon}
               </div>
 
               {/* Text */}
               <div className="flex-1 pr-4">
-                <h3 className="mb-1 text-lg font-bold text-slate-900">{step.title}</h3>
-                <p className="text-sm leading-relaxed text-slate-500">{step.desc}</p>
+                <h3 className="text-text-primary mb-1 text-lg font-bold">{step.title}</h3>
+                <p className="text-text-muted text-sm leading-relaxed">{step.desc}</p>
               </div>
 
               {/* Status Badge */}
               <div className="shrink-0">
-                <div className="rounded-lg border-2 border-slate-200 bg-white px-6 py-2 text-sm font-bold text-slate-900">
+                <div className="border-border-soft text-text-primary rounded-lg border-2 bg-white px-6 py-2 text-sm font-bold">
                   {step.status}
                 </div>
               </div>
@@ -106,13 +106,13 @@ export const StepGenerating = () => {
       </div>
 
       <div className="w-full flex-1 lg:max-w-xl">
-        <div className="h-full rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-          <h2 className="mb-1 text-xl font-bold text-slate-900">Your roadmap review</h2>
-          <p className="mb-8 text-sm text-slate-500">
+        <div className="border-border-soft h-full rounded-2xl border bg-white p-8 shadow-sm">
+          <h2 className="text-text-primary mb-1 text-xl font-bold">Your roadmap review</h2>
+          <p className="text-text-muted mb-8 text-sm">
             This is a preview. Final roadmap may adjust as we personalize it for you.
           </p>
 
-          <div className="relative flex h-95 w-full items-center justify-center overflow-hidden rounded-xl border border-slate-100 bg-slate-50/50">
+          <div className="border-border-soft bg-bg-section/50 relative flex h-95 w-full items-center justify-center overflow-hidden rounded-xl border">
             <div className="pointer-events-none absolute inset-0 opacity-60 grayscale transition-all duration-1000">
               <RoadmapGraph
                 nodes={previewNodes}
