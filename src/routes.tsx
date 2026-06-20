@@ -26,6 +26,7 @@ import ProfilePage from '@/pages/profile-page'
 import SettingsPage from '@/pages/settings-page'
 
 import { RoadmapCompletePage } from '@/pages/roadmap-complete-page'
+import { AddAnotherRolePage } from '@/pages/add-another-role-page'
 
 export function AppRoutes() {
   return (
@@ -103,14 +104,7 @@ export function AppRoutes() {
               </div>
             }
           />
-          <Route
-            path="/dashboard/add-role"
-            element={
-              <div className="text-text-placeholder flex h-full items-center justify-center text-2xl font-bold">
-                🚧 Trang Add Role (Task 20 sẽ làm)
-              </div>
-            }
-          />
+          <Route path="/dashboard/add-role" element={<AddAnotherRolePage />} />
         </Route>
       </Route>
 
