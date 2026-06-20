@@ -26,13 +26,13 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-gray-200 shadow-sm md:flex-row">
+    <div className="border-border-soft flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border shadow-sm md:flex-row">
       <div className="flex w-full flex-col justify-between bg-white px-10 py-16 md:w-1/2">
         <div className="flex-1">
           {forgot.isSuccess ? (
             <div className="flex flex-col gap-4">
-              <h1 className="text-3xl font-extrabold text-gray-900">Check your email</h1>
-              <p className="text-sm text-gray-500">
+              <h1 className="text-text-primary text-3xl font-extrabold">Check your email</h1>
+              <p className="text-text-muted text-sm">
                 If the email exists, a password reset link has been sent. Please check your inbox.
               </p>
               <Link
@@ -44,24 +44,28 @@ export default function ForgotPasswordPage() {
             </div>
           ) : (
             <>
-              <h1 className="mb-2 text-3xl font-extrabold text-gray-900">Forgot your password?</h1>
-              <p className="mb-8 text-sm text-gray-400">
+              <h1 className="text-text-primary mb-2 text-3xl font-extrabold">
+                Forgot your password?
+              </h1>
+              <p className="text-text-placeholder mb-8 text-sm">
                 Enter your email and we'll send reset instructions.
               </p>
 
               <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-gray-800" htmlFor="email">
+                  <label className="text-text-primary text-sm font-semibold" htmlFor="email">
                     Email
                   </label>
                   <input
                     id="email"
                     type="email"
                     placeholder="you@gmail.com"
-                    className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
+                    className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                     {...register('email')}
                   />
-                  {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
+                  {errors.email && (
+                    <p className="text-error-text text-xs">{errors.email.message}</p>
+                  )}
                 </div>
 
                 <button
@@ -75,7 +79,7 @@ export default function ForgotPasswordPage() {
 
               <div className="my-5 flex items-center gap-3">
                 <div className="h-px flex-1 bg-gray-200" />
-                <span className="text-xs text-gray-400">or</span>
+                <span className="text-text-placeholder text-xs">or</span>
                 <div className="h-px flex-1 bg-gray-200" />
               </div>
 
@@ -94,8 +98,8 @@ export default function ForgotPasswordPage() {
           className="w-full max-w-sm object-contain"
         />
         <div className="text-center">
-          <h2 className="mb-1 text-lg font-bold text-gray-900">We've got your back</h2>
-          <p className="max-w-xs text-sm text-gray-500">
+          <h2 className="text-text-primary mb-1 text-lg font-bold">We've got your back</h2>
+          <p className="text-text-muted max-w-xs text-sm">
             Reset your password quickly and securely so you can get back to your learning journey.
           </p>
         </div>

@@ -65,10 +65,10 @@ export default function MyLearningJourneyPage() {
 
   if (!roadmaps || roadmaps.length === 0) {
     return (
-      <div className="mx-auto my-20 max-w-md rounded-2xl border border-slate-100 bg-white p-10 text-center shadow-sm">
-        <RiBookOpenLine className="mx-auto mb-4 text-5xl text-slate-200" />
-        <p className="text-lg font-bold text-slate-700">No active roadmaps</p>
-        <p className="mt-1 text-sm text-slate-500">
+      <div className="border-border-soft mx-auto my-20 max-w-md rounded-2xl border bg-white p-10 text-center shadow-sm">
+        <RiBookOpenLine className="text-text-disabled mx-auto mb-4 text-5xl" />
+        <p className="text-text-secondary text-lg font-bold">No active roadmaps</p>
+        <p className="text-text-muted mt-1 text-sm">
           Start a roadmap from the dashboard to begin your learning journey.
         </p>
       </div>
@@ -86,10 +86,10 @@ export default function MyLearningJourneyPage() {
     }
     // Explicit slug, but the user isn't following that roadmap.
     return (
-      <div className="mx-auto my-20 max-w-md rounded-2xl border border-slate-100 bg-white p-10 text-center shadow-sm">
-        <RiBookOpenLine className="mx-auto mb-4 text-5xl text-slate-200" />
-        <p className="text-lg font-bold text-slate-700">You're not following this roadmap</p>
-        <p className="mt-1 text-sm text-slate-500">
+      <div className="border-border-soft mx-auto my-20 max-w-md rounded-2xl border bg-white p-10 text-center shadow-sm">
+        <RiBookOpenLine className="text-text-disabled mx-auto mb-4 text-5xl" />
+        <p className="text-text-secondary text-lg font-bold">You're not following this roadmap</p>
+        <p className="text-text-muted mt-1 text-sm">
           Pick one you're learning, or browse roadmaps to start a new one.
         </p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
@@ -104,7 +104,7 @@ export default function MyLearningJourneyPage() {
           ))}
           <button
             onClick={() => navigate('/roadmaps/browse')}
-            className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-50"
+            className="border-border-soft text-text-secondary hover:bg-bg-section rounded-lg border px-3 py-1.5 text-xs font-bold transition-colors"
           >
             Browse roadmaps
           </button>
@@ -115,7 +115,7 @@ export default function MyLearningJourneyPage() {
 
   if (isError || !roadmapDetail) {
     return (
-      <div className="mx-auto my-20 max-w-md rounded-2xl border border-red-100 bg-red-50 p-8 text-center text-red-600">
+      <div className="border-error-border bg-error-bg text-error-text mx-auto my-20 max-w-md rounded-2xl border p-8 text-center">
         <p className="text-lg font-bold">Failed to load roadmap</p>
         <p className="mt-1 text-sm">Please check your connection or try again.</p>
       </div>
@@ -129,17 +129,17 @@ export default function MyLearningJourneyPage() {
       {/* Header */}
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-800">
+          <h1 className="text-text-primary text-2xl font-black">
             {roadmap.roleName ?? 'My Learning Journey'}
           </h1>
-          <p className="mt-0.5 text-sm text-slate-500">
+          <p className="text-text-muted mt-0.5 text-sm">
             Follow your roadmap step by step and keep moving forward.
           </p>
         </div>
 
         {/* Roadmap switcher — only shown when user has 2 active roadmaps */}
         {roadmaps.length > 1 && (
-          <div className="flex items-center gap-1 rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
+          <div className="border-border-soft flex items-center gap-1 rounded-xl border bg-white p-1 shadow-sm">
             {roadmaps.map((r, idx) => (
               <button
                 key={r._id}
@@ -147,7 +147,7 @@ export default function MyLearningJourneyPage() {
                 className={`rounded-lg px-3 py-1.5 text-xs font-bold whitespace-nowrap transition-all ${
                   r._id === activeRoadmapId
                     ? 'bg-brand-purple-600 text-white shadow-sm'
-                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
+                    : 'text-text-muted hover:bg-bg-section hover:text-text-secondary'
                 }`}
               >
                 {r.roleName ?? `Roadmap ${idx + 1}`}

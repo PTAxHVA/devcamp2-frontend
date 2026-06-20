@@ -27,13 +27,13 @@ export const Stepper = ({ currentStep }: StepperProps) => {
                   ? 'border-brand-purple-600 text-brand-purple-600 shadow-brand-purple-200 -mt-1 h-10 w-10 border-2 bg-white text-lg font-bold shadow-md'
                   : isCompleted
                     ? 'bg-brand-purple-600 h-8 w-8 text-white'
-                    : 'h-8 w-8 border-2 border-slate-200 bg-white font-medium text-slate-400'
+                    : 'border-border-soft text-text-placeholder h-8 w-8 border-2 bg-white font-medium'
               } `}
             >
               {isCompleted ? <RiCheckLine className="h-5 w-5" /> : stepNum}
             </div>
             <span
-              className={`text-sm transition-colors duration-300 ${isActive ? 'text-brand-purple-600 font-bold' : isCompleted ? 'font-semibold text-slate-900' : 'font-medium text-slate-400'} `}
+              className={`text-sm transition-colors duration-300 ${isActive ? 'text-brand-purple-600 font-bold' : isCompleted ? 'text-text-primary font-semibold' : 'text-text-placeholder font-medium'} `}
             >
               {step}
             </span>

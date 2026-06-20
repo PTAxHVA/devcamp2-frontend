@@ -2,7 +2,7 @@ import { Link } from 'react-router'
 
 export default function ResetPasswordSuccessPage() {
   return (
-    <div className="flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-gray-200 shadow-sm md:flex-row">
+    <div className="border-border-soft flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border shadow-sm md:flex-row">
       {/* ── Left: illustration ── */}
       <div className="hidden w-1/2 items-center justify-center bg-[#f9f9fb] px-10 py-12 md:flex">
         <div className="relative flex items-center justify-center">
@@ -41,8 +41,8 @@ export default function ResetPasswordSuccessPage() {
 
       {/* ── Right: message ── */}
       <div className="flex w-full flex-col justify-center gap-6 bg-white px-10 py-16 md:w-1/2">
-        <h1 className="text-3xl font-extrabold text-gray-900">Password reset successful!</h1>
-        <p className="text-sm text-gray-500">
+        <h1 className="text-text-primary text-3xl font-extrabold">Password reset successful!</h1>
+        <p className="text-text-muted text-sm">
           Your password has been updated.
           <br />
           You can now log in with your new password.

@@ -29,7 +29,7 @@ export default function RoadmapSnakePath({
   }
 
   return (
-    <div className="relative mt-4 w-full overflow-hidden rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
+    <div className="border-border-soft relative mt-4 w-full overflow-hidden rounded-3xl border bg-white p-6 shadow-sm">
       {/* Legend */}
       <div className="mb-3 flex flex-wrap items-center gap-4">
         {[
@@ -39,7 +39,7 @@ export default function RoadmapSnakePath({
         ].map(({ color, label }) => (
           <div
             key={label}
-            className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500"
+            className="text-text-muted flex items-center gap-1.5 text-[11px] font-medium"
           >
             <span className={`h-2 w-2 rounded-full ${color} shrink-0`} />
             {label}
@@ -50,7 +50,7 @@ export default function RoadmapSnakePath({
       {/* Scrollable roadmap area — grows with topics; scrolls once it passes the
           max height so the page never gets dragged super long. */}
       <div
-        className="relative max-h-[70vh] overflow-y-auto overscroll-contain rounded-2xl border border-slate-100"
+        className="border-border-soft relative max-h-[70vh] overflow-y-auto overscroll-contain rounded-2xl border"
         style={{
           backgroundImage: 'radial-gradient(circle, #E2E8F0 1.5px, transparent 1.5px)',
           backgroundSize: '24px 24px',
@@ -100,10 +100,10 @@ export default function RoadmapSnakePath({
                     : 'bg-white ring-1 ring-slate-200'
                   let circleCls = isActive
                     ? 'bg-slate-600 text-white'
-                    : 'bg-slate-100 text-slate-400'
+                    : 'bg-bg-section text-text-placeholder'
                   let labelCls = isActive
-                    ? 'text-slate-700 font-semibold'
-                    : 'text-slate-400 font-medium'
+                    ? 'text-text-secondary font-semibold'
+                    : 'text-text-placeholder font-medium'
                   let icon: React.ReactNode = (
                     <span className="text-base font-bold">{topicNum}</span>
                   )
@@ -114,24 +114,25 @@ export default function RoadmapSnakePath({
                   if (typeNode?.type === 'start') {
                     ringCls = 'bg-white ring-1 ring-emerald-200'
                     circleCls = 'bg-emerald-500 text-white'
-                    labelCls = 'text-slate-500 font-semibold tracking-widest uppercase text-[10px]'
+                    labelCls = 'text-text-muted font-semibold tracking-widest uppercase text-[10px]'
                     icon = <RiStarFill size={20} />
                   } else if (typeNode?.type === 'finish') {
                     ringCls = 'bg-white ring-1 ring-slate-200'
-                    circleCls = 'bg-slate-200 text-slate-500'
-                    labelCls = 'text-slate-400 font-semibold tracking-widest uppercase text-[10px]'
+                    circleCls = 'bg-slate-200 text-text-muted'
+                    labelCls =
+                      'text-text-placeholder font-semibold tracking-widest uppercase text-[10px]'
                     icon = <RiFlagFill size={20} />
                   } else if (isCompleted) {
                     ringCls = 'bg-white ring-1 ring-emerald-200'
                     circleCls = 'bg-emerald-500 text-white'
-                    labelCls = 'text-slate-600 font-medium'
+                    labelCls = 'text-text-secondary font-medium'
                     icon = <RiCheckFill size={22} />
                     tooltipBg = 'bg-emerald-600'
                     tooltipArrow = 'border-t-emerald-600'
                   } else if (isInProgress) {
                     ringCls = 'bg-white ring-1 ring-amber-200'
                     circleCls = 'bg-amber-500 text-white'
-                    labelCls = 'text-slate-700 font-semibold'
+                    labelCls = 'text-text-secondary font-semibold'
                     icon = <RiPlayMiniFill size={22} />
                     tooltipBg = 'bg-amber-500'
                     tooltipArrow = 'border-t-amber-500'
@@ -154,14 +155,14 @@ export default function RoadmapSnakePath({
                           />
                         ) : (
                           <div
-                            className={`absolute top-1/2 z-0 ${horizSpan} border-t-2 border-dashed border-slate-200 ${isReverse ? 'right-1/2' : 'left-1/2'}`}
+                            className={`absolute top-1/2 z-0 ${horizSpan} border-border-soft border-t-2 border-dashed ${isReverse ? 'right-1/2' : 'left-1/2'}`}
                           />
                         ))}
 
                       {/* U-turn connector */}
                       {isLastInRow && !isLastRow && nextNode && (
                         <div
-                          className={`absolute top-1/2 z-0 h-40 w-[70%] ${isNextUnlocked ? 'border-solid border-emerald-200' : 'border-dashed border-slate-200'} border-t-2 border-b-2 ${
+                          className={`absolute top-1/2 z-0 h-40 w-[70%] ${isNextUnlocked ? 'border-solid border-emerald-200' : 'border-border-soft border-dashed'} border-t-2 border-b-2 ${
                             isReverse
                               ? 'right-1/2 rounded-l-[80px] border-l-2'
                               : 'left-1/2 rounded-r-[80px] border-r-2'

@@ -3,7 +3,7 @@ import { Sidebar, Navbar } from '@/components/shared/'
 
 export const MainLayout = () => {
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-slate-50/50 font-sans text-slate-900">
+    <div className="bg-bg-section/50 text-text-primary flex h-screen w-full overflow-hidden font-sans">
       <Sidebar />
       <div className="relative flex flex-1 flex-col overflow-hidden">
         <Navbar />

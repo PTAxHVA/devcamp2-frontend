@@ -1,10 +1,13 @@
 @import 'tailwindcss';
-@plugin "daisyui/index.js";
+@plugin 'daisyui/index.js';
 
 @theme {
   /* ===============FONT STYLE=================== */
   --font-primary: 'Inter', system-ui, -apple-system, sans-serif;
   --font-secondary: 'Roboto', sans-serif;
+  /* Wire Tailwind's default `font-sans` to the primary brand font so every
+     surface (body, layout wrappers, headings) renders Inter consistently. */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 
   /* ===============FONT SIZE==================== */
   --text-sm: 14px;

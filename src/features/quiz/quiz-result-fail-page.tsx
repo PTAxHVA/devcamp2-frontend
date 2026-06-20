@@ -49,10 +49,10 @@ export function QuizResultFailPage() {
 
   return (
     <div className="animate-fade-in mx-auto max-w-2xl p-6">
-      <div className="card border border-red-200 bg-red-50 shadow-xl transition-all duration-500 hover:shadow-2xl">
+      <div className="card border-error-border bg-error-bg border shadow-xl transition-all duration-500 hover:shadow-2xl">
         <div className="card-body items-center text-center">
-          <FiXCircle className="h-20 w-20 text-red-500" />
-          <h2 className="card-title mt-4 text-3xl font-bold text-red-700">
+          <FiXCircle className="text-error-text h-20 w-20" />
+          <h2 className="card-title text-error-text mt-4 text-3xl font-bold">
             You failed to meet the requirements
           </h2>
           <p className="mt-2 text-xl font-semibold">Score: {quizAttempt.score}%</p>

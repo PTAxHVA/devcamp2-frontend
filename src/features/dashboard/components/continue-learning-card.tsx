@@ -41,8 +41,8 @@ export function ContinueLearningCard({
             }
           >
             <div className="flex h-full flex-col items-center justify-center">
-              <span className="text-2xl font-extrabold text-slate-800">{progress}%</span>
-              <span className="mt-1 text-[10px] font-bold tracking-wider text-slate-500 uppercase">
+              <span className="text-text-primary text-2xl font-extrabold">{progress}%</span>
+              <span className="text-text-muted mt-1 text-[10px] font-bold tracking-wider uppercase">
                 Complete
               </span>
             </div>
@@ -55,25 +55,25 @@ export function ContinueLearningCard({
             Current roadmap
           </p>
           <h3
-            className="group flex w-fit cursor-pointer items-center gap-2 text-2xl font-bold text-slate-900"
+            className="group text-text-primary flex w-fit cursor-pointer items-center gap-2 text-2xl font-bold"
             onClick={() => navigate(`/roadmaps/${continueLearning.userRoadmapId}`)}
           >
             {continueLearning.sectionName}
-            <FiExternalLink className="group-hover:text-primary h-5 w-5 text-slate-400 transition-colors" />
+            <FiExternalLink className="group-hover:text-primary text-text-placeholder h-5 w-5 transition-colors" />
           </h3>
           <div className="my-4 h-px w-full bg-slate-200/60"></div>
 
           <div>
-            <p className="mb-2 text-[11px] font-bold tracking-widest text-slate-500 uppercase">
+            <p className="text-text-muted mb-2 text-[11px] font-bold tracking-widest uppercase">
               Next up
             </p>
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-md border border-slate-100 bg-white font-bold text-slate-700 shadow-sm">
+              <div className="border-border-soft text-text-secondary flex h-8 w-8 items-center justify-center rounded-md border bg-white font-bold shadow-sm">
                 {completed}
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-slate-800">{continueLearning.topicName}</span>
-                <span className="text-xs font-medium text-slate-500">
+                <span className="text-text-primary font-bold">{continueLearning.topicName}</span>
+                <span className="text-text-muted text-xs font-medium">
                   {completed} of {total} topics completed
                 </span>
               </div>
@@ -95,7 +95,7 @@ export function ContinueLearningCard({
           Continue Learning <FiArrowRight className="ml-1 h-4 w-4" />
         </button>
         <button
-          className="btn btn-outline rounded-lg border-slate-200 bg-white px-5 text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+          className="btn btn-outline border-border-soft text-text-secondary hover:border-border-input hover:bg-bg-section rounded-lg bg-white px-5"
           onClick={() => navigate(`/roadmaps/${continueLearning.userRoadmapId}`)}
         >
           View Roadmap <FiExternalLink className="ml-1 h-4 w-4" />

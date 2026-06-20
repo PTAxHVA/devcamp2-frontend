@@ -36,9 +36,9 @@ const DemoRoadmapPage = () => {
 
   return (
     <div className="bg-base-100 flex h-screen w-full flex-col">
-      <header className="shrink-0 border-b border-slate-200 px-8 py-4">
-        <h1 className="text-xl font-bold text-slate-900">{data.roadmap.roleName}</h1>
-        <p className="text-sm text-slate-500">{data.roadmap.description}</p>
+      <header className="border-border-soft shrink-0 border-b px-8 py-4">
+        <h1 className="text-text-primary text-xl font-bold">{data.roadmap.roleName}</h1>
+        <p className="text-text-muted text-sm">{data.roadmap.description}</p>
       </header>
       <div className="min-h-0 flex-1">
         <Roadmap nodes={graph.nodes as Node<BaseNodeData>[]} edges={graph.edges} />

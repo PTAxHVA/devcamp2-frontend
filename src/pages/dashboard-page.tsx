@@ -36,7 +36,7 @@ const DashboardPage = () => {
       {/* 1. Header Khu vực Lời chào */}
       <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
+          <h1 className="text-text-primary text-3xl font-extrabold tracking-tight">
             Welcome back, {displayName}!
           </h1>
           <p className="text-base-content/60 mt-2 font-medium">
@@ -45,7 +45,7 @@ const DashboardPage = () => {
         </div>
         <Link
           to="/roadmaps/browse"
-          className="btn btn-outline btn-sm rounded-full border-slate-300 bg-white px-4 shadow-sm hover:bg-slate-50"
+          className="btn btn-outline btn-sm border-border-input hover:bg-bg-section rounded-full bg-white px-4 shadow-sm"
         >
           Browse all Roadmaps <FiExternalLink className="ml-1" />
         </Link>
@@ -60,14 +60,14 @@ const DashboardPage = () => {
           <div className="flex flex-col gap-8 xl:col-span-7">
             {data.continueLearning && (
               <div className="flex flex-col gap-3">
-                <h2 className="text-xl font-bold text-slate-900">Continue Learning</h2>
+                <h2 className="text-text-primary text-xl font-bold">Continue Learning</h2>
                 <ContinueLearningCard continueLearning={data.continueLearning} />
               </div>
             )}
 
             <div className="flex flex-col gap-3">
               <div className="flex items-end justify-between">
-                <h2 className="text-xl font-bold text-slate-900">My Roadmaps</h2>
+                <h2 className="text-text-primary text-xl font-bold">My Roadmaps</h2>
                 <Link
                   to="/roadmaps/browse"
                   className="text-primary flex items-center gap-1 text-sm font-bold hover:underline"
@@ -93,7 +93,7 @@ const DashboardPage = () => {
 
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-slate-900">Weekly Progress</h2>
+                <h2 className="text-text-primary text-xl font-bold">Weekly Progress</h2>
                 <select className="select select-bordered select-sm rounded-full bg-white font-medium">
                   <option>This week</option>
                   <option>Last week</option>
@@ -104,7 +104,7 @@ const DashboardPage = () => {
 
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-slate-900">Learning Streak</h2>
+                <h2 className="text-text-primary text-xl font-bold">Learning Streak</h2>
                 <div className="flex items-center gap-2 text-sm font-bold">
                   This week <span className="text-warning text-lg">🔥</span>
                 </div>

@@ -42,7 +42,7 @@ export default function RoadmapPreviewModal({
         <button
           onClick={onClose}
           aria-label="Close preview"
-          className="absolute top-5 right-5 flex h-9 w-9 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+          className="text-text-placeholder hover:bg-bg-section hover:text-text-secondary absolute top-5 right-5 flex h-9 w-9 items-center justify-center rounded-full transition-colors"
         >
           <RiCloseLine size={22} />
         </button>
@@ -52,7 +52,7 @@ export default function RoadmapPreviewModal({
             <span className="loading loading-spinner loading-lg text-brand-purple-600" />
           </div>
         ) : isError ? (
-          <div className="flex flex-col items-center py-16 text-center text-red-500">
+          <div className="text-error-text flex flex-col items-center py-16 text-center">
             <p className="text-lg font-bold">Failed to load preview</p>
             <p className="mb-5 text-sm">Please check your connection and try again.</p>
             <button
@@ -68,52 +68,52 @@ export default function RoadmapPreviewModal({
             <p className="text-brand-purple-600 mb-1 text-xs font-bold tracking-wider uppercase">
               Roadmap preview
             </p>
-            <h2 className="mb-2 pr-8 text-2xl font-black text-slate-900">{title}</h2>
-            <p className="mb-5 text-sm text-slate-500">
+            <h2 className="text-text-primary mb-2 pr-8 text-2xl font-black">{title}</h2>
+            <p className="text-text-muted mb-5 text-sm">
               {data?.description ?? 'No description available.'}
             </p>
 
-            <div className="mb-6 flex flex-wrap gap-3 text-xs font-bold text-slate-600">
-              <span className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5">
-                <RiGitBranchLine className="text-slate-400" /> {branches.length} branch
+            <div className="text-text-secondary mb-6 flex flex-wrap gap-3 text-xs font-bold">
+              <span className="border-border-soft flex items-center gap-1.5 rounded-lg border px-3 py-1.5">
+                <RiGitBranchLine className="text-text-placeholder" /> {branches.length} branch
                 {branches.length === 1 ? '' : 'es'}
               </span>
-              <span className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5">
-                <RiListUnordered className="text-slate-400" /> {totalTopics} topics
+              <span className="border-border-soft flex items-center gap-1.5 rounded-lg border px-3 py-1.5">
+                <RiListUnordered className="text-text-placeholder" /> {totalTopics} topics
               </span>
             </div>
 
-            <h3 className="mb-3 text-sm font-bold text-slate-900">What you'll learn</h3>
+            <h3 className="text-text-primary mb-3 text-sm font-bold">What you'll learn</h3>
             {branches.length > 0 ? (
               <ul className="mb-8 space-y-2.5">
                 {branches.map((b) => (
                   <li
                     key={b._id}
-                    className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-4"
+                    className="border-border-soft bg-bg-section flex items-start gap-3 rounded-2xl border p-4"
                   >
                     <RiBookOpenLine className="text-brand-purple-500 mt-0.5 shrink-0 text-lg" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-bold text-slate-800">{b.name}</p>
+                      <p className="text-text-primary text-sm font-bold">{b.name}</p>
                       {b.description && (
-                        <p className="mt-0.5 line-clamp-2 text-xs text-slate-500">
+                        <p className="text-text-muted mt-0.5 line-clamp-2 text-xs">
                           {b.description}
                         </p>
                       )}
                     </div>
-                    <span className="shrink-0 text-xs font-semibold text-slate-400">
+                    <span className="text-text-placeholder shrink-0 text-xs font-semibold">
                       {b.topicCount} topics
                     </span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="mb-8 text-sm text-slate-500">No content available yet.</p>
+              <p className="text-text-muted mb-8 text-sm">No content available yet.</p>
             )}
 
             <div className="flex gap-3">
               <button
                 onClick={onClose}
-                className="flex-1 rounded-xl border border-slate-200 py-3 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50"
+                className="border-border-soft text-text-secondary hover:bg-bg-section flex-1 rounded-xl border py-3 text-sm font-bold transition-colors"
               >
                 Close
               </button>
@@ -126,7 +126,7 @@ export default function RoadmapPreviewModal({
                   })
                 }
                 disabled={enroll.isPending || branches.length === 0}
-                className="flex-1 rounded-xl bg-[#0f3460] py-3 text-sm font-bold text-white transition-colors hover:bg-[#0a2545] disabled:cursor-not-allowed disabled:opacity-60"
+                className="bg-btn-primary-bg hover:bg-btn-primary-hover flex-1 rounded-xl py-3 text-sm font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {enroll.isPending ? (
                   <span className="loading loading-spinner loading-xs" />

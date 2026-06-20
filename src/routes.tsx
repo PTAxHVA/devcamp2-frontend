@@ -73,7 +73,7 @@ export function AppRoutes() {
           <Route
             path="/goals"
             element={
-              <div className="flex h-full items-center justify-center text-2xl font-bold text-slate-400">
+              <div className="text-text-placeholder flex h-full items-center justify-center text-2xl font-bold">
                 🚧 Trang Goals (Đang xây dựng)
               </div>
             }
@@ -81,7 +81,7 @@ export function AppRoutes() {
           <Route
             path="/ai-assistant"
             element={
-              <div className="flex h-full items-center justify-center text-2xl font-bold text-slate-400">
+              <div className="text-text-placeholder flex h-full items-center justify-center text-2xl font-bold">
                 🚧 Trang AI Assistant (Đang xây dựng)
               </div>
             }
@@ -89,7 +89,7 @@ export function AppRoutes() {
           <Route
             path="/support"
             element={
-              <div className="flex h-full items-center justify-center text-2xl font-bold text-slate-400">
+              <div className="text-text-placeholder flex h-full items-center justify-center text-2xl font-bold">
                 🚧 Trang Help & Support (Đang xây dựng)
               </div>
             }
@@ -97,7 +97,7 @@ export function AppRoutes() {
           <Route
             path="/dashboard/add-role"
             element={
-              <div className="flex h-full items-center justify-center text-2xl font-bold text-slate-400">
+              <div className="text-text-placeholder flex h-full items-center justify-center text-2xl font-bold">
                 🚧 Trang Add Role (Task 20 sẽ làm)
               </div>
             }
