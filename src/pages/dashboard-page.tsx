@@ -3,6 +3,7 @@ import { StatsGrid } from '@/features/dashboard/components/stats-grid'
 import { MyRoadmapsGrid } from '@/features/dashboard/components/my-roadmaps-grid'
 import { ContinueLearningCard } from '@/features/dashboard/components/continue-learning-card'
 import { EmptyDashboard } from '@/features/dashboard/components/empty-dashboard'
+import { DashboardSkeleton } from '@/features/dashboard/components/dashboard-skeleton'
 import { WeeklyProgressChart } from '@/features/dashboard/components/weekly-progress-chart'
 import { StreakCalendar } from '@/features/dashboard/components/streak-calendar'
 import { Link } from 'react-router'
@@ -12,11 +13,7 @@ const DashboardPage = () => {
   const { data, isLoading, isError } = useDashboard()
 
   if (isLoading) {
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-      </div>
-    )
+    return <DashboardSkeleton />
   }
 
   if (isError) {

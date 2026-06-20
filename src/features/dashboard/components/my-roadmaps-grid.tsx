@@ -1,5 +1,5 @@
 import { Link } from 'react-router'
-import { HiMiniAcademicCap, HiMiniPlus } from 'react-icons/hi2'
+import { HiMiniAcademicCap, HiMiniPlus, HiMiniLockClosed } from 'react-icons/hi2'
 import type { DashboardData } from '@/features/dashboard/types'
 
 interface MyRoadmapsGridProps {
@@ -21,6 +21,9 @@ const formatBadge = (type: DashboardData['roadmaps'][number]['sourceType']) => {
 export function MyRoadmapsGrid({ roadmaps, hasAvailableRoles }: MyRoadmapsGridProps) {
   // 1. Chỉ lấy tối đa 2 roadmaps để hiển thị
   const displayedRoadmaps = roadmaps.slice(0, 2)
+
+  // Task 21: Kiểm tra xem user đã đạt giới hạn chưa (>= 2 roadmaps hoặc không còn role nào)
+  const isCapped = roadmaps.length >= 2 || !hasAvailableRoles
 
   return (
     // 2. Chỉnh lại lưới thành tối đa 2 cột
@@ -71,20 +74,36 @@ export function MyRoadmapsGrid({ roadmaps, hasAvailableRoles }: MyRoadmapsGridPr
         )
       })}
 
-      {/* 3. Render nút Add Role khi có ÍT HƠN 2 roadmaps */}
-      {hasAvailableRoles && roadmaps.length < 2 && (
-        <Link
-          to="/dashboard/add-role"
-          className="card bg-base-200/50 border-base-300 hover:border-primary/60 hover:bg-primary/5 group focus:ring-primary min-h-[160px] border-2 border-dashed no-underline transition-all focus:border-transparent focus:ring-2 focus:outline-none"
-        >
-          <div className="card-body text-base-content/60 group-hover:text-primary flex flex-col items-center justify-center p-5 transition-colors">
-            <div className="bg-base-200 group-hover:bg-primary/20 mb-2 flex h-12 w-12 items-center justify-center rounded-full transition-colors">
-              <HiMiniPlus className="h-6 w-6" />
+      {/* 3. Render nút Add Role (Luôn hiện, nhưng Disable và có Tooltip nếu đạt giới hạn - Task 21) */}
+      <div
+        className={`tooltip tooltip-bottom flex w-full ${isCapped ? 'cursor-not-allowed' : ''}`}
+        data-tip={isCapped ? 'Limit reached: Max 2 roadmaps' : 'Add a new learning path'}
+      >
+        {isCapped ? (
+          // Trạng thái vô hiệu hóa (Bỏ Link, bỏ hover, thêm icon ổ khóa)
+          <div className="card bg-base-200/30 border-base-300 min-h-[160px] w-full border-2 border-dashed transition-all">
+            <div className="card-body text-base-content/40 flex flex-col items-center justify-center p-5 transition-colors">
+              <div className="bg-base-200/50 mb-2 flex h-12 w-12 items-center justify-center rounded-full transition-colors">
+                <HiMiniLockClosed className="h-6 w-6" />
+              </div>
+              <p className="text-sm font-medium">Add another role</p>
             </div>
-            <p className="text-sm font-medium">Add another role</p>
           </div>
-        </Link>
-      )}
+        ) : (
+          // Trạng thái bình thường (GIỮ NGUYÊN 100% CODE CỦA FILE GỐC)
+          <Link
+            to="/dashboard/add-role"
+            className="card bg-base-200/50 border-base-300 hover:border-primary/60 hover:bg-primary/5 group focus:ring-primary min-h-[160px] w-full border-2 border-dashed no-underline transition-all focus:border-transparent focus:ring-2 focus:outline-none"
+          >
+            <div className="card-body text-base-content/60 group-hover:text-primary flex flex-col items-center justify-center p-5 transition-colors">
+              <div className="bg-base-200 group-hover:bg-primary/20 mb-2 flex h-12 w-12 items-center justify-center rounded-full transition-colors">
+                <HiMiniPlus className="h-6 w-6" />
+              </div>
+              <p className="text-sm font-medium">Add another role</p>
+            </div>
+          </Link>
+        )}
+      </div>
     </div>
   )
 }
