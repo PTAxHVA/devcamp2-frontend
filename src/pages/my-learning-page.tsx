@@ -47,7 +47,7 @@ export default function MyLearningJourneyPage() {
     }
     return (
       roadmapDetail.topics.find((t) => t.status === 'in_progress') ??
-      roadmapDetail.topics.find((t) => t.status === 'available') ??
+      roadmapDetail.topics.find((t) => t.status !== 'completed') ??
       roadmapDetail.topics[0] ??
       null
     )
