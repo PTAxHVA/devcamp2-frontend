@@ -1,17 +1,25 @@
-import { RiSearchLine, RiNotification3Line } from 'react-icons/ri'
+import { RiSearchLine, RiNotification3Line, RiMenuLine } from 'react-icons/ri'
 import { useMe } from '@/features/profile/hooks/use-profile'
 // import Logo from '@/assets/Logo.svg'
 
-export const Navbar = () => {
+interface NavbarProps {
+  onMenuClick?: () => void
+}
+
+export const Navbar = ({ onMenuClick }: NavbarProps) => {
   const { data: me } = useMe()
   const initials = me?.username?.slice(0, 2).toUpperCase() ?? '??'
   const displayName = me?.username ?? ''
 
   return (
-    <header className="border-border-soft z-10 flex h-20 shrink-0 flex-row items-center justify-between border-b bg-white px-8">
-      {/* <div>
-            <img src={Logo} alt="VORA Logo" className="w-35 h-auto object-contain" />
-        </div> */}
+    <header className="border-border-soft z-10 flex h-20 shrink-0 flex-row items-center justify-between border-b bg-white px-4 md:px-8">
+      <button
+        onClick={onMenuClick}
+        aria-label="Open menu"
+        className="text-text-secondary mr-1 md:hidden"
+      >
+        <RiMenuLine className="h-6 w-6" />
+      </button>
       <div className="relative max-w-2xl flex-1">
         <RiSearchLine className="text-text-placeholder absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2" />
         <input

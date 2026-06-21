@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
 
 export interface ProgressItem {
@@ -6,6 +6,17 @@ export interface ProgressItem {
   totalSections: number
   totalCompletedSections: number
   roadmapCompletionPercentage: number
+}
+
+interface UpdateProfileBody {
+  username?: string
+  level?: string
+}
+
+interface UpdateAccountBody {
+  email?: string
+  currentPassword: string
+  password?: string
 }
 
 export function useMe() {
@@ -26,5 +37,27 @@ export function useMyProgress() {
   return useQuery<ProgressItem[]>({
     queryKey: ['me', 'progress'],
     queryFn: async () => (await apiClient.get('/me/progress')).data.data,
+  })
+}
+
+export function useUpdateProfile() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (body: UpdateProfileBody) =>
+      (await apiClient.patch('/me/profile', body)).data.data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['me'] })
+    },
+  })
+}
+
+export function useUpdateAccount() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (body: UpdateAccountBody) =>
+      (await apiClient.patch('/me/account', body)).data.data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['me'] })
+    },
   })
 }

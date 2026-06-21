@@ -201,21 +201,6 @@ export default function SignupPage() {
             </button>
           </form>
 
-          <div className="my-5 flex items-center gap-3">
-            <div className="h-px flex-1 bg-gray-200" />
-            <span className="text-text-placeholder text-xs">or</span>
-            <div className="h-px flex-1 bg-gray-200" />
-          </div>
-
-          <button className="border-border-soft text-text-secondary hover:bg-bg-section flex w-full items-center justify-center gap-2 rounded-lg border py-2.5 text-sm font-medium transition">
-            <img
-              src="https://www.svgrepo.com/show/475656/google-color.svg"
-              className="h-5 w-5"
-              alt="Google"
-            />
-            Continue with Google
-          </button>
-
           <p className="text-text-placeholder mt-6 text-center text-sm">
             Already have an account?{' '}
             <Link to="/login" className="font-semibold text-indigo-600 hover:underline">

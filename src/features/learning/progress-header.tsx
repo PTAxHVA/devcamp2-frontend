@@ -14,9 +14,15 @@ export default function ProgressHeader({ topics }: ProgressHeaderProps) {
     .filter((t) => t.status !== 'completed')
     .reduce((sum, t) => sum + t.estimatedHours, 0)
 
-  const hoursLabel =
-    remainingHours === 0
-      ? 'All done!'
+  const allCompleted = topics.length > 0 && completed.length === topics.length
+
+  // Only say "All done!" when everything is actually completed. If the estimate
+  // data is missing (remainingHours is 0 but topics remain), show a neutral dash
+  // instead of a misleading "All done!" / "~0m" label.
+  const hoursLabel = allCompleted
+    ? 'All done!'
+    : remainingHours <= 0
+      ? '—'
       : remainingHours < 1
         ? `${Math.round(remainingHours * 60)}m left`
         : `~${Math.round(remainingHours)}h left`
