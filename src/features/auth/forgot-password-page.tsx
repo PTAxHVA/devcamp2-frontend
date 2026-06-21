@@ -6,7 +6,7 @@ import ForgotPasswordImg from '@/assets/forgot-password.png'
 import { useForgotPassword } from './hooks/use-forgot-password'
 
 const forgotSchema = z.object({
-  email: z.string().email('Email không hợp lệ'),
+  email: z.string().email('Invalid email address'),
 })
 type ForgotInput = z.infer<typeof forgotSchema>
 
@@ -73,7 +73,7 @@ export default function ForgotPasswordPage() {
                   disabled={forgot.isPending}
                   className="w-full rounded-lg bg-[#001a57] py-2.5 text-sm font-semibold text-white transition hover:bg-[#002080] disabled:opacity-60"
                 >
-                  {forgot.isPending ? 'Đang gửi...' : 'Send reset link'}
+                  {forgot.isPending ? 'Sending...' : 'Send reset link'}
                 </button>
               </form>
 

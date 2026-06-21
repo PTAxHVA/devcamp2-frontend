@@ -30,7 +30,7 @@ export function FillQuestion({ question, value, onChange }: FillQuestionProps) {
             />
             <input
               type="text"
-              placeholder="Nhập câu trả lời của bạn..."
+              placeholder="Enter your answer..."
               className="placeholder:text-base-content/30 w-full bg-transparent text-base font-medium outline-none"
               value={value}
               onChange={(e) => onChange(e.target.value)}

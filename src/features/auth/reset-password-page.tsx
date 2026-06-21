@@ -7,11 +7,11 @@ import { useResetPassword } from './hooks/use-reset-password'
 
 const resetSchema = z
   .object({
-    newPassword: z.string().min(8, 'Mật khẩu tối thiểu 8 ký tự'),
+    newPassword: z.string().min(8, 'Password must be at least 8 characters'),
     confirmPassword: z.string(),
   })
   .refine((d) => d.newPassword === d.confirmPassword, {
-    message: 'Mật khẩu nhập lại không khớp',
+    message: 'Passwords do not match',
     path: ['confirmPassword'],
   })
 type ResetInput = z.infer<typeof resetSchema>

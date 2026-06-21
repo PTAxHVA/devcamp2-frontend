@@ -39,13 +39,13 @@ export function QuizAttemptPage() {
   if (error || !quizId || questions.length === 0) {
     return (
       <div className="mx-auto my-20 max-w-md rounded-2xl border border-red-100 bg-red-50 p-8 text-center">
-        <p className="text-lg font-bold text-red-600">Không tải được bài quiz</p>
-        <p className="mt-1 text-sm text-red-500">Vui lòng thử lại.</p>
+        <p className="text-lg font-bold text-red-600">Unable to load this quiz</p>
+        <p className="mt-1 text-sm text-red-500">Please try again.</p>
         <button
           onClick={() => navigate(-1)}
           className="mt-5 rounded-xl border border-slate-200 bg-white px-5 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50"
         >
-          Quay lại
+          Go back
         </button>
       </div>
     )
@@ -69,7 +69,7 @@ export function QuizAttemptPage() {
       ]
     })
     if (payload.length === 0) {
-      toast.error('Hãy trả lời ít nhất 1 câu trước khi nộp.')
+      toast.error('Please answer at least one question before submitting.')
       return
     }
     submit.mutate(payload, {
