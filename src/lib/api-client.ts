@@ -25,6 +25,9 @@ apiClient.interceptors.request.use((config) => {
 const COLD_START_TOAST_ID = 'server-waking'
 const MAX_COLD_START_RETRIES = 2
 const RETRY_BASE_DELAY_MS = 2000
+// Only idempotent methods are auto-retried — replaying a POST/PATCH/etc. on an
+// ambiguous failure could double-submit (e.g. enroll, quiz answer).
+const RETRIABLE_METHODS = ['get', 'head', 'options']
 
 type RetriableConfig = InternalAxiosRequestConfig & { _coldStartRetry?: number }
 
@@ -50,17 +53,14 @@ apiClient.interceptors.response.use(
     return response
   },
   async (error: AxiosError) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      if (window.location.pathname !== '/login') {
-        window.location.assign('/login')
-      }
-      return Promise.reject(error)
-    }
-
     const config = error.config as RetriableConfig | undefined
-    if (config && isColdStartError(error)) {
+
+    // Cold start on a safe-to-replay request → waking-up toast + retry with backoff.
+    if (
+      config &&
+      isColdStartError(error) &&
+      RETRIABLE_METHODS.includes((config.method ?? 'get').toLowerCase())
+    ) {
       const attempt = config._coldStartRetry ?? 0
       if (attempt < MAX_COLD_START_RETRIES) {
         config._coldStartRetry = attempt + 1
@@ -68,7 +68,19 @@ apiClient.interceptors.response.use(
         await new Promise((resolve) => setTimeout(resolve, RETRY_BASE_DELAY_MS * (attempt + 1)))
         return apiClient.request(config)
       }
-      toast.dismiss(COLD_START_TOAST_ID)
+    }
+
+    // Terminal outcome — clear the waking-up toast so it can never linger.
+    toast.dismiss(COLD_START_TOAST_ID)
+
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      if (window.location.pathname !== '/login') {
+        window.location.assign('/login')
+      }
+    } else if (isColdStartError(error)) {
+      // Cold start we couldn't auto-recover (non-idempotent, or retries exhausted).
       toast.error('Server is taking longer than usual. Please try again.')
     }
 
