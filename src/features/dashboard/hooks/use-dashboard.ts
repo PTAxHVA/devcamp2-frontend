@@ -49,6 +49,9 @@ interface BEDashboardRes {
   weeklyProgressCounts?: number[]
 }
 
+// NOTE: GET /dashboard does not yet expose weekly counts, so this resolves to
+// undefined today and the Weekly Progress card stays hidden (better than showing
+// fabricated bars). Wired defensively for when the backend surfaces the field.
 function normalizeWeeklyProgressCounts(value: unknown): number[] | undefined {
   const counts = Array.isArray(value)
     ? value
@@ -58,7 +61,8 @@ function normalizeWeeklyProgressCounts(value: unknown): number[] | undefined {
 
   if (!Array.isArray(counts) || counts.length !== 7) return undefined
 
-  const normalized = counts.map((count) => Number(count))
+  // Reject non-numeric entries rather than coercing null/''/false to 0.
+  const normalized = counts.map((count) => (typeof count === 'number' ? count : NaN))
   return normalized.every((count) => Number.isFinite(count) && count >= 0) ? normalized : undefined
 }
 
