@@ -81,7 +81,7 @@ export function AppRoutes() {
             path="/goals"
             element={
               <div className="text-text-placeholder flex h-full items-center justify-center text-2xl font-bold">
-                🚧 Trang Goals (Đang xây dựng)
+                🚧 Goals (Coming soon)
               </div>
             }
           />
@@ -89,7 +89,7 @@ export function AppRoutes() {
             path="/ai-assistant"
             element={
               <div className="text-text-placeholder flex h-full items-center justify-center text-2xl font-bold">
-                🚧 Trang AI Assistant (Đang xây dựng)
+                🚧 AI Assistant (Coming soon)
               </div>
             }
           />
@@ -97,7 +97,7 @@ export function AppRoutes() {
             path="/support"
             element={
               <div className="text-text-placeholder flex h-full items-center justify-center text-2xl font-bold">
-                🚧 Trang Help & Support (Đang xây dựng)
+                🚧 Help & Support (Coming soon)
               </div>
             }
           />

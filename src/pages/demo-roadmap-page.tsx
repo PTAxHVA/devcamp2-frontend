@@ -34,7 +34,7 @@ const DemoRoadmapPage = () => {
   if (isError || !data || !graph) {
     return (
       <div className="bg-base-100 text-error flex h-screen w-full items-center justify-center">
-        Không tải được demo roadmap. Vui lòng thử lại.
+        Unable to load the demo roadmap. Please try again.
       </div>
     )
   }

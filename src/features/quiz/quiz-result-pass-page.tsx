@@ -21,12 +21,12 @@ export function QuizResultPassPage() {
   if (isError || !data) {
     return (
       <div className="mx-auto my-20 max-w-md rounded-2xl border border-red-100 bg-red-50 p-8 text-center">
-        <p className="font-semibold text-red-600">Không tải được kết quả.</p>
+        <p className="font-semibold text-red-600">Unable to load the result.</p>
         <button
           onClick={() => navigate('/dashboard')}
           className="mt-4 rounded-xl border border-slate-200 bg-white px-5 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50"
         >
-          Về Dashboard
+          Back to Dashboard
         </button>
       </div>
     )

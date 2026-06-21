@@ -9,7 +9,7 @@ export function useForgotPassword() {
       return data.data
     },
     onError: () => {
-      toast.error('Có lỗi xảy ra, vui lòng thử lại')
+      toast.error('Something went wrong. Please try again.')
     },
     // onSuccess không toast — BE luôn trả 200 kể cả email không tồn tại
     // UI tự hiện message "nếu email tồn tại..." qua isSuccess

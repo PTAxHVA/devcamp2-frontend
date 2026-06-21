@@ -82,7 +82,7 @@ export function AppHeader() {
                 onClick={logout}
                 className="text-error-text hover:bg-bg-section flex w-full items-center gap-2.5 px-4 py-2 text-sm"
               >
-                <LogOut className="h-4 w-4" /> Đăng xuất
+                <LogOut className="h-4 w-4" /> Log out
               </button>
             </div>
           )}
