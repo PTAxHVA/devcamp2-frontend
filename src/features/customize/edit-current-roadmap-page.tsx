@@ -195,19 +195,6 @@ export default function EditCurrentRoadmapPage() {
     aiFeedbackMutation.mutate({ action: 'remove', topicId: removedTopicId })
   }
 
-  const handleMoveNode = (direction: 'up' | 'down') => {
-    if (!selectedId) return
-    const index = nodes.findIndex((n) => n.id === selectedId)
-    if (index === -1) return
-    if (direction === 'up' && index === 0) return
-    if (direction === 'down' && index === nodes.length - 1) return
-
-    const targetIndex = direction === 'up' ? index - 1 : index + 1
-    const reordered = [...nodes]
-    ;[reordered[index], reordered[targetIndex]] = [reordered[targetIndex], reordered[index]]
-    relayout(reordered)
-  }
-
   const saveMutation = useMutation({
     mutationFn: async () => {
       const res = await apiClient.patch(`/roadmaps/${roadmapId}`, { removeTopicIds: removedIds })
@@ -322,18 +309,18 @@ export default function EditCurrentRoadmapPage() {
               </button>
               <div className="mx-2 h-5 w-px bg-slate-200" />
               <button
-                onClick={() => handleMoveNode('up')}
-                disabled={!selectedId}
-                className="border-border-soft text-text-secondary hover:bg-bg-section flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold disabled:opacity-40"
+                disabled
+                title="Reordering topics is coming soon."
+                className="border-border-soft text-text-placeholder flex cursor-not-allowed items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold opacity-50"
               >
-                <RiArrowUpLine className="text-brand-purple-600" /> Move up
+                <RiArrowUpLine /> Move up
               </button>
               <button
-                onClick={() => handleMoveNode('down')}
-                disabled={!selectedId}
-                className="border-border-soft text-text-secondary hover:bg-bg-section flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold disabled:opacity-40"
+                disabled
+                title="Reordering topics is coming soon."
+                className="border-border-soft text-text-placeholder flex cursor-not-allowed items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold opacity-50"
               >
-                <RiArrowDownLine className="text-brand-purple-600" /> Move down
+                <RiArrowDownLine /> Move down
               </button>
             </div>
           </div>
