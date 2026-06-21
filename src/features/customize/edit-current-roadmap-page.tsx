@@ -1,9 +1,12 @@
-import { useMemo, useState, useCallback } from 'react'
+import { useMemo, useState, useCallback, useEffect, useRef } from 'react'
 import { BaseRoadmapNode, type BaseNodeData } from '@/features/roadmap/components/base-roadmap-node'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
 import { logger } from '@/lib/logger'
+import toast from 'react-hot-toast'
 import { useParams, useNavigate } from 'react-router'
+import { useRoadmapDetail, type BEGraphTopic } from '@/features/roadmap/hooks/use-roadmap-detail'
+import { buildFlowGraph } from '@/features/roadmap/lib/build-flow-graph'
 import {
   ReactFlow,
   Background,
@@ -25,217 +28,227 @@ import {
   RiArrowDownLine,
   RiSparklingFill,
   RiLoader4Line,
+  RiInformationLine,
 } from 'react-icons/ri'
+
+const VERTICAL_GAP = 140
+const COLUMN_X = 0
+const EDGE_STYLE = { stroke: '#CBD5E1', strokeWidth: 2 }
+
+interface AiFeedback {
+  feedback: string
+  severity: 'info' | 'warning'
+}
+
+interface TopicMeta {
+  name: string
+  status: BEGraphTopic['status']
+  estimatedHours: number
+  sectionTotal: number
+  sectionCompleted: number
+  /** A topic the learner has started cannot be removed (backend enforces this too). */
+  hasProgress: boolean
+}
+
+const STATUS_LABEL: Record<BEGraphTopic['status'], string> = {
+  completed: 'Completed',
+  in_progress: 'In progress',
+  available: 'Available',
+  locked: 'Locked',
+}
+
+/** Pull the backend error code out of an axios error, if present. */
+const errorCode = (error: unknown): string | undefined =>
+  (error as { response?: { data?: { error?: { code?: string } } } })?.response?.data?.error?.code
 
 export default function EditCurrentRoadmapPage() {
   const { id: roadmapId } = useParams()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
-  const nodeTypes = useMemo(() => ({ editNode: BaseRoadmapNode }), [])
+  const nodeTypes = useMemo(() => ({ roadmapNode: BaseRoadmapNode }), [])
   const [showAlert, setShowAlert] = useState(true)
+  // On mobile the topic-details panel is a bottom sheet that opens when a node is
+  // tapped; on lg+ it is a static sidebar and this flag is ignored.
+  const [sheetOpen, setSheetOpen] = useState(false)
 
-  // --- DỮ LIỆU KHỞI TẠO MOCK BAN ĐẦU ---
-  const initialNodes: Node<BaseNodeData>[] = [
-    {
-      id: '1',
-      type: 'editNode',
-      position: { x: 250, y: 20 },
-      data: { label: 'Web Fundamentals', number: '1', status: 'completed' },
-    },
-    {
-      id: '2',
-      type: 'editNode',
-      position: { x: 50, y: 120 },
-      data: { label: 'HTML & CSS', number: '2', status: 'current' },
-    },
-    {
-      id: '3',
-      type: 'editNode',
-      position: { x: 450, y: 120 },
-      data: { label: 'JavaScript Basics', number: '3', status: 'upcoming' },
-    },
-    {
-      id: '4',
-      type: 'editNode',
-      position: { x: 250, y: 240 },
-      data: { label: 'DOM & Events', number: '4', status: 'upcoming' },
-    },
-    {
-      id: '5',
-      type: 'editNode',
-      position: { x: 250, y: 360 },
-      data: { label: 'React Basics', number: '5', status: 'upcoming' },
-    },
-  ]
+  const { data, isLoading, isError } = useRoadmapDetail(roadmapId ?? '')
 
-  const initialEdges: Edge[] = [
-    {
-      id: 'e1-2',
-      source: '1',
-      target: '2',
-      type: 'smoothstep',
-      style: { stroke: '#CBD5E1', strokeWidth: 2 },
-    },
-    {
-      id: 'e1-3',
-      source: '1',
-      target: '3',
-      type: 'smoothstep',
-      style: { stroke: '#CBD5E1', strokeWidth: 2 },
-    },
-    {
-      id: 'e2-4',
-      source: '2',
-      target: '4',
-      type: 'smoothstep',
-      style: { stroke: '#CBD5E1', strokeWidth: 2 },
-    },
-    {
-      id: 'e3-4',
-      source: '3',
-      target: '4',
-      type: 'smoothstep',
-      style: { stroke: '#CBD5E1', strokeWidth: 2 },
-    },
-    {
-      id: 'e4-5',
-      source: '4',
-      target: '5',
-      type: 'smoothstep',
-      style: { stroke: '#CBD5E1', strokeWidth: 2 },
-    },
-  ]
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node<BaseNodeData>>([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [aiFeedback, setAiFeedback] = useState<AiFeedback | null>(null)
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes)
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
+  // Captured once from the fetched roadmap: per-topic metadata (for removal rules
+  // and the details panel) and the original topic set (to diff into removeTopicIds).
+  const initializedRef = useRef(false)
+  const [topicMeta, setTopicMeta] = useState<Map<string, TopicMeta>>(new Map())
+  const [originalIds, setOriginalIds] = useState<string[]>([])
 
-  // --- STATE QUẢN LÝ CONTROLLED FORM ---
-  const [selectedNode, setSelectedNode] = useState<Node<BaseNodeData> | null>(initialNodes[1]) // Mặc định chọn node 2
-  const [formTitle, setFormTitle] = useState('')
-  const [formDescription, setFormDescription] = useState('')
-  const [formType, setFormType] = useState('Core Topic')
-  const [formTime, setFormTime] = useState('4-6 weeks')
-  const [formRequired, setFormRequired] = useState(true)
+  // Seed the editor from real roadmap data the first time it arrives. Node ids are
+  // the real MasterTopic ObjectIds, so the diff produces valid PATCH payloads.
+  useEffect(() => {
+    if (!data || initializedRef.current) return
+    initializedRef.current = true
+
+    const graph = buildFlowGraph(data)
+    setNodes(graph.nodes)
+    setEdges(graph.edges)
+
+    const meta = new Map<string, TopicMeta>()
+    for (const t of data.topics) {
+      meta.set(t.masterTopicId, {
+        name: t.name,
+        status: t.status,
+        estimatedHours: t.estimatedHours,
+        sectionTotal: t.sectionTotal,
+        sectionCompleted: t.sectionCompleted,
+        hasProgress: t.sectionCompleted > 0,
+      })
+    }
+    setTopicMeta(meta)
+    setOriginalIds(data.topics.map((t) => t.masterTopicId))
+    setSelectedId(graph.nodes[0]?.id ?? null)
+  }, [data, setNodes, setEdges])
+
+  // Topics present at load but no longer on the canvas — the PATCH removal diff.
+  const removedIds = useMemo(() => {
+    const present = new Set(nodes.map((n) => n.id))
+    return originalIds.filter((id) => !present.has(id))
+  }, [nodes, originalIds])
+
+  const selectedMeta = selectedId ? topicMeta.get(selectedId) : undefined
 
   const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
-    setSelectedNode(node as Node<BaseNodeData>)
+    setSelectedId(node.id)
+    setSheetOpen(true)
   }, [])
 
-  const saveRoadmapMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiClient.put(`/roadmaps/${roadmapId}/customize`, { nodes, edges })
-      return response.data
-    },
-    onSuccess: () => {
-      logger.info('Roadmap changes saved successfully', roadmapId || 'unknown_id')
-      navigate(`/roadmaps/${roadmapId}`)
-    },
-    onError: (error) => {
-      logger.error(
-        'Failed to save roadmap changes:',
-        error instanceof Error ? error.message : String(error),
-      )
-    },
-  })
-
-  const autoRebuildGraph = (currentNodes: Node<BaseNodeData>[]) => {
-    const updatedNodes = currentNodes.map((n, i) => ({
+  // Re-number, re-stack vertically and keep the graph connected after a structural
+  // change. Layout/ordering is visual only — the backend re-derives canonical order.
+  const relayout = (nextNodes: Node<BaseNodeData>[]) => {
+    const updated = nextNodes.map((n, i) => ({
       ...n,
-      data: { ...n.data, number: (i + 1).toString() },
+      position: { x: COLUMN_X, y: i * VERTICAL_GAP },
+      data: { ...n.data, number: String(i + 1) },
     }))
 
-    const nodeIds = new Set(updatedNodes.map((n) => n.id))
-    const validEdges = edges.filter((e) => nodeIds.has(e.source) && nodeIds.has(e.target))
+    const ids = new Set(updated.map((n) => n.id))
+    const kept = edges.filter((e) => ids.has(e.source) && ids.has(e.target))
 
-    updatedNodes.forEach((node, idx) => {
+    updated.forEach((node, idx) => {
       if (idx === 0) return
-      const hasParent = validEdges.some((e) => e.target === node.id)
+      const hasParent = kept.some((e) => e.target === node.id)
       if (!hasParent) {
-        validEdges.push({
-          id: `e${updatedNodes[idx - 1].id}-${node.id}`,
-          source: updatedNodes[idx - 1].id,
+        const prev = updated[idx - 1]
+        kept.push({
+          id: `e-${prev.id}-${node.id}`,
+          source: prev.id,
           target: node.id,
           type: 'smoothstep',
-          style: { stroke: '#CBD5E1', strokeWidth: 2 },
+          style: EDGE_STYLE,
         })
       }
     })
 
-    setNodes(updatedNodes)
-    setEdges(validEdges)
+    setNodes(updated)
+    setEdges(kept)
   }
 
-  // --- ACTIONS TRÊN TOOLBAR ---
-  const handleAddTopic = () => {
-    const nextId = nodes.length > 0 ? Math.max(...nodes.map((n) => parseInt(n.id) || 0)) + 1 : 1
-    const lastNode = nodes[nodes.length - 1]
-
-    const newNode: Node<BaseNodeData> = {
-      id: nextId.toString(),
-      type: 'editNode',
-      position: {
-        x: lastNode ? lastNode.position.x : 250,
-        y: lastNode ? lastNode.position.y + 120 : 50,
-      },
-      data: { label: 'New Topic Spec', number: '', status: 'upcoming' },
-    }
-
-    const updatedNodes = [...nodes, newNode]
-    const newEdge: Edge = {
-      id: `e${lastNode?.id || '1'}-${nextId}`,
-      source: lastNode?.id || '1',
-      target: nextId.toString(),
-      type: 'smoothstep',
-      style: { stroke: '#CBD5E1', strokeWidth: 2 },
-    }
-
-    autoRebuildGraph(updatedNodes)
-    setEdges((eds) => [...eds, newEdge])
-    setSelectedNode(newNode)
-  }
+  const aiFeedbackMutation = useMutation({
+    mutationFn: async (vars: { action: 'add' | 'remove'; topicId: string }) => {
+      const res = await apiClient.post<{ data: AiFeedback }>('/ai/roadmap-feedback', {
+        userRoadmapId: roadmapId,
+        action: vars.action,
+        topicId: vars.topicId,
+      })
+      return res.data.data
+    },
+    onSuccess: (fb) => setAiFeedback(fb),
+    onError: (error) => {
+      logger.error(
+        'Failed to fetch AI feedback:',
+        error instanceof Error ? error.message : String(error),
+      )
+      setAiFeedback(null)
+    },
+  })
 
   const handleRemoveTopic = () => {
-    if (!selectedNode || selectedNode.id === '1') return // Chặn xóa node gốc
-    if (selectedNode.data.status === 'completed') {
-      alert('Cannot remove a completed topic!')
+    if (!selectedId) return
+    const meta = topicMeta.get(selectedId)
+    if (meta?.hasProgress) {
+      toast.error("You can't remove a topic you've already started.")
+      return
+    }
+    if (nodes.length <= 1) {
+      toast.error('A roadmap must keep at least one topic.')
       return
     }
 
-    const filteredNodes = nodes.filter((n) => n.id !== selectedNode.id)
-    autoRebuildGraph(filteredNodes)
-    setSelectedNode(filteredNodes[0] || null)
+    const removedTopicId = selectedId
+    const remaining = nodes.filter((n) => n.id !== removedTopicId)
+    relayout(remaining)
+    setSelectedId(remaining[0]?.id ?? null)
+
+    // Advisory only: tell the learner what removing this topic implies.
+    aiFeedbackMutation.mutate({ action: 'remove', topicId: removedTopicId })
   }
 
-  const handleMoveNode = (direction: 'up' | 'down') => {
-    if (!selectedNode) return
-    const index = nodes.findIndex((n) => n.id === selectedNode.id)
-    if (index === -1) return
-    if (direction === 'up' && index === 0) return
-    if (direction === 'down' && index === nodes.length - 1) return
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiClient.patch(`/roadmaps/${roadmapId}`, { removeTopicIds: removedIds })
+      return res.data
+    },
+    onSuccess: () => {
+      logger.info('Roadmap changes saved successfully', roadmapId || 'unknown_id')
+      toast.success('Your roadmap has been updated.')
+      queryClient.invalidateQueries({ queryKey: ['roadmap-detail', roadmapId] })
+      queryClient.invalidateQueries({ queryKey: ['my-roadmaps'] })
+      navigate(`/roadmaps/${roadmapId}`)
+    },
+    onError: (error) => {
+      const code = errorCode(error)
+      logger.error(
+        'Failed to save roadmap changes:',
+        error instanceof Error ? error.message : String(error),
+      )
+      if (code === 'TOPIC_NOT_REMOVABLE') {
+        toast.error('One of those topics has learning progress and cannot be removed.')
+      } else if (code === 'ROADMAP_EMPTY') {
+        toast.error('A roadmap must keep at least one topic.')
+      } else {
+        toast.error('Could not save your changes. Please try again.')
+      }
+    },
+  })
 
-    const targetIndex = direction === 'up' ? index - 1 : index + 1
-    const updatedNodes = [...nodes]
-
-    // Hoán đổi vị trí cấu trúc mảng
-    const tempNode = updatedNodes[index]
-    updatedNodes[index] = updatedNodes[targetIndex]
-    updatedNodes[targetIndex] = tempNode
-
-    const tempY = updatedNodes[index].position.y
-    updatedNodes[index].position.y = updatedNodes[targetIndex].position.y
-    updatedNodes[targetIndex].position.y = tempY
-
-    autoRebuildGraph(updatedNodes)
-  }
-
-  const updateGraphNodeData = (field: string, value: string | boolean) => {
-    if (!selectedNode) return
-    setNodes((nds) =>
-      nds.map((n) =>
-        n.id === selectedNode.id ? { ...n, data: { ...n.data, [field]: value } } : n,
-      ),
+  if (isLoading) {
+    return (
+      <div className="flex h-full w-full items-center justify-center p-10">
+        <div className="text-text-muted flex items-center gap-3">
+          <RiLoader4Line className="animate-spin text-xl" /> Loading roadmap...
+        </div>
+      </div>
     )
   }
+
+  if (isError || !data) {
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center gap-4 p-10 text-center">
+        <RiAlertLine className="text-error-text text-4xl" />
+        <p className="text-text-primary font-bold">Failed to load this roadmap.</p>
+        <button
+          onClick={() => navigate(-1)}
+          className="border-border-soft text-text-secondary hover:bg-bg-section rounded-xl border px-5 py-2 font-semibold"
+        >
+          Go back
+        </button>
+      </div>
+    )
+  }
+
+  const hasChanges = removedIds.length > 0
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 flex h-full w-full flex-col bg-white p-6 duration-500 ease-out lg:p-8">
@@ -260,7 +273,9 @@ export default function EditCurrentRoadmapPage() {
             <RiAlertLine className="mt-0.5 text-lg text-orange-500" />
             <div>
               <h4 className="font-bold text-orange-900">Edits may affect your future progress.</h4>
-              <p className="text-sm text-orange-700">Completed topics cannot be removed.</p>
+              <p className="text-sm text-orange-700">
+                Topics you have already started cannot be removed.
+              </p>
             </div>
           </div>
           <button
@@ -274,36 +289,38 @@ export default function EditCurrentRoadmapPage() {
 
       {/* Main Container */}
       <div className="flex min-h-150 flex-1 flex-col gap-6 lg:flex-row">
-        {/* === CANVAS BÊN TRÁI === */}
+        {/* === CANVAS === */}
         <div className="border-border-soft flex flex-1 flex-col rounded-2xl border bg-white">
-          {/* Toolbar xử lý Mutation thực sự */}
           <div className="border-border-soft flex flex-wrap items-center justify-between border-b p-4">
             <div className="flex items-center gap-2">
               <button
-                onClick={handleAddTopic}
-                className="border-border-soft text-text-secondary hover:bg-bg-section flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold"
+                disabled
+                title="Adding new topics is coming soon."
+                className="border-border-soft text-text-placeholder flex cursor-not-allowed items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold opacity-50"
               >
-                <RiAddLine className="text-brand-purple-600" /> Add topic
+                <RiAddLine /> Add topic
               </button>
               <button
                 onClick={handleRemoveTopic}
-                disabled={!selectedNode || selectedNode.id === '1'}
+                disabled={!selectedId || selectedMeta?.hasProgress}
                 className="border-border-soft text-text-secondary hover:bg-bg-section flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold disabled:opacity-40"
               >
                 <RiSubtractLine className="text-error-text" /> Remove topic
               </button>
               <div className="mx-2 h-5 w-px bg-slate-200" />
               <button
-                onClick={() => handleMoveNode('up')}
-                className="border-border-soft text-text-secondary hover:bg-bg-section flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold"
+                disabled
+                title="Reordering topics is coming soon."
+                className="border-border-soft text-text-placeholder flex cursor-not-allowed items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold opacity-50"
               >
-                <RiArrowUpLine className="text-brand-purple-600" /> Move up
+                <RiArrowUpLine /> Move up
               </button>
               <button
-                onClick={() => handleMoveNode('down')}
-                className="border-border-soft text-text-secondary hover:bg-bg-section flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold"
+                disabled
+                title="Reordering topics is coming soon."
+                className="border-border-soft text-text-placeholder flex cursor-not-allowed items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold opacity-50"
               >
-                <RiArrowDownLine className="text-brand-purple-600" /> Move down
+                <RiArrowDownLine /> Move down
               </button>
             </div>
           </div>
@@ -325,109 +342,105 @@ export default function EditCurrentRoadmapPage() {
           </div>
         </div>
 
-        {/* === CONTROLLED FORM BÊN PHẢI === */}
-        <div className="border-border-soft flex w-full flex-col rounded-2xl border bg-white p-6 shadow-sm lg:w-100">
+        {/* Backdrop for the mobile bottom sheet */}
+        {sheetOpen && (
+          <div
+            className="fixed inset-0 z-30 bg-black/30 lg:hidden"
+            onClick={() => setSheetOpen(false)}
+            aria-hidden
+          />
+        )}
+
+        {/* === TOPIC DETAILS (read-only) ===
+            Mobile: bottom sheet that slides up. Desktop (lg+): static sidebar. */}
+        <div
+          className={`border-border-soft flex flex-col border bg-white shadow-sm transition-transform duration-300 ease-out lg:static! lg:z-auto lg:max-h-none lg:w-100 lg:translate-y-0 lg:overflow-visible lg:rounded-2xl ${
+            sheetOpen ? 'translate-y-0' : 'translate-y-full'
+          } fixed inset-x-0 bottom-0 z-40 max-h-[75vh] overflow-y-auto rounded-t-2xl p-6`}
+        >
+          {/* Mobile sheet header: drag handle + close */}
+          <div className="relative mb-4 lg:hidden">
+            <div className="mx-auto h-1.5 w-12 rounded-full bg-slate-300" />
+            <button
+              onClick={() => setSheetOpen(false)}
+              aria-label="Close topic details"
+              className="text-text-placeholder hover:bg-bg-section absolute -top-2 right-0 rounded-lg p-1"
+            >
+              <RiCloseLine className="text-xl" />
+            </button>
+          </div>
           <h2 className="text-text-primary mb-6 text-lg font-bold">Topic details</h2>
 
-          {selectedNode ? (
+          {selectedMeta ? (
             <div className="flex flex-1 flex-col gap-5">
               <div>
-                <label className="text-text-secondary mb-1.5 block text-sm font-bold">
-                  Title *
-                </label>
-                <input
-                  type="text"
-                  value={formTitle}
-                  onChange={(e) => {
-                    setFormTitle(e.target.value)
-                    updateGraphNodeData('label', e.target.value)
-                  }}
-                  className="border-border-soft text-text-primary focus:border-border-purple w-full rounded-xl border px-4 py-2.5 text-sm focus:ring-1 focus:ring-purple-500 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="text-text-secondary mb-1.5 block text-sm font-bold">
-                  Description
-                </label>
-                <textarea
-                  rows={4}
-                  value={formDescription}
-                  onChange={(e) => {
-                    setFormDescription(e.target.value)
-                    updateGraphNodeData('description', e.target.value)
-                  }}
-                  className="border-border-soft text-text-primary focus:border-border-purple w-full resize-none rounded-xl border px-4 py-2.5 text-sm focus:ring-1 focus:ring-purple-500 focus:outline-none"
-                />
+                <p className="text-text-secondary mb-1.5 text-sm font-bold">Title</p>
+                <p className="text-text-primary text-base font-semibold">{selectedMeta.name}</p>
               </div>
 
               <div className="flex gap-4">
                 <div className="flex-1">
-                  <label className="text-text-secondary mb-1.5 block text-sm font-bold">Type</label>
-                  <select
-                    value={formType}
-                    onChange={(e) => {
-                      setFormType(e.target.value)
-                      updateGraphNodeData('type', e.target.value)
-                    }}
-                    className="border-border-soft w-full appearance-none rounded-xl border bg-white px-4 py-2.5 text-sm"
-                  >
-                    <option>Core Topic</option>
-                    <option>Optional</option>
-                  </select>
+                  <p className="text-text-secondary mb-1.5 text-sm font-bold">Status</p>
+                  <span className="bg-bg-section text-text-primary inline-block rounded-lg px-3 py-1 text-sm font-semibold">
+                    {STATUS_LABEL[selectedMeta.status]}
+                  </span>
                 </div>
                 <div className="flex-1">
-                  <label className="text-text-secondary mb-1.5 block text-sm font-bold">
-                    Estimated time
-                  </label>
-                  <select
-                    value={formTime}
-                    onChange={(e) => {
-                      setFormTime(e.target.value)
-                      updateGraphNodeData('estimatedTime', e.target.value)
-                    }}
-                    className="border-border-soft w-full appearance-none rounded-xl border bg-white px-4 py-2.5 text-sm"
-                  >
-                    <option>4-6 weeks</option>
-                    <option>1-2 weeks</option>
-                  </select>
+                  <p className="text-text-secondary mb-1.5 text-sm font-bold">Estimated time</p>
+                  <p className="text-text-primary text-sm font-semibold">
+                    {selectedMeta.estimatedHours} hrs
+                  </p>
                 </div>
               </div>
 
-              <div className="border-border-soft mt-2 flex items-center justify-between border-t pt-5">
-                <div>
-                  <p className="text-text-primary text-sm font-bold">Required</p>
-                  <p className="text-text-muted text-xs">
-                    Mark as required to keep this topic in path.
+              <div>
+                <p className="text-text-secondary mb-1.5 text-sm font-bold">Sections</p>
+                <p className="text-text-primary text-sm font-semibold">
+                  {selectedMeta.sectionCompleted} / {selectedMeta.sectionTotal} completed
+                </p>
+              </div>
+
+              <div className="border-border-soft mt-auto border-t pt-4">
+                {selectedMeta.hasProgress ? (
+                  <p className="text-text-muted flex items-start gap-2 text-xs">
+                    <RiInformationLine className="mt-0.5 shrink-0 text-sm" />
+                    You have already started this topic, so it can&apos;t be removed.
                   </p>
-                </div>
-                <div
-                  onClick={() => {
-                    const nextVal = !formRequired
-                    setFormRequired(nextVal)
-                    updateGraphNodeData('status', nextVal ? 'upcoming' : 'locked')
-                  }}
-                  className={`flex h-6 w-11 cursor-pointer items-center rounded-full p-1 transition-colors ${formRequired ? 'bg-brand-purple-600' : 'bg-slate-200'}`}
-                >
-                  <div
-                    className={`h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${formRequired ? 'translate-x-5' : 'translate-x-0'}`}
-                  />
-                </div>
+                ) : (
+                  <p className="text-text-muted flex items-start gap-2 text-xs">
+                    <RiInformationLine className="mt-0.5 shrink-0 text-sm" />
+                    Use the toolbar to remove or reorder this topic.
+                  </p>
+                )}
               </div>
             </div>
           ) : (
             <div className="text-text-placeholder flex flex-1 items-center justify-center text-sm">
-              Select a topic on the canvas to configure.
+              Select a topic on the canvas to see its details.
             </div>
           )}
         </div>
       </div>
 
-      {/* Footer chứa nút bấm tích hợp Backend thật */}
+      {/* Footer */}
       <div className="mt-6 flex flex-col items-end gap-6 lg:flex-row lg:items-center lg:justify-between">
-        <div className="border-border-purple bg-bg-lavender/50 flex w-full flex-1 items-center gap-4 rounded-xl border p-4 lg:w-auto">
-          <div className="text-brand-purple-600 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-sm">
-            <RiSparklingFill className="text-xl" />
+        <div
+          className={`flex w-full flex-1 items-center gap-4 rounded-xl border p-4 lg:w-auto ${
+            aiFeedback?.severity === 'warning'
+              ? 'border-orange-200 bg-orange-50'
+              : 'border-border-purple bg-bg-lavender/50'
+          }`}
+        >
+          <div
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-sm ${
+              aiFeedback?.severity === 'warning' ? 'text-orange-500' : 'text-brand-purple-600'
+            }`}
+          >
+            {aiFeedbackMutation.isPending ? (
+              <RiLoader4Line className="animate-spin text-xl" />
+            ) : (
+              <RiSparklingFill className="text-xl" />
+            )}
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
@@ -437,7 +450,11 @@ export default function EditCurrentRoadmapPage() {
               </span>
             </div>
             <p className="text-text-secondary text-xs">
-              Edits look valid. Structure has been automatically synchronized.
+              {aiFeedbackMutation.isPending
+                ? 'Reviewing your change...'
+                : aiFeedback
+                  ? aiFeedback.feedback
+                  : 'Remove a topic and the AI will tell you how it affects your path.'}
             </p>
           </div>
         </div>
@@ -450,11 +467,11 @@ export default function EditCurrentRoadmapPage() {
             Cancel
           </button>
           <button
-            onClick={() => saveRoadmapMutation.mutate()}
-            disabled={saveRoadmapMutation.isPending}
+            onClick={() => saveMutation.mutate()}
+            disabled={saveMutation.isPending || !hasChanges}
             className="flex items-center gap-2 rounded-xl bg-[#0B1528] px-6 py-2.5 font-bold text-white transition hover:bg-slate-800 disabled:opacity-50"
           >
-            {saveRoadmapMutation.isPending && <RiLoader4Line className="animate-spin" />}
+            {saveMutation.isPending && <RiLoader4Line className="animate-spin" />}
             Save changes
           </button>
         </div>

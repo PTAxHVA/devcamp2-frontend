@@ -56,7 +56,6 @@ export function AppRoutes() {
         <Route path="/quizzes/:attemptId/result/fail" element={<QuizResultFailPage />} />
       </Route>
 
-      {/* App pages — cần đăng nhập (ProtectedRoute), dùng MainLayout của team */}
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
@@ -65,8 +64,6 @@ export function AppRoutes() {
             element={<SectionDetailPage />}
           />
           <Route path="/my-learning/topics/:id" element={<TopicDetailPage />} />
-
-          {/* LƯU Ý: Phải đặt save-success lên trước :id để không bị bắt nhầm route */}
 
           <Route path="/roadmaps/browse" element={<BrowseRoadmapsPage />} />
           <Route path="/roadmaps/:id/complete" element={<RoadmapCompletePage />} />

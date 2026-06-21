@@ -125,7 +125,7 @@ export const StepLearningPath = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:pl-14">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:pl-14 lg:grid-cols-3">
               {section.options.map((option) => (
                 <div
                   key={option.id}

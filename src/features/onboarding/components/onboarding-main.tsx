@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { RiArrowLeftLine, RiArrowRightLine } from 'react-icons/ri'
-import { useNavigate } from 'react-router'
 import { NavBar, Footer } from '@/features/onboarding/components'
 import { Stepper } from './stepper'
 import {
@@ -15,10 +14,11 @@ import {
 import StepCustomize from './steps/customize'
 import { steps, PREFERENCE_QUESTIONS, LEARNING_PATH_KEYS } from '../data/onboarding-data'
 import { useWizardStore } from '../onboarding-store'
+import { useCompleteOnboarding } from '../hooks/use-complete-onboarding'
 
 const OnboardingMain = () => {
-  const navigate = useNavigate()
   const { step: currentStep, answers, setAnswer, nextStep, prevStep, goToStep } = useWizardStore()
+  const completeOnboarding = useCompleteOnboarding()
   const [direction, setDirection] = useState('next')
   const [subStep, setSubStep] = useState(1)
 
@@ -170,7 +170,12 @@ const OnboardingMain = () => {
           {currentStep === 5 && subStep === 1 && <StepPreferences />}
           {currentStep === 5 && subStep === 2 && <StepLearningPath />}
           {currentStep === 6 && <StepGenerating />}
-          {currentStep === 7 && <StepCustomize onComplete={() => navigate('/dashboard')} />}
+          {currentStep === 7 && (
+            <StepCustomize
+              onComplete={() => completeOnboarding.mutate()}
+              isSubmitting={completeOnboarding.isPending}
+            />
+          )}
         </div>
 
         {currentStep !== 1 && (
@@ -192,7 +197,7 @@ const OnboardingMain = () => {
                   onClick={handleNext}
                   className="btn h-12 rounded-xl border-none bg-[#0B1528] px-10 text-base font-semibold text-white transition-all hover:bg-[#15233e] hover:shadow-lg active:scale-95"
                 >
-                  {currentStep === 5 && subStep === 2 ? 'Generate Your Roadmap' : 'Continue'}
+                  {currentStep === 5 && subStep === 2 ? 'Personalize Your Roadmap' : 'Continue'}
                   <RiArrowRightLine className="ml-2 h-5 w-5" />
                 </button>
               )}
