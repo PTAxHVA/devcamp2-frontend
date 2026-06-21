@@ -74,13 +74,25 @@ export function buildFlowGraph(data: BERoadmapDetail): FlowGraph {
     },
   }))
 
-  const edges: Edge[] = data.edges.map((edge) => ({
-    id: `e-${edge.source}-${edge.target}`,
-    source: edge.source,
-    target: edge.target,
-    type: 'smoothstep',
-    style: { stroke: EDGE_COLOR, strokeWidth: 2 },
-  }))
+  const edges: Edge[] =
+    data.edges.length > 0
+      ? data.edges.map((edge) => ({
+          id: `e-${edge.source}-${edge.target}`,
+          source: edge.source,
+          target: edge.target,
+          type: 'smoothstep',
+          style: { stroke: EDGE_COLOR, strokeWidth: 2 },
+        }))
+      : // Backend sent no prerequisite edges (e.g. the demo roadmap, whose seed has
+        // empty dependsOn). Chain topics sequentially by orderIndex so the graph reads
+        // as a connected path instead of disconnected nodes.
+        ordered.slice(1).map((topic, index) => ({
+          id: `e-seq-${ordered[index].masterTopicId}-${topic.masterTopicId}`,
+          source: ordered[index].masterTopicId,
+          target: topic.masterTopicId,
+          type: 'smoothstep',
+          style: { stroke: EDGE_COLOR, strokeWidth: 2 },
+        }))
 
   return { nodes, edges }
 }
