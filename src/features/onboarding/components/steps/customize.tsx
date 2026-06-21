@@ -1,9 +1,5 @@
-import { useState, useEffect } from 'react'
-import { useMutation } from '@tanstack/react-query'
-import { apiClient } from '@/lib/api-client'
-import { buildFlowGraph } from '@/features/roadmap/lib/build-flow-graph'
+import { useState } from 'react'
 import { BaseRoadmapNode, type BaseNodeData } from '@/features/roadmap/components/base-roadmap-node'
-import { logger } from '@/lib/logger'
 import {
   ReactFlow,
   Background,
@@ -25,13 +21,12 @@ import {
 
 interface CustomizeProps {
   onComplete?: () => void
+  isSubmitting?: boolean
 }
 
 const nodeTypes = { roadmapNode: BaseRoadmapNode }
 
-export default function StepCustomize({ onComplete }: CustomizeProps) {
-  const [aiError, setAiError] = useState<string | null>(null)
-
+export default function StepCustomize({ onComplete, isSubmitting = false }: CustomizeProps) {
   const initialNodes: Node<BaseNodeData>[] = [
     {
       id: '1',
@@ -93,54 +88,6 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
 
   const [activeTab, setActiveTab] = useState<'ai' | 'manual'>('ai')
   const [newTopicTitle, setNewTopicTitle] = useState('')
-  const [feedback, setFeedback] = useState('')
-
-  const { mutate: refineRoadmap, isPending: isRefining } = useMutation({
-    mutationFn: async (userFeedback: string) => {
-      setAiError(null)
-      const response = await apiClient.post('/ai/roadmap-feedback', { feedback: userFeedback })
-      return response.data
-    },
-    onSuccess: (data) => {
-      logger.info('AI Refined Roadmap Successfully', data)
-
-      try {
-        const rawTopics = Array.isArray(data) ? data : data?.topics || []
-
-        if (rawTopics.length > 0) {
-          const { nodes: mappedNodes, edges: mappedEdges } = buildFlowGraph(rawTopics)
-          setNodes(mappedNodes as Node<BaseNodeData>[])
-          setEdges(mappedEdges)
-        }
-      } catch (error) {
-        logger.error(
-          'Failed to map domain data to UI:',
-          error instanceof Error ? error.message : String(error),
-        )
-        setAiError('Please try again!')
-      }
-    },
-    onError: (error) => {
-      logger.error(
-        'Failed to apply AI feedback:',
-        error instanceof Error ? error.message : String(error),
-      )
-      setAiError('The AI Assistant is currently unavailable. Please try again in a few moments.')
-    },
-  })
-
-  // Debounce gọi AI khi feedback đổi. Phụ thuộc `refineRoadmap` (reference ổn định
-  // từ useMutation) thay vì cả object mutation (đổi mỗi render) để tránh effect
-  // re-run mỗi render và bắn lặp vô hạn endpoint AI.
-  useEffect(() => {
-    if (!feedback.trim()) return
-
-    const delayDebounceFn = setTimeout(() => {
-      refineRoadmap(feedback)
-    }, 500)
-
-    return () => clearTimeout(delayDebounceFn)
-  }, [feedback, refineRoadmap])
 
   const rebuildEdgesAndNumbers = (
     currentNodes: Node<BaseNodeData>[],
@@ -283,32 +230,23 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
               </div>
               <h2 className="text-text-primary mb-2 text-3xl font-extrabold">Talk to AI</h2>
               <p className="text-text-secondary mb-6 text-sm leading-relaxed">
-                Not quite right? Tell the AI what you want to change, add, or remove. The roadmap
-                will update automatically.
+                Tell the AI what to change and it will refine the topics — for now this is a preview
+                of the layout below.
               </p>
 
               <div className="relative flex flex-1 flex-col">
                 <textarea
-                  value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
+                  disabled
                   placeholder="e.g., 'Make it more advanced', or 'I only have 2 hours a week'."
-                  className="focus:border-brand-purple-500 focus:ring-brand-purple-500/50 border-border-soft bg-bg-section/50 text-text-primary placeholder:text-text-placeholder h-full w-full resize-none rounded-2xl border p-4 text-sm transition-all focus:bg-white focus:ring-2 focus:outline-none"
+                  className="border-border-soft bg-bg-section/50 text-text-primary placeholder:text-text-placeholder h-full w-full cursor-not-allowed resize-none rounded-2xl border p-4 text-sm opacity-60"
                 />
-
-                <div
-                  className={`bg-bg-lavender text-brand-purple-600 absolute right-4 bottom-4 flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold transition-opacity duration-300 ${
-                    isRefining ? 'opacity-100' : 'opacity-0'
-                  }`}
-                >
-                  <RiLoader4Line className="animate-spin text-base" /> Thinking...
-                </div>
               </div>
 
-              {aiError && (
-                <div className="animate-in fade-in slide-in-from-top-1 border-error-border bg-error-bg text-error-text mt-3 rounded-xl border p-3 text-xs font-medium">
-                  {aiError}
-                </div>
-              )}
+              <div className="border-border-soft bg-bg-section/50 text-text-secondary mt-3 flex items-start gap-2 rounded-xl border p-3 text-xs font-medium">
+                <RiSparklingFill className="text-brand-purple-500 mt-0.5 shrink-0" />
+                AI refinement unlocks once your roadmap is generated. Finish setup, then edit it
+                anytime from “Edit current roadmap”.
+              </div>
             </div>
           )}
           {activeTab === 'manual' && (
@@ -369,9 +307,16 @@ export default function StepCustomize({ onComplete }: CustomizeProps) {
           <div className="border-border-soft mt-6 flex flex-col gap-3 border-t pt-4">
             <button
               onClick={onComplete}
-              className="w-full rounded-xl bg-slate-900 py-4 font-bold text-white transition-all hover:bg-slate-800 active:scale-95"
+              disabled={isSubmitting}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 py-4 font-bold text-white transition-all hover:bg-slate-800 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Confirm & Generate
+              {isSubmitting ? (
+                <>
+                  <RiLoader4Line className="animate-spin text-lg" /> Generating...
+                </>
+              ) : (
+                'Confirm & Generate'
+              )}
             </button>
           </div>
         </div>
