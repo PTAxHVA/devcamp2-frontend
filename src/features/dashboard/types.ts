@@ -13,6 +13,7 @@ export interface DashboardData {
     progressPercentage: number
     sourceType: 'SUGGESTED' | 'CUSTOMIZED'
   }>
+  weeklyProgressCounts?: number[]
   streak: {
     currentStreak: number
     longestStreak: number

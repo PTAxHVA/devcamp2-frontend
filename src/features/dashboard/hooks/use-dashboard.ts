@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { isAxiosError } from 'axios'
 import { apiClient } from '@/lib/api-client'
 import { logger } from '@/lib/logger'
 import type { DashboardData } from '@/features/dashboard/types'
@@ -12,7 +13,7 @@ interface BERoadmap {
   _id: string
   roadmapId: string
   roleName?: string
-  sourceType: 'SUGGESTED' | 'CUSTOMIZED'
+  sourceType?: 'SUGGESTED' | 'CUSTOMIZED'
 }
 
 interface BEContinueLearning {
@@ -33,25 +34,49 @@ interface BEStreak {
   lastActivityDate: string | null
 }
 
+type BEWeeklyProgress = number[] | { counts?: number[] }
+
 interface BEDashboardRes {
   continueLearningList?: BEContinueLearning[]
-  roadmaps: BERoadmap[]
+  roadmaps: string[]
   streak?: BEStreak
   stats: {
     progress: BEProgressStat[]
     level: string
   }
   availableRolesForAdd?: BEAvailableRole[]
+  weeklyProgress?: BEWeeklyProgress
+  weeklyProgressCounts?: number[]
+}
+
+// NOTE: GET /dashboard does not yet expose weekly counts, so this resolves to
+// undefined today and the Weekly Progress card stays hidden (better than showing
+// fabricated bars). Wired defensively for when the backend surfaces the field.
+function normalizeWeeklyProgressCounts(value: unknown): number[] | undefined {
+  const counts = Array.isArray(value)
+    ? value
+    : value && typeof value === 'object' && 'counts' in value
+      ? (value as { counts?: unknown }).counts
+      : undefined
+
+  if (!Array.isArray(counts) || counts.length !== 7) return undefined
+
+  // Reject non-numeric entries rather than coercing null/''/false to 0.
+  const normalized = counts.map((count) => (typeof count === 'number' ? count : NaN))
+  return normalized.every((count) => Number.isFinite(count) && count >= 0) ? normalized : undefined
 }
 
 export function useDashboard() {
   return useQuery<DashboardData>({
     queryKey: ['dashboard'],
     queryFn: async () => {
-      const dashRes = await apiClient.get<{ data: BEDashboardRes }>('/dashboard')
+      const [dashRes, roadmapsRes] = await Promise.all([
+        apiClient.get<{ data: BEDashboardRes }>('/dashboard'),
+        apiClient.get<{ data: BERoadmap[] }>('/roadmaps'),
+      ])
       const dashData = dashRes.data.data
 
-      const activeRoadmaps = dashData.roadmaps || []
+      const activeRoadmaps = roadmapsRes.data.data || []
 
       const roadmaps = activeRoadmaps.map((r) => {
         const progressStat = dashData.stats?.progress?.find((p) => p.roadmapId === r.roadmapId)
@@ -101,10 +126,14 @@ export function useDashboard() {
 
       const totalProgress = roadmaps.reduce((acc, r) => acc + r.progressPercentage, 0)
       const avgProgress = roadmaps.length > 0 ? Math.round(totalProgress / roadmaps.length) : 0
+      const weeklyProgressCounts =
+        normalizeWeeklyProgressCounts(dashData.weeklyProgressCounts) ??
+        normalizeWeeklyProgressCounts(dashData.weeklyProgress)
 
       return {
         continueLearning,
         roadmaps,
+        weeklyProgressCounts,
         streak: {
           currentStreak: dashData.streak?.streak || 0,
           longestStreak: dashData.streak?.longestStreak || 0,
@@ -121,6 +150,14 @@ export function useDashboard() {
           roleName: r.roleName,
         })),
       }
+    },
+    retry: (failureCount, error) => {
+      if (isAxiosError(error)) {
+        const status = error.response?.status
+        if (status && status >= 400 && status < 500) return false
+      }
+
+      return failureCount < 3
     },
   })
 }
