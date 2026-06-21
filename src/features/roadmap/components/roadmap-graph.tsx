@@ -13,6 +13,7 @@ import '@xyflow/react/dist/style.css'
 
 import { RiCheckLine, RiLockLine } from 'react-icons/ri'
 import { BaseRoadmapNode, type BaseNodeData } from '@/features/roadmap/components/base-roadmap-node'
+import { useIsMobile } from '@/hooks/use-is-mobile'
 
 export interface RoadmapGraphProps {
   nodes: Node<BaseNodeData>[]
@@ -35,6 +36,7 @@ export const RoadmapGraph = ({
   isReadOnly = false,
   withUI = true,
 }: RoadmapGraphProps) => {
+  const isMobile = useIsMobile()
   return (
     <div
       className={`relative flex-1 ${
@@ -76,15 +78,17 @@ export const RoadmapGraph = ({
         nodeTypes={nodeTypes}
         onNodeClick={onNodeClick}
         fitView
-        fitViewOptions={{ padding: 0.2 }}
-        minZoom={0.5}
+        // On mobile, cap the initial fit-view zoom at 60% so the tree opens zoomed out.
+        fitViewOptions={{ padding: 0.2, maxZoom: isMobile ? 0.6 : 1.5 }}
+        minZoom={isMobile ? 0.3 : 0.5}
         maxZoom={1.5}
         nodesDraggable={!isReadOnly}
         nodesConnectable={!isReadOnly}
         elementsSelectable={!isReadOnly}
         panOnDrag={!isReadOnly}
         zoomOnScroll={!isReadOnly}
-        zoomOnPinch={!isReadOnly}
+        // Always allow pinch-to-zoom on touch devices, even in read-only previews.
+        zoomOnPinch={isMobile || !isReadOnly}
         proOptions={{ hideAttribution: true }}
       >
         {withUI && !isReadOnly && (
