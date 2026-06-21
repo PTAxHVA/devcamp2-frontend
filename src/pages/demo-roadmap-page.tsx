@@ -14,7 +14,12 @@ const DemoRoadmapPage = () => {
   const { data, isLoading, isError } = useDemoRoadmap()
 
   const graph = useMemo(
-    () => (data ? buildFlowGraph(data as unknown as Parameters<typeof buildFlowGraph>[0]) : null),
+    () =>
+      data
+        ? buildFlowGraph(data as unknown as Parameters<typeof buildFlowGraph>[0], {
+            synthesizeSequentialEdges: true,
+          })
+        : null,
     [data],
   )
 

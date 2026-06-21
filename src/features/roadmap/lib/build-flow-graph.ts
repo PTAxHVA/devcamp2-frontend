@@ -58,8 +58,16 @@ export interface FlowGraph {
  * Pure transform: backend roadmap graph -> React Flow nodes + edges.
  * Layout is a single vertical column ordered by `orderIndex` (the backend
  * does not send coordinates). Edges follow the prerequisite graph as-is.
+ *
+ * `synthesizeSequentialEdges` is an explicit opt-in for the demo roadmap (whose
+ * seed has empty `dependsOn`): it chains topics by `orderIndex` so the graph reads
+ * as a connected path. It is OFF by default so a genuinely flat authed roadmap is
+ * never drawn with fabricated prerequisite arrows.
  */
-export function buildFlowGraph(data: BERoadmapDetail): FlowGraph {
+export function buildFlowGraph(
+  data: BERoadmapDetail,
+  opts: { synthesizeSequentialEdges?: boolean } = {},
+): FlowGraph {
   const ordered = [...data.topics].sort((a, b) => a.orderIndex - b.orderIndex)
   const statusById = deriveTopicStatuses(data.topics)
 
@@ -74,13 +82,25 @@ export function buildFlowGraph(data: BERoadmapDetail): FlowGraph {
     },
   }))
 
-  const edges: Edge[] = data.edges.map((edge) => ({
-    id: `e-${edge.source}-${edge.target}`,
-    source: edge.source,
-    target: edge.target,
-    type: 'smoothstep',
-    style: { stroke: EDGE_COLOR, strokeWidth: 2 },
-  }))
+  const edges: Edge[] =
+    data.edges.length > 0 || !opts.synthesizeSequentialEdges
+      ? data.edges.map((edge) => ({
+          id: `e-${edge.source}-${edge.target}`,
+          source: edge.source,
+          target: edge.target,
+          type: 'smoothstep',
+          style: { stroke: EDGE_COLOR, strokeWidth: 2 },
+        }))
+      : // Demo opt-in only: backend sent no prerequisite edges (demo seed has empty
+        // dependsOn). Chain topics sequentially by orderIndex so the graph reads as a
+        // connected path instead of disconnected nodes.
+        ordered.slice(1).map((topic, index) => ({
+          id: `e-seq-${index}-${ordered[index].masterTopicId}-${topic.masterTopicId}`,
+          source: ordered[index].masterTopicId,
+          target: topic.masterTopicId,
+          type: 'smoothstep',
+          style: { stroke: EDGE_COLOR, strokeWidth: 2 },
+        }))
 
   return { nodes, edges }
 }
