@@ -68,6 +68,9 @@ export default function EditCurrentRoadmapPage() {
 
   const nodeTypes = useMemo(() => ({ roadmapNode: BaseRoadmapNode }), [])
   const [showAlert, setShowAlert] = useState(true)
+  // On mobile the topic-details panel is a bottom sheet that opens when a node is
+  // tapped; on lg+ it is a static sidebar and this flag is ignored.
+  const [sheetOpen, setSheetOpen] = useState(false)
 
   const { data, isLoading, isError } = useRoadmapDetail(roadmapId ?? '')
 
@@ -118,6 +121,7 @@ export default function EditCurrentRoadmapPage() {
 
   const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
     setSelectedId(node.id)
+    setSheetOpen(true)
   }, [])
 
   // Re-number, re-stack vertically and keep the graph connected after a structural
@@ -351,8 +355,33 @@ export default function EditCurrentRoadmapPage() {
           </div>
         </div>
 
-        {/* === TOPIC DETAILS (read-only) === */}
-        <div className="border-border-soft flex w-full flex-col rounded-2xl border bg-white p-6 shadow-sm lg:w-100">
+        {/* Backdrop for the mobile bottom sheet */}
+        {sheetOpen && (
+          <div
+            className="fixed inset-0 z-30 bg-black/30 lg:hidden"
+            onClick={() => setSheetOpen(false)}
+            aria-hidden
+          />
+        )}
+
+        {/* === TOPIC DETAILS (read-only) ===
+            Mobile: bottom sheet that slides up. Desktop (lg+): static sidebar. */}
+        <div
+          className={`border-border-soft flex flex-col border bg-white shadow-sm transition-transform duration-300 ease-out lg:static! lg:z-auto lg:max-h-none lg:w-100 lg:translate-y-0 lg:overflow-visible lg:rounded-2xl ${
+            sheetOpen ? 'translate-y-0' : 'translate-y-full'
+          } fixed inset-x-0 bottom-0 z-40 max-h-[75vh] overflow-y-auto rounded-t-2xl p-6`}
+        >
+          {/* Mobile sheet header: drag handle + close */}
+          <div className="relative mb-4 lg:hidden">
+            <div className="mx-auto h-1.5 w-12 rounded-full bg-slate-300" />
+            <button
+              onClick={() => setSheetOpen(false)}
+              aria-label="Close topic details"
+              className="text-text-placeholder hover:bg-bg-section absolute -top-2 right-0 rounded-lg p-1"
+            >
+              <RiCloseLine className="text-xl" />
+            </button>
+          </div>
           <h2 className="text-text-primary mb-6 text-lg font-bold">Topic details</h2>
 
           {selectedMeta ? (

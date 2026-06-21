@@ -197,7 +197,7 @@ const OnboardingMain = () => {
                   onClick={handleNext}
                   className="btn h-12 rounded-xl border-none bg-[#0B1528] px-10 text-base font-semibold text-white transition-all hover:bg-[#15233e] hover:shadow-lg active:scale-95"
                 >
-                  {currentStep === 5 && subStep === 2 ? 'Generate Your Roadmap' : 'Continue'}
+                  {currentStep === 5 && subStep === 2 ? 'Personalize Your Roadmap' : 'Continue'}
                   <RiArrowRightLine className="ml-2 h-5 w-5" />
                 </button>
               )}

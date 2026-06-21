@@ -8,7 +8,7 @@ interface StepRoleProps {
 
 export const StepRole = ({ selectedRole, setSelectedRole }: StepRoleProps) => {
   return (
-    <div className="mb-20 grid grid-cols-1 gap-8 md:grid-cols-3">
+    <div className="mb-20 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
       {roles.map((role) => (
         <div
           key={role.id}

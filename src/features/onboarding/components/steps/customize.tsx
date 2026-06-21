@@ -31,7 +31,7 @@ export default function StepCustomize({ onComplete, isSubmitting = false }: Cust
   // The free-text request can't refine the (still-mock) canvas live — there is no
   // roadmap yet. Instead we persist it into the wizard answers so it is sent with
   // POST /onboarding/questionnaire (extraPreferences) and the AI suggest step uses
-  // it when generating the real roadmap on "Confirm & Generate".
+  // it when personalizing the real roadmap on "Confirm & Personalize".
   const aiRequest = useWizardStore((s) => (s.answers?.aiRefinement as string) ?? '')
   const setAnswer = useWizardStore((s) => s.setAnswer)
 
@@ -238,8 +238,8 @@ export default function StepCustomize({ onComplete, isSubmitting = false }: Cust
               </div>
               <h2 className="text-text-primary mb-2 text-3xl font-extrabold">Talk to AI</h2>
               <p className="text-text-secondary mb-6 text-sm leading-relaxed">
-                Tell the AI what you want to change, add, or remove. We&apos;ll use this to
-                personalize your roadmap when you generate it.
+                Tell the AI what you want to change, add, or remove. We&apos;ll apply it when you
+                personalize your roadmap.
               </p>
 
               <div className="relative flex flex-1 flex-col">
@@ -253,8 +253,8 @@ export default function StepCustomize({ onComplete, isSubmitting = false }: Cust
 
               <div className="border-border-soft bg-bg-section/50 text-text-secondary mt-3 flex items-start gap-2 rounded-xl border p-3 text-xs font-medium">
                 <RiSparklingFill className="text-brand-purple-500 mt-0.5 shrink-0" />
-                Your request is applied when the roadmap is generated. Afterwards you can fine-tune
-                it anytime from “Edit current roadmap”.
+                Your request is applied when your roadmap is personalized. Afterwards you can
+                fine-tune it anytime from “Edit current roadmap”.
               </div>
             </div>
           )}
@@ -321,10 +321,10 @@ export default function StepCustomize({ onComplete, isSubmitting = false }: Cust
             >
               {isSubmitting ? (
                 <>
-                  <RiLoader4Line className="animate-spin text-lg" /> Generating...
+                  <RiLoader4Line className="animate-spin text-lg" /> Personalizing...
                 </>
               ) : (
-                'Confirm & Generate'
+                'Confirm & Personalize'
               )}
             </button>
           </div>

@@ -124,7 +124,7 @@ export const StepGenerating = () => {
 
             <div className="pointer-events-none absolute inset-0 z-20 flex items-end justify-center bg-linear-to-b from-transparent via-slate-50/40 to-slate-50 pb-8">
               <span className="text-brand-purple-600 border-brand-purple-100 flex animate-pulse items-center gap-2 rounded-full border bg-white/90 px-5 py-2.5 text-xs font-bold shadow-sm backdrop-blur">
-                <RiLightbulbFlashLine className="h-4 w-4" /> Generating topics...
+                <RiLightbulbFlashLine className="h-4 w-4" /> Personalizing topics...
               </span>
             </div>
           </div>
