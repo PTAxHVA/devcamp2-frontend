@@ -12,14 +12,15 @@ interface BEQuestion {
   options?: Array<{ _id: string; questionId: string; content: string; orderIndex: number }>
 }
 
+// POST /quizzes/:id/start and GET /attempts/:id both return only an in-progress
+// attempt (exactly these 3 fields). Pass/fail + cooldown live on the result/submit
+// endpoints, not here.
 interface AttemptResponse {
   data: {
     quizAttempt: {
       attemptId: string
       quizId: string
       startedAt: string
-      submittedAt?: string | null
-      cooldownUntil?: string | null
     }
     questions: BEQuestion[]
   }
@@ -41,39 +42,15 @@ const readString = (value: unknown): string | undefined =>
   typeof value === 'string' && value.length > 0 ? value : undefined
 
 function getConflictCode(payload: unknown): string | undefined {
-  const root = asRecord(payload)
-  const error = asRecord(root?.error)
-
-  return readString(error?.code) ?? readString(root?.code)
+  const error = asRecord(asRecord(payload)?.error)
+  return readString(error?.code)
 }
 
-function readAttemptId(value: Record<string, unknown> | null): string | undefined {
-  return (
-    readString(value?.attemptId) ??
-    readString(value?.quizAttemptId) ??
-    readString(value?.id) ??
-    readString(value?._id)
-  )
-}
-
+// The 409 (QUIZ_ALREADY_STARTED / COOLDOWN_ACTIVE) carries the existing attempt id
+// at error.details.attemptId (see backend quiz.service.ts).
 function getConflictAttemptId(payload: unknown): string | undefined {
-  const root = asRecord(payload)
-  const error = asRecord(root?.error)
-  const data = asRecord(root?.data)
-  const details = asRecord(error?.details)
-  const errorData = asRecord(error?.data)
-  const quizAttempt = asRecord(data?.quizAttempt)
-  const attempt = asRecord(data?.attempt)
-
-  return (
-    readAttemptId(error) ??
-    readAttemptId(details) ??
-    readAttemptId(errorData) ??
-    readAttemptId(data) ??
-    readAttemptId(quizAttempt) ??
-    readAttemptId(attempt) ??
-    readAttemptId(root)
-  )
+  const details = asRecord(asRecord(asRecord(payload)?.error)?.details)
+  return readString(details?.attemptId)
 }
 
 export function useQuizAttempt(quizId: string) {
@@ -86,11 +63,6 @@ export function useQuizAttempt(quizId: string) {
     let cancelled = false
 
     const initAttempt = ({ quizAttempt, questions }: AttemptResponse['data']) => {
-      if (quizAttempt.submittedAt || quizAttempt.cooldownUntil) {
-        navigate(`/quizzes/${quizAttempt.attemptId}/result/fail`, { replace: true })
-        return
-      }
-
       setAttempt(quizAttempt.attemptId, questions.map(mapQuestion))
     }
 
