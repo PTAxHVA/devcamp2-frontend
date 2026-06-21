@@ -8,9 +8,11 @@ import { WeeklyProgressChart } from '@/features/dashboard/components/weekly-prog
 import { StreakCalendar } from '@/features/dashboard/components/streak-calendar'
 import { Link } from 'react-router'
 import { FiExternalLink } from 'react-icons/fi'
+import { useAuthStore } from '@/stores/auth-store'
 
 const DashboardPage = () => {
   const { data, isLoading, isError } = useDashboard()
+  const authUser = useAuthStore((s) => s.user)
 
   if (isLoading) {
     return <DashboardSkeleton />
@@ -26,7 +28,7 @@ const DashboardPage = () => {
 
   if (!data) return null
 
-  const displayName = (data as typeof data & { userName?: string }).userName || 'Student'
+  const displayName = authUser?.username || data.userName || 'Student'
 
   return (
     <div className="fade-in animate-in mx-auto h-full w-full max-w-[1400px] p-6 duration-500 lg:p-8">
