@@ -87,7 +87,7 @@ export function buildFlowGraph(data: BERoadmapDetail): FlowGraph {
         // empty dependsOn). Chain topics sequentially by orderIndex so the graph reads
         // as a connected path instead of disconnected nodes.
         ordered.slice(1).map((topic, index) => ({
-          id: `e-seq-${ordered[index].masterTopicId}-${topic.masterTopicId}`,
+          id: `e-seq-${index}-${ordered[index].masterTopicId}-${topic.masterTopicId}`,
           source: ordered[index].masterTopicId,
           target: topic.masterTopicId,
           type: 'smoothstep',
