@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { isAxiosError } from 'axios'
 import { apiClient } from '@/lib/api-client'
 import { logger } from '@/lib/logger'
 import type { DashboardData } from '@/features/dashboard/types'
@@ -12,7 +13,7 @@ interface BERoadmap {
   _id: string
   roadmapId: string
   roleName?: string
-  sourceType: 'SUGGESTED' | 'CUSTOMIZED'
+  sourceType?: 'SUGGESTED' | 'CUSTOMIZED'
 }
 
 interface BEContinueLearning {
@@ -35,7 +36,7 @@ interface BEStreak {
 
 interface BEDashboardRes {
   continueLearningList?: BEContinueLearning[]
-  roadmaps: BERoadmap[]
+  roadmaps: string[]
   streak?: BEStreak
   stats: {
     progress: BEProgressStat[]
@@ -48,10 +49,13 @@ export function useDashboard() {
   return useQuery<DashboardData>({
     queryKey: ['dashboard'],
     queryFn: async () => {
-      const dashRes = await apiClient.get<{ data: BEDashboardRes }>('/dashboard')
+      const [dashRes, roadmapsRes] = await Promise.all([
+        apiClient.get<{ data: BEDashboardRes }>('/dashboard'),
+        apiClient.get<{ data: BERoadmap[] }>('/roadmaps'),
+      ])
       const dashData = dashRes.data.data
 
-      const activeRoadmaps = dashData.roadmaps || []
+      const activeRoadmaps = roadmapsRes.data.data || []
 
       const roadmaps = activeRoadmaps.map((r) => {
         const progressStat = dashData.stats?.progress?.find((p) => p.roadmapId === r.roadmapId)
@@ -121,6 +125,14 @@ export function useDashboard() {
           roleName: r.roleName,
         })),
       }
+    },
+    retry: (failureCount, error) => {
+      if (isAxiosError(error)) {
+        const status = error.response?.status
+        if (status && status >= 400 && status < 500) return false
+      }
+
+      return failureCount < 3
     },
   })
 }
