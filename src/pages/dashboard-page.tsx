@@ -88,16 +88,18 @@ const DashboardPage = () => {
               quizAvg={data.stats.quizAvg}
             />
 
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <h2 className="text-text-primary text-xl font-bold">Weekly Progress</h2>
-                <select className="select select-bordered select-sm rounded-full bg-white font-medium">
-                  <option>This week</option>
-                  <option>Last week</option>
-                </select>
+            {data.weeklyProgressCounts && (
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-text-primary text-xl font-bold">Weekly Progress</h2>
+                  <select className="select select-bordered select-sm rounded-full bg-white font-medium">
+                    <option>This week</option>
+                    <option>Last week</option>
+                  </select>
+                </div>
+                <WeeklyProgressChart counts={data.weeklyProgressCounts} />
               </div>
-              <WeeklyProgressChart counts={[4, 8, 5, 9, 6, 2, 3]} />
-            </div>
+            )}
 
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">

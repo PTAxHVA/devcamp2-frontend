@@ -34,6 +34,8 @@ interface BEStreak {
   lastActivityDate: string | null
 }
 
+type BEWeeklyProgress = number[] | { counts?: number[] }
+
 interface BEDashboardRes {
   continueLearningList?: BEContinueLearning[]
   roadmaps: string[]
@@ -43,6 +45,21 @@ interface BEDashboardRes {
     level: string
   }
   availableRolesForAdd?: BEAvailableRole[]
+  weeklyProgress?: BEWeeklyProgress
+  weeklyProgressCounts?: number[]
+}
+
+function normalizeWeeklyProgressCounts(value: unknown): number[] | undefined {
+  const counts = Array.isArray(value)
+    ? value
+    : value && typeof value === 'object' && 'counts' in value
+      ? (value as { counts?: unknown }).counts
+      : undefined
+
+  if (!Array.isArray(counts) || counts.length !== 7) return undefined
+
+  const normalized = counts.map((count) => Number(count))
+  return normalized.every((count) => Number.isFinite(count) && count >= 0) ? normalized : undefined
 }
 
 export function useDashboard() {
@@ -105,10 +122,14 @@ export function useDashboard() {
 
       const totalProgress = roadmaps.reduce((acc, r) => acc + r.progressPercentage, 0)
       const avgProgress = roadmaps.length > 0 ? Math.round(totalProgress / roadmaps.length) : 0
+      const weeklyProgressCounts =
+        normalizeWeeklyProgressCounts(dashData.weeklyProgressCounts) ??
+        normalizeWeeklyProgressCounts(dashData.weeklyProgress)
 
       return {
         continueLearning,
         roadmaps,
+        weeklyProgressCounts,
         streak: {
           currentStreak: dashData.streak?.streak || 0,
           longestStreak: dashData.streak?.longestStreak || 0,
