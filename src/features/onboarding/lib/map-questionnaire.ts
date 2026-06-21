@@ -56,6 +56,8 @@ export function mapAnswersToQuestionnaire(
     str(answers.additionalInfo),
     str(answers.styling) && `Preferred styling: ${str(answers.styling)}`,
     str(answers.projectDirection) && `Project direction: ${str(answers.projectDirection)}`,
+    // Free-text "Talk to AI" request from the Customize step.
+    str(answers.aiRefinement) && `Customization request: ${str(answers.aiRefinement)}`,
   ]
     .filter(Boolean)
     .join('. ')

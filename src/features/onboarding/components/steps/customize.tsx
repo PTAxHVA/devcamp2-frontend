@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { BaseRoadmapNode, type BaseNodeData } from '@/features/roadmap/components/base-roadmap-node'
+import { useWizardStore } from '../../onboarding-store'
 import {
   ReactFlow,
   Background,
@@ -27,6 +28,13 @@ interface CustomizeProps {
 const nodeTypes = { roadmapNode: BaseRoadmapNode }
 
 export default function StepCustomize({ onComplete, isSubmitting = false }: CustomizeProps) {
+  // The free-text request can't refine the (still-mock) canvas live — there is no
+  // roadmap yet. Instead we persist it into the wizard answers so it is sent with
+  // POST /onboarding/questionnaire (extraPreferences) and the AI suggest step uses
+  // it when generating the real roadmap on "Confirm & Generate".
+  const aiRequest = useWizardStore((s) => (s.answers?.aiRefinement as string) ?? '')
+  const setAnswer = useWizardStore((s) => s.setAnswer)
+
   const initialNodes: Node<BaseNodeData>[] = [
     {
       id: '1',
@@ -230,22 +238,23 @@ export default function StepCustomize({ onComplete, isSubmitting = false }: Cust
               </div>
               <h2 className="text-text-primary mb-2 text-3xl font-extrabold">Talk to AI</h2>
               <p className="text-text-secondary mb-6 text-sm leading-relaxed">
-                Tell the AI what to change and it will refine the topics — for now this is a preview
-                of the layout below.
+                Tell the AI what you want to change, add, or remove. We&apos;ll use this to
+                personalize your roadmap when you generate it.
               </p>
 
               <div className="relative flex flex-1 flex-col">
                 <textarea
-                  disabled
+                  value={aiRequest}
+                  onChange={(e) => setAnswer('aiRefinement', e.target.value.slice(0, 1000))}
                   placeholder="e.g., 'Make it more advanced', or 'I only have 2 hours a week'."
-                  className="border-border-soft bg-bg-section/50 text-text-primary placeholder:text-text-placeholder h-full w-full cursor-not-allowed resize-none rounded-2xl border p-4 text-sm opacity-60"
+                  className="focus:border-brand-purple-500 focus:ring-brand-purple-500/50 border-border-soft bg-bg-section/50 text-text-primary placeholder:text-text-placeholder h-full w-full resize-none rounded-2xl border p-4 text-sm transition-all focus:bg-white focus:ring-2 focus:outline-none"
                 />
               </div>
 
               <div className="border-border-soft bg-bg-section/50 text-text-secondary mt-3 flex items-start gap-2 rounded-xl border p-3 text-xs font-medium">
                 <RiSparklingFill className="text-brand-purple-500 mt-0.5 shrink-0" />
-                AI refinement unlocks once your roadmap is generated. Finish setup, then edit it
-                anytime from “Edit current roadmap”.
+                Your request is applied when the roadmap is generated. Afterwards you can fine-tune
+                it anytime from “Edit current roadmap”.
               </div>
             </div>
           )}
