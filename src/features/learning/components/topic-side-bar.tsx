@@ -58,11 +58,13 @@ export default function TopicDetailSidebar({ topic }: TopicDetailSidebarProps) {
     topic.sectionTotal > 0 ? Math.round((topic.sectionCompleted / topic.sectionTotal) * 100) : 0
 
   const estimateLabel =
-    topic.estimatedHours < 1
-      ? `~${Math.round(topic.estimatedHours * 60)} min`
-      : topic.estimatedHours === 1
-        ? '~1 hour'
-        : `~${topic.estimatedHours} hours`
+    topic.estimatedHours <= 0
+      ? '—'
+      : topic.estimatedHours < 1
+        ? `~${Math.round(topic.estimatedHours * 60)} min`
+        : topic.estimatedHours === 1
+          ? '~1 hour'
+          : `~${topic.estimatedHours} hours`
 
   const canNavigate = topic.status !== 'locked'
 

@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
+import { toast } from 'react-hot-toast'
+import axios from 'axios'
 import { useAuthStore } from '@/stores/auth-store'
-import { useMe } from '@/features/profile/hooks/use-profile'
+import { useMe, useUpdateProfile, useUpdateAccount } from '@/features/profile/hooks/use-profile'
 import {
   User,
   Lock,
@@ -68,10 +70,20 @@ export default function SettingsPage() {
   const navigate = useNavigate()
   const setAuth = useAuthStore((s) => s.setAuth)
   const { data: me } = useMe()
+  const updateProfile = useUpdateProfile()
+  const updateAccount = useUpdateAccount()
 
   // Account settings state
   const [fullName, setFullName] = useState(me?.username ?? '')
   const [email, setEmail] = useState(me?.email ?? '')
+  const [hydrated, setHydrated] = useState(false)
+
+  // Populate fields once the current user has loaded (render-phase reset)
+  if (!hydrated && me) {
+    setHydrated(true)
+    setFullName(me.username ?? '')
+    setEmail(me.email ?? '')
+  }
 
   // Password state
   const [showCurrent, setShowCurrent] = useState(false)
@@ -102,6 +114,54 @@ export default function SettingsPage() {
   const logout = () => {
     setAuth(null, null)
     navigate('/login')
+  }
+
+  const handleSaveProfile = () => {
+    const name = fullName.trim()
+    if (name.length < 2) {
+      toast.error('Name must be at least 2 characters')
+      return
+    }
+    updateProfile.mutate(
+      { username: name },
+      {
+        onSuccess: () => toast.success('Profile updated'),
+        onError: (err) => {
+          const msg = axios.isAxiosError(err) ? err.response?.data?.error?.message : null
+          toast.error(msg ?? 'Could not update profile')
+        },
+      },
+    )
+  }
+
+  const handleUpdatePassword = () => {
+    if (!currentPassword) {
+      toast.error('Enter your current password')
+      return
+    }
+    if (newPassword.length < 8) {
+      toast.error('New password must be at least 8 characters')
+      return
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('Passwords do not match')
+      return
+    }
+    updateAccount.mutate(
+      { currentPassword, password: newPassword },
+      {
+        onSuccess: () => {
+          toast.success('Password updated')
+          setCurrentPassword('')
+          setNewPassword('')
+          setConfirmPassword('')
+        },
+        onError: (err) => {
+          const msg = axios.isAxiosError(err) ? err.response?.data?.error?.message : null
+          toast.error(msg ?? 'Could not update password')
+        },
+      },
+    )
   }
 
   return (
@@ -142,15 +202,21 @@ export default function SettingsPage() {
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="border-border-input focus:border-brand-purple-500 w-full rounded-lg border px-4 py-2.5 pr-10 text-sm transition outline-none"
+                    disabled
+                    readOnly
+                    className="border-border-input bg-bg-section text-text-muted w-full cursor-not-allowed rounded-lg border px-4 py-2.5 pr-10 text-sm outline-none"
                   />
                   <Mail className="text-text-muted absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
                 </div>
+                <p className="text-text-muted text-xs">Email address can't be changed yet.</p>
               </div>
               <div className="flex justify-end">
-                <button className="bg-btn-primary-bg hover:bg-btn-primary-hover rounded-lg px-5 py-2 text-sm font-semibold text-white transition">
-                  Save change
+                <button
+                  onClick={handleSaveProfile}
+                  disabled={updateProfile.isPending}
+                  className="bg-btn-primary-bg hover:bg-btn-primary-hover rounded-lg px-5 py-2 text-sm font-semibold text-white transition disabled:opacity-60"
+                >
+                  {updateProfile.isPending ? 'Saving...' : 'Save change'}
                 </button>
               </div>
             </div>
@@ -246,8 +312,12 @@ export default function SettingsPage() {
               </div>
 
               <div className="flex justify-end">
-                <button className="bg-btn-primary-bg hover:bg-btn-primary-hover rounded-lg px-5 py-2 text-sm font-semibold text-white transition">
-                  Update password
+                <button
+                  onClick={handleUpdatePassword}
+                  disabled={updateAccount.isPending}
+                  className="bg-btn-primary-bg hover:bg-btn-primary-hover rounded-lg px-5 py-2 text-sm font-semibold text-white transition disabled:opacity-60"
+                >
+                  {updateAccount.isPending ? 'Updating...' : 'Update password'}
                 </button>
               </div>
             </div>

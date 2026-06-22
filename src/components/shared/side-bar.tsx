@@ -9,10 +9,16 @@ import {
   RiSettings4Line,
   RiQuestionLine,
   RiArrowLeftSLine,
+  RiCloseLine,
 } from 'react-icons/ri'
 import Logo from '@/assets/Logo.svg'
 
-export const Sidebar = () => {
+interface SidebarProps {
+  mobileOpen?: boolean
+  onClose?: () => void
+}
+
+export const Sidebar = ({ mobileOpen = false, onClose }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const location = useLocation()
 
@@ -40,9 +46,9 @@ export const Sidebar = () => {
 
   return (
     <aside
-      className={`border-border-soft relative flex h-full shrink-0 flex-col justify-between border-r bg-white transition-all duration-300 ease-in-out md:flex ${
-        isCollapsed ? 'w-22' : 'w-65'
-      }`}
+      className={`border-border-soft fixed inset-y-0 left-0 z-40 flex h-full w-65 shrink-0 flex-col justify-between border-r bg-white transition-transform duration-300 ease-in-out md:relative md:inset-auto md:z-auto md:translate-x-0 md:transition-all ${
+        mobileOpen ? 'translate-x-0' : '-translate-x-full'
+      } ${isCollapsed ? 'md:w-22' : 'md:w-65'}`}
     >
       <div>
         {/* Header / Logo */}
@@ -54,9 +60,16 @@ export const Sidebar = () => {
               <img src={Logo} alt="VORA Logo" className="h-auto w-35 object-contain" />
             )}
           </h1>
+          <button
+            onClick={onClose}
+            aria-label="Close menu"
+            className="text-text-muted hover:text-text-secondary ml-auto md:hidden"
+          >
+            <RiCloseLine className="h-6 w-6" />
+          </button>
         </div>
 
-        <nav className="space-y-1 overflow-hidden px-4 py-4">
+        <nav className="space-y-1 overflow-hidden px-4 py-4" onClick={onClose}>
           <NavLink to="/dashboard" className={getNavClass('/dashboard')}>
             <RiHome6Line className="h-5 w-5 shrink-0" />
             {!isCollapsed && <span>Dashboard</span>}
@@ -96,7 +109,7 @@ export const Sidebar = () => {
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-          className="hover:border-brand-purple-600 hover:bg-brand-purple-600 border-border-soft text-text-placeholder absolute top-17 -right-3.5 z-20 grid h-7 w-7 place-items-center rounded-full border bg-white shadow-md transition-all duration-200 ease-out hover:scale-110 hover:text-white active:scale-95" // 👉 Đã sửa thành brand-purple
+          className="hover:border-brand-purple-600 hover:bg-brand-purple-600 border-border-soft text-text-placeholder absolute top-17 -right-3.5 z-20 hidden h-7 w-7 place-items-center rounded-full border bg-white shadow-md transition-all duration-200 ease-out hover:scale-110 hover:text-white active:scale-95 md:grid"
         >
           <RiArrowLeftSLine
             className={`h-5 w-5 transition-transform duration-300 ${
@@ -104,7 +117,7 @@ export const Sidebar = () => {
             }`}
           />
         </button>
-        <NavLink to="/support" className={getNavClass('/support')}>
+        <NavLink to="/support" className={getNavClass('/support')} onClick={onClose}>
           <RiQuestionLine className="h-5 w-5 shrink-0" />
           {!isCollapsed && <span>Help & Support</span>}
         </NavLink>

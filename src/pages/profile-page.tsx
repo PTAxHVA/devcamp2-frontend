@@ -1,4 +1,4 @@
-import { BookOpen, Flame, TrendingUp, Clock, Star, ExternalLink, Pencil } from 'lucide-react'
+import { BookOpen, Flame, Clock, Star, ExternalLink, Pencil } from 'lucide-react'
 import { useMe, useMyProfile, useMyProgress } from '@/features/profile/hooks/use-profile'
 import { useMyRoadmaps } from '@/features/learning/hooks/use-my-learning'
 
@@ -84,6 +84,11 @@ export default function ProfilePage() {
     }
   })
 
+  const sectionsCompleted = (progressData ?? []).reduce(
+    (sum, p) => sum + (p.totalCompletedSections ?? 0),
+    0,
+  )
+
   if (loadingMe || loadingProfile || loadingRoadmaps || loadingProgress) {
     return (
       <div className="flex h-60 items-center justify-center">
@@ -99,7 +104,7 @@ export default function ProfilePage() {
         month: 'long',
         day: 'numeric',
       })
-    : 'March 12, 2025'
+    : '—'
 
   return (
     <div className="flex items-start gap-5">
@@ -123,12 +128,12 @@ export default function ProfilePage() {
           {/* Info */}
           <div className="min-w-0 flex-1">
             <div className="mb-1 flex items-center gap-2">
-              <h2 className="text-text-primary text-xl font-bold">{me?.username ?? 'Alex D.'}</h2>
+              <h2 className="text-text-primary text-xl font-bold">{me?.username ?? ''}</h2>
               <span className="border-brand-purple-400 text-brand-purple-600 rounded-full border px-2.5 py-0.5 text-xs font-semibold">
-                {levelLabel[profile?.level] ?? 'Learner'}
+                {levelLabel[profile?.level?.toLowerCase()] ?? 'Learner'}
               </span>
             </div>
-            <p className="text-text-muted mb-2 text-sm">{me?.email ?? 'alex.d@example.com'}</p>
+            <p className="text-text-muted mb-2 text-sm">{me?.email ?? ''}</p>
             <p className="text-text-secondary mb-3 text-sm">
               Passionate about building intuitive web experiences and continuously leveling up my
               skills.
@@ -191,36 +196,22 @@ export default function ProfilePage() {
             <div className="flex flex-col gap-1">
               <div className="text-brand-purple-500 flex items-center gap-1.5">
                 <BookOpen className="h-4 w-4" />
-                <span className="text-text-primary text-xl font-extrabold">28</span>
+                <span className="text-text-primary text-xl font-extrabold">
+                  {sectionsCompleted}
+                </span>
               </div>
-              <p className="text-text-primary text-xs font-semibold">Topics completed</p>
+              <p className="text-text-primary text-xs font-semibold">Sections completed</p>
               <p className="text-text-muted text-xs">Across all roadmaps</p>
             </div>
             <div className="flex flex-col gap-1">
               <div className="text-brand-purple-500 flex items-center gap-1.5">
                 <Flame className="h-4 w-4" />
                 <span className="text-text-primary text-xl font-extrabold">
-                  {profile?.streak ?? 7}
+                  {profile?.streak ?? 0}
                 </span>
               </div>
               <p className="text-text-primary text-xs font-semibold">Day streak</p>
               <p className="text-text-muted text-xs">Keep it going!</p>
-            </div>
-            <div className="flex flex-col gap-1">
-              <div className="text-brand-purple-500 flex items-center gap-1.5">
-                <TrendingUp className="h-4 w-4" />
-                <span className="text-text-primary text-xl font-extrabold">87%</span>
-              </div>
-              <p className="text-text-primary text-xs font-semibold">Quiz average</p>
-              <p className="text-text-muted text-xs">Last 30 days</p>
-            </div>
-            <div className="flex flex-col gap-1">
-              <div className="text-brand-purple-500 flex items-center gap-1.5">
-                <Clock className="h-4 w-4" />
-                <span className="text-text-primary text-xl font-extrabold">32.5</span>
-              </div>
-              <p className="text-text-primary text-xs font-semibold">Total learning hours</p>
-              <p className="text-text-muted text-xs">All time</p>
             </div>
           </div>
         </div>
