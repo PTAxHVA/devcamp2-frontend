@@ -88,7 +88,7 @@ export function QuizAttemptPage() {
       })
 
     if (submitAnswers.length === 0) {
-      toast.error('Vui lòng trả lời ít nhất 1 câu hỏi trước khi nộp bài.')
+      toast.error('Please answer at least 1 question before submitting.')
       return
     }
 
@@ -110,7 +110,7 @@ export function QuizAttemptPage() {
           <div className="text-base-content/70 flex items-center justify-between text-sm font-bold">
             <span className="flex items-center gap-2">
               <HiOutlineLightBulb className="text-warning h-5 w-5 animate-pulse" />
-              Câu hỏi {currentIndex + 1} / {questions.length}
+              Question {currentIndex + 1} / {questions.length}
             </span>
             <span className="font-mono text-xs opacity-60">Quiz ID: {quizId}</span>
           </div>
@@ -145,7 +145,7 @@ export function QuizAttemptPage() {
             onClick={prev}
             disabled={isFirstQuestion}
           >
-            <HiMiniArrowLeft className="h-5 w-5" /> Quay lại
+            <HiMiniArrowLeft className="h-5 w-5" /> Previous
           </button>
 
           {isLastQuestion ? (
@@ -158,7 +158,7 @@ export function QuizAttemptPage() {
                 <span className="loading loading-spinner"></span>
               ) : (
                 <>
-                  Nộp bài <HiMiniPaperAirplane className="h-5 w-5" />
+                  Submit <HiMiniPaperAirplane className="h-5 w-5" />
                 </>
               )}
             </button>
@@ -167,7 +167,7 @@ export function QuizAttemptPage() {
               className="btn btn-primary px-8 shadow-md transition-all active:scale-95"
               onClick={next}
             >
-              Tiếp tục <HiMiniArrowRight className="h-5 w-5" />
+              Next <HiMiniArrowRight className="h-5 w-5" />
             </button>
           )}
         </div>

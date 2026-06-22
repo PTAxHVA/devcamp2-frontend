@@ -40,12 +40,12 @@ export function useSignup(setError: UseFormSetError<SignupInput>) {
 
         if (code === 'EMAIL_TAKEN') {
           // inline error under email field, NOT a toast
-          setError('email', { message: 'Email đã được dùng' })
+          setError('email', { message: 'This email is already in use' })
         } else {
-          toast.error(message ?? 'Có lỗi xảy ra')
+          toast.error(message ?? 'Something went wrong. Please try again.')
         }
       } else {
-        toast.error('Có lỗi xảy ra')
+        toast.error('Something went wrong. Please try again.')
       }
     },
   })

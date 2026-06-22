@@ -49,14 +49,14 @@ function Section({
   children: React.ReactNode
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-border-soft p-6 flex flex-col gap-5">
+    <div className="border-border-soft flex flex-col gap-5 rounded-2xl border bg-white p-6">
       <div className="flex items-start gap-3">
-        <div className="w-8 h-8 rounded-lg bg-bg-lavender flex items-center justify-center shrink-0">
-          <Icon className="w-4 h-4 text-brand-purple-500" />
+        <div className="bg-bg-lavender flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+          <Icon className="text-brand-purple-500 h-4 w-4" />
         </div>
         <div>
-          <p className="text-sm font-bold text-text-primary">{title}</p>
-          <p className="text-xs text-text-muted mt-0.5">{subtitle}</p>
+          <p className="text-text-primary text-sm font-bold">{title}</p>
+          <p className="text-text-muted mt-0.5 text-xs">{subtitle}</p>
         </div>
       </div>
       {children}
@@ -105,16 +105,16 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto flex flex-col gap-4">
+    <div className="mx-auto flex max-w-5xl flex-col gap-4">
       {/* Header */}
       <div className="mb-2">
-        <h1 className="text-2xl font-extrabold text-text-primary">Settings</h1>
-        <p className="text-sm text-text-muted mt-1">
+        <h1 className="text-text-primary text-2xl font-extrabold">Settings</h1>
+        <p className="text-text-muted mt-1 text-sm">
           Manage your account, preferences, and application settings.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* ── Left column ── */}
         <div className="flex flex-col gap-4">
           {/* Account Settings */}
@@ -125,31 +125,35 @@ export default function SettingsPage() {
           >
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-text-primary">Full name</label>
+                <label className="text-text-primary text-xs font-semibold">Full name</label>
                 <div className="relative">
                   <input
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full px-4 py-2.5 pr-10 rounded-lg border border-border-input text-sm outline-none focus:border-brand-purple-500 transition"
+                    className="border-border-input focus:border-brand-purple-500 w-full rounded-lg border px-4 py-2.5 pr-10 text-sm transition outline-none"
                   />
-                  <User className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                  <User className="text-text-muted absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
                 </div>
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-text-primary">Email address</label>
+                <label className="text-text-primary text-xs font-semibold">Email address</label>
                 <div className="relative">
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-2.5 pr-10 rounded-lg border border-border-input text-sm outline-none focus:border-brand-purple-500 transition"
+                    className="border-border-input focus:border-brand-purple-500 w-full rounded-lg border px-4 py-2.5 pr-10 text-sm transition outline-none"
                   />
-                  <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                  <Mail className="text-text-muted absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
                 </div>
               </div>
               <div className="flex justify-end">
-                <button className="px-5 py-2 rounded-lg bg-[#003B71] text-white text-sm font-semibold hover:bg-[#082A5E] transition">
+                <button
+                  disabled
+                  title="Available after backend integration"
+                  className="cursor-not-allowed rounded-lg bg-[#003B71] px-5 py-2 text-sm font-semibold text-white opacity-50 transition"
+                >
                   Save change
                 </button>
               </div>
@@ -165,21 +169,21 @@ export default function SettingsPage() {
             <div className="flex flex-col gap-3">
               {/* Current password */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-text-primary">Current password</label>
+                <label className="text-text-primary text-xs font-semibold">Current password</label>
                 <div className="relative">
                   <input
                     type={showCurrent ? 'text' : 'password'}
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="Enter current password"
-                    className="w-full px-4 py-2.5 pr-10 rounded-lg border border-border-input text-sm outline-none focus:border-brand-purple-500 transition"
+                    className="border-border-input focus:border-brand-purple-500 w-full rounded-lg border px-4 py-2.5 pr-10 text-sm transition outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => setShowCurrent((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted"
+                    className="text-text-muted absolute top-1/2 right-3 -translate-y-1/2"
                   >
-                    {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showCurrent ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
@@ -187,26 +191,26 @@ export default function SettingsPage() {
               {/* New + Confirm */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-text-primary">New password</label>
+                  <label className="text-text-primary text-xs font-semibold">New password</label>
                   <div className="relative">
                     <input
                       type={showNew ? 'text' : 'password'}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="Enter new password"
-                      className="w-full px-4 py-2.5 pr-10 rounded-lg border border-border-input text-sm outline-none focus:border-brand-purple-500 transition"
+                      className="border-border-input focus:border-brand-purple-500 w-full rounded-lg border px-4 py-2.5 pr-10 text-sm transition outline-none"
                     />
                     <button
                       type="button"
                       onClick={() => setShowNew((v) => !v)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted"
+                      className="text-text-muted absolute top-1/2 right-3 -translate-y-1/2"
                     >
-                      {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-text-primary">
+                  <label className="text-text-primary text-xs font-semibold">
                     Confirm new password
                   </label>
                   <div className="relative">
@@ -215,14 +219,14 @@ export default function SettingsPage() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Confirm new password"
-                      className="w-full px-4 py-2.5 pr-10 rounded-lg border border-border-input text-sm outline-none focus:border-brand-purple-500 transition"
+                      className="border-border-input focus:border-brand-purple-500 w-full rounded-lg border px-4 py-2.5 pr-10 text-sm transition outline-none"
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirm((v) => !v)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted"
+                      className="text-text-muted absolute top-1/2 right-3 -translate-y-1/2"
                     >
-                      {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
                 </div>
@@ -230,7 +234,7 @@ export default function SettingsPage() {
 
               {/* Password rules */}
               <div className="flex flex-col gap-1">
-                <p className="text-xs text-text-muted">Password must include:</p>
+                <p className="text-text-muted text-xs">Password must include:</p>
                 {passwordRules.map((rule) => {
                   const passed = rule.test(newPassword)
                   return (
@@ -246,7 +250,11 @@ export default function SettingsPage() {
               </div>
 
               <div className="flex justify-end">
-                <button className="px-5 py-2 rounded-lg bg-[#003B71] text-white text-sm font-semibold hover:bg-[#082A5E] transition">
+                <button
+                  disabled
+                  title="Available after backend integration"
+                  className="cursor-not-allowed rounded-lg bg-[#003B71] px-5 py-2 text-sm font-semibold text-white opacity-50 transition"
+                >
                   Update password
                 </button>
               </div>
@@ -262,26 +270,26 @@ export default function SettingsPage() {
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <FaGithub className="w-5 h-5 text-text-primary" />
+                  <FaGithub className="text-text-primary h-5 w-5" />
                   <div>
-                    <p className="text-sm font-medium text-text-primary">Github</p>
-                    <p className="text-xs text-text-muted">alexd-dev</p>
+                    <p className="text-text-primary text-sm font-medium">Github</p>
+                    <p className="text-text-muted text-xs">alexd-dev</p>
                   </div>
                 </div>
-                <button className="text-sm font-semibold text-brand-purple-500 hover:underline">
+                <button className="text-brand-purple-500 text-sm font-semibold hover:underline">
                   Continue
                 </button>
               </div>
-              <div className="h-px bg-border-soft" />
+              <div className="bg-border-soft h-px" />
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <FcGoogle className="w-5 h-5" />
+                  <FcGoogle className="h-5 w-5" />
                   <div>
-                    <p className="text-sm font-medium text-text-primary">Google</p>
-                    <p className="text-xs text-text-muted">alex.d@example.com</p>
+                    <p className="text-text-primary text-sm font-medium">Google</p>
+                    <p className="text-text-muted text-xs">alex.d@example.com</p>
                   </div>
                 </div>
-                <button className="text-sm font-semibold text-brand-purple-500 hover:underline">
+                <button className="text-brand-purple-500 text-sm font-semibold hover:underline">
                   Continue
                 </button>
               </div>
@@ -327,8 +335,8 @@ export default function SettingsPage() {
               ].map((item) => (
                 <div key={item.key} className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-sm font-medium text-text-primary">{item.label}</p>
-                    <p className="text-xs text-text-muted mt-0.5">{item.desc}</p>
+                    <p className="text-text-primary text-sm font-medium">{item.label}</p>
+                    <p className="text-text-muted mt-0.5 text-xs">{item.desc}</p>
                   </div>
                   <Toggle
                     enabled={notifications[item.key as keyof typeof notifications]}
@@ -337,10 +345,10 @@ export default function SettingsPage() {
                 </div>
               ))}
 
-              <div className="flex items-center justify-between pt-2 border-t border-border-soft">
-                <p className="text-sm font-medium text-text-primary">Email frequency</p>
-                <button className="flex items-center gap-2 text-sm text-text-primary border border-border-input rounded-lg px-3 py-1.5 hover:bg-bg-section transition">
-                  Instant <ChevronDown className="w-4 h-4" />
+              <div className="border-border-soft flex items-center justify-between border-t pt-2">
+                <p className="text-text-primary text-sm font-medium">Email frequency</p>
+                <button className="text-text-primary border-border-input hover:bg-bg-section flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition">
+                  Instant <ChevronDown className="h-4 w-4" />
                 </button>
               </div>
             </div>
@@ -354,13 +362,13 @@ export default function SettingsPage() {
           >
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                <p className="text-xs font-semibold text-text-primary">Current password</p>
+                <p className="text-text-primary text-xs font-semibold">Theme</p>
                 <div className="flex gap-2">
                   {(['light', 'dark', 'system'] as const).map((t) => (
                     <button
                       key={t}
                       onClick={() => setTheme(t)}
-                      className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg border text-sm font-medium transition ${
+                      className={`flex flex-1 items-center justify-center gap-2 rounded-lg border py-2 text-sm font-medium transition ${
                         theme === t
                           ? 'border-brand-purple-500 bg-bg-lavender text-brand-purple-600'
                           : 'border-border-input text-text-secondary hover:bg-bg-section'
@@ -374,9 +382,9 @@ export default function SettingsPage() {
               </div>
 
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-text-primary">Language</p>
-                <button className="flex items-center gap-2 text-sm text-text-primary border border-border-input rounded-lg px-3 py-1.5 hover:bg-bg-section transition">
-                  English (US) <ChevronDown className="w-4 h-4" />
+                <p className="text-text-primary text-sm font-medium">Language</p>
+                <button className="text-text-primary border-border-input hover:bg-bg-section flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition">
+                  English (US) <ChevronDown className="h-4 w-4" />
                 </button>
               </div>
             </div>
@@ -390,15 +398,15 @@ export default function SettingsPage() {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <LogOut className="w-4 h-4 text-text-muted" />
+                <LogOut className="text-text-muted h-4 w-4" />
                 <div>
-                  <p className="text-sm font-medium text-text-primary">Logout</p>
-                  <p className="text-xs text-text-muted">Log out of your account on this device.</p>
+                  <p className="text-text-primary text-sm font-medium">Logout</p>
+                  <p className="text-text-muted text-xs">Log out of your account on this device.</p>
                 </div>
               </div>
               <button
                 onClick={logout}
-                className="px-4 py-2 rounded-lg border border-border-input text-sm font-semibold text-text-primary hover:bg-bg-section transition"
+                className="border-border-input text-text-primary hover:bg-bg-section rounded-lg border px-4 py-2 text-sm font-semibold transition"
               >
                 Log out
               </button>

@@ -34,7 +34,7 @@ export function useLogin() {
     },
     onError: (err) => {
       const msg = axios.isAxiosError(err) ? err.response?.data?.error?.message : null
-      toast.error(msg ?? 'Có lỗi xảy ra')
+      toast.error(msg ?? 'Something went wrong. Please try again.')
     },
   })
 }

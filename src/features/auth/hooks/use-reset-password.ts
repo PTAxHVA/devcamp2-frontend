@@ -18,9 +18,9 @@ export function useResetPassword() {
     onError: (err) => {
       const code = axios.isAxiosError(err) ? err.response?.data?.error?.code : null
       if (code === 'INVALID_RESET_TOKEN') {
-        toast.error('Link đặt lại không hợp lệ hoặc đã hết hạn')
+        toast.error('This reset link is invalid or has expired.')
       } else {
-        toast.error('Có lỗi xảy ra, vui lòng thử lại')
+        toast.error('Something went wrong. Please try again.')
       }
     },
   })

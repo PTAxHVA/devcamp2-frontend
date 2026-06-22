@@ -1,130 +1,80 @@
+import { useState } from 'react'
 import {
+  User,
+  Mail,
+  Calendar,
   BookOpen,
   Flame,
   TrendingUp,
   Clock,
-  CheckCircle2,
-  HelpCircle,
-  Play,
-  Trophy,
-  Star,
-  ExternalLink,
   Pencil,
+  X,
+  Check,
 } from 'lucide-react'
 import { useMe, useMyProfile } from '@/features/profile/hooks/use-profile'
 
-// ── Mock data (xóa khi BE ship) ──
-const mockRoadmaps = [
-  { id: 1, title: 'Frontend Web Development', progress: 58, done: 8, total: 14 },
-  { id: 2, title: 'Backend Web Development', progress: 36, done: 5, total: 14 },
-  { id: 3, title: 'Fullstack Web Development', progress: 22, done: 3, total: 14 },
-]
-
-const mockActivity = [
-  {
-    icon: CheckCircle2,
-    color: 'text-green-500',
-    type: 'Completed topic',
-    title: 'DOM & Events',
-    sub: 'in Frontend Web Development',
-    time: '2 days ago',
-  },
-  {
-    icon: HelpCircle,
-    color: 'text-brand-purple-400',
-    type: 'Quiz completed',
-    title: 'JavaScript Basics Quiz',
-    sub: 'Score: 92%',
-    time: '3 days ago',
-  },
-  {
-    icon: Play,
-    color: 'text-blue-400',
-    type: 'Started roadmap',
-    title: 'Backend Web Development',
-    sub: '',
-    time: '5 days ago',
-  },
-  {
-    icon: CheckCircle2,
-    color: 'text-green-500',
-    type: 'Completed topic',
-    title: 'HTML & CSS',
-    sub: 'in Frontend Web Development',
-    time: '1 week ago',
-  },
-  {
-    icon: Trophy,
-    color: 'text-yellow-500',
-    type: 'Earned achievement',
-    title: '7 Day Streak',
-    sub: 'Keep it up!',
-    time: '1 week ago',
-  },
-]
-// ────────────────────────────────
-
+// Fix: thêm cả key chữ hoa lẫn chữ thường để handle BE trả 'BEGINNER' hoặc 'beginner'
 const levelLabel: Record<string, string> = {
-  beginner: 'Learner',
+  beginner: 'Beginner',
   intermediate: 'Intermediate',
   advanced: 'Advanced',
+  BEGINNER: 'Beginner',
+  INTERMEDIATE: 'Intermediate',
+  ADVANCED: 'Advanced',
 }
 
-function RoadmapCard({
+const levelOptions = [
+  { value: 'beginner', label: 'Beginner' },
+  { value: 'intermediate', label: 'Intermediate' },
+  { value: 'advanced', label: 'Advanced' },
+]
+
+function Section({
+  icon: Icon,
   title,
-  progress,
-  done,
-  total,
+  subtitle,
+  children,
 }: {
+  icon: React.ElementType
   title: string
-  progress: number
-  done: number
-  total: number
+  subtitle: string
+  children: React.ReactNode
 }) {
   return (
-    <div className="flex-1 min-w-0 rounded-xl border border-border-soft bg-white p-4 flex flex-col gap-3">
-      {/* Mini roadmap illustration placeholder */}
-      <div className="w-full h-24 bg-bg-section rounded-lg flex items-center justify-center">
-        <div className="flex flex-col items-center gap-1 text-xs text-text-muted opacity-60 select-none">
-          <div className="flex gap-3">
-            <span className="px-2 py-0.5 border border-border-input rounded text-[10px]">
-              Frontend
-            </span>
-          </div>
-          <div className="w-px h-3 bg-border-input" />
-          <div className="flex gap-3">
-            <span className="px-2 py-0.5 border border-border-input rounded text-[10px]">
-              Web Fundamentals
-            </span>
-          </div>
-          <div className="flex gap-4">
-            <div className="w-px h-3 bg-border-input" />
-            <div className="w-px h-3 bg-border-input" />
-          </div>
-          <div className="flex gap-2">
-            <span className="px-1.5 py-0.5 border border-border-input rounded text-[10px]">
-              HTML & CSS
-            </span>
-            <span className="px-1.5 py-0.5 border border-border-input rounded text-[10px]">
-              JS Basics
-            </span>
-          </div>
+    <div className="border-border-soft flex flex-col gap-5 rounded-2xl border bg-white p-6">
+      <div className="flex items-start gap-3">
+        <div className="bg-bg-lavender flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+          <Icon className="text-brand-purple-500 h-4 w-4" />
+        </div>
+        <div>
+          <p className="text-text-primary text-sm font-bold">{title}</p>
+          <p className="text-text-muted mt-0.5 text-xs">{subtitle}</p>
         </div>
       </div>
+      {children}
+    </div>
+  )
+}
 
-      <p className="text-sm font-bold text-text-primary leading-snug">{title}</p>
-
-      {/* Progress bar */}
-      <div className="w-full h-1.5 rounded-full bg-border-soft overflow-hidden">
-        <div
-          className="h-full rounded-full bg-brand-purple-500 transition-all"
-          style={{ width: `${progress}%` }}
-        />
+function StatCard({
+  icon: Icon,
+  value,
+  label,
+  sub,
+}: {
+  icon: React.ElementType
+  value: string | number | null
+  label: string
+  sub: string
+}) {
+  return (
+    <div className="border-border-soft flex flex-col gap-2 rounded-2xl border bg-white p-5">
+      <div className="flex items-center gap-2">
+        <Icon className="text-brand-purple-500 h-4 w-4" />
+        <span className="text-text-primary text-2xl font-extrabold">{value ?? '—'}</span>
       </div>
-
-      <p className="text-xs text-text-muted">
-        {progress}% complete • {done} of {total} topics
-      </p>
+      <p className="text-text-primary text-xs font-semibold">{label}</p>
+      <p className="text-text-muted text-xs">{sub}</p>
     </div>
   )
 }
@@ -133,13 +83,9 @@ export default function ProfilePage() {
   const { data: me, isLoading: loadingMe } = useMe()
   const { data: profile, isLoading: loadingProfile } = useMyProfile()
 
-  if (loadingMe || loadingProfile) {
-    return (
-      <div className="flex items-center justify-center h-60">
-        <span className="loading loading-spinner loading-md text-brand-purple-500" />
-      </div>
-    )
-  }
+  const [editing, setEditing] = useState(false)
+  const [username, setUsername] = useState('')
+  const [level, setLevel] = useState('')
 
   const initials = me?.username?.slice(0, 2).toUpperCase() ?? 'U'
   const joinedDate = me?.createdAt
@@ -148,156 +94,212 @@ export default function ProfilePage() {
         month: 'long',
         day: 'numeric',
       })
-    : 'March 12, 2025'
+    : '—'
+
+  // Fix: normalize level về lowercase để map đúng
+  const normalizedLevel = profile?.level?.toLowerCase() ?? ''
+  const displayLevel = levelLabel[normalizedLevel] ?? '—'
+
+  const handleEdit = () => {
+    setUsername(me?.username ?? '')
+    setLevel(normalizedLevel || 'beginner')
+    setEditing(true)
+  }
+
+  const handleCancel = () => setEditing(false)
+
+  const handleSave = () => {
+    // TODO: wire PATCH /me/profile khi Yoshio ship
+    setEditing(false)
+  }
+
+  if (loadingMe || loadingProfile) {
+    return (
+      <div className="flex h-60 items-center justify-center">
+        <span className="loading loading-spinner loading-md text-brand-purple-500" />
+      </div>
+    )
+  }
 
   return (
-    <div className="flex gap-5 items-start">
-      {/* ── Left (main) ── */}
-      <div className="flex-1 min-w-0 flex flex-col gap-4">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-extrabold text-text-primary">Profile</h1>
-          <p className="text-sm text-text-muted mt-0.5">Your learning journey at a glance.</p>
-        </div>
-
-        {/* Profile card */}
-        <div className="bg-white rounded-2xl border border-border-soft p-6 flex items-start gap-5">
-          {/* Avatar */}
-          <div className="w-20 h-20 rounded-full bg-brand-purple-300/30 flex items-center justify-center shrink-0">
-            <div className="w-12 h-12 rounded-full bg-brand-purple-300/50 flex items-center justify-center text-brand-purple-600 font-bold text-xl">
-              {initials}
-            </div>
-          </div>
-
-          {/* Info */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <h2 className="text-xl font-bold text-text-primary">{me?.username ?? 'Alex D.'}</h2>
-              <span className="px-2.5 py-0.5 rounded-full border border-brand-purple-400 text-xs font-semibold text-brand-purple-600">
-                {levelLabel[profile?.level] ?? 'Learner'}
-              </span>
-            </div>
-            <p className="text-sm text-text-muted mb-2">{me?.email ?? 'alex.d@example.com'}</p>
-            <p className="text-sm text-text-secondary mb-3">
-              Passionate about building intuitive web experiences and continuously leveling up my
-              skills.
-            </p>
-            <div className="flex items-center gap-1.5 text-xs text-text-muted">
-              <Clock className="w-3.5 h-3.5" />
-              Joined {joinedDate}
-            </div>
-          </div>
-
-          {/* Edit button */}
-          <button className="flex items-center gap-2 px-4 py-2 rounded-xl border border-border-input text-sm font-semibold text-text-primary hover:bg-bg-section transition shrink-0">
-            <Pencil className="w-3.5 h-3.5" /> Edit profile
-          </button>
-        </div>
-
-        {/* Active Roadmaps */}
-        <div className="bg-white rounded-2xl border border-border-soft p-6 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-bold text-text-primary">Active roadmaps</p>
-              <p className="text-xs text-text-muted mt-0.5">Roadmaps you're currently following.</p>
-            </div>
-            <button className="flex items-center gap-1 text-xs font-semibold text-brand-purple-500 hover:underline">
-              View all roadmaps <ExternalLink className="w-3 h-3" />
-            </button>
-          </div>
-          <div className="flex gap-3">
-            {mockRoadmaps.map((r) => (
-              <RoadmapCard key={r.id} {...r} />
-            ))}
-          </div>
-        </div>
-
-        {/* Banner */}
-        <div className="bg-white rounded-2xl border border-border-soft p-5 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Star className="w-8 h-8 text-yellow-400 shrink-0" />
-            <div>
-              <p className="text-sm font-bold text-text-primary">Keep learning, keep growing!</p>
-              <p className="text-xs text-text-muted">
-                You're making great progress. Stay consistent and unlock new achievements.
-              </p>
-            </div>
-          </div>
-          <button className="px-5 py-2.5 rounded-xl bg-brand-purple-500 text-white text-sm font-semibold hover:bg-brand-purple-600 transition shrink-0">
-            Explore Roadmaps
-          </button>
-        </div>
+    <div className="mx-auto flex max-w-5xl flex-col gap-4">
+      <div className="mb-2">
+        <h1 className="text-text-primary text-2xl font-extrabold">Profile</h1>
+        <p className="text-text-muted mt-1 text-sm">View and manage your personal information.</p>
       </div>
 
-      {/* ── Right (stats + activity) ── */}
-      <div className="w-72 shrink-0 flex flex-col gap-4">
-        {/* Learning stats */}
-        <div className="bg-white rounded-2xl border border-border-soft p-5 flex flex-col gap-4">
-          <p className="text-sm font-bold text-text-primary">Learning stats</p>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-1.5 text-brand-purple-500">
-                <BookOpen className="w-4 h-4" />
-                <span className="text-xl font-extrabold text-text-primary">28</span>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {/* ── Left ── */}
+        <div className="flex flex-col gap-4">
+          <Section icon={User} title="Personal information" subtitle="Your public profile details.">
+            <div className="flex items-center gap-4">
+              <div className="bg-brand-purple-400 flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-xl font-bold text-white">
+                {initials}
               </div>
-              <p className="text-xs font-semibold text-text-primary">Topics completed</p>
-              <p className="text-xs text-text-muted">Across all roadmaps</p>
-            </div>
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-1.5 text-brand-purple-500">
-                <Flame className="w-4 h-4" />
-                <span className="text-xl font-extrabold text-text-primary">
-                  {profile?.streak ?? 7}
-                </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-text-primary text-base font-bold">{me?.username ?? '—'}</p>
+                {displayLevel !== '—' && (
+                  <span className="border-brand-purple-400 text-brand-purple-600 mt-1 inline-block rounded-full border px-2.5 py-0.5 text-xs font-semibold">
+                    {displayLevel}
+                  </span>
+                )}
               </div>
-              <p className="text-xs font-semibold text-text-primary">Day streak</p>
-              <p className="text-xs text-text-muted">Keep it going!</p>
+              {!editing && (
+                <button
+                  onClick={handleEdit}
+                  className="border-border-input text-text-primary hover:bg-bg-section flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition"
+                >
+                  <Pencil className="h-3.5 w-3.5" /> Edit
+                </button>
+              )}
             </div>
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-1.5 text-brand-purple-500">
-                <TrendingUp className="w-4 h-4" />
-                <span className="text-xl font-extrabold text-text-primary">87%</span>
+
+            {editing && (
+              <div className="border-border-soft flex flex-col gap-3 border-t pt-2">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-text-primary text-xs font-semibold">Full name</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      className="border-border-input focus:border-brand-purple-500 w-full rounded-lg border px-4 py-2.5 pr-10 text-sm transition outline-none"
+                    />
+                    <User className="text-text-muted absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-text-primary text-xs font-semibold">Level</label>
+                  <select
+                    value={level}
+                    onChange={(e) => setLevel(e.target.value)}
+                    className="border-border-input focus:border-brand-purple-500 w-full rounded-lg border bg-white px-4 py-2.5 text-sm transition outline-none"
+                  >
+                    {levelOptions.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={handleCancel}
+                    className="border-border-input text-text-primary hover:bg-bg-section flex items-center gap-1.5 rounded-lg border px-4 py-2 text-xs font-semibold transition"
+                  >
+                    <X className="h-3.5 w-3.5" /> Cancel
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    className="flex items-center gap-1.5 rounded-lg bg-[#003B71] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#082A5E]"
+                  >
+                    <Check className="h-3.5 w-3.5" /> Save changes
+                  </button>
+                </div>
               </div>
-              <p className="text-xs font-semibold text-text-primary">Quiz average</p>
-              <p className="text-xs text-text-muted">Last 30 days</p>
-            </div>
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-1.5 text-brand-purple-500">
-                <Clock className="w-4 h-4" />
-                <span className="text-xl font-extrabold text-text-primary">32.5</span>
+            )}
+
+            {!editing && (
+              <div className="border-border-soft flex flex-col gap-3 border-t pt-2">
+                <div className="flex items-center gap-3">
+                  <Mail className="text-text-muted h-4 w-4 shrink-0" />
+                  <div>
+                    <p className="text-text-muted text-xs">Email</p>
+                    <p className="text-text-primary text-sm font-medium">{me?.email ?? '—'}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Calendar className="text-text-muted h-4 w-4 shrink-0" />
+                  <div>
+                    <p className="text-text-muted text-xs">Joined</p>
+                    <p className="text-text-primary text-sm font-medium">{joinedDate}</p>
+                  </div>
+                </div>
               </div>
-              <p className="text-xs font-semibold text-text-primary">Total learning hours</p>
-              <p className="text-xs text-text-muted">All time</p>
+            )}
+          </Section>
+
+          <Section icon={Pencil} title="Bio" subtitle="Tell others a little about yourself.">
+            <textarea
+              rows={3}
+              placeholder="Write a short bio..."
+              className="border-border-input focus:border-brand-purple-500 text-text-primary placeholder:text-text-muted w-full resize-none rounded-lg border px-4 py-2.5 text-sm transition outline-none"
+            />
+            <div className="flex justify-end">
+              <button className="rounded-lg bg-[#003B71] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#082A5E]">
+                Save bio
+              </button>
             </div>
-          </div>
+          </Section>
         </div>
 
-        {/* Recent activity */}
-        <div className="bg-white rounded-2xl border border-border-soft p-5 flex flex-col gap-4">
-          <div>
-            <p className="text-sm font-bold text-text-primary">Recent activity</p>
-            <p className="text-xs text-text-muted mt-0.5">See what you've been up to.</p>
-          </div>
-          <div className="flex flex-col gap-3">
-            {mockActivity.map((item, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <div
-                  className={`w-7 h-7 rounded-full bg-bg-section flex items-center justify-center shrink-0 ${item.color}`}
-                >
-                  <item.icon className="w-3.5 h-3.5" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-text-muted">{item.type}</p>
-                  <p className="text-xs font-semibold text-text-primary truncate">{item.title}</p>
-                  {item.sub && <p className="text-xs text-text-muted">{item.sub}</p>}
-                </div>
-                <span className="text-xs text-text-muted shrink-0">{item.time}</span>
+        {/* ── Right ── */}
+        <div className="flex flex-col gap-4">
+          {/* Learning stats — chỉ hiện streak thật từ BE, còn lại chờ endpoint */}
+          <div className="border-border-soft flex flex-col gap-4 rounded-2xl border bg-white p-6">
+            <div className="flex items-start gap-3">
+              <div className="bg-bg-lavender flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+                <TrendingUp className="text-brand-purple-500 h-4 w-4" />
               </div>
-            ))}
+              <div>
+                <p className="text-text-primary text-sm font-bold">Learning stats</p>
+                <p className="text-text-muted mt-0.5 text-xs">Your progress at a glance.</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {/* Streak — lấy từ BE */}
+              <StatCard
+                icon={Flame}
+                value={profile?.streak ?? null}
+                label="Day streak"
+                sub="Keep it going!"
+              />
+              {/* Topics completed — chờ /me/progress */}
+              <StatCard
+                icon={BookOpen}
+                value={null}
+                label="Topics completed"
+                sub="Available soon"
+              />
+              {/* Quiz avg — chờ /dashboard */}
+              <StatCard icon={TrendingUp} value={null} label="Quiz average" sub="Available soon" />
+              {/* Learning hours — chờ /dashboard */}
+              <StatCard
+                icon={Clock}
+                value={null}
+                label="Total learning hours"
+                sub="Available soon"
+              />
+            </div>
           </div>
-          <button className="flex items-center gap-1 text-xs font-semibold text-brand-purple-500 hover:underline">
-            View all activity <ExternalLink className="w-3 h-3" />
-          </button>
+
+          <Section icon={User} title="Account status" subtitle="Your current account information.">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <p className="text-text-primary text-sm">Account status</p>
+                <span
+                  className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                    me?.isActive ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'
+                  }`}
+                >
+                  {me?.isActive ? 'Active' : 'Inactive'}
+                </span>
+              </div>
+              <div className="bg-border-soft h-px" />
+              <div className="flex items-center justify-between">
+                <p className="text-text-primary text-sm">Onboarding</p>
+                <span
+                  className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                    me?.onboardingCompleted
+                      ? 'bg-green-50 text-green-600'
+                      : 'bg-yellow-50 text-yellow-600'
+                  }`}
+                >
+                  {me?.onboardingCompleted ? 'Completed' : 'Pending'}
+                </span>
+              </div>
+            </div>
+          </Section>
         </div>
       </div>
     </div>
