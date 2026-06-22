@@ -104,7 +104,7 @@ export default function ProfilePage() {
         month: 'long',
         day: 'numeric',
       })
-    : 'March 12, 2025'
+    : '—'
 
   return (
     <div className="flex items-start gap-5">
@@ -128,12 +128,12 @@ export default function ProfilePage() {
           {/* Info */}
           <div className="min-w-0 flex-1">
             <div className="mb-1 flex items-center gap-2">
-              <h2 className="text-text-primary text-xl font-bold">{me?.username ?? 'Alex D.'}</h2>
+              <h2 className="text-text-primary text-xl font-bold">{me?.username ?? ''}</h2>
               <span className="border-brand-purple-400 text-brand-purple-600 rounded-full border px-2.5 py-0.5 text-xs font-semibold">
                 {levelLabel[profile?.level?.toLowerCase()] ?? 'Learner'}
               </span>
             </div>
-            <p className="text-text-muted mb-2 text-sm">{me?.email ?? 'alex.d@example.com'}</p>
+            <p className="text-text-muted mb-2 text-sm">{me?.email ?? ''}</p>
             <p className="text-text-secondary mb-3 text-sm">
               Passionate about building intuitive web experiences and continuously leveling up my
               skills.
