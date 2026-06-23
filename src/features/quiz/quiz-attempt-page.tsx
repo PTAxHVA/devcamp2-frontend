@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router'
 import { FiClock, FiZap } from 'react-icons/fi'
 import { HiMiniArrowLeft, HiMiniArrowRight, HiMiniPaperAirplane } from 'react-icons/hi2'
@@ -12,7 +12,7 @@ import { useQuizTimer } from '@/features/quiz/hooks/use-quiz-timer'
 
 // Section quizzes require >=80% to pass (product spec).
 const PASS_THRESHOLD = 80
-// Client-side time budget shown to the learner. Display only — it does not auto-submit.
+// Client-side time budget. When it expires, the current answers are submitted.
 const QUIZ_DURATION_SECONDS = 10 * 60
 
 export function QuizAttemptPage() {
@@ -23,10 +23,57 @@ export function QuizAttemptPage() {
   const { attemptId, questions, currentIndex, answers, setAnswer, next, prev, reset } =
     useQuizStore()
   const submit = useSubmitQuiz(attemptId ?? '')
-  const { formatted, isUrgent } = useQuizTimer(QUIZ_DURATION_SECONDS)
+  const isQuizReady = !isLoading && !error && !!quizId && !!attemptId && questions.length > 0
+  const { formatted, isUrgent, isExpired } = useQuizTimer(
+    QUIZ_DURATION_SECONDS,
+    isQuizReady && !submit.isPending,
+  )
+  const didAutoSubmit = useRef(false)
 
   // Clear the session on unmount so a stale attempt never bleeds into the next quiz.
   useEffect(() => reset, [reset])
+
+  const buildPayload = useCallback(
+    () =>
+      questions.flatMap((q) => {
+        const val = answers[q.id]
+        if (val === undefined || val === '') return []
+        return [
+          q.type === 'mcq'
+            ? { questionId: q.id, selectedOptionId: val }
+            : { questionId: q.id, userInput: val },
+        ]
+      }),
+    [answers, questions],
+  )
+
+  const submitAttempt = useCallback(
+    ({ allowEmpty = false, isTimedOut = false } = {}) => {
+      if (!attemptId || submit.isPending) return
+
+      const payload = buildPayload()
+      if (!allowEmpty && payload.length === 0) {
+        toast.error('Please answer at least one question before submitting.')
+        return
+      }
+
+      if (isTimedOut) {
+        toast("Time's up. Submitting your quiz now.")
+      }
+
+      submit.mutate(payload, {
+        onSuccess: (result) =>
+          navigate(`/quizzes/${result.quizAttemptId}/result/${result.isPassed ? 'pass' : 'fail'}`),
+      })
+    },
+    [attemptId, buildPayload, navigate, submit],
+  )
+
+  useEffect(() => {
+    if (!isExpired || !isQuizReady || didAutoSubmit.current) return
+    didAutoSubmit.current = true
+    submitAttempt({ allowEmpty: true, isTimedOut: true })
+  }, [isExpired, isQuizReady, submitAttempt])
 
   if (isLoading) {
     return (
@@ -58,24 +105,8 @@ export function QuizAttemptPage() {
   const currentAnswer = answers[current.id]
 
   const handleSubmit = () => {
-    if (!attemptId) return
-    const payload = questions.flatMap((q) => {
-      const val = answers[q.id]
-      if (val === undefined || val === '') return []
-      return [
-        q.type === 'mcq'
-          ? { questionId: q.id, selectedOptionId: val }
-          : { questionId: q.id, userInput: val },
-      ]
-    })
-    if (payload.length === 0) {
-      toast.error('Please answer at least one question before submitting.')
-      return
-    }
-    submit.mutate(payload, {
-      onSuccess: (result) =>
-        navigate(`/quizzes/${result.quizAttemptId}/result/${result.isPassed ? 'pass' : 'fail'}`),
-    })
+    if (isExpired) return
+    submitAttempt()
   }
 
   return (
@@ -123,7 +154,7 @@ export function QuizAttemptPage() {
             <div className="mt-10 flex items-center justify-between border-t pt-6">
               <button
                 onClick={prev}
-                disabled={isFirst}
+                disabled={isFirst || isExpired || submit.isPending}
                 className="btn btn-ghost font-bold text-indigo-600 disabled:opacity-40"
               >
                 <HiMiniArrowLeft className="h-5 w-5" /> Previous
@@ -131,7 +162,7 @@ export function QuizAttemptPage() {
               {isLast ? (
                 <button
                   onClick={handleSubmit}
-                  disabled={submit.isPending}
+                  disabled={submit.isPending || isExpired}
                   className="btn h-12 rounded-xl bg-slate-900 px-8 text-white hover:bg-slate-800"
                 >
                   {submit.isPending ? (
@@ -145,6 +176,7 @@ export function QuizAttemptPage() {
               ) : (
                 <button
                   onClick={next}
+                  disabled={isExpired || submit.isPending}
                   className="btn h-12 rounded-xl bg-slate-900 px-8 text-white hover:bg-slate-800"
                 >
                   Next <HiMiniArrowRight className="h-5 w-5" />
@@ -167,7 +199,7 @@ export function QuizAttemptPage() {
                 </div>
                 <div>
                   <p className="text-xs font-bold tracking-wider text-slate-500 uppercase">
-                    Time remaining
+                    {isExpired ? 'Time expired' : 'Time remaining'}
                   </p>
                   <p
                     className={`text-2xl font-black ${isUrgent ? 'text-red-600' : 'text-slate-800'}`}
