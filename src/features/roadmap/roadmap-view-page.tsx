@@ -15,6 +15,7 @@ import {
   RiArrowRightLine,
   RiExternalLinkLine,
   RiBookmark2Line,
+  RiEditLine,
 } from 'react-icons/ri'
 
 import { RoadmapGraph } from './components/roadmap-graph'
@@ -31,7 +32,7 @@ const RoadmapViewPage = () => {
 
   const { layoutedNodes, layoutedEdges } = useMemo(() => {
     if (!roadmapDetail) return { layoutedNodes: [], layoutedEdges: [] }
-    const { nodes, edges } = buildFlowGraph(roadmapDetail)
+    const { nodes, edges } = buildFlowGraph(roadmapDetail, { synthesizeSequentialEdges: true })
     return { layoutedNodes: nodes, layoutedEdges: edges }
   }, [roadmapDetail])
 
@@ -93,12 +94,20 @@ const RoadmapViewPage = () => {
     <div className="flex h-full max-w-420">
       <div className="flex flex-1 flex-col overflow-hidden bg-white p-6 lg:p-8">
         <div className="w-full">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="text-brand-purple-600 hover:text-brand-purple-700 mb-4 flex cursor-pointer items-center gap-2 text-sm font-semibold transition-colors"
-          >
-            <RiArrowLeftLine /> Back to Dashboard
-          </button>
+          <div className="mb-4 flex items-center justify-between">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="text-brand-purple-600 hover:text-brand-purple-700 flex cursor-pointer items-center gap-2 text-sm font-semibold transition-colors"
+            >
+              <RiArrowLeftLine /> Back to Dashboard
+            </button>
+            <button
+              onClick={() => navigate(`/roadmaps/${id}/edit`)}
+              className="border-border-soft text-text-secondary hover:bg-bg-section flex cursor-pointer items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-semibold transition-colors"
+            >
+              <RiEditLine /> Edit roadmap
+            </button>
+          </div>
           <div className="mb-2 flex items-center gap-3">
             <h1 className="text-text-primary text-3xl font-bold">{title}</h1>
             <RiBookmarkLine className="text-brand-purple-600 text-2xl" />

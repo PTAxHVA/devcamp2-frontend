@@ -2,6 +2,20 @@ import axios from 'axios'
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios'
 import toast from 'react-hot-toast'
 
+export interface ApiError {
+  code: string | undefined
+  message: string | undefined
+}
+
+/** Extract `{code, message}` from the BE error envelope: `response.data.error`. */
+export function extractApiError(err: unknown): ApiError {
+  if (axios.isAxiosError(err)) {
+    const data = (err as AxiosError<{ error?: { code?: string; message?: string } }>).response?.data
+    return { code: data?.error?.code, message: data?.error?.message }
+  }
+  return { code: undefined, message: undefined }
+}
+
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1/client'
 
 /**

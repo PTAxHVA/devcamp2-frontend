@@ -1,7 +1,6 @@
-import { apiClient } from '@/lib/api-client'
+import { apiClient, extractApiError } from '@/lib/api-client'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
-import axios from 'axios'
 import { useAuthStore } from '@/stores/auth-store'
 import { useNavigate } from 'react-router'
 import type { UseFormSetError } from 'react-hook-form'
@@ -34,18 +33,12 @@ export function useSignup(setError: UseFormSetError<SignupInput>) {
       navigate('/onboarding') // new user → always onboarding
     },
     onError: (err) => {
-      if (axios.isAxiosError(err)) {
-        const code = err.response?.data?.error?.code
-        const message = err.response?.data?.error?.message
-
-        if (code === 'EMAIL_TAKEN') {
-          // inline error under email field, NOT a toast
-          setError('email', { message: 'Email is already in use' })
-        } else {
-          toast.error(message ?? 'Something went wrong')
-        }
+      const { code, message } = extractApiError(err)
+      if (code === 'EMAIL_TAKEN') {
+        // inline error under email field, NOT a toast
+        setError('email', { message: 'Email is already in use' })
       } else {
-        toast.error('Something went wrong')
+        toast.error(message ?? 'Something went wrong')
       }
     },
   })

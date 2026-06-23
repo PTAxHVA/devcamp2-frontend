@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router'
 import toast from 'react-hot-toast'
-import { apiClient } from '@/lib/api-client'
+import { apiClient, extractApiError } from '@/lib/api-client'
 import { logger } from '@/lib/logger'
 import type { BrowseRoadmap } from '@/features/roadmap/hooks/use-browse-roadmaps'
 import type { MasterRoadmapPreview } from '@/features/roadmap/hooks/use-master-roadmap'
@@ -63,8 +63,7 @@ export function useCompleteOnboarding() {
       navigate('/dashboard')
     },
     onError: (err: unknown) => {
-      const code = (err as { response?: { data?: { error?: { code?: string } } } })?.response?.data
-        ?.error?.code
+      const { code } = extractApiError(err)
       logger.error('onboarding', 'Failed to complete onboarding', err)
 
       if (code === 'ROADMAP_ALREADY_ACTIVE') {

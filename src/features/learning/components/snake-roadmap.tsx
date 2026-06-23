@@ -35,6 +35,7 @@ export default function RoadmapSnakePath({
         {[
           { color: 'bg-emerald-500', label: 'Completed' },
           { color: 'bg-amber-500', label: 'In Progress' },
+          { color: 'bg-purple-300', label: 'Ready to Start' },
           { color: 'bg-slate-200', label: 'Locked' },
         ].map(({ color, label }) => (
           <div
@@ -77,6 +78,7 @@ export default function RoadmapSnakePath({
                   const isActive = activeTopicId === node.masterTopicId
                   const isCompleted = node.status === 'completed'
                   const isInProgress = node.status === 'in_progress'
+                  const isAvailable = node.status === 'available'
 
                   // Only "done" segments draw a solid connector; everything else is dashed.
                   const isNextUnlocked =
@@ -90,11 +92,8 @@ export default function RoadmapSnakePath({
                     ? null
                     : topics.findIndex((t) => t.masterTopicId === node.masterTopicId) + 1
 
-                  // Only 3 states: slate (locked / not started yet), emerald (completed),
-                  // amber (in progress). There is no "available" state — anything not done
-                  // and not in progress stays slate. The node the user clicks (active) just
-                  // gets a highlight ring so they can see what they selected; it only turns
-                  // amber once they actually start learning it (status -> in_progress).
+                  // 4 states: slate/gray (locked), purple (available/ready), emerald (completed),
+                  // amber (in progress). "available" = prerequisites met, user can start now.
                   let ringCls = isActive
                     ? 'bg-white ring-2 ring-slate-400'
                     : 'bg-white ring-1 ring-slate-200'
@@ -136,6 +135,14 @@ export default function RoadmapSnakePath({
                     icon = <RiPlayMiniFill size={22} />
                     tooltipBg = 'bg-amber-500'
                     tooltipArrow = 'border-t-amber-500'
+                  } else if (isAvailable) {
+                    ringCls = isActive
+                      ? 'bg-white ring-2 ring-purple-300'
+                      : 'bg-white ring-2 ring-purple-200'
+                    circleCls = 'bg-purple-100 text-purple-700'
+                    labelCls = 'text-purple-700 font-semibold'
+                    tooltipBg = 'bg-purple-700'
+                    tooltipArrow = 'border-t-purple-700'
                   }
 
                   // Calm: only the topic actively being learned pulses.

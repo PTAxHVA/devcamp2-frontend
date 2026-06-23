@@ -1,11 +1,26 @@
-import { QueryClient } from '@tanstack/react-query'
+import { QueryClient, QueryCache } from '@tanstack/react-query'
 import axios from 'axios'
+import toast from 'react-hot-toast'
+import { extractApiError } from './api-client'
 
 /**
  * Shared TanStack Query client.
  * Defaults tuned for learning platform: 1 min stale, no refetch on focus.
+ * Global query error handler surfaces BE error messages so each query hook
+ * doesn't need its own onError toast.
  */
 export const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status
+        // 401 is handled by the api-client interceptor (redirect to login).
+        if (status === 401) return
+        const { message } = extractApiError(error)
+        toast.error(message ?? 'Something went wrong. Please try again.')
+      }
+    },
+  }),
   defaultOptions: {
     queries: {
       staleTime: 60 * 1000,

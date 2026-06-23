@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import { apiClient } from '@/lib/api-client'
+import { apiClient, extractApiError } from '@/lib/api-client'
 import { roadmapSlug } from '@/features/learning/lib/roadmap-slug'
 
 interface EnrollVars {
@@ -36,8 +36,7 @@ export function useEnrollRoadmap() {
       navigate(`/my-learning/${roadmapSlug(vars.roleName)}`)
     },
     onError: (err: unknown, vars) => {
-      const code = (err as { response?: { data?: { error?: { code?: string } } } })?.response?.data
-        ?.error?.code
+      const { code } = extractApiError(err)
       if (code === 'ROADMAP_ALREADY_ACTIVE') {
         // Already enrolled — just take them to the roadmap instead of erroring.
         navigate(`/my-learning/${roadmapSlug(vars.roleName)}`)

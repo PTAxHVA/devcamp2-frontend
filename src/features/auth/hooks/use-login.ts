@@ -1,7 +1,6 @@
-import { apiClient } from '@/lib/api-client'
+import { apiClient, extractApiError } from '@/lib/api-client'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
-import axios from 'axios'
 import { useAuthStore } from '@/stores/auth-store'
 import { useNavigate } from 'react-router'
 
@@ -36,8 +35,8 @@ export function useLogin() {
       }
     },
     onError: (err) => {
-      const msg = axios.isAxiosError(err) ? err.response?.data?.error?.message : null
-      toast.error(msg ?? 'Something went wrong')
+      const { message } = extractApiError(err)
+      toast.error(message ?? 'Something went wrong')
     },
   })
 }

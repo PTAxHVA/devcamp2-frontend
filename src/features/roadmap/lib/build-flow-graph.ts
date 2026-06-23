@@ -26,19 +26,31 @@ const isTopicCompleted = (t: BEGraphTopic) =>
  * - locked      : no section progress and at least one in-roadmap prerequisite is not completed
  */
 export function deriveTopicStatuses(topics: BEGraphTopic[]): Map<string, BackendStatus> {
+  const ordered = [...topics].sort((a, b) => a.orderIndex - b.orderIndex)
   const idSet = new Set(topics.map((t) => t.masterTopicId))
   const completed = new Set(topics.filter(isTopicCompleted).map((t) => t.masterTopicId))
 
   const result = new Map<string, BackendStatus>()
-  for (const t of topics) {
+  for (let i = 0; i < ordered.length; i++) {
+    const t = ordered[i]
     let status: BackendStatus
     if (isTopicCompleted(t)) {
       status = 'completed'
     } else if (t.sectionCompleted > 0) {
       status = 'in_progress'
+    } else if (i === 0) {
+      // Root topic is always available — nothing in the roadmap can block it.
+      status = 'available'
     } else {
-      const prereqs = t.prerequisiteTopicIds.filter((id) => idSet.has(id))
-      status = prereqs.every((id) => completed.has(id)) ? 'available' : 'locked'
+      const inRoadmapPrereqs = t.prerequisiteTopicIds.filter((id) => idSet.has(id))
+      if (inRoadmapPrereqs.length > 0) {
+        // Explicit prerequisite graph: available when all prereqs are done.
+        status = inRoadmapPrereqs.every((id) => completed.has(id)) ? 'available' : 'locked'
+      } else {
+        // No prerequisites seeded: sequential unlock — only available after the
+        // immediately preceding topic (by orderIndex) is completed.
+        status = completed.has(ordered[i - 1].masterTopicId) ? 'available' : 'locked'
+      }
     }
     result.set(t.masterTopicId, status)
   }
