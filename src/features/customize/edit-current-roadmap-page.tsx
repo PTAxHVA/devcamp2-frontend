@@ -385,7 +385,7 @@ export default function EditCurrentRoadmapPage() {
                 ) : (
                   <p className="text-text-muted flex items-start gap-2 text-xs">
                     <RiInformationLine className="mt-0.5 shrink-0 text-sm" />
-                    Use the toolbar to remove or reorder this topic.
+                    Use the toolbar to remove this topic.
                   </p>
                 )}
               </div>

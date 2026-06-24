@@ -81,7 +81,9 @@ export default function TopicDetailSidebar({ topic }: TopicDetailSidebarProps) {
       ? 'Review Topic'
       : topic.status === 'in_progress'
         ? 'Continue Learning'
-        : 'Locked'
+        : topic.status === 'available'
+          ? 'Start Learning'
+          : 'Locked'
 
   return (
     <div className="border-border-soft sticky top-6 overflow-hidden rounded-2xl border bg-white shadow-sm">
