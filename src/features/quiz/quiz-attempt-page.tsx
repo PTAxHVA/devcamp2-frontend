@@ -52,9 +52,17 @@ export function QuizAttemptPage() {
       if (!attemptId || submit.isPending) return
 
       const payload = buildPayload()
-      if (!allowEmpty && payload.length === 0) {
-        toast.error('Please answer at least one question before submitting.')
-        return
+      if (payload.length === 0) {
+        if (isTimedOut) {
+          toast("Time's up. No answers were submitted.")
+          navigate('/dashboard', { replace: true })
+          return
+        }
+
+        if (!allowEmpty) {
+          toast.error('Please answer at least one question before submitting.')
+          return
+        }
       }
 
       if (isTimedOut) {
