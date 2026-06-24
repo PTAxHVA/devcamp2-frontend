@@ -20,7 +20,7 @@ export default defineConfig({
   ],
   // Start the Vite dev server before running tests
   webServer: {
-    command: 'npm run dev',
+    command: 'yarn dev',
     url: 'http://localhost:5173',
     reuseExistingServer: true,
     timeout: 120_000,

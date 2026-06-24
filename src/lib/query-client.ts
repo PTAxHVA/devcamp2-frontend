@@ -11,11 +11,14 @@ import { extractApiError } from './api-client'
  */
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
-    onError: (error) => {
+    onError: (error, query) => {
       if (axios.isAxiosError(error)) {
         const status = error.response?.status
         // 401 is handled by the api-client interceptor (redirect to login).
         if (status === 401) return
+        // Queries that render their own error state can opt out via meta.suppressToast: true
+        // to avoid showing a toast alongside an inline error message.
+        if (query.meta?.suppressToast) return
         const { message } = extractApiError(error)
         toast.error(message ?? 'Something went wrong. Please try again.')
       }

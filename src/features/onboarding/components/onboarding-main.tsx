@@ -90,9 +90,10 @@ const OnboardingMain = () => {
       setDirection('back')
       goToStep(7)
     } else if (currentStep === 7) {
+      // Gate: back to the last user-input step (LearningPath), before AI generation.
       setDirection('back')
-      goToStep(2)
-      setSubStep(1)
+      goToStep(5)
+      setSubStep(2)
     } else if (currentStep === 5 && subStep === 2) {
       setDirection('back')
       setSubStep(1)

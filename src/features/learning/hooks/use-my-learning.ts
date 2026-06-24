@@ -28,23 +28,27 @@ function mapApiTopic(t: {
   }
 }
 
+/** Matches isTopicCompleted in build-flow-graph.ts: section progress is the
+ *  source of truth, not the BE status field. */
+const isTopicDone = (t: Pick<LearningTopic, 'sectionTotal' | 'sectionCompleted'>): boolean =>
+  t.sectionTotal > 0 && t.sectionCompleted >= t.sectionTotal
+
 /** Sequential unlock: topic 1 always available, topic N unlocks only after N-1 is completed.
- *  Mirrors deriveTopicStatuses in build-flow-graph.ts — runs client-side because the backend
- *  sends 'locked' for all uncompleted topics regardless of prerequisite state. */
+ *  Uses section progress (same logic as build-flow-graph.ts) so the snake roadmap and the
+ *  ReactFlow graph agree on what "completed" means. BE sends 'available' for eligible topics
+ *  but also sends 'locked' for the root when no progress exists, so we re-derive here. */
 function deriveSequentialStatuses(topics: LearningTopic[]): LearningTopic[] {
   if (!topics.length) return topics
   const ordered = [...topics].sort((a, b) => a.orderIndex - b.orderIndex)
-  const completedIds = new Set(
-    ordered.filter((t) => t.status === 'completed').map((t) => t.masterTopicId),
-  )
+  const completedIds = new Set(ordered.filter(isTopicDone).map((t) => t.masterTopicId))
   const idSet = new Set(ordered.map((t) => t.masterTopicId))
 
   const derivedStatus = new Map<string, TopicStatus>()
   for (let i = 0; i < ordered.length; i++) {
     const t = ordered[i]
-    if (t.status === 'completed') {
+    if (isTopicDone(t)) {
       derivedStatus.set(t.masterTopicId, 'completed')
-    } else if (t.status === 'in_progress') {
+    } else if (t.sectionCompleted > 0) {
       derivedStatus.set(t.masterTopicId, 'in_progress')
     } else if (i === 0) {
       derivedStatus.set(t.masterTopicId, 'available')

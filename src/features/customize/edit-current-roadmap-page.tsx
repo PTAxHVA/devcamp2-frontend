@@ -21,11 +21,8 @@ import {
   RiArrowLeftLine,
   RiBookmarkLine,
   RiAlertLine,
-  RiAddLine,
   RiSubtractLine,
-  RiArrowUpLine,
   RiCloseLine,
-  RiArrowDownLine,
   RiSparklingFill,
   RiLoader4Line,
   RiInformationLine,
@@ -84,9 +81,6 @@ export default function EditCurrentRoadmapPage() {
   const initializedRef = useRef(false)
   const [topicMeta, setTopicMeta] = useState<Map<string, TopicMeta>>(new Map())
   const [originalIds, setOriginalIds] = useState<string[]>([])
-  const [addTopicInput, setAddTopicInput] = useState('')
-  const [addTopicOpen, setAddTopicOpen] = useState(false)
-
   // Seed the editor from real roadmap data the first time it arrives. Node ids are
   // the real MasterTopic ObjectIds, so the diff produces valid PATCH payloads.
   useEffect(() => {
@@ -197,58 +191,10 @@ export default function EditCurrentRoadmapPage() {
     aiFeedbackMutation.mutate({ action: 'remove', topicId: removedTopicId })
   }
 
-  const handleMoveUp = () => {
-    if (!selectedId) return
-    const idx = nodes.findIndex((n) => n.id === selectedId)
-    if (idx <= 0) return
-    const next = [...nodes]
-    ;[next[idx - 1], next[idx]] = [next[idx], next[idx - 1]]
-    relayout(next)
-  }
-
-  const handleMoveDown = () => {
-    if (!selectedId) return
-    const idx = nodes.findIndex((n) => n.id === selectedId)
-    if (idx < 0 || idx >= nodes.length - 1) return
-    const next = [...nodes]
-    ;[next[idx], next[idx + 1]] = [next[idx + 1], next[idx]]
-    relayout(next)
-  }
-
-  const handleAddTopic = () => {
-    const name = addTopicInput.trim()
-    if (!name) return
-    const tempId = `new-${Date.now()}`
-    const newNode: Node<BaseNodeData> = {
-      id: tempId,
-      type: 'roadmapNode',
-      position: { x: COLUMN_X, y: nodes.length * VERTICAL_GAP },
-      data: { number: String(nodes.length + 1), label: name, status: 'locked' },
-    }
-    relayout([...nodes, newNode])
-    setTopicMeta((prev) => {
-      const m = new Map(prev)
-      m.set(tempId, {
-        name,
-        status: 'locked',
-        estimatedHours: 0,
-        sectionTotal: 0,
-        sectionCompleted: 0,
-        hasProgress: false,
-      })
-      return m
-    })
-    setSelectedId(tempId)
-    setAddTopicInput('')
-    setAddTopicOpen(false)
-  }
-
   const saveMutation = useMutation({
     mutationFn: async () => {
-      const addedNames = nodes.filter((n) => n.id.startsWith('new-')).map((n) => n.data.label)
       const res = await apiClient.patch(`/roadmaps/${roadmapId}`, {
         removeTopicIds: removedIds,
-        ...(addedNames.length > 0 && { addTopicNames: addedNames }),
       })
       return res.data
     },
@@ -300,8 +246,7 @@ export default function EditCurrentRoadmapPage() {
     )
   }
 
-  const addedCount = nodes.filter((n) => n.id.startsWith('new-')).length
-  const hasChanges = removedIds.length > 0 || addedCount > 0
+  const hasChanges = removedIds.length > 0
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 flex h-full w-full flex-col bg-white p-6 duration-500 ease-out lg:p-8">
@@ -347,55 +292,11 @@ export default function EditCurrentRoadmapPage() {
           <div className="border-border-soft flex flex-wrap items-center justify-between border-b p-4">
             <div className="relative flex items-center gap-2">
               <button
-                onClick={() => setAddTopicOpen((o) => !o)}
-                className="border-border-soft text-text-secondary hover:bg-bg-section flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold"
-              >
-                <RiAddLine /> Add topic
-              </button>
-              {addTopicOpen && (
-                <div className="absolute top-full left-0 z-20 mt-1 flex gap-2 rounded-xl border border-slate-200 bg-white p-2 shadow-md">
-                  <input
-                    autoFocus
-                    value={addTopicInput}
-                    onChange={(e) => setAddTopicInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleAddTopic()
-                      if (e.key === 'Escape') setAddTopicOpen(false)
-                    }}
-                    placeholder="Topic name…"
-                    className="border-border-soft focus:border-brand-purple-500 w-52 rounded-lg border px-3 py-1.5 text-sm outline-none"
-                  />
-                  <button
-                    onClick={handleAddTopic}
-                    className="rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-bold text-white hover:bg-slate-800"
-                  >
-                    Add
-                  </button>
-                </div>
-              )}
-              <button
                 onClick={handleRemoveTopic}
                 disabled={!selectedId || selectedMeta?.hasProgress}
                 className="border-border-soft text-text-secondary hover:bg-bg-section flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold disabled:opacity-40"
               >
                 <RiSubtractLine className="text-error-text" /> Remove topic
-              </button>
-              <div className="mx-2 h-5 w-px bg-slate-200" />
-              <button
-                onClick={handleMoveUp}
-                disabled={!selectedId || nodes.findIndex((n) => n.id === selectedId) <= 0}
-                className="border-border-soft text-text-secondary hover:bg-bg-section flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold disabled:opacity-40"
-              >
-                <RiArrowUpLine /> Move up
-              </button>
-              <button
-                onClick={handleMoveDown}
-                disabled={
-                  !selectedId || nodes.findIndex((n) => n.id === selectedId) >= nodes.length - 1
-                }
-                className="border-border-soft text-text-secondary hover:bg-bg-section flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold disabled:opacity-40"
-              >
-                <RiArrowDownLine /> Move down
               </button>
             </div>
           </div>
