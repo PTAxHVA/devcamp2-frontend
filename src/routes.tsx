@@ -27,6 +27,7 @@ import SettingsPage from '@/pages/settings-page'
 
 import { RoadmapCompletePage } from '@/pages/roadmap-complete-page'
 import { AddAnotherRolePage } from '@/pages/add-another-role-page'
+import { TermsPage, PrivacyPage } from '@/pages/legal-pages'
 
 export function AppRoutes() {
   return (
@@ -38,6 +39,8 @@ export function AppRoutes() {
       />
 
       <Route path="/demo-roadmap" element={<DemoRoadmapPage />} />
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
 
       {/* Auth pages */}
       <Route element={<AuthLayout />}>

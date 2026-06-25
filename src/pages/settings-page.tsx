@@ -4,20 +4,7 @@ import { toast } from 'react-hot-toast'
 import axios from 'axios'
 import { useAuthStore } from '@/stores/auth-store'
 import { useMe, useUpdateProfile, useUpdateAccount } from '@/features/profile/hooks/use-profile'
-import {
-  User,
-  Lock,
-  Link2,
-  Bell,
-  Palette,
-  LogOut,
-  Eye,
-  EyeOff,
-  Mail,
-  ChevronDown,
-} from 'lucide-react'
-import { FcGoogle } from 'react-icons/fc'
-import { FaGithub } from 'react-icons/fa'
+import { User, Lock, Bell, LogOut, Eye, EyeOff, Mail, ChevronDown } from 'lucide-react'
 
 // Toggle switch component
 function Toggle({ enabled, onChange }: { enabled: boolean; onChange: (v: boolean) => void }) {
@@ -101,9 +88,6 @@ export default function SettingsPage() {
     productAnnouncements: false,
     weeklySummary: true,
   })
-
-  // Theme state
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('light')
 
   const passwordRules = [
     { label: 'At least 8 characters', test: (v: string) => v.length >= 8 },
@@ -322,41 +306,6 @@ export default function SettingsPage() {
               </div>
             </div>
           </Section>
-
-          {/* Connected Accounts */}
-          <Section
-            icon={Link2}
-            title="Connected accounts"
-            subtitle="Connect external accounts to enhance your experience."
-          >
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <FaGithub className="text-text-primary h-5 w-5" />
-                  <div>
-                    <p className="text-text-primary text-sm font-medium">Github</p>
-                    <p className="text-text-muted text-xs">alexd-dev</p>
-                  </div>
-                </div>
-                <button className="text-brand-purple-500 text-sm font-semibold hover:underline">
-                  Continue
-                </button>
-              </div>
-              <div className="bg-border-soft h-px" />
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <FcGoogle className="h-5 w-5" />
-                  <div>
-                    <p className="text-text-primary text-sm font-medium">Google</p>
-                    <p className="text-text-muted text-xs">alex.d@example.com</p>
-                  </div>
-                </div>
-                <button className="text-brand-purple-500 text-sm font-semibold hover:underline">
-                  Continue
-                </button>
-              </div>
-            </div>
-          </Section>
         </div>
 
         {/* ── Right column ── */}
@@ -411,42 +360,6 @@ export default function SettingsPage() {
                 <p className="text-text-primary text-sm font-medium">Email frequency</p>
                 <button className="text-text-primary border-border-input hover:bg-bg-section flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition">
                   Instant <ChevronDown className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          </Section>
-
-          {/* Appearance & Language */}
-          <Section
-            icon={Palette}
-            title="Appearance & language"
-            subtitle="Customize how VORA looks and works for you."
-          >
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <p className="text-text-primary text-xs font-semibold">Current password</p>
-                <div className="flex gap-2">
-                  {(['light', 'dark', 'system'] as const).map((t) => (
-                    <button
-                      key={t}
-                      onClick={() => setTheme(t)}
-                      className={`flex flex-1 items-center justify-center gap-2 rounded-lg border py-2 text-sm font-medium transition ${
-                        theme === t
-                          ? 'border-brand-purple-500 bg-bg-lavender text-brand-purple-600'
-                          : 'border-border-input text-text-secondary hover:bg-bg-section'
-                      }`}
-                    >
-                      {t === 'light' ? '☀' : t === 'dark' ? '🌙' : '🖥'}{' '}
-                      {t.charAt(0).toUpperCase() + t.slice(1)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <p className="text-text-primary text-sm font-medium">Language</p>
-                <button className="text-text-primary border-border-input hover:bg-bg-section flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition">
-                  English (US) <ChevronDown className="h-4 w-4" />
                 </button>
               </div>
             </div>

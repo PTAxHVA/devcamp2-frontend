@@ -102,7 +102,9 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <p className="text-text-disabled mt-10 text-xs">2025 VORA. All rights reserved.</p>
+        <p className="text-text-disabled mt-10 text-xs">
+          © {new Date().getFullYear()} VORA. All rights reserved.
+        </p>
       </div>
 
       {/* ── Right: Info panel ── */}

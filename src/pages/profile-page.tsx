@@ -21,31 +21,20 @@ function RoadmapCard({
 }) {
   return (
     <div className="border-border-soft flex min-w-0 flex-1 flex-col gap-3 rounded-xl border bg-white p-4">
-      {/* Mini roadmap illustration placeholder */}
+      {/* Abstract roadmap illustration — shows the real roadmap title, no fabricated topic names */}
       <div className="bg-bg-section flex h-24 w-full items-center justify-center rounded-lg">
-        <div className="text-text-muted flex flex-col items-center gap-1 text-xs opacity-60 select-none">
-          <div className="flex gap-3">
-            <span className="border-border-input rounded border px-2 py-0.5 text-[10px]">
-              Frontend
-            </span>
-          </div>
+        <div className="text-text-muted flex flex-col items-center gap-1.5 opacity-60 select-none">
+          <span className="border-border-input max-w-[9rem] truncate rounded border px-2 py-0.5 text-[10px]">
+            {title}
+          </span>
           <div className="bg-border-input h-3 w-px" />
-          <div className="flex gap-3">
-            <span className="border-border-input rounded border px-2 py-0.5 text-[10px]">
-              Web Fundamentals
-            </span>
-          </div>
           <div className="flex gap-4">
             <div className="bg-border-input h-3 w-px" />
             <div className="bg-border-input h-3 w-px" />
           </div>
           <div className="flex gap-2">
-            <span className="border-border-input rounded border px-1.5 py-0.5 text-[10px]">
-              HTML & CSS
-            </span>
-            <span className="border-border-input rounded border px-1.5 py-0.5 text-[10px]">
-              JS Basics
-            </span>
+            <span className="bg-border-input h-2 w-10 rounded" />
+            <span className="bg-border-input h-2 w-10 rounded" />
           </div>
         </div>
       </div>
@@ -133,11 +122,7 @@ export default function ProfilePage() {
                 {levelLabel[profile?.level?.toLowerCase()] ?? 'Learner'}
               </span>
             </div>
-            <p className="text-text-muted mb-2 text-sm">{me?.email ?? ''}</p>
-            <p className="text-text-secondary mb-3 text-sm">
-              Passionate about building intuitive web experiences and continuously leveling up my
-              skills.
-            </p>
+            <p className="text-text-muted mb-3 text-sm">{me?.email ?? ''}</p>
             <div className="text-text-muted flex items-center gap-1.5 text-xs">
               <Clock className="h-3.5 w-3.5" />
               Joined {joinedDate}
