@@ -12,6 +12,7 @@ export const StepRole = ({ selectedRole, setSelectedRole }: StepRoleProps) => {
       {roles.map((role) => (
         <div
           key={role.id}
+          data-testid="role-card"
           onClick={() => setSelectedRole(role.id)}
           className={`relative flex min-h-80 cursor-pointer flex-col rounded-2xl bg-white p-10 transition-all duration-300 ${
             selectedRole === role.id

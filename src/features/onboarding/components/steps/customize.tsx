@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { BaseRoadmapNode, type BaseNodeData } from '@/features/roadmap/components/base-roadmap-node'
 import { useWizardStore } from '../../onboarding-store'
 import {
@@ -18,7 +18,30 @@ import {
   RiListSettingsLine,
   RiDeleteBinLine,
   RiAddLine,
+  RiSearchLine,
+  RiLightbulbFlashLine,
+  RiKey2Line,
+  RiCheckLine,
 } from 'react-icons/ri'
+
+const GENERATING_STEPS = [
+  {
+    icon: RiSearchLine,
+    title: 'Analyzing your profile',
+    desc: 'Reviewing goals, experience, and preferences',
+  },
+  {
+    icon: RiLightbulbFlashLine,
+    title: 'Matching the best roadmap',
+    desc: 'Selecting the right skills and resources',
+  },
+  {
+    icon: RiKey2Line,
+    title: 'Ordering topics & milestones',
+    desc: 'Structuring the roadmap for effective learning',
+  },
+]
+const SLOW_THRESHOLD_MS = 20_000
 
 interface CustomizeProps {
   onComplete?: () => void
@@ -28,12 +51,34 @@ interface CustomizeProps {
 const nodeTypes = { roadmapNode: BaseRoadmapNode }
 
 export default function StepCustomize({ onComplete, isSubmitting = false }: CustomizeProps) {
-  // The free-text request can't refine the (still-mock) canvas live — there is no
-  // roadmap yet. Instead we persist it into the wizard answers so it is sent with
-  // POST /onboarding/questionnaire (extraPreferences) and the AI suggest step uses
-  // it when personalizing the real roadmap on "Confirm & Personalize".
   const aiRequest = useWizardStore((s) => (s.answers?.aiRefinement as string) ?? '')
   const setAnswer = useWizardStore((s) => s.setAnswer)
+
+  const [activeGenStep, setActiveGenStep] = useState(0)
+  const [slowWarning, setSlowWarning] = useState(false)
+  // Track previous isSubmitting so we can reset animation state during render
+  // when submission ends (avoids setState-in-effect lint rule).
+  const [prevIsSubmitting, setPrevIsSubmitting] = useState(isSubmitting)
+  if (prevIsSubmitting !== isSubmitting) {
+    setPrevIsSubmitting(isSubmitting)
+    if (!isSubmitting) {
+      setActiveGenStep(0)
+      setSlowWarning(false)
+    }
+  }
+
+  useEffect(() => {
+    if (!isSubmitting) return
+    const stepInterval = setInterval(
+      () => setActiveGenStep((prev) => Math.min(prev + 1, GENERATING_STEPS.length - 1)),
+      3500,
+    )
+    const slowTimer = setTimeout(() => setSlowWarning(true), SLOW_THRESHOLD_MS)
+    return () => {
+      clearInterval(stepInterval)
+      clearTimeout(slowTimer)
+    }
+  }, [isSubmitting])
 
   const initialNodes: Node<BaseNodeData>[] = [
     {
@@ -184,6 +229,73 @@ export default function StepCustomize({ onComplete, isSubmitting = false }: Cust
 
   return (
     <div className="animate-in fade-in flex w-full flex-col items-center duration-500">
+      {isSubmitting && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm">
+          <div className="w-full max-w-md px-6">
+            <div className="mb-8 flex flex-col items-center gap-4 text-center">
+              <div className="bg-bg-lavender flex h-16 w-16 items-center justify-center rounded-full">
+                <RiLoader4Line className="text-brand-purple-600 h-8 w-8 animate-spin" />
+              </div>
+              <div>
+                <h2 className="text-text-primary text-2xl font-extrabold">
+                  AI is building your roadmap
+                </h2>
+                <p className="text-text-muted mt-1 text-sm">
+                  {slowWarning
+                    ? 'This is taking a bit longer than usual — almost there…'
+                    : 'Personalizing your learning path, this usually takes ~10 seconds.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              {GENERATING_STEPS.map((s, idx) => {
+                const Icon = s.icon
+                const isDone = idx < activeGenStep
+                const isActive = idx === activeGenStep
+                return (
+                  <div
+                    key={idx}
+                    className={`border-border-soft flex items-center gap-4 rounded-2xl border bg-white p-4 shadow-sm transition-all duration-500 ${
+                      isActive ? 'border-brand-purple-200 shadow-md' : ''
+                    }`}
+                  >
+                    <div
+                      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-colors duration-500 ${
+                        isDone
+                          ? 'bg-emerald-100 text-emerald-600'
+                          : isActive
+                            ? 'bg-bg-lavender text-brand-purple-600'
+                            : 'bg-base-200 text-base-content/30'
+                      }`}
+                    >
+                      {isDone ? <RiCheckLine className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
+                    </div>
+                    <div className="flex-1">
+                      <p
+                        className={`text-sm font-bold transition-colors duration-300 ${
+                          isDone
+                            ? 'text-text-secondary line-through'
+                            : isActive
+                              ? 'text-text-primary'
+                              : 'text-text-placeholder'
+                        }`}
+                      >
+                        {s.title}
+                      </p>
+                      <p className="text-text-muted mt-0.5 text-xs">{s.desc}</p>
+                    </div>
+                    {isActive && (
+                      <RiLoader4Line className="text-brand-purple-400 h-4 w-4 shrink-0 animate-spin" />
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mb-8 text-center">
         <h1 className="text-text-primary mb-2 text-4xl font-extrabold">Customize your Roadmap</h1>
         <p className="text-text-muted font-medium">

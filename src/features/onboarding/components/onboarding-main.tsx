@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { RiArrowLeftLine, RiArrowRightLine } from 'react-icons/ri'
+import { useNavigate } from 'react-router'
 import { NavBar, Footer } from '@/features/onboarding/components'
 import { Stepper } from './stepper'
 import {
@@ -12,6 +13,7 @@ import {
   StepGenerating,
 } from './steps'
 import StepCustomize from './steps/customize'
+import { StepGate } from './steps/gate'
 import { steps, PREFERENCE_QUESTIONS, LEARNING_PATH_KEYS } from '../data/onboarding-data'
 import { useWizardStore } from '../onboarding-store'
 import { useCompleteOnboarding } from '../hooks/use-complete-onboarding'
@@ -19,6 +21,7 @@ import { useCompleteOnboarding } from '../hooks/use-complete-onboarding'
 const OnboardingMain = () => {
   const { step: currentStep, answers, setAnswer, nextStep, prevStep, goToStep } = useWizardStore()
   const completeOnboarding = useCompleteOnboarding()
+  const navigate = useNavigate()
   const [direction, setDirection] = useState('next')
   const [subStep, setSubStep] = useState(1)
 
@@ -83,10 +86,14 @@ const OnboardingMain = () => {
 
   const handleBack = () => {
     setErrorStepKey(null)
-    if (currentStep === 7) {
+    if (currentStep === 8) {
       setDirection('back')
-      goToStep(2)
-      setSubStep(1)
+      goToStep(7)
+    } else if (currentStep === 7) {
+      // Gate: back to the last user-input step (LearningPath), before AI generation.
+      setDirection('back')
+      goToStep(5)
+      setSubStep(2)
     } else if (currentStep === 5 && subStep === 2) {
       setDirection('back')
       setSubStep(1)
@@ -115,9 +122,9 @@ const OnboardingMain = () => {
           .fade-only { animation: simpleFadeIn 0.4s ease-in-out forwards; }
         `}</style>
 
-        {currentStep !== 6 && (
+        {currentStep !== 6 && currentStep !== 7 && currentStep !== 8 && (
           <div className="mb-10 w-full">
-            <Stepper currentStep={currentStep === 7 ? 6 : currentStep} />
+            <Stepper currentStep={currentStep} />
           </div>
         )}
 
@@ -171,6 +178,17 @@ const OnboardingMain = () => {
           {currentStep === 5 && subStep === 2 && <StepLearningPath />}
           {currentStep === 6 && <StepGenerating />}
           {currentStep === 7 && (
+            <StepGate
+              onAccept={() => completeOnboarding.mutate()}
+              onCustomize={() => {
+                setDirection('next')
+                goToStep(8)
+              }}
+              onChooseAnother={() => navigate('/roadmaps/browse')}
+              isSubmitting={completeOnboarding.isPending}
+            />
+          )}
+          {currentStep === 8 && (
             <StepCustomize
               onComplete={() => completeOnboarding.mutate()}
               isSubmitting={completeOnboarding.isPending}
@@ -180,7 +198,7 @@ const OnboardingMain = () => {
 
         {currentStep !== 1 && (
           <div className="border-border-soft/60 mt-16 flex flex-col border-t pt-8">
-            {showValidationError && currentStep !== 6 && currentStep !== 7 && (
+            {showValidationError && currentStep !== 6 && currentStep !== 7 && currentStep !== 8 && (
               <p className="text-error-text mb-4 text-right text-sm font-medium">
                 Please complete this step before continuing.
               </p>
@@ -192,7 +210,7 @@ const OnboardingMain = () => {
               >
                 <RiArrowLeftLine className="mr-2 h-5 w-5" /> Back
               </button>
-              {currentStep !== 6 && currentStep !== 7 && (
+              {currentStep !== 6 && currentStep !== 7 && currentStep !== 8 && (
                 <button
                   onClick={handleNext}
                   className="btn h-12 rounded-xl border-none bg-[#0B1528] px-10 text-base font-semibold text-white transition-all hover:bg-[#15233e] hover:shadow-lg active:scale-95"

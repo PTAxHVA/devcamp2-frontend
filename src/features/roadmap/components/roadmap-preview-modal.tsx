@@ -1,12 +1,83 @@
-import { useEffect } from 'react'
-import { RiCloseLine, RiListUnordered, RiGitBranchLine, RiBookOpenLine } from 'react-icons/ri'
+import { useEffect, useMemo, useState } from 'react'
+import {
+  RiCloseLine,
+  RiListUnordered,
+  RiGitBranchLine,
+  RiCheckLine,
+  RiCircleLine,
+} from 'react-icons/ri'
 import { useMasterRoadmap } from '../hooks/use-master-roadmap'
 import { useEnrollRoadmap } from '../hooks/use-enroll-roadmap'
+import type { MasterBranch } from '../hooks/use-master-roadmap'
 
 interface RoadmapPreviewModalProps {
   roadmapId: string
   roleName?: string
   onClose: () => void
+}
+
+/** Minimal tree: branches rendered as connected nodes in a vertical column. */
+function BranchTree({
+  branches,
+  selected,
+  onToggle,
+}: {
+  branches: MasterBranch[]
+  selected: Set<string>
+  onToggle: (id: string) => void
+}) {
+  return (
+    <div className="relative flex flex-col gap-0">
+      {branches.map((b, idx) => {
+        const isSelected = selected.has(b._id)
+        const isLast = idx === branches.length - 1
+        return (
+          <div key={b._id} className="flex items-start gap-3">
+            {/* Vertical connector line + node dot */}
+            <div className="flex flex-col items-center" style={{ width: 24, minWidth: 24 }}>
+              <div
+                className={`mt-3 h-3 w-3 shrink-0 rounded-full border-2 transition-colors ${
+                  isSelected
+                    ? 'border-brand-purple-600 bg-brand-purple-600'
+                    : 'border-slate-300 bg-white'
+                }`}
+              />
+              {!isLast && <div className="w-0.5 flex-1 bg-slate-200" style={{ minHeight: 28 }} />}
+            </div>
+
+            {/* Branch card (toggle) */}
+            <button
+              onClick={() => onToggle(b._id)}
+              className={`mb-3 flex w-full items-start gap-3 rounded-2xl border p-4 text-left transition-all ${
+                isSelected
+                  ? 'border-brand-purple-200 bg-bg-lavender'
+                  : 'border-border-soft bg-bg-section hover:border-slate-300'
+              }`}
+            >
+              <div
+                className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${
+                  isSelected
+                    ? 'border-brand-purple-600 bg-brand-purple-600 text-white'
+                    : 'border-slate-300'
+                }`}
+              >
+                {isSelected && <RiCheckLine className="h-3 w-3" />}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-text-primary text-sm font-bold">{b.name}</p>
+                {b.description && (
+                  <p className="text-text-muted mt-0.5 line-clamp-2 text-xs">{b.description}</p>
+                )}
+              </div>
+              <span className="text-text-placeholder shrink-0 text-xs font-semibold">
+                {b.topicCount} topics
+              </span>
+            </button>
+          </div>
+        )
+      })}
+    </div>
+  )
 }
 
 export default function RoadmapPreviewModal({
@@ -16,6 +87,19 @@ export default function RoadmapPreviewModal({
 }: RoadmapPreviewModalProps) {
   const { data, isLoading, isError, refetch, isFetching } = useMasterRoadmap(roadmapId)
   const enroll = useEnrollRoadmap()
+  // Track which branches the user has explicitly deselected; default is all selected.
+  const [deselectedBranches, setDeselectedBranches] = useState<Set<string>>(new Set())
+
+  const allBranchIds = useMemo(
+    () => new Set(data?.branches?.map((b) => b._id) ?? []),
+    [data?.branches],
+  )
+
+  const selectedBranches = useMemo(() => {
+    const result = new Set(allBranchIds)
+    deselectedBranches.forEach((id) => result.delete(id))
+    return result
+  }, [allBranchIds, deselectedBranches])
 
   // Close on Escape for keyboard users.
   useEffect(() => {
@@ -24,9 +108,28 @@ export default function RoadmapPreviewModal({
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
+  const toggleBranch = (id: string) => {
+    if (!selectedBranches.has(id)) {
+      setDeselectedBranches((prev) => {
+        const next = new Set(prev)
+        next.delete(id)
+        return next
+      })
+    } else if (selectedBranches.size > 1) {
+      setDeselectedBranches((prev) => {
+        const next = new Set(prev)
+        next.add(id)
+        return next
+      })
+    }
+  }
+
   const title = data?.roleName ?? roleName ?? 'Roadmap'
   const branches = data?.branches ?? []
-  const totalTopics = branches.reduce((sum, b) => sum + (b.topicCount || 0), 0)
+  const selectedCount = selectedBranches.size
+  const selectedTopics = branches
+    .filter((b) => selectedBranches.has(b._id))
+    .reduce((sum, b) => sum + (b.topicCount || 0), 0)
 
   return (
     <div
@@ -36,7 +139,7 @@ export default function RoadmapPreviewModal({
       aria-modal="true"
     >
       <div
-        className="animate-in zoom-in-95 relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-6 shadow-xl duration-200 lg:p-8"
+        className="animate-in zoom-in-95 relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-6 shadow-xl duration-200 lg:p-8"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -75,39 +178,31 @@ export default function RoadmapPreviewModal({
 
             <div className="text-text-secondary mb-6 flex flex-wrap gap-3 text-xs font-bold">
               <span className="border-border-soft flex items-center gap-1.5 rounded-lg border px-3 py-1.5">
-                <RiGitBranchLine className="text-text-placeholder" /> {branches.length} branch
-                {branches.length === 1 ? '' : 'es'}
+                <RiGitBranchLine className="text-text-placeholder" /> {selectedCount}/
+                {branches.length} branch{branches.length === 1 ? '' : 'es'} selected
               </span>
               <span className="border-border-soft flex items-center gap-1.5 rounded-lg border px-3 py-1.5">
-                <RiListUnordered className="text-text-placeholder" /> {totalTopics} topics
+                <RiListUnordered className="text-text-placeholder" /> {selectedTopics} topics
               </span>
             </div>
 
-            <h3 className="text-text-primary mb-3 text-sm font-bold">What you'll learn</h3>
+            <div className="mb-2 flex items-center justify-between">
+              <h3 className="text-text-primary text-sm font-bold">Choose your learning path</h3>
+              <span className="text-text-muted text-xs">Click to select / deselect</span>
+            </div>
+
             {branches.length > 0 ? (
-              <ul className="mb-8 space-y-2.5">
-                {branches.map((b) => (
-                  <li
-                    key={b._id}
-                    className="border-border-soft bg-bg-section flex items-start gap-3 rounded-2xl border p-4"
-                  >
-                    <RiBookOpenLine className="text-brand-purple-500 mt-0.5 shrink-0 text-lg" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-text-primary text-sm font-bold">{b.name}</p>
-                      {b.description && (
-                        <p className="text-text-muted mt-0.5 line-clamp-2 text-xs">
-                          {b.description}
-                        </p>
-                      )}
-                    </div>
-                    <span className="text-text-placeholder shrink-0 text-xs font-semibold">
-                      {b.topicCount} topics
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              <div className="mb-6">
+                <BranchTree
+                  branches={branches}
+                  selected={selectedBranches}
+                  onToggle={toggleBranch}
+                />
+              </div>
             ) : (
-              <p className="text-text-muted mb-8 text-sm">No content available yet.</p>
+              <div className="mb-6 flex items-center gap-2 text-sm text-slate-400">
+                <RiCircleLine /> No content available yet.
+              </div>
             )}
 
             <div className="flex gap-3">
@@ -122,16 +217,16 @@ export default function RoadmapPreviewModal({
                   enroll.mutate({
                     masterRoadmapId: roadmapId,
                     roleName: title,
-                    branchSelections: branches.map((b) => b._id),
+                    branchSelections: [...selectedBranches],
                   })
                 }
-                disabled={enroll.isPending || branches.length === 0}
+                disabled={enroll.isPending || selectedBranches.size === 0}
                 className="bg-btn-primary-bg hover:bg-btn-primary-hover flex-1 rounded-xl py-3 text-sm font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {enroll.isPending ? (
                   <span className="loading loading-spinner loading-xs" />
                 ) : (
-                  'Use roadmap'
+                  `Use roadmap (${selectedCount} branch${selectedCount === 1 ? '' : 'es'})`
                 )}
               </button>
             </div>

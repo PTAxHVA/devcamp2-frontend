@@ -21,11 +21,8 @@ import {
   RiArrowLeftLine,
   RiBookmarkLine,
   RiAlertLine,
-  RiAddLine,
   RiSubtractLine,
-  RiArrowUpLine,
   RiCloseLine,
-  RiArrowDownLine,
   RiSparklingFill,
   RiLoader4Line,
   RiInformationLine,
@@ -84,7 +81,6 @@ export default function EditCurrentRoadmapPage() {
   const initializedRef = useRef(false)
   const [topicMeta, setTopicMeta] = useState<Map<string, TopicMeta>>(new Map())
   const [originalIds, setOriginalIds] = useState<string[]>([])
-
   // Seed the editor from real roadmap data the first time it arrives. Node ids are
   // the real MasterTopic ObjectIds, so the diff produces valid PATCH payloads.
   useEffect(() => {
@@ -197,7 +193,9 @@ export default function EditCurrentRoadmapPage() {
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiClient.patch(`/roadmaps/${roadmapId}`, { removeTopicIds: removedIds })
+      const res = await apiClient.patch(`/roadmaps/${roadmapId}`, {
+        removeTopicIds: removedIds,
+      })
       return res.data
     },
     onSuccess: () => {
@@ -292,35 +290,13 @@ export default function EditCurrentRoadmapPage() {
         {/* === CANVAS === */}
         <div className="border-border-soft flex flex-1 flex-col rounded-2xl border bg-white">
           <div className="border-border-soft flex flex-wrap items-center justify-between border-b p-4">
-            <div className="flex items-center gap-2">
-              <button
-                disabled
-                title="Adding new topics is coming soon."
-                className="border-border-soft text-text-placeholder flex cursor-not-allowed items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold opacity-50"
-              >
-                <RiAddLine /> Add topic
-              </button>
+            <div className="relative flex items-center gap-2">
               <button
                 onClick={handleRemoveTopic}
                 disabled={!selectedId || selectedMeta?.hasProgress}
                 className="border-border-soft text-text-secondary hover:bg-bg-section flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold disabled:opacity-40"
               >
                 <RiSubtractLine className="text-error-text" /> Remove topic
-              </button>
-              <div className="mx-2 h-5 w-px bg-slate-200" />
-              <button
-                disabled
-                title="Reordering topics is coming soon."
-                className="border-border-soft text-text-placeholder flex cursor-not-allowed items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold opacity-50"
-              >
-                <RiArrowUpLine /> Move up
-              </button>
-              <button
-                disabled
-                title="Reordering topics is coming soon."
-                className="border-border-soft text-text-placeholder flex cursor-not-allowed items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold opacity-50"
-              >
-                <RiArrowDownLine /> Move down
               </button>
             </div>
           </div>
@@ -409,7 +385,7 @@ export default function EditCurrentRoadmapPage() {
                 ) : (
                   <p className="text-text-muted flex items-start gap-2 text-xs">
                     <RiInformationLine className="mt-0.5 shrink-0 text-sm" />
-                    Use the toolbar to remove or reorder this topic.
+                    Use the toolbar to remove this topic.
                   </p>
                 )}
               </div>

@@ -11,6 +11,7 @@ export const StepGoal = ({ selectedGoal, setSelectedGoal }: StepGoalProps) => {
       {goals.map((goal) => (
         <div
           key={goal.id}
+          data-testid="goal-card"
           onClick={() => setSelectedGoal(goal.id)}
           className={`relative flex min-h-70 cursor-pointer flex-col items-center justify-center rounded-2xl bg-white p-8 text-center transition-all duration-300 ${
             selectedGoal === goal.id

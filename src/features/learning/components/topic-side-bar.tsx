@@ -29,6 +29,14 @@ const STATUS_CONFIG = {
     dot: 'bg-amber-500',
     bar: 'bg-amber-500',
   },
+  available: {
+    label: 'Ready to Start',
+    color: 'text-brand-purple-600',
+    bg: 'bg-bg-lavender',
+    borderB: 'border-b-brand-purple-100',
+    dot: 'bg-brand-purple-400',
+    bar: 'bg-brand-purple-400',
+  },
   locked: {
     label: 'Locked',
     color: 'text-text-muted',
@@ -66,14 +74,16 @@ export default function TopicDetailSidebar({ topic }: TopicDetailSidebarProps) {
           ? '~1 hour'
           : `~${topic.estimatedHours} hours`
 
-  const canNavigate = topic.status !== 'locked'
+  const canNavigate = topic.status !== 'locked' // 'available', 'in_progress', 'completed' all navigable
 
   const btnLabel =
     topic.status === 'completed'
       ? 'Review Topic'
       : topic.status === 'in_progress'
         ? 'Continue Learning'
-        : 'Locked'
+        : topic.status === 'available'
+          ? 'Start Learning'
+          : 'Locked'
 
   return (
     <div className="border-border-soft sticky top-6 overflow-hidden rounded-2xl border bg-white shadow-sm">
