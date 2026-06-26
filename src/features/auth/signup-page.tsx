@@ -180,13 +180,23 @@ export default function SignupPage() {
                 />
                 <span className="text-text-muted text-sm">
                   I agree to VORA's{' '}
-                  <span className="cursor-pointer text-indigo-600 hover:underline">
+                  <Link
+                    to="/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-indigo-600 hover:underline"
+                  >
                     Terms of Service
-                  </span>{' '}
+                  </Link>{' '}
                   and{' '}
-                  <span className="cursor-pointer text-indigo-600 hover:underline">
+                  <Link
+                    to="/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-indigo-600 hover:underline"
+                  >
                     Privacy Policy
-                  </span>
+                  </Link>
                 </span>
               </label>
               {errors.terms && <p className="text-error-text text-xs">{errors.terms.message}</p>}
@@ -209,7 +219,9 @@ export default function SignupPage() {
           </p>
         </div>
 
-        <p className="text-text-disabled mt-10 text-xs">2025 VORA. All rights reserved.</p>
+        <p className="text-text-disabled mt-10 text-xs">
+          © {new Date().getFullYear()} VORA. All rights reserved.
+        </p>
       </div>
 
       {/* ── Right: Info panel ── */}
