@@ -36,7 +36,6 @@ export default function LoginPage() {
 
   return (
     <div className="flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-gray-200 shadow-sm md:flex-row">
-      {/* ── Left: Form ── */}
       <div className="flex w-full flex-col justify-between bg-white px-10 py-12 md:w-1/2">
         <div className="flex-1">
           <h1 className="mb-2 text-4xl font-extrabold text-gray-900">Welcome back</h1>
@@ -53,6 +52,7 @@ export default function LoginPage() {
                 id="email"
                 type="email"
                 placeholder="Enter your email"
+                autoComplete="email"
                 className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('email')}
               />
@@ -67,6 +67,7 @@ export default function LoginPage() {
                 id="password"
                 type="password"
                 placeholder="••••••••"
+                autoComplete="current-password"
                 className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('password')}
               />
@@ -100,10 +101,9 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <p className="mt-10 text-xs text-gray-300">2025 VORA. All rights reserved.</p>
+        <p className="mt-10 text-xs text-gray-300">© 2026 VORA. All rights reserved.</p>
       </div>
 
-      {/* ── Right: Info panel ── */}
       <div className="hidden w-1/2 flex-col items-center justify-center gap-8 bg-[#f9f9fb] px-10 py-12 md:flex">
         <div className="text-center">
           <h2 className="mb-2 text-xl font-bold text-gray-900">
@@ -113,13 +113,11 @@ export default function LoginPage() {
             VORA helps you build the right skills, in the right order, to reach your goals faster.
           </p>
         </div>
-
         <img
           src={RoadmapPreview}
           alt="Roadmap preview"
           className="w-full max-w-sm rounded-xl border border-gray-200 object-cover shadow-sm"
         />
-
         <div className="flex w-full max-w-sm flex-col gap-4">
           {features.map((item) => (
             <div key={item.title} className="flex items-start gap-3">

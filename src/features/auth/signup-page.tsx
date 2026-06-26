@@ -48,16 +48,11 @@ export default function SignupPage() {
   const passwordValue = useWatch({ control, name: 'password' }) ?? ''
 
   const onSubmit = (data: SignupInput) => {
-    signup.mutate({
-      username: data.username,
-      email: data.email,
-      password: data.password,
-    })
+    signup.mutate({ username: data.username, email: data.email, password: data.password })
   }
 
   return (
     <div className="flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-gray-200 shadow-sm md:flex-row">
-      {/* ── Left: Form ── */}
       <div className="flex w-full flex-col justify-between bg-white px-10 py-12 md:w-1/2">
         <div className="flex-1">
           <h1 className="mb-2 text-4xl font-extrabold text-gray-900">Create your account</h1>
@@ -66,7 +61,6 @@ export default function SignupPage() {
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
-            {/* Full name */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-semibold text-gray-800" htmlFor="username">
                 Full name
@@ -75,13 +69,13 @@ export default function SignupPage() {
                 id="username"
                 type="text"
                 placeholder="Your name"
+                autoComplete="name"
                 className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('username')}
               />
               {errors.username && <p className="text-xs text-red-500">{errors.username.message}</p>}
             </div>
 
-            {/* Email */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-semibold text-gray-800" htmlFor="email">
                 Email
@@ -90,13 +84,13 @@ export default function SignupPage() {
                 id="email"
                 type="email"
                 placeholder="Enter your email"
+                autoComplete="email"
                 className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('email')}
               />
               {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
             </div>
 
-            {/* Password */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-semibold text-gray-800" htmlFor="password">
                 Password
@@ -105,11 +99,11 @@ export default function SignupPage() {
                 id="password"
                 type="password"
                 placeholder="••••••••"
+                autoComplete="new-password"
                 className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('password')}
               />
               {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
-
               {passwordValue.length > 0 && (
                 <div className="mt-2 flex flex-col gap-1.5">
                   <p className="text-xs font-semibold text-gray-600">Password must:</p>
@@ -118,9 +112,7 @@ export default function SignupPage() {
                     return (
                       <div key={rule.label} className="flex items-center gap-2">
                         <div
-                          className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                            passed ? 'border-indigo-500 bg-indigo-500' : 'border-gray-300 bg-white'
-                          }`}
+                          className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${passed ? 'border-indigo-500 bg-indigo-500' : 'border-gray-300 bg-white'}`}
                         >
                           {passed && (
                             <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 8 8">
@@ -146,7 +138,6 @@ export default function SignupPage() {
               )}
             </div>
 
-            {/* Confirm password */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-semibold text-gray-800" htmlFor="confirmPassword">
                 Confirm password
@@ -155,6 +146,7 @@ export default function SignupPage() {
                 id="confirmPassword"
                 type="password"
                 placeholder="••••••••"
+                autoComplete="new-password"
                 className="w-full rounded-lg border border-gray-200 px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('confirmPassword')}
               />
@@ -163,7 +155,6 @@ export default function SignupPage() {
               )}
             </div>
 
-            {/* Terms — có register + error message */}
             <div className="flex flex-col gap-1">
               <label className="flex cursor-pointer items-start gap-2">
                 <input
@@ -173,13 +164,13 @@ export default function SignupPage() {
                 />
                 <span className="text-sm text-gray-500">
                   I agree to VORA's{' '}
-                  <span className="cursor-pointer text-indigo-600 hover:underline">
+                  <Link to="/terms" className="text-indigo-600 hover:underline">
                     Terms of Service
-                  </span>{' '}
+                  </Link>{' '}
                   and{' '}
-                  <span className="cursor-pointer text-indigo-600 hover:underline">
+                  <Link to="/privacy" className="text-indigo-600 hover:underline">
                     Privacy Policy
-                  </span>
+                  </Link>
                 </span>
               </label>
               {errors.terms && <p className="text-xs text-red-500">{errors.terms.message}</p>}
@@ -202,10 +193,9 @@ export default function SignupPage() {
           </p>
         </div>
 
-        <p className="mt-10 text-xs text-gray-300">2025 VORA. All rights reserved.</p>
+        <p className="mt-10 text-xs text-gray-300">© 2026 VORA. All rights reserved.</p>
       </div>
 
-      {/* ── Right: Info panel ── */}
       <div className="hidden w-1/2 flex-col gap-8 bg-[#f9f9fb] px-10 py-12 md:flex">
         <div>
           <h2 className="mb-2 text-xl font-bold text-gray-900">

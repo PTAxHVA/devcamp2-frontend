@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useAuthStore } from '@/stores/auth-store'
 import { useMe } from '@/features/profile/hooks/use-profile'
+import { useThemeStore } from '@/stores/theme-store'
 import {
   User,
   Lock,
@@ -17,7 +18,6 @@ import {
 import { FcGoogle } from 'react-icons/fc'
 import { FaGithub } from 'react-icons/fa'
 
-// Toggle switch component
 function Toggle({ enabled, onChange }: { enabled: boolean; onChange: (v: boolean) => void }) {
   return (
     <button
@@ -28,15 +28,12 @@ function Toggle({ enabled, onChange }: { enabled: boolean; onChange: (v: boolean
       }`}
     >
       <span
-        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ${
-          enabled ? 'translate-x-5' : 'translate-x-0'
-        }`}
+        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ${enabled ? 'translate-x-5' : 'translate-x-0'}`}
       />
     </button>
   )
 }
 
-// Section card wrapper
 function Section({
   icon: Icon,
   title,
@@ -68,20 +65,16 @@ export default function SettingsPage() {
   const navigate = useNavigate()
   const setAuth = useAuthStore((s) => s.setAuth)
   const { data: me } = useMe()
+  const { theme, setTheme } = useThemeStore()
 
-  // Account settings state
   const [fullName, setFullName] = useState(me?.username ?? '')
   const [email, setEmail] = useState(me?.email ?? '')
-
-  // Password state
   const [showCurrent, setShowCurrent] = useState(false)
   const [showNew, setShowNew] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-
-  // Notification state
   const [notifications, setNotifications] = useState({
     roadmapUpdates: true,
     goalProgress: true,
@@ -89,9 +82,6 @@ export default function SettingsPage() {
     productAnnouncements: false,
     weeklySummary: true,
   })
-
-  // Theme state
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('light')
 
   const passwordRules = [
     { label: 'At least 8 characters', test: (v: string) => v.length >= 8 },
@@ -106,7 +96,6 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-4">
-      {/* Header */}
       <div className="mb-2">
         <h1 className="text-text-primary text-2xl font-extrabold">Settings</h1>
         <p className="text-text-muted mt-1 text-sm">
@@ -117,7 +106,6 @@ export default function SettingsPage() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* ── Left column ── */}
         <div className="flex flex-col gap-4">
-          {/* Account Settings */}
           <Section
             icon={User}
             title="Account settings"
@@ -160,14 +148,12 @@ export default function SettingsPage() {
             </div>
           </Section>
 
-          {/* Password & Security */}
           <Section
             icon={Lock}
             title="Password & security"
             subtitle="Keep your account secure by updating your password."
           >
             <div className="flex flex-col gap-3">
-              {/* Current password */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-text-primary text-xs font-semibold">Current password</label>
                 <div className="relative">
@@ -187,8 +173,6 @@ export default function SettingsPage() {
                   </button>
                 </div>
               </div>
-
-              {/* New + Confirm */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-text-primary text-xs font-semibold">New password</label>
@@ -231,8 +215,6 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </div>
-
-              {/* Password rules */}
               <div className="flex flex-col gap-1">
                 <p className="text-text-muted text-xs">Password must include:</p>
                 {passwordRules.map((rule) => {
@@ -248,7 +230,6 @@ export default function SettingsPage() {
                   )
                 })}
               </div>
-
               <div className="flex justify-end">
                 <button
                   disabled
@@ -261,7 +242,6 @@ export default function SettingsPage() {
             </div>
           </Section>
 
-          {/* Connected Accounts */}
           <Section
             icon={Link2}
             title="Connected accounts"
@@ -299,7 +279,6 @@ export default function SettingsPage() {
 
         {/* ── Right column ── */}
         <div className="flex flex-col gap-4">
-          {/* Notification References */}
           <Section
             icon={Bell}
             title="Notification references"
@@ -344,7 +323,6 @@ export default function SettingsPage() {
                   />
                 </div>
               ))}
-
               <div className="border-border-soft flex items-center justify-between border-t pt-2">
                 <p className="text-text-primary text-sm font-medium">Email frequency</p>
                 <button className="text-text-primary border-border-input hover:bg-bg-section flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition">
@@ -354,7 +332,6 @@ export default function SettingsPage() {
             </div>
           </Section>
 
-          {/* Appearance & Language */}
           <Section
             icon={Palette}
             title="Appearance & language"
@@ -380,7 +357,6 @@ export default function SettingsPage() {
                   ))}
                 </div>
               </div>
-
               <div className="flex items-center justify-between">
                 <p className="text-text-primary text-sm font-medium">Language</p>
                 <button className="text-text-primary border-border-input hover:bg-bg-section flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition">
@@ -390,7 +366,6 @@ export default function SettingsPage() {
             </div>
           </Section>
 
-          {/* Account Actions */}
           <Section
             icon={LogOut}
             title="Account actions"
