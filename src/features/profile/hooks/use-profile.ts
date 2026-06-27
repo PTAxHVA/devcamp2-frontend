@@ -19,6 +19,10 @@ interface UpdateAccountBody {
   password?: string
 }
 
+interface DeactivateAccountBody {
+  currentPassword: string
+}
+
 export function useMe() {
   return useQuery({
     queryKey: ['me'],
@@ -65,7 +69,7 @@ export function useUpdateAccount() {
 export function useDeactivateAccount() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (body: UpdateAccountBody) =>
+    mutationFn: async (body: DeactivateAccountBody) =>
       (await apiClient.patch('/me/account/deactivate', body)).data.data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['me'] })
