@@ -3,8 +3,13 @@ import { useNavigate } from 'react-router'
 import { toast } from 'react-hot-toast'
 import axios from 'axios'
 import { useAuthStore } from '@/stores/auth-store'
-import { useMe, useUpdateProfile, useUpdateAccount } from '@/features/profile/hooks/use-profile'
-import { User, Lock, Bell, LogOut, Eye, EyeOff, Mail, ChevronDown } from 'lucide-react'
+import {
+  useMe,
+  useUpdateProfile,
+  useUpdateAccount,
+  useDeactivateAccount,
+} from '@/features/profile/hooks/use-profile'
+import { User, Lock, Bell, LogOut, Eye, EyeOff, Mail, ChevronDown, X } from 'lucide-react'
 
 // Toggle switch component
 function Toggle({ enabled, onChange }: { enabled: boolean; onChange: (v: boolean) => void }) {
@@ -59,11 +64,15 @@ export default function SettingsPage() {
   const { data: me } = useMe()
   const updateProfile = useUpdateProfile()
   const updateAccount = useUpdateAccount()
+  const deactivateAccount = useDeactivateAccount()
 
   // Account settings state
   const [fullName, setFullName] = useState(me?.username ?? '')
   const [email, setEmail] = useState(me?.email ?? '')
   const [hydrated, setHydrated] = useState(false)
+  const [showDeactivatePassword, setShowDeactivatePassword] = useState(false)
+  const [deactivatePassword, setDeactivatePassword] = useState('')
+  const [showConfirmDeactivatePassword, setShowConfirmDeactivatePassword] = useState(false)
 
   // Populate fields once the current user has loaded (render-phase reset)
   if (!hydrated && me) {
@@ -143,6 +152,28 @@ export default function SettingsPage() {
         onError: (err) => {
           const msg = axios.isAxiosError(err) ? err.response?.data?.error?.message : null
           toast.error(msg ?? 'Could not update password')
+        },
+      },
+    )
+  }
+
+  const handleDeactivateAccount = () => {
+    if (!deactivatePassword) {
+      toast.error('Enter your password to confirm')
+      return
+    }
+    deactivateAccount.mutate(
+      { currentPassword: deactivatePassword },
+      {
+        onSuccess: () => {
+          toast.success('Account deleted successfully')
+          setShowDeactivatePassword(false)
+          setDeactivatePassword('')
+          logout()
+        },
+        onError: (err) => {
+          const msg = axios.isAxiosError(err) ? err.response?.data?.error?.message : null
+          toast.error(msg ?? 'Could not delete account')
         },
       },
     )
@@ -387,8 +418,102 @@ export default function SettingsPage() {
               </button>
             </div>
           </Section>
+
+          {/* Delete Account */}
+          <Section icon={User} title="Delete account" subtitle="Delete your account.">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <User className="text-text-muted h-4 w-4" />
+                <div>
+                  <p className="text-text-primary text-sm font-medium">Delete account</p>
+                  <p className="text-text-muted text-xs">Delete your account on this device.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowDeactivatePassword(true)}
+                className="border-border-input text-text-primary hover:bg-bg-section rounded-lg border px-4 py-2 text-sm font-semibold transition"
+              >
+                Delete account
+              </button>
+            </div>
+          </Section>
         </div>
       </div>
+
+      {showDeactivatePassword && (
+        <div
+          className="animate-in fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 duration-200"
+          onClick={() => {
+            setShowDeactivatePassword(false)
+            setDeactivatePassword('')
+          }}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="animate-in zoom-in-95 relative w-full max-w-md overflow-hidden rounded-3xl bg-white p-6 shadow-xl duration-200 lg:p-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => {
+                setShowDeactivatePassword(false)
+                setDeactivatePassword('')
+              }}
+              aria-label="Close"
+              className="text-text-placeholder hover:bg-bg-section hover:text-text-secondary absolute top-5 right-5 flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+            >
+              <X size={20} />
+            </button>
+
+            <h3 className="text-text-primary text-lg font-bold">Delete account</h3>
+            <p className="text-text-muted mt-2 text-sm leading-relaxed">
+              Are you sure you want to delete your account? This action will deactivate your profile
+              and log you out. To confirm, please enter your password.
+            </p>
+            <div className="mt-4 flex flex-col gap-1.5">
+              <label className="text-text-primary text-xs font-semibold">Password</label>
+              <div className="relative">
+                <input
+                  type={showConfirmDeactivatePassword ? 'text' : 'password'}
+                  value={deactivatePassword}
+                  onChange={(e) => setDeactivatePassword(e.target.value)}
+                  className="border-border-input focus:border-brand-purple-500 w-full rounded-lg border px-4 py-2.5 pr-10 text-sm transition outline-none"
+                  placeholder="Enter your current password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmDeactivatePassword(!showConfirmDeactivatePassword)}
+                  className="text-text-muted absolute top-1/2 right-3 -translate-y-1/2"
+                >
+                  {showConfirmDeactivatePassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowDeactivatePassword(false)
+                  setDeactivatePassword('')
+                }}
+                className="border-border-input text-text-primary hover:bg-bg-section rounded-lg border px-4 py-2 text-sm font-semibold transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeactivateAccount}
+                disabled={deactivateAccount.isPending}
+                className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:bg-red-400"
+              >
+                {deactivateAccount.isPending ? 'Deleting...' : 'Delete account'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

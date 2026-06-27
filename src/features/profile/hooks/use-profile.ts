@@ -61,3 +61,14 @@ export function useUpdateAccount() {
     },
   })
 }
+
+export function useDeactivateAccount() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (body: UpdateAccountBody) =>
+      (await apiClient.patch('/me/account/deactivate', body)).data.data,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['me'] })
+    },
+  })
+}
