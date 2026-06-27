@@ -2,6 +2,7 @@ import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useSearchParams } from 'react-router'
 import { z } from 'zod'
+import { toast } from 'react-hot-toast'
 import ResetPasswordImg from '@/assets/reset-password.png'
 import { useResetPassword } from './hooks/use-reset-password'
 
@@ -25,7 +26,7 @@ const passwordRules = [
 ]
 
 export default function ResetPasswordPage() {
-  // 1. Lấy token tự động từ URL (Ví dụ: /reset-password?token=abcxyz123)
+  // 1. Lấy token tự động từ URL (Hỗ trợ cả route cũ /auth/reset-password và route mới /reset-password)
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token') ?? ''
 
@@ -49,7 +50,12 @@ export default function ResetPasswordPage() {
   const newPasswordValue = useWatch({ control, name: 'newPassword' }) || ''
 
   const onSubmit = (data: ResetInput) => {
-    // Truyền cả token và mật khẩu mới lên API
+    // FIX LOW: Guard bảo mật chặn đứng hành vi submit ép khi token rỗng
+    if (!token) {
+      toast.error('Invalid or expired reset token. Please request a new link.')
+      return
+    }
+
     reset.mutate({
       token,
       newPassword: data.newPassword,
@@ -129,11 +135,19 @@ export default function ResetPasswordPage() {
               {reset.isPending ? 'Processing...' : 'Reset password'}
             </button>
 
-            {/* Cảnh báo nếu link thiếu token */}
+            {/* FIX LOW: Thêm block cảnh báo kèm lối thoát mở dẫn sang trang /forgot-password */}
             {!token && (
-              <p className="mt-1 text-center text-xs font-semibold text-red-500">
-                Error: Reset token is missing. Please check your email link again.
-              </p>
+              <div className="mt-2 flex flex-col items-center gap-2 rounded-lg bg-red-50 p-3 text-center">
+                <p className="text-xs font-semibold text-red-500">
+                  Error: Reset token is missing or has expired.
+                </p>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-bold text-indigo-600 hover:underline"
+                >
+                  Request a new reset link →
+                </Link>
+              </div>
             )}
           </form>
 

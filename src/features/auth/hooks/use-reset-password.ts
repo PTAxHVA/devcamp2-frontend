@@ -19,7 +19,7 @@ export function useResetPassword() {
     },
     onSuccess: () => {
       // Tách biệt logic: Thành công là nhảy hẳn sang trang thành công riêng biệt
-      navigate('/reset-password-success')
+      navigate('/auth/reset-password/success')
     },
     onError: (err) => {
       const { message } = extractApiError(err)

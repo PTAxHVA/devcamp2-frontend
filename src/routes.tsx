@@ -48,8 +48,10 @@ export function AppRoutes() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-        {/* Đã FIX: Đồng bộ chuẩn đường dẫn ngắn gọn theo UI và Hooks */}
+        {/* Giải pháp A: Giữ cả 2 route để link email cũ không bị 404 */}
+        <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+
         <Route path="/reset-password-success" element={<ResetPasswordSuccessPage />} />
       </Route>
 

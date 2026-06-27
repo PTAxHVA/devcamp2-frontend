@@ -313,7 +313,7 @@ export default function SettingsPage() {
           {/* Notification References */}
           <Section
             icon={Bell}
-            title="Notification references"
+            title="Notification preferences"
             subtitle="Choose what you want to be notified about."
           >
             <div className="flex flex-col gap-4">
