@@ -23,12 +23,12 @@ const features = [
   {
     icon: <RiLineChartLine className="h-5 w-5 text-indigo-600" />,
     title: 'Track your progress',
-    desc: 'See your growth and stay motivated with clear progress tracking.',
+    desc: 'Visualize your growth and stay motivated every step of the way.',
   },
   {
     icon: <RiLightbulbLine className="h-5 w-5 text-indigo-600" />,
-    title: 'Learn smarter',
-    desc: 'Focus on what matters and build real skills with hands-on projects.',
+    title: 'Smart recommendations',
+    desc: 'Discover the most relevant topics and resources to boost your skills.',
   },
 ]
 
@@ -36,18 +36,28 @@ export default function SignupPage() {
   const {
     register,
     handleSubmit,
-    setError,
+    setError, // <--- Lấy thêm hàm setError này ra từ useForm để truyền vào hook
     control,
     formState: { errors },
   } = useForm<SignupInput>({
     resolver: zodResolver(signupSchema),
-    defaultValues: { password: '', terms: false },
+    defaultValues: {
+      username: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      terms: false,
+    },
   })
 
+  // Truyền setError vào hook giúp đồng bộ lỗi từ Server đổ trực tiếp vào ô input dưới UI
   const signup = useSignup(setError)
-  const passwordValue = useWatch({ control, name: 'password' }) ?? ''
+
+  // Theo dõi giá trị nhập vào ô password để cập nhật UI kiểm tra mật khẩu mạnh/yếu
+  const passwordValue = useWatch({ control, name: 'password' }) || ''
 
   const onSubmit = (data: SignupInput) => {
+    // Chỉ truyền đúng 2 trường username và email, password lên backend
     signup.mutate({
       username: data.username,
       email: data.email,
@@ -57,16 +67,23 @@ export default function SignupPage() {
 
   return (
     <div className="border-border-soft flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border shadow-sm md:flex-row">
-      {/* ── Left: Form ── */}
-      <div className="flex w-full flex-col justify-between bg-white px-10 py-12 md:w-1/2">
+      {/* ── Left Side: Signup Form ── */}
+      <div className="flex w-full flex-col justify-between bg-white px-10 py-16 md:w-1/2">
         <div className="flex-1">
-          <h1 className="text-text-primary mb-2 text-4xl font-extrabold">Create your account</h1>
-          <p className="mb-8 text-sm font-medium text-indigo-500">
-            Start your personalized learning journey. It's free to get started.
+          <h1 className="text-text-primary text-3xl font-extrabold">Create an account</h1>
+          <p className="text-text-secondary mt-2 mb-6 text-sm">
+            Start your learning journey with VORA today.
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
-            {/* Full name */}
+            {/* ALERT BANNER: Hiển thị lỗi tổng quan từ server (Ví dụ: lỗi hệ thống, không gán vào ô cụ thể nào) */}
+            {signup.isError && !errors.email && !errors.username && !errors.password && (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs font-medium text-red-600">
+                Something went wrong during signup. Please verify your information and try again.
+              </div>
+            )}
+
+            {/* Input Full Name */}
             <div className="flex flex-col gap-1.5">
               <label className="text-text-primary text-sm font-semibold" htmlFor="username">
                 Full name
@@ -83,22 +100,22 @@ export default function SignupPage() {
               )}
             </div>
 
-            {/* Email */}
+            {/* Input Email */}
             <div className="flex flex-col gap-1.5">
               <label className="text-text-primary text-sm font-semibold" htmlFor="email">
-                Email
+                Email address
               </label>
               <input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder="you@gmail.com"
                 className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('email')}
               />
               {errors.email && <p className="text-error-text text-xs">{errors.email.message}</p>}
             </div>
 
-            {/* Password */}
+            {/* Input Password */}
             <div className="flex flex-col gap-1.5">
               <label className="text-text-primary text-sm font-semibold" htmlFor="password">
                 Password
@@ -113,50 +130,31 @@ export default function SignupPage() {
               {errors.password && (
                 <p className="text-error-text text-xs">{errors.password.message}</p>
               )}
-
-              {/* Live password rules */}
-              {passwordValue.length > 0 && (
-                <div className="mt-2 flex flex-col gap-1.5">
-                  <p className="text-text-secondary text-xs font-semibold">Password must:</p>
-                  {passwordRules.map((rule) => {
-                    const passed = rule.test(passwordValue)
-                    return (
-                      <div key={rule.label} className="flex items-center gap-2">
-                        <div
-                          className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                            passed
-                              ? 'border-indigo-500 bg-indigo-500'
-                              : 'border-border-input bg-white'
-                          }`}
-                        >
-                          {passed && (
-                            <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 8 8">
-                              <path
-                                d="M1 4l2 2 4-4"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          )}
-                        </div>
-                        <span
-                          className={`text-xs transition-colors ${passed ? 'text-indigo-600' : 'text-text-placeholder'}`}
-                        >
-                          {rule.label}
-                        </span>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
             </div>
 
-            {/* Confirm password */}
+            {/* Password Validation Rules UI Block */}
+            <div className="flex flex-col gap-1 rounded-lg bg-gray-50 p-3 text-xs">
+              {passwordRules.map((rule) => {
+                const isPassed = rule.test(passwordValue)
+                return (
+                  <div key={rule.label} className="flex items-center gap-2">
+                    <span className={isPassed ? 'font-bold text-green-500' : 'text-gray-300'}>
+                      {isPassed ? '✓' : '○'}
+                    </span>
+                    <span
+                      className={isPassed ? 'font-medium text-green-700' : 'text-text-secondary'}
+                    >
+                      {rule.label}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Input Confirm Password */}
             <div className="flex flex-col gap-1.5">
               <label className="text-text-primary text-sm font-semibold" htmlFor="confirmPassword">
-                Confirm new password
+                Confirm password
               </label>
               <input
                 id="confirmPassword"
@@ -170,51 +168,45 @@ export default function SignupPage() {
               )}
             </div>
 
-            {/* Terms */}
+            {/* Checkbox Terms of Service */}
             <div className="flex flex-col gap-1">
-              <label className="flex cursor-pointer items-start gap-2">
+              <label className="flex cursor-pointer items-start gap-2.5 text-sm">
                 <input
                   type="checkbox"
-                  className="mt-0.5 h-4 w-4 accent-indigo-600"
+                  className="mt-1 h-4 w-4 shrink-0 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                   {...register('terms')}
                 />
-                <span className="text-text-muted text-sm">
-                  I agree to VORA's{' '}
-                  <Link
-                    to="/terms"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-indigo-600 hover:underline"
-                  >
+                <span className="text-text-secondary text-xs leading-normal">
+                  I agree to the{' '}
+                  <Link to="/terms" className="font-medium text-indigo-600 hover:underline">
                     Terms of Service
                   </Link>{' '}
                   and{' '}
-                  <Link
-                    to="/privacy"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-indigo-600 hover:underline"
-                  >
+                  <Link to="/privacy" className="font-medium text-indigo-600 hover:underline">
                     Privacy Policy
                   </Link>
+                  .
                 </span>
               </label>
-              {errors.terms && <p className="text-error-text text-xs">{errors.terms.message}</p>}
+              {errors.terms && (
+                <p className="text-error-text mt-1 text-xs">{errors.terms.message}</p>
+              )}
             </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={signup.isPending}
-              className="w-full rounded-lg bg-[#001a57] py-2.5 text-sm font-semibold text-white transition hover:bg-[#002080] disabled:opacity-60"
+              className="mt-2 w-full rounded-lg bg-[#001a57] py-2.5 text-sm font-semibold text-white transition hover:bg-[#002080] disabled:opacity-60"
             >
               {signup.isPending ? 'Creating account...' : 'Create account'}
             </button>
           </form>
 
-          <p className="text-text-placeholder mt-6 text-center text-sm">
+          <p className="text-text-secondary mt-5 text-center text-sm">
             Already have an account?{' '}
             <Link to="/login" className="font-semibold text-indigo-600 hover:underline">
-              Login
+              Log in
             </Link>
           </p>
         </div>
@@ -224,7 +216,7 @@ export default function SignupPage() {
         </p>
       </div>
 
-      {/* ── Right: Info panel ── */}
+      {/* ── Right Side: Info Panel & Feature Previews ── */}
       <div className="hidden w-1/2 flex-col gap-8 bg-[#f9f9fb] px-10 py-12 md:flex">
         <div>
           <h2 className="text-text-primary mb-2 text-xl font-bold">
@@ -248,8 +240,8 @@ export default function SignupPage() {
                 {item.icon}
               </div>
               <div>
-                <p className="text-text-primary text-sm font-bold">{item.title}</p>
-                <p className="text-text-muted mt-0.5 text-xs">{item.desc}</p>
+                <p className="text-text-primary text-sm font-semibold">{item.title}</p>
+                <p className="text-text-secondary text-xs">{item.desc}</p>
               </div>
             </div>
           ))}

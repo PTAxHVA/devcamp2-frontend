@@ -1,44 +1,45 @@
 import { apiClient, extractApiError } from '@/lib/api-client'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
-import { useAuthStore } from '@/stores/auth-store'
 import { useNavigate } from 'react-router'
-import type { UseFormSetError } from 'react-hook-form'
-import type { SignupInput } from '@/features/auth/auth-schemas'
+import { type UseFormSetError } from 'react-hook-form'
+import { type SignupInput } from '../auth-schemas'
 
-interface SignupVars {
-  username: string
-  email: string
-  password: string
-}
-
-interface AuthPayload {
-  token: string
-  user: { id: string; email: string; username: string }
-}
+// Loại bỏ các trường chỉ dùng ở UI như confirmPassword và terms trước khi gửi lên API
+type SignupVars = Omit<SignupInput, 'confirmPassword' | 'terms'>
 
 export function useSignup(setError: UseFormSetError<SignupInput>) {
-  const setAuth = useAuthStore((s) => s.setAuth)
   const navigate = useNavigate()
 
   return useMutation({
-    // POST /auth/signup body { username, email, password }
-    // → 201, data.data = { token, user }
-    mutationFn: async (input: SignupVars): Promise<AuthPayload> => {
+    mutationFn: async (input: SignupVars) => {
       const { data } = await apiClient.post('/auth/signup', input)
-      return data.data // unwrap 2 lớp .data
+      return data.data
     },
-    onSuccess: (payload) => {
-      setAuth(payload.token, payload.user)
-      navigate('/onboarding') // new user → always onboarding
+    onSuccess: () => {
+      toast.success('Account created successfully! Please log in.')
+      navigate('/login')
     },
     onError: (err) => {
-      const { code, message } = extractApiError(err)
-      if (code === 'EMAIL_TAKEN') {
-        // inline error under email field, NOT a toast
-        setError('email', { message: 'Email is already in use' })
-      } else {
-        toast.error(message ?? 'Something went wrong')
+      const { message, errors } = extractApiError(err)
+
+      // Trường hợp 1: Backend trả về object lỗi chi tiết (Ví dụ: { email: "Email already taken" })
+      if (errors && typeof errors === 'object') {
+        Object.entries(errors).forEach(([key, val]) => {
+          setError(key as keyof SignupInput, {
+            // <-- Thay bằng keyof SignupInput
+            type: 'server',
+            message: Array.isArray(val) ? val[0] : String(val),
+          })
+        })
+      }
+      // Trường hợp 2: Fallback nếu Backend trả về chuỗi text chứa chữ "email"
+      else if (message?.toLowerCase().includes('email')) {
+        setError('email', { type: 'server', message })
+      }
+      // Trường hợp 3: Gặp lỗi hệ thống khác thì báo Toast
+      else {
+        toast.error(message ?? 'Something went wrong during signup.')
       }
     },
   })
