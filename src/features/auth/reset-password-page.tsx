@@ -2,6 +2,7 @@ import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useSearchParams } from 'react-router'
 import { z } from 'zod'
+import { toast } from 'react-hot-toast'
 import ResetPasswordImg from '@/assets/reset-password.png'
 import { useResetPassword } from './hooks/use-reset-password'
 
@@ -25,8 +26,11 @@ const passwordRules = [
 ]
 
 export default function ResetPasswordPage() {
-  const [params] = useSearchParams()
-  const token = params.get('token')
+  // 1. Lấy token tự động từ URL (Hỗ trợ cả route cũ /auth/reset-password và route mới /reset-password)
+  const [searchParams] = useSearchParams()
+  const token = searchParams.get('token') ?? ''
+
+  // 2. Gọi Hook Mutation xử lý API
   const reset = useResetPassword()
 
   const {
@@ -36,55 +40,40 @@ export default function ResetPasswordPage() {
     formState: { errors },
   } = useForm<ResetInput>({
     resolver: zodResolver(resetSchema),
-    defaultValues: { newPassword: '' },
+    defaultValues: {
+      newPassword: '',
+      confirmPassword: '',
+    },
   })
 
-  const passwordValue = useWatch({ control, name: 'newPassword' }) ?? ''
+  // Theo dõi giá trị nhập vào ô password để hiển thị tích xanh các rule kiểm tra mật khẩu
+  const newPasswordValue = useWatch({ control, name: 'newPassword' }) || ''
 
   const onSubmit = (data: ResetInput) => {
-    if (!token) return
-    reset.mutate({ token, newPassword: data.newPassword })
-  }
+    // FIX LOW: Guard bảo mật chặn đứng hành vi submit ép khi token rỗng
+    if (!token) {
+      toast.error('Invalid or expired reset token. Please request a new link.')
+      return
+    }
 
-  // Token không hợp lệ
-  if (!token) {
-    return (
-      <div className="border-border-soft flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border shadow-sm md:flex-row">
-        <div className="flex w-full flex-col gap-4 bg-white px-10 py-16 md:w-1/2">
-          <h1 className="text-text-primary text-3xl font-extrabold">The link is invalid.</h1>
-          <p className="text-text-muted text-sm">
-            The password reset link is invalid or has expired.
-          </p>
-          <Link
-            to="/forgot-password"
-            className="mt-2 text-sm font-semibold text-indigo-600 hover:underline"
-          >
-            → Request a new link
-          </Link>
-        </div>
-        <div className="hidden w-1/2 items-center justify-center bg-[#f9f9fb] px-10 py-12 md:flex">
-          <img
-            src={ResetPasswordImg}
-            alt="Reset password"
-            className="w-full max-w-sm object-contain"
-          />
-        </div>
-      </div>
-    )
+    reset.mutate({
+      token,
+      newPassword: data.newPassword,
+    })
   }
 
   return (
     <div className="border-border-soft flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border shadow-sm md:flex-row">
-      <div className="flex w-full flex-col justify-between bg-white px-10 py-12 md:w-1/2">
+      {/* ── Left Side: Reset Password Form ── */}
+      <div className="flex w-full flex-col justify-between bg-white px-10 py-16 md:w-1/2">
         <div className="flex-1">
-          <h1 className="text-text-primary mb-2 text-3xl font-extrabold">Reset your password</h1>
-          <p className="mb-8 text-sm font-medium text-indigo-500">
-            Create a new password for your account.
-            <br />
-            Make sure it's strong and unique.
+          <h1 className="text-text-primary text-3xl font-extrabold">Reset password</h1>
+          <p className="text-text-secondary mt-2 mb-6 text-sm">
+            Please enter your new password below.
           </p>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+            {/* Input New Password */}
             <div className="flex flex-col gap-1.5">
               <label className="text-text-primary text-sm font-semibold" htmlFor="newPassword">
                 New password
@@ -99,43 +88,28 @@ export default function ResetPasswordPage() {
               {errors.newPassword && (
                 <p className="text-error-text text-xs">{errors.newPassword.message}</p>
               )}
-
-              <div className="mt-2 flex flex-col gap-1.5">
-                <p className="text-text-secondary text-xs font-semibold">Password must:</p>
-                {passwordRules.map((rule) => {
-                  const passed = rule.test(passwordValue)
-                  return (
-                    <div key={rule.label} className="flex items-center gap-2">
-                      <div
-                        className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                          passed
-                            ? 'border-indigo-500 bg-indigo-500'
-                            : 'border-border-input bg-white'
-                        }`}
-                      >
-                        {passed && (
-                          <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 8 8">
-                            <path
-                              d="M1 4l2 2 4-4"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        )}
-                      </div>
-                      <span
-                        className={`text-xs transition-colors ${passed ? 'text-indigo-600' : 'text-text-placeholder'}`}
-                      >
-                        {rule.label}
-                      </span>
-                    </div>
-                  )
-                })}
-              </div>
             </div>
 
+            {/* Password Validation Rules UI Block */}
+            <div className="flex flex-col gap-1 rounded-lg bg-gray-50 p-3 text-xs">
+              {passwordRules.map((rule) => {
+                const isPassed = rule.test(newPasswordValue)
+                return (
+                  <div key={rule.label} className="flex items-center gap-2">
+                    <span className={isPassed ? 'font-bold text-green-500' : 'text-gray-300'}>
+                      {isPassed ? '✓' : '○'}
+                    </span>
+                    <span
+                      className={isPassed ? 'font-medium text-green-700' : 'text-text-secondary'}
+                    >
+                      {rule.label}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Input Confirm Password */}
             <div className="flex flex-col gap-1.5">
               <label className="text-text-primary text-sm font-semibold" htmlFor="confirmPassword">
                 Confirm new password
@@ -152,13 +126,29 @@ export default function ResetPasswordPage() {
               )}
             </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
-              disabled={reset.isPending}
+              disabled={reset.isPending || !token}
               className="w-full rounded-lg bg-[#001a57] py-2.5 text-sm font-semibold text-white transition hover:bg-[#002080] disabled:opacity-60"
             >
               {reset.isPending ? 'Processing...' : 'Reset password'}
             </button>
+
+            {/* FIX LOW: Thêm block cảnh báo kèm lối thoát mở dẫn sang trang /forgot-password */}
+            {!token && (
+              <div className="mt-2 flex flex-col items-center gap-2 rounded-lg bg-red-50 p-3 text-center">
+                <p className="text-xs font-semibold text-red-500">
+                  Error: Reset token is missing or has expired.
+                </p>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-bold text-indigo-600 hover:underline"
+                >
+                  Request a new reset link →
+                </Link>
+              </div>
+            )}
           </form>
 
           <div className="my-5 flex items-center gap-3">
@@ -173,12 +163,20 @@ export default function ResetPasswordPage() {
         </div>
       </div>
 
-      <div className="hidden w-1/2 items-center justify-center bg-[#f9f9fb] px-10 py-12 md:flex">
+      {/* ── Right Side: Info Panel & Illustration ── */}
+      <div className="hidden w-1/2 flex-col items-center justify-center gap-6 bg-[#f9f9fb] px-10 py-12 md:flex">
         <img
           src={ResetPasswordImg}
           alt="Reset password"
-          className="w-full max-w-xs object-contain"
+          className="w-full max-w-sm object-contain"
         />
+        <div className="text-center">
+          <h2 className="text-text-primary mb-1 text-lg font-bold">Secure your account</h2>
+          <p className="text-text-secondary max-w-xs text-sm">
+            Make sure your new password is strong and contains a mix of letters, numbers, and
+            special characters.
+          </p>
+        </div>
       </div>
     </div>
   )

@@ -42,13 +42,17 @@ export function AppRoutes() {
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
 
-      {/* Auth pages */}
+      {/* Auth pages (Public Routes) */}
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
+        {/* Giải pháp A: Giữ cả 2 route để link email cũ không bị 404 */}
         <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/auth/reset-password/success" element={<ResetPasswordSuccessPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+        <Route path="/reset-password-success" element={<ResetPasswordSuccessPage />} />
       </Route>
 
       {/* Onboarding + full-screen quiz & results — cần đăng nhập (no sidebar) */}
@@ -59,6 +63,7 @@ export function AppRoutes() {
         <Route path="/quizzes/:attemptId/result/fail" element={<QuizResultFailPage />} />
       </Route>
 
+      {/* Main App Routes — Bảo mật bằng ProtectedRoute và bọc trong MainLayout */}
       <Route element={<ProtectedRoute />}>
         <Route element={<MainLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
