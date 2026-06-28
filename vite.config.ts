@@ -1,16 +1,19 @@
-import { defineConfig } from 'vite'
+import { defineConfig, mergeConfig } from 'vite'
+import { defineConfig as defineVitestConfig, configDefaults } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
-import { configDefaults } from 'vitest/config' // Thêm dòng này để lấy cấu hình mặc định
 
-export default defineConfig({
+const viteConfig = defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
   },
+})
+
+const vitestConfig = defineVitestConfig({
   test: {
     globals: true,
     environment: 'jsdom',
@@ -18,3 +21,5 @@ export default defineConfig({
     exclude: [...configDefaults.exclude, '**/e2e/**', 'e2e/**/*'],
   },
 })
+
+export default mergeConfig(viteConfig, vitestConfig)
