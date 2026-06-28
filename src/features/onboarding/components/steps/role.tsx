@@ -1,4 +1,4 @@
-import { RiTimeLine } from 'react-icons/ri'
+import { RiTimeLine, RiInformationLine } from 'react-icons/ri'
 import { roles } from '../../data/onboarding-data'
 
 interface StepRoleProps {
@@ -36,7 +36,13 @@ export const StepRole = ({ selectedRole, setSelectedRole }: StepRoleProps) => {
             <h3 className="text-text-primary mb-3 text-xl font-bold">{role.title}</h3>
             <p className="text-text-muted text-base leading-relaxed">{role.desc}</p>
           </div>
-          <div className="border-border-soft text-text-muted mt-8 flex items-center gap-2 border-t pt-5 text-sm font-medium">
+          {role.mappedNote && (
+            <div className="mt-4 flex items-start gap-2 rounded-lg bg-amber-50 px-3 py-2.5 text-xs text-amber-700">
+              <RiInformationLine className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <span>{role.mappedNote}</span>
+            </div>
+          )}
+          <div className="border-border-soft text-text-muted mt-4 flex items-center gap-2 border-t pt-5 text-sm font-medium">
             <RiTimeLine className="text-brand-purple-600 h-5 w-5" />
             <span>Estimated time: {role.time}</span>
           </div>

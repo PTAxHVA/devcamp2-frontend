@@ -22,6 +22,7 @@ import toast from 'react-hot-toast'
 import { useSectionDetail } from './hooks/use-section-detail'
 import { useTopicDetail } from '@/features/topic/hooks/use-topic-detail'
 import { useSectionQuiz } from './hooks/use-section-quiz'
+import { useCompleteSection } from './hooks/use-complete-section'
 import { QUIZ_PASS_THRESHOLD } from '@/constants/learning'
 
 // Resource icon helper
@@ -88,6 +89,8 @@ export default function SectionDetailPage() {
     !!section?.hasQuiz,
   )
 
+  const completeSection = useCompleteSection()
+
   const isLoading = isSecLoading || isTopicLoading
   const isError = isSecError || !section || !topic
 
@@ -152,10 +155,19 @@ export default function SectionDetailPage() {
     navigate(`/quizzes/${quiz.quizId}/attempt`)
   }
 
-  // NOTE: there is no section-completion API yet. Rather than fake success with a
-  // mocked toast (which misleads learners into thinking progress was saved), the
-  // non-quiz "Complete Section" CTA is rendered disabled below. Wire it to the real
-  // endpoint once the backend exposes one.
+  const handleCompleteSection = () => {
+    if (!sectionId) return
+    completeSection.mutate(sectionId, {
+      onSuccess: () => {
+        toast.success('Section completed!')
+        if (nextSection) {
+          navigate(`/my-learning/topics/${topicId}/sections/${nextSection._id}${qRoadmap}`)
+        } else {
+          navigate(`/my-learning/topics/${topicId}${qRoadmap}`)
+        }
+      },
+    })
+  }
 
   return (
     <div className="mx-auto w-full max-w-400 p-6 lg:p-8">
@@ -374,18 +386,27 @@ export default function SectionDetailPage() {
               >
                 <RiSparklingFill className="text-brand-purple-300 animate-pulse" /> Start Quiz
               </button>
+            ) : section.isCompleted ? (
+              <button
+                disabled
+                className="flex w-full cursor-default items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-6 py-3 text-sm font-bold text-emerald-700 sm:w-auto"
+              >
+                <RiCheckboxCircleLine className="text-emerald-500" />
+                Completed
+              </button>
             ) : (
-              <div className="flex w-full flex-col items-stretch gap-1.5 sm:w-auto sm:items-end">
-                <button
-                  disabled
-                  title="Marking a section complete isn't available yet."
-                  className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-[#0B1221] px-6 py-3 text-sm font-bold text-white opacity-50 sm:w-auto"
-                >
+              <button
+                onClick={handleCompleteSection}
+                disabled={completeSection.isPending}
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#0B1221] px-6 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-slate-800 disabled:opacity-50 sm:w-auto"
+              >
+                {completeSection.isPending ? (
+                  <span className="loading loading-spinner loading-xs" />
+                ) : (
                   <RiCheckboxCircleLine className="text-emerald-400" />
-                  Complete Section
-                </button>
-                <span className="text-text-muted text-xs">Progress saving is coming soon.</span>
-              </div>
+                )}
+                Complete Section
+              </button>
             )}
           </div>
         </div>

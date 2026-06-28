@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import type { Node } from '@xyflow/react'
 import toast from 'react-hot-toast'
@@ -28,7 +28,11 @@ const RoadmapViewPage = () => {
 
   const { data: roadmapDetail, isLoading, isError } = useRoadmapDetail(id as string)
 
-  const [currentTopicId, setCurrentTopicId] = useState<string | null>(null)
+  // Tracks explicit user selection; null means "use the first topic as default."
+  const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null)
+
+  const firstTopicId = roadmapDetail?.topics?.[0]?.masterTopicId ?? null
+  const currentTopicId = selectedTopicId ?? firstTopicId
 
   const { layoutedNodes, layoutedEdges } = useMemo(() => {
     if (!roadmapDetail) return { layoutedNodes: [], layoutedEdges: [] }
@@ -36,15 +40,8 @@ const RoadmapViewPage = () => {
     return { layoutedNodes: nodes, layoutedEdges: edges }
   }, [roadmapDetail])
 
-  useEffect(() => {
-    if (roadmapDetail?.topics?.length && !currentTopicId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setCurrentTopicId(roadmapDetail.topics[0].masterTopicId)
-    }
-  }, [roadmapDetail, currentTopicId])
-
   const handleNodeClick = (_event: React.MouseEvent, node: Node) => {
-    setCurrentTopicId(node.id)
+    setSelectedTopicId(node.id)
   }
 
   const handleGoToTopic = () => {

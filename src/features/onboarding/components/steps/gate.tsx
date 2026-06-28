@@ -1,5 +1,7 @@
 import { RiCheckLine, RiListSettingsLine, RiSearchLine, RiLoader4Line } from 'react-icons/ri'
 import { useWizardStore } from '../../onboarding-store'
+import { useBrowseRoadmaps } from '@/features/roadmap/hooks/use-browse-roadmaps'
+import { matchMasterRoadmap } from '../../lib/map-questionnaire'
 
 interface StepGateProps {
   onAccept: () => void
@@ -10,6 +12,9 @@ interface StepGateProps {
 
 export function StepGate({ onAccept, onCustomize, onChooseAnother, isSubmitting }: StepGateProps) {
   const role = useWizardStore((s) => s.answers?.role as string | undefined)
+  const { data: roadmaps } = useBrowseRoadmaps()
+  const matched = matchMasterRoadmap(role, roadmaps ?? [])
+  const roadmapName = matched?.roleName ?? role
 
   return (
     <div className="animate-in fade-in mx-auto mt-8 flex w-full max-w-2xl flex-col items-center gap-10 duration-700">
@@ -21,7 +26,7 @@ export function StepGate({ onAccept, onCustomize, onChooseAnother, isSubmitting 
           Your roadmap is ready!
         </h1>
         <p className="text-text-muted text-lg">
-          We've built a personalized{role ? ` ${role}` : ''} learning path for you.
+          We've built a personalized {roadmapName ?? 'learning'} path for you.
           <br />
           What would you like to do next?
         </p>
