@@ -4,7 +4,11 @@ import type { BEGraphTopic } from '@/features/roadmap/hooks/use-roadmap-detail'
 
 function makeTopic(overrides: Partial<BEGraphTopic> & { masterTopicId: string }): BEGraphTopic {
   return {
+    userTopicId: null,
+    name: overrides.masterTopicId,
+    status: 'locked',
     orderIndex: 0,
+    estimatedHours: 5,
     sectionTotal: 3,
     sectionCompleted: 0,
     prerequisiteTopicIds: [],

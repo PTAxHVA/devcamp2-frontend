@@ -6,7 +6,7 @@ import {
 import type { BrowseRoadmap } from '@/features/roadmap/hooks/use-browse-roadmaps'
 
 function makeRoadmap(roleName: string): BrowseRoadmap {
-  return { _id: roleName, roleName, description: '', topicCount: 0, estimatedHours: 0 }
+  return { _id: roleName, roleName }
 }
 
 const roadmaps: BrowseRoadmap[] = [
@@ -86,7 +86,9 @@ describe('mapAnswersToQuestionnaire', () => {
   it('strips undefined keys from the payload', () => {
     const payload = mapAnswersToQuestionnaire({ role: 'backend', goal: 'fun' }, [])
     const keys = Object.keys(payload)
-    expect(keys.every((k) => (payload as Record<string, unknown>)[k] !== undefined)).toBe(true)
+    expect(
+      keys.every((k) => (payload as unknown as Record<string, unknown>)[k] !== undefined),
+    ).toBe(true)
   })
 
   it('folds additionalInfo into extraPreferences', () => {
