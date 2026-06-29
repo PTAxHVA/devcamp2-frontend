@@ -115,42 +115,40 @@ export default function SignupPage() {
               )}
 
               {/* Live password rules */}
-              {passwordValue.length > 0 && (
-                <div className="mt-2 flex flex-col gap-1.5">
-                  <p className="text-text-secondary text-xs font-semibold">Password must:</p>
-                  {passwordRules.map((rule) => {
-                    const passed = rule.test(passwordValue)
-                    return (
-                      <div key={rule.label} className="flex items-center gap-2">
-                        <div
-                          className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                            passed
-                              ? 'border-indigo-500 bg-indigo-500'
-                              : 'border-border-input bg-white'
-                          }`}
-                        >
-                          {passed && (
-                            <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 8 8">
-                              <path
-                                d="M1 4l2 2 4-4"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          )}
-                        </div>
-                        <span
-                          className={`text-xs transition-colors ${passed ? 'text-indigo-600' : 'text-text-placeholder'}`}
-                        >
-                          {rule.label}
-                        </span>
+              <div className="mt-2 flex flex-col gap-1.5">
+                <p className="text-text-secondary text-xs font-semibold">Password must:</p>
+                {passwordRules.map((rule) => {
+                  const passed = rule.test(passwordValue)
+                  return (
+                    <div key={rule.label} className="flex items-center gap-2">
+                      <div
+                        className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+                          passed
+                            ? 'border-indigo-500 bg-indigo-500'
+                            : 'border-border-input bg-white'
+                        }`}
+                      >
+                        {passed && (
+                          <svg className="h-2 w-2 text-white" fill="none" viewBox="0 0 8 8">
+                            <path
+                              d="M1 4l2 2 4-4"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        )}
                       </div>
-                    )
-                  })}
-                </div>
-              )}
+                      <span
+                        className={`text-xs transition-colors ${passed ? 'text-indigo-600' : 'text-text-placeholder'}`}
+                      >
+                        {rule.label}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
 
             {/* Confirm password */}
