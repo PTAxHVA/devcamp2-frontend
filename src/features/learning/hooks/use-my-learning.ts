@@ -37,7 +37,7 @@ const isTopicDone = (t: Pick<LearningTopic, 'sectionTotal' | 'sectionCompleted'>
  *  Uses section progress (same logic as build-flow-graph.ts) so the snake roadmap and the
  *  ReactFlow graph agree on what "completed" means. BE sends 'available' for eligible topics
  *  but also sends 'locked' for the root when no progress exists, so we re-derive here. */
-function deriveSequentialStatuses(topics: LearningTopic[]): LearningTopic[] {
+export function deriveSequentialStatuses(topics: LearningTopic[]): LearningTopic[] {
   if (!topics.length) return topics
   const ordered = [...topics].sort((a, b) => a.orderIndex - b.orderIndex)
   const completedIds = new Set(ordered.filter(isTopicDone).map((t) => t.masterTopicId))

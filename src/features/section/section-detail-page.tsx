@@ -152,11 +152,6 @@ export default function SectionDetailPage() {
     navigate(`/quizzes/${quiz.quizId}/attempt`)
   }
 
-  // NOTE: there is no section-completion API yet. Rather than fake success with a
-  // mocked toast (which misleads learners into thinking progress was saved), the
-  // non-quiz "Complete Section" CTA is rendered disabled below. Wire it to the real
-  // endpoint once the backend exposes one.
-
   return (
     <div className="mx-auto w-full max-w-400 p-6 lg:p-8">
       {/* Breadcrumbs */}

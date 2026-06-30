@@ -24,6 +24,7 @@ export const roles = [
     desc: 'Build user interfaces and interactive experiences for the web.',
     time: '3–6 months',
     icon: <LuLayoutTemplate className="text-text-placeholder h-16 w-16 stroke-[1.25]" />,
+    mappedNote: undefined as string | undefined,
   },
   {
     id: 'backend',
@@ -31,6 +32,7 @@ export const roles = [
     desc: 'Build server-side logic, APIs, and databases that power applications.',
     time: '3–6 months',
     icon: <LuDatabase className="text-text-placeholder h-16 w-16 stroke-[1.25]" />,
+    mappedNote: undefined as string | undefined,
   },
   {
     id: 'fullstack',
@@ -38,6 +40,7 @@ export const roles = [
     desc: 'Work on both frontend and backend to build complete applications.',
     time: '6–9 months',
     icon: <LuCode className="text-text-placeholder h-16 w-16 stroke-[1.25]" />,
+    mappedNote: "No dedicated Fullstack roadmap yet — you'll start with the Frontend roadmap.",
   },
 ]
 
