@@ -57,10 +57,20 @@ export function QuizAttemptPage() {
 
       const payload = buildPayload()
       if (payload.length === 0) {
-        if (!isTimedOut) {
-          toast.error('Please answer at least one question before submitting.')
-          return false
+        if (isTimedOut) {
+          // Timer expired with nothing answered. The backend rejects an empty
+          // submission (answers must have >=1), so exit gracefully instead of
+          // POSTing [] and stranding the user on a page with every button disabled.
+          if (timeoutToastAttemptId.current !== attemptId) {
+            timeoutToastAttemptId.current = attemptId
+            toast("Time's up. No answers were submitted.")
+          }
+          navigate('/dashboard', { replace: true })
+          return true
         }
+
+        toast.error('Please answer at least one question before submitting.')
+        return false
       }
 
       if (isTimedOut && timeoutToastAttemptId.current !== attemptId) {
