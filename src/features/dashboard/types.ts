@@ -18,6 +18,7 @@ export interface DashboardData {
     currentStreak: number
     longestStreak: number
     lastActivityDate: string | null
+    activityDays?: boolean[]
     todayCompleted: boolean
   }
   stats: { roadmapProgress: number; completedTopics: number; quizAvg: number }

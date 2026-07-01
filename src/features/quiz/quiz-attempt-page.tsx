@@ -20,15 +20,18 @@ export function QuizAttemptPage() {
   const navigate = useNavigate()
 
   const { isLoading, error } = useQuizAttempt(quizId ?? '')
-  const { attemptId, questions, currentIndex, answers, setAnswer, next, prev, reset } =
+  const { attemptId, startedAt, questions, currentIndex, answers, setAnswer, next, prev, reset } =
     useQuizStore()
-  const submit = useSubmitQuiz(attemptId ?? '')
+  const { mutate: submitQuiz, isPending: isSubmitPending } = useSubmitQuiz(attemptId ?? '')
   const isQuizReady = !isLoading && !error && !!quizId && !!attemptId && questions.length > 0
   const { formatted, isUrgent, isExpired } = useQuizTimer(
     QUIZ_DURATION_SECONDS,
-    isQuizReady && !submit.isPending,
+    isQuizReady && !isSubmitPending,
+    startedAt,
   )
-  const didAutoSubmit = useRef(false)
+  const autoSubmittedAttemptId = useRef<string | null>(null)
+  const submissionInFlight = useRef(false)
+  const timeoutToastAttemptId = useRef<string | null>(null)
 
   // Clear the session on unmount so a stale attempt never bleeds into the next quiz.
   useEffect(() => reset, [reset])
@@ -48,40 +51,80 @@ export function QuizAttemptPage() {
   )
 
   const submitAttempt = useCallback(
-    ({ allowEmpty = false, isTimedOut = false } = {}) => {
-      if (!attemptId || submit.isPending) return
+    ({ isTimedOut = false } = {}) => {
+      if (!attemptId || submissionInFlight.current) return false
+      if (isTimedOut && typeof navigator !== 'undefined' && !navigator.onLine) return false
 
       const payload = buildPayload()
       if (payload.length === 0) {
         if (isTimedOut) {
-          toast("Time's up. No answers were submitted.")
+          // Timer expired with nothing answered. The backend rejects an empty
+          // submission (answers must have >=1), so exit gracefully instead of
+          // POSTing [] and stranding the user on a page with every button disabled.
+          if (timeoutToastAttemptId.current !== attemptId) {
+            timeoutToastAttemptId.current = attemptId
+            toast("Time's up. No answers were submitted.")
+          }
           navigate('/dashboard', { replace: true })
-          return
+          return true
         }
 
-        if (!allowEmpty) {
-          toast.error('Please answer at least one question before submitting.')
-          return
-        }
+        toast.error('Please answer at least one question before submitting.')
+        return false
       }
 
-      if (isTimedOut) {
+      if (isTimedOut && timeoutToastAttemptId.current !== attemptId) {
+        timeoutToastAttemptId.current = attemptId
         toast("Time's up. Submitting your quiz now.")
       }
 
-      submit.mutate(payload, {
+      submissionInFlight.current = true
+      submitQuiz(payload, {
+        onError: () => {
+          if (isTimedOut && autoSubmittedAttemptId.current === attemptId) {
+            autoSubmittedAttemptId.current = null
+          }
+        },
+        onSettled: () => {
+          submissionInFlight.current = false
+        },
         onSuccess: (result) =>
           navigate(`/quizzes/${result.quizAttemptId}/result/${result.isPassed ? 'pass' : 'fail'}`),
       })
+      return true
     },
-    [attemptId, buildPayload, navigate, submit],
+    [attemptId, buildPayload, navigate, submitQuiz],
   )
 
+  const autoSubmit = useCallback(() => {
+    if (!isExpired || !isQuizReady || !attemptId) return
+    if (autoSubmittedAttemptId.current === attemptId) return
+
+    autoSubmittedAttemptId.current = attemptId
+    if (!submitAttempt({ isTimedOut: true })) {
+      autoSubmittedAttemptId.current = null
+    }
+  }, [attemptId, isExpired, isQuizReady, submitAttempt])
+
+  useEffect(() => autoSubmit(), [autoSubmit])
+
   useEffect(() => {
-    if (!isExpired || !isQuizReady || didAutoSubmit.current) return
-    didAutoSubmit.current = true
-    submitAttempt({ allowEmpty: true, isTimedOut: true })
-  }, [isExpired, isQuizReady, submitAttempt])
+    const resumeAutoSubmit = () => {
+      if (document.visibilityState === 'hidden' || submissionInFlight.current) return
+      autoSubmittedAttemptId.current = null
+      autoSubmit()
+    }
+
+    window.addEventListener('online', resumeAutoSubmit)
+    window.addEventListener('focus', resumeAutoSubmit)
+    document.addEventListener('visibilitychange', resumeAutoSubmit)
+
+    return () => {
+      window.removeEventListener('online', resumeAutoSubmit)
+      window.removeEventListener('focus', resumeAutoSubmit)
+      document.removeEventListener('visibilitychange', resumeAutoSubmit)
+    }
+  }, [autoSubmit])
 
   if (isLoading) {
     return (
@@ -162,7 +205,7 @@ export function QuizAttemptPage() {
             <div className="mt-10 flex items-center justify-between border-t pt-6">
               <button
                 onClick={prev}
-                disabled={isFirst || isExpired || submit.isPending}
+                disabled={isFirst || isExpired || isSubmitPending}
                 className="btn btn-ghost font-bold text-indigo-600 disabled:opacity-40"
               >
                 <HiMiniArrowLeft className="h-5 w-5" /> Previous
@@ -170,10 +213,10 @@ export function QuizAttemptPage() {
               {isLast ? (
                 <button
                   onClick={handleSubmit}
-                  disabled={submit.isPending || isExpired}
+                  disabled={isSubmitPending || isExpired}
                   className="btn h-12 rounded-xl bg-slate-900 px-8 text-white hover:bg-slate-800"
                 >
-                  {submit.isPending ? (
+                  {isSubmitPending ? (
                     <span className="loading loading-spinner loading-sm" />
                   ) : (
                     <>
@@ -184,7 +227,7 @@ export function QuizAttemptPage() {
               ) : (
                 <button
                   onClick={next}
-                  disabled={isExpired || submit.isPending}
+                  disabled={isExpired || isSubmitPending}
                   className="btn h-12 rounded-xl bg-slate-900 px-8 text-white hover:bg-slate-800"
                 >
                   Next <HiMiniArrowRight className="h-5 w-5" />
