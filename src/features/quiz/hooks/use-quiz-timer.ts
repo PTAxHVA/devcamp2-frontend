@@ -1,18 +1,48 @@
 import { useState, useEffect } from 'react'
 
-export function useQuizTimer(initialSeconds: number, enabled = true) {
-  const [secondsLeft, setSecondsLeft] = useState(initialSeconds)
+export function calculateSecondsLeft(
+  initialSeconds: number,
+  startedAt: string | null,
+  nowMs: number,
+): number {
+  const safeDuration = Number.isFinite(initialSeconds) ? Math.max(0, Math.floor(initialSeconds)) : 0
+  if (!startedAt) return safeDuration
+
+  const startedAtMs = Date.parse(startedAt)
+  if (!Number.isFinite(startedAtMs)) return safeDuration
+
+  return Math.min(
+    safeDuration,
+    Math.max(0, Math.ceil((startedAtMs + safeDuration * 1000 - nowMs) / 1000)),
+  )
+}
+
+export function useQuizTimer(
+  initialSeconds: number,
+  enabled = true,
+  startedAt: string | null = null,
+) {
+  const [nowMs, setNowMs] = useState(() => Date.now())
 
   useEffect(() => {
     if (!enabled) return
 
-    // One interval for the whole countdown; the functional update avoids
-    // re-subscribing a new interval on every tick.
-    const id = setInterval(() => {
-      setSecondsLeft((prev) => (prev <= 0 ? 0 : prev - 1))
-    }, 1000)
-    return () => clearInterval(id)
+    // Derive from the backend start time instead of decrementing local state.
+    // This stays correct after a suspended tab, refresh, or resumed attempt.
+    const updateNow = () => setNowMs(Date.now())
+    updateNow()
+    const id = setInterval(updateNow, 250)
+    document.addEventListener('visibilitychange', updateNow)
+    window.addEventListener('focus', updateNow)
+
+    return () => {
+      clearInterval(id)
+      document.removeEventListener('visibilitychange', updateNow)
+      window.removeEventListener('focus', updateNow)
+    }
   }, [enabled])
+
+  const secondsLeft = calculateSecondsLeft(initialSeconds, startedAt, nowMs)
 
   const m = Math.floor(secondsLeft / 60)
   const s = secondsLeft % 60

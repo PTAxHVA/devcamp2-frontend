@@ -138,6 +138,7 @@ export function useDashboard() {
           currentStreak: dashData.streak?.streak || 0,
           longestStreak: dashData.streak?.longestStreak || 0,
           lastActivityDate: dashData.streak?.lastActivityDate || null,
+          activityDays: weeklyProgressCounts?.map((count) => count > 0),
           todayCompleted,
         },
         stats: {

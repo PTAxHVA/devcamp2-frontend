@@ -1,5 +1,12 @@
 import { FiCalendar } from 'react-icons/fi'
 import { FaFire } from 'react-icons/fa'
+import { alignCurrentWeekActivityToLastSevenDays } from '@/features/dashboard/lib/streak-activity'
+
+const DAY_MS = 24 * 60 * 60 * 1000
+
+function localDayNumber(date: Date): number {
+  return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / DAY_MS
+}
 
 function deriveActivityDays(streak: {
   currentStreak: number
@@ -8,13 +15,11 @@ function deriveActivityDays(streak: {
   if (!streak.lastActivityDate || streak.currentStreak === 0) return Array(7).fill(false)
 
   const lastActivity = new Date(streak.lastActivityDate)
-  lastActivity.setHours(0, 0, 0, 0)
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
+  if (Number.isNaN(lastActivity.getTime())) return Array(7).fill(false)
 
-  const daysSinceLast = Math.round(
-    (today.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24),
-  )
+  const today = new Date()
+  const daysSinceLast = localDayNumber(today) - localDayNumber(lastActivity)
+  if (daysSinceLast < 0) return Array(7).fill(false)
 
   // i=0 → 6 days ago, i=6 → today. Day i is active if it falls within the streak window
   // ending at lastActivityDate.
@@ -27,9 +32,16 @@ function deriveActivityDays(streak: {
 export function StreakCalendar({
   streak,
 }: {
-  streak: { currentStreak: number; lastActivityDate: string | null; todayCompleted: boolean }
+  streak: {
+    currentStreak: number
+    lastActivityDate: string | null
+    activityDays?: boolean[]
+    todayCompleted: boolean
+  }
 }) {
-  const activityDays = deriveActivityDays(streak)
+  const activityDays = streak.activityDays
+    ? alignCurrentWeekActivityToLastSevenDays(streak.activityDays)
+    : deriveActivityDays(streak)
 
   const today = new Date()
   const dayLabels = Array.from({ length: 7 }, (_, i) => {

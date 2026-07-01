@@ -61,9 +61,20 @@ export function useQuizAttempt(quizId: string) {
 
   useEffect(() => {
     let cancelled = false
+    let inFlight = false
+    let retryTimer: ReturnType<typeof setTimeout> | undefined
+    let retryCount = 0
+
+    const clearRetry = () => {
+      if (retryTimer !== undefined) clearTimeout(retryTimer)
+      retryTimer = undefined
+    }
 
     const initAttempt = ({ quizAttempt, questions }: AttemptResponse['data']) => {
-      setAttempt(quizAttempt.attemptId, questions.map(mapQuestion))
+      setAttempt(quizAttempt.attemptId, quizAttempt.startedAt, questions.map(mapQuestion))
+      retryCount = 0
+      setError(null)
+      setIsLoading(false)
     }
 
     const loadAttempt = async (attemptId: string) => {
@@ -72,11 +83,23 @@ export function useQuizAttempt(quizId: string) {
     }
 
     const startAttempt = async () => {
+      if (cancelled || inFlight) return
+
       if (!quizId) {
         setIsLoading(false)
         return
       }
 
+      // Keep initialization pending while offline. The `online` listener below
+      // resumes it without turning a temporary disconnect into a fatal state.
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        setIsLoading(true)
+        setError(null)
+        return
+      }
+
+      inFlight = true
+      clearRetry()
       setIsLoading(true)
       setError(null)
 
@@ -105,16 +128,36 @@ export function useQuizAttempt(quizId: string) {
           return
         }
 
+        // Starting is idempotent at product level: if an ambiguous request did
+        // reach the server, the next request resolves through the resume path.
+        if (isAxiosError(err) && !err.response && retryCount < 3) {
+          retryCount += 1
+          retryTimer = setTimeout(() => {
+            retryTimer = undefined
+            void startAttempt()
+          }, retryCount * 1500)
+          return
+        }
+
         setError(err)
       } finally {
-        if (!cancelled) setIsLoading(false)
+        inFlight = false
+        if (!cancelled && retryTimer === undefined) setIsLoading(false)
       }
     }
 
+    const handleOnline = () => {
+      retryCount = 0
+      void startAttempt()
+    }
+
+    window.addEventListener('online', handleOnline)
     void startAttempt()
 
     return () => {
       cancelled = true
+      clearRetry()
+      window.removeEventListener('online', handleOnline)
     }
   }, [navigate, quizId, setAttempt])
 
