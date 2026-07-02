@@ -22,7 +22,13 @@ export function QuizAttemptPage() {
   const sectionId = searchParams.get('sectionId')
   const topicId = searchParams.get('topicId')
   const roadmapId = searchParams.get('roadmapId')
-  const queryParamsStr = `?sectionId=${sectionId || ''}&topicId=${topicId || ''}${roadmapId ? `&roadmapId=${roadmapId}` : ''}`
+  // Only include context params that are present so result/back URLs stay
+  // clean (no `?sectionId=&topicId=`); missing params fall back downstream.
+  const ctxParams = new URLSearchParams()
+  if (sectionId) ctxParams.set('sectionId', sectionId)
+  if (topicId) ctxParams.set('topicId', topicId)
+  if (roadmapId) ctxParams.set('roadmapId', roadmapId)
+  const queryParamsStr = ctxParams.toString() ? `?${ctxParams.toString()}` : ''
 
   const { isLoading, error } = useQuizAttempt(quizId ?? '')
   const { attemptId, startedAt, questions, currentIndex, answers, setAnswer, next, prev, reset } =

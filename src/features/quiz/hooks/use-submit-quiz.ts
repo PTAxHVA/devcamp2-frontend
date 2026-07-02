@@ -59,9 +59,12 @@ export function useSubmitQuiz(attemptId: string) {
       }
     },
     onSuccess: (result) => {
+      // The attempt id is reused across retries, so its cached result would be
+      // served stale (60s staleTime) — invalidate it so the pass/fail page
+      // always renders the freshly graded attempt, not the previous one.
+      qc.invalidateQueries({ queryKey: ['attempt-result', result.quizAttemptId] })
       if (result.isPassed) {
         qc.invalidateQueries({ queryKey: ['dashboard'] })
-        qc.invalidateQueries({ queryKey: ['streak'] })
         qc.invalidateQueries({ queryKey: ['topic-detail'] })
         qc.invalidateQueries({ queryKey: ['section-detail'] })
         qc.invalidateQueries({ queryKey: ['section-quiz'] })
