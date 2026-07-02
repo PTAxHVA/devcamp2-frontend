@@ -9,26 +9,7 @@ import {
   useUpdateAccount,
   useDeactivateAccount,
 } from '@/features/profile/hooks/use-profile'
-import { User, Lock, Bell, LogOut, Eye, EyeOff, Mail, ChevronDown, X } from 'lucide-react'
-
-// Toggle switch component
-function Toggle({ enabled, onChange }: { enabled: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <button
-      type="button"
-      onClick={() => onChange(!enabled)}
-      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${
-        enabled ? 'bg-brand-purple-500' : 'bg-gray-200'
-      }`}
-    >
-      <span
-        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ${
-          enabled ? 'translate-x-5' : 'translate-x-0'
-        }`}
-      />
-    </button>
-  )
-}
+import { User, Lock, LogOut, Eye, EyeOff, Mail, X } from 'lucide-react'
 
 // Section card wrapper
 function Section({
@@ -105,15 +86,6 @@ export default function SettingsPage() {
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-
-  // Notification state
-  const [notifications, setNotifications] = useState({
-    roadmapUpdates: true,
-    goalProgress: true,
-    learningReminders: true,
-    productAnnouncements: false,
-    weeklySummary: true,
-  })
 
   const passwordRules = [
     { label: 'At least 8 characters', test: (v: string) => v.length >= 8 },
@@ -357,61 +329,6 @@ export default function SettingsPage() {
 
         {/* ── Right column ── */}
         <div className="flex flex-col gap-4">
-          {/* Notification References */}
-          <Section
-            icon={Bell}
-            title="Notification preferences"
-            subtitle="Choose what you want to be notified about."
-          >
-            <div className="flex flex-col gap-4">
-              {[
-                {
-                  key: 'roadmapUpdates',
-                  label: 'Roadmap updates',
-                  desc: 'Get notified about changes to roadmaps you follow.',
-                },
-                {
-                  key: 'goalProgress',
-                  label: 'Goal progress',
-                  desc: 'Receive updates on your goal progress.',
-                },
-                {
-                  key: 'learningReminders',
-                  label: 'Learning reminders',
-                  desc: 'Get reminded to keep learning and stay on track.',
-                },
-                {
-                  key: 'productAnnouncements',
-                  label: 'Product announcements',
-                  desc: 'Important updates, new features, and tips.',
-                },
-                {
-                  key: 'weeklySummary',
-                  label: 'Weekly summary',
-                  desc: 'Receive a weekly summary of your activity.',
-                },
-              ].map((item) => (
-                <div key={item.key} className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-text-primary text-sm font-medium">{item.label}</p>
-                    <p className="text-text-muted mt-0.5 text-xs">{item.desc}</p>
-                  </div>
-                  <Toggle
-                    enabled={notifications[item.key as keyof typeof notifications]}
-                    onChange={(v) => setNotifications((prev) => ({ ...prev, [item.key]: v }))}
-                  />
-                </div>
-              ))}
-
-              <div className="border-border-soft flex items-center justify-between border-t pt-2">
-                <p className="text-text-primary text-sm font-medium">Email frequency</p>
-                <button className="text-text-primary border-border-input hover:bg-bg-section flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition">
-                  Instant <ChevronDown className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          </Section>
-
           {/* Account Actions */}
           <Section
             icon={LogOut}

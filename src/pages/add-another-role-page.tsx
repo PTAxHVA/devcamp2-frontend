@@ -13,6 +13,8 @@ export function AddAnotherRolePage() {
   const available = (allRoadmaps ?? []).filter(
     (r) => !enrolled.has((r.roleName ?? '').toLowerCase()),
   )
+  // Proactively tell the learner when they're at the 2-roadmap cap (L10).
+  const atCap = (myRoadmaps ?? []).length >= 2
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 mx-auto max-w-5xl p-6 duration-500">
@@ -50,9 +52,13 @@ export function AddAnotherRolePage() {
         </div>
       ) : available.length === 0 ? (
         <div className="mx-auto max-w-md rounded-2xl border border-slate-100 bg-white py-12 text-center shadow-sm">
-          <p className="text-lg font-bold text-slate-700">No new roles available</p>
+          <p className="text-lg font-bold text-slate-700">
+            {atCap ? "You've reached the maximum of 2 active roadmaps" : 'No new roles available'}
+          </p>
           <p className="mt-1 text-sm text-slate-500">
-            You're already following every roadmap we offer.
+            {atCap
+              ? 'Remove a roadmap from your dashboard first to add a different one.'
+              : "You're already following every roadmap we offer."}
           </p>
           <Link
             to="/roadmaps/browse"

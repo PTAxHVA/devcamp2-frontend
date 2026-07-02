@@ -1,9 +1,10 @@
 import { RiArrowDownSLine } from 'react-icons/ri'
-import { PREFERENCE_QUESTIONS } from '../../data/onboarding-data'
+import { getPreferenceQuestions } from '../../data/onboarding-data'
 import { useWizardStore } from '../../onboarding-store'
 
 export const StepPreferences = () => {
   const { answers, setAnswer } = useWizardStore()
+  const questions = getPreferenceQuestions(answers?.role as string | undefined)
   return (
     <div className="w-full">
       <div className="mb-10 text-left">
@@ -17,7 +18,7 @@ export const StepPreferences = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-x-12 gap-y-8 md:grid-cols-2">
-        {PREFERENCE_QUESTIONS.map((q) => (
+        {questions.map((q) => (
           <div key={q.id} className="flex gap-4">
             {/* Icon Block */}
             <div className="mt-1">

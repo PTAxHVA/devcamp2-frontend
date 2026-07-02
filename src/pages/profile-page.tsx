@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router'
 import { BookOpen, Flame, Clock, Star, ExternalLink, Pencil } from 'lucide-react'
 import { useMe, useMyProfile, useMyProgress } from '@/features/profile/hooks/use-profile'
 import { useMyRoadmaps } from '@/features/learning/hooks/use-my-learning'
@@ -50,13 +51,14 @@ function RoadmapCard({
       </div>
 
       <p className="text-text-muted text-xs">
-        {progress}% complete • {done} of {total} topics
+        {progress}% complete • {done} of {total} sections
       </p>
     </div>
   )
 }
 
 export default function ProfilePage() {
+  const navigate = useNavigate()
   const { data: me, isLoading: loadingMe } = useMe()
   const { data: profile, isLoading: loadingProfile } = useMyProfile()
   const { data: roadmapsData, isLoading: loadingRoadmaps } = useMyRoadmaps()
@@ -130,7 +132,10 @@ export default function ProfilePage() {
           </div>
 
           {/* Edit button */}
-          <button className="border-border-input text-text-primary hover:bg-bg-section flex shrink-0 items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition">
+          <button
+            onClick={() => navigate('/settings')}
+            className="border-border-input text-text-primary hover:bg-bg-section flex shrink-0 items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition"
+          >
             <Pencil className="h-3.5 w-3.5" /> Edit profile
           </button>
         </div>
@@ -142,7 +147,10 @@ export default function ProfilePage() {
               <p className="text-text-primary text-sm font-bold">Active roadmaps</p>
               <p className="text-text-muted mt-0.5 text-xs">Roadmaps you're currently following.</p>
             </div>
-            <button className="text-brand-purple-500 flex items-center gap-1 text-xs font-semibold hover:underline">
+            <button
+              onClick={() => navigate('/my-learning')}
+              className="text-brand-purple-500 flex items-center gap-1 text-xs font-semibold hover:underline"
+            >
               View all roadmaps <ExternalLink className="h-3 w-3" />
             </button>
           </div>
@@ -166,7 +174,10 @@ export default function ProfilePage() {
               </p>
             </div>
           </div>
-          <button className="bg-brand-purple-500 hover:bg-brand-purple-600 shrink-0 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition">
+          <button
+            onClick={() => navigate('/roadmaps/browse')}
+            className="bg-brand-purple-500 hover:bg-brand-purple-600 shrink-0 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition"
+          >
             Explore Roadmaps
           </button>
         </div>
@@ -199,21 +210,6 @@ export default function ProfilePage() {
               <p className="text-text-muted text-xs">Keep it going!</p>
             </div>
           </div>
-        </div>
-
-        {/* Recent activity */}
-        <div className="border-border-soft flex flex-col gap-4 rounded-2xl border bg-white p-5">
-          <div>
-            <p className="text-text-primary text-sm font-bold">Recent activity</p>
-            <p className="text-text-muted mt-0.5 text-xs">See what you've been up to.</p>
-          </div>
-          <div className="flex flex-col items-center justify-center gap-2 py-6 text-center">
-            <p className="text-text-muted text-xs font-semibold">Activity feed coming soon</p>
-            <p className="text-text-muted text-xs">Your learning history will appear here.</p>
-          </div>
-          <button className="text-brand-purple-500 flex items-center gap-1 text-xs font-semibold hover:underline">
-            View all activity <ExternalLink className="h-3 w-3" />
-          </button>
         </div>
       </div>
     </div>

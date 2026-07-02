@@ -202,3 +202,14 @@ export const PREFERENCE_QUESTIONS = [
 ]
 
 export const LEARNING_PATH_KEYS = ['learningFramework', 'styling', 'projectDirection'] as const
+
+// Frontend + Fullstack get the frontend-specific questions (Fullstack starts on the
+// Frontend roadmap). Backend does not — so a Backend learner is never asked which
+// frontend framework/styling/path to use (H11).
+export const isFrontendFocusedRole = (role: string | undefined | null): boolean =>
+  role === 'frontend' || role === 'fullstack'
+
+// Preference questions for a given role: the frontend-only "framework" question is
+// dropped for non-frontend roles.
+export const getPreferenceQuestions = (role: string | undefined | null) =>
+  PREFERENCE_QUESTIONS.filter((q) => q.id !== 'framework' || isFrontendFocusedRole(role))
