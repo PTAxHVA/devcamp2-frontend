@@ -149,7 +149,14 @@ export default function SectionDetailPage() {
       toast.error('Quiz details are still loading. Please try again.')
       return
     }
-    navigate(`/quizzes/${quiz.quizId}/attempt`)
+    if (quiz.lastAttemptPassed && quiz.lastAttemptId) {
+      navigate(
+        `/quizzes/${quiz.lastAttemptId}/result/pass?sectionId=${sectionId}&topicId=${topicId}${roadmapId ? `&roadmapId=${roadmapId}` : ''}`,
+      )
+      return
+    }
+    const q = `?sectionId=${sectionId}&topicId=${topicId}${roadmapId ? `&roadmapId=${roadmapId}` : ''}`
+    navigate(`/quizzes/${quiz.quizId}/attempt${q}`)
   }
 
   return (
@@ -367,7 +374,8 @@ export default function SectionDetailPage() {
                 disabled={isQuizLoading}
                 className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#0B1221] px-6 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-slate-800 disabled:opacity-50 sm:w-auto"
               >
-                <RiSparklingFill className="text-brand-purple-300 animate-pulse" /> Start Quiz
+                <RiSparklingFill className="text-brand-purple-300 animate-pulse" />{' '}
+                {quiz?.lastAttemptPassed ? 'View Results' : 'Start Quiz'}
               </button>
             ) : (
               <div className="flex w-full flex-col items-stretch gap-1.5 sm:w-auto sm:items-end">

@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router'
+import { useParams, useNavigate, useSearchParams } from 'react-router'
 import { FiCheck } from 'react-icons/fi'
 import { useQuizResult } from '@/features/quiz/hooks/use-quiz-result'
 import { AnswerReview } from '@/features/quiz/components/answer-review'
@@ -8,6 +8,9 @@ const PASS_THRESHOLD = 80
 export function QuizResultPassPage() {
   const { attemptId } = useParams<{ attemptId: string }>()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const topicId = searchParams.get('topicId')
+  const roadmapId = searchParams.get('roadmapId')
   const { data, isLoading, isError } = useQuizResult(attemptId ?? '')
 
   if (isLoading) {
@@ -80,7 +83,15 @@ export function QuizResultPassPage() {
 
       <div className="mt-10 flex justify-end">
         <button
-          onClick={() => navigate('/dashboard')}
+          onClick={() => {
+            if (topicId) {
+              navigate(
+                `/my-learning/topics/${topicId}${roadmapId ? `?roadmapId=${roadmapId}` : ''}`,
+              )
+            } else {
+              navigate('/dashboard')
+            }
+          }}
           className="btn h-14 rounded-xl bg-slate-900 px-10 text-lg font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-slate-800"
         >
           Continue →

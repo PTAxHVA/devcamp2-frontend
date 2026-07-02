@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router'
+import { useParams, useNavigate, useSearchParams } from 'react-router'
 import { FiX, FiRefreshCw, FiShield } from 'react-icons/fi'
 import { useQuizResult } from '@/features/quiz/hooks/use-quiz-result'
 import { useCooldownTimer } from '@/features/quiz/hooks/use-cooldown-timer'
@@ -9,6 +9,10 @@ const PASS_THRESHOLD = 80
 export function QuizResultFailPage() {
   const { attemptId } = useParams<{ attemptId: string }>()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const sectionId = searchParams.get('sectionId')
+  const topicId = searchParams.get('topicId')
+  const roadmapId = searchParams.get('roadmapId')
   const { data, isLoading, isError } = useQuizResult(attemptId ?? '')
 
   // Real cooldown from the attempt; null until loaded / when BE sets no cooldown.
@@ -105,16 +109,27 @@ export function QuizResultFailPage() {
                   : 'cursor-not-allowed border-none bg-slate-200 text-slate-400'
               }`}
               disabled={!isExpired}
-              onClick={() => navigate(`/quizzes/${quizId}/attempt`)}
+              onClick={() => {
+                const q = `?sectionId=${sectionId || ''}&topicId=${topicId || ''}${roadmapId ? `&roadmapId=${roadmapId}` : ''}`
+                navigate(`/quizzes/${quizId}/attempt${q}`)
+              }}
             >
               <FiRefreshCw className="mr-2 h-5 w-5" />
               {isExpired ? 'Retry quiz' : `Retry in ${formatted}`}
             </button>
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => {
+                if (topicId) {
+                  navigate(
+                    `/my-learning/topics/${topicId}${roadmapId ? `?roadmapId=${roadmapId}` : ''}`,
+                  )
+                } else {
+                  navigate('/dashboard')
+                }
+              }}
               className="btn h-14 flex-1 rounded-xl border-slate-200 bg-white text-base font-bold text-slate-700 hover:bg-slate-50"
             >
-              Back to dashboard
+              Back to topic
             </button>
           </div>
         </div>

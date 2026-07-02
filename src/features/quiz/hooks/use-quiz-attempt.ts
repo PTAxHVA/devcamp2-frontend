@@ -124,7 +124,7 @@ export function useQuizAttempt(quizId: string) {
         }
 
         if (status === 409 && code === 'COOLDOWN_ACTIVE' && attemptId) {
-          navigate(`/quizzes/${attemptId}/result/fail`, { replace: true })
+          navigate(`/quizzes/${attemptId}/result/fail${window.location.search}`, { replace: true })
           return
         }
 
