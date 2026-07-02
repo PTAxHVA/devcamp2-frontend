@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router'
+import { useParams, useNavigate, useSearchParams } from 'react-router'
 import { FiClock, FiZap } from 'react-icons/fi'
 import { HiMiniArrowLeft, HiMiniArrowRight, HiMiniPaperAirplane } from 'react-icons/hi2'
 import toast from 'react-hot-toast'
@@ -18,6 +18,17 @@ const QUIZ_DURATION_SECONDS = 10 * 60
 export function QuizAttemptPage() {
   const { quizId } = useParams<{ quizId: string }>()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const sectionId = searchParams.get('sectionId')
+  const topicId = searchParams.get('topicId')
+  const roadmapId = searchParams.get('roadmapId')
+  // Only include context params that are present so result/back URLs stay
+  // clean (no `?sectionId=&topicId=`); missing params fall back downstream.
+  const ctxParams = new URLSearchParams()
+  if (sectionId) ctxParams.set('sectionId', sectionId)
+  if (topicId) ctxParams.set('topicId', topicId)
+  if (roadmapId) ctxParams.set('roadmapId', roadmapId)
+  const queryParamsStr = ctxParams.toString() ? `?${ctxParams.toString()}` : ''
 
   const { isLoading, error } = useQuizAttempt(quizId ?? '')
   const { attemptId, startedAt, questions, currentIndex, answers, setAnswer, next, prev, reset } =
@@ -65,7 +76,11 @@ export function QuizAttemptPage() {
             timeoutToastAttemptId.current = attemptId
             toast("Time's up. No answers were submitted.")
           }
-          navigate('/dashboard', { replace: true })
+          const target =
+            sectionId && topicId
+              ? `/my-learning/topics/${topicId}/sections/${sectionId}${roadmapId ? `?roadmapId=${roadmapId}` : ''}`
+              : '/dashboard'
+          navigate(target, { replace: true })
           return true
         }
 
@@ -89,11 +104,13 @@ export function QuizAttemptPage() {
           submissionInFlight.current = false
         },
         onSuccess: (result) =>
-          navigate(`/quizzes/${result.quizAttemptId}/result/${result.isPassed ? 'pass' : 'fail'}`),
+          navigate(
+            `/quizzes/${result.quizAttemptId}/result/${result.isPassed ? 'pass' : 'fail'}${queryParamsStr}`,
+          ),
       })
       return true
     },
-    [attemptId, buildPayload, navigate, submitQuiz],
+    [attemptId, buildPayload, navigate, submitQuiz, queryParamsStr, roadmapId, sectionId, topicId],
   )
 
   const autoSubmit = useCallback(() => {
@@ -166,7 +183,15 @@ export function QuizAttemptPage() {
       <div className="mb-6 flex items-end justify-between">
         <div>
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => {
+              if (sectionId && topicId) {
+                navigate(
+                  `/my-learning/topics/${topicId}/sections/${sectionId}${roadmapId ? `?roadmapId=${roadmapId}` : ''}`,
+                )
+              } else {
+                navigate(-1)
+              }
+            }}
             className="mb-2 flex items-center font-bold text-indigo-600 hover:underline"
           >
             ← Back to lesson

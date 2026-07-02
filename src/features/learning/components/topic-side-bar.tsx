@@ -10,6 +10,7 @@ import type { LearningTopic } from '../types'
 
 interface TopicDetailSidebarProps {
   topic: LearningTopic | null
+  roadmapId?: string | null
 }
 
 const STATUS_CONFIG = {
@@ -47,8 +48,9 @@ const STATUS_CONFIG = {
   },
 }
 
-export default function TopicDetailSidebar({ topic }: TopicDetailSidebarProps) {
+export default function TopicDetailSidebar({ topic, roadmapId }: TopicDetailSidebarProps) {
   const navigate = useNavigate()
+  const q = roadmapId ? `?roadmapId=${roadmapId}` : ''
 
   if (!topic) {
     return (
@@ -155,7 +157,7 @@ export default function TopicDetailSidebar({ topic }: TopicDetailSidebarProps) {
         {/* CTA */}
         <button
           disabled={!canNavigate}
-          onClick={() => canNavigate && navigate(`/my-learning/topics/${topic.masterTopicId}`)}
+          onClick={() => canNavigate && navigate(`/my-learning/topics/${topic.masterTopicId}${q}`)}
           className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all ${
             !canNavigate
               ? 'bg-bg-section text-text-placeholder cursor-not-allowed'

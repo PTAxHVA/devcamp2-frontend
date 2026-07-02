@@ -5,6 +5,8 @@ export interface BESectionQuiz {
   quizId: string
   minPassScore: number
   questionCount: number
+  lastAttemptId?: string | null
+  lastAttemptPassed?: boolean
 }
 
 interface ApiResponse<T> {
