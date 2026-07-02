@@ -28,9 +28,17 @@ export function useLogin() {
     onSuccess: async (payload) => {
       setAuth(payload.token, payload.user)
       // Return the user to the page they were bounced from (M7), unless it was an
-      // auth page. Onboarding-incomplete users always finish onboarding first.
-      const fromPath = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname
-      const from = fromPath && fromPath !== '/login' && fromPath !== '/signup' ? fromPath : null
+      // auth page. Keep the full path (search + hash) so deep links like
+      // /my-learning/topics/t/sections/s?roadmapId=r survive login. Onboarding-
+      // incomplete users always finish onboarding first.
+      const fromLoc = (
+        location.state as { from?: { pathname?: string; search?: string; hash?: string } } | null
+      )?.from
+      const fromPathname = fromLoc?.pathname
+      const from =
+        fromPathname && fromPathname !== '/login' && fromPathname !== '/signup'
+          ? `${fromPathname}${fromLoc?.search ?? ''}${fromLoc?.hash ?? ''}`
+          : null
       try {
         const { data } = await apiClient.get('/onboarding/status')
         const completed = data?.data?.completed ?? true
