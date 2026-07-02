@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react'
 import RoadmapCard from '@/features/roadmap/components/roadmap-card'
 import { useBrowseRoadmaps } from '@/features/roadmap/hooks/use-browse-roadmaps'
+import { useMyRoadmaps } from '@/features/learning/hooks/use-my-learning'
+import { enrolledMasterRoadmapIds } from '@/features/roadmap/lib/enrolled-roadmaps'
 
 type Tab = 'recommended' | 'all' | 'popular' | 'new'
 
@@ -10,6 +12,8 @@ export default function BrowseRoadmapsPage() {
   const [tab, setTab] = useState<Tab>('recommended')
 
   const { data: rawRoadmaps = [], isLoading, isError, isFetching, refetch } = useBrowseRoadmaps()
+  const { data: myRoadmaps } = useMyRoadmaps()
+  const enrolledIds = useMemo(() => enrolledMasterRoadmapIds(myRoadmaps), [myRoadmaps])
 
   const clearFilters = () => {
     setSearch('')
@@ -114,7 +118,7 @@ export default function BrowseRoadmapsPage() {
       ) : displayRoadmaps.length > 0 ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {displayRoadmaps.map((item) => (
-            <RoadmapCard key={item._id} data={item} />
+            <RoadmapCard key={item._id} data={item} isEnrolled={enrolledIds.has(item._id)} />
           ))}
         </div>
       ) : (

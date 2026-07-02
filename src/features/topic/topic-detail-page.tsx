@@ -221,17 +221,16 @@ export default function TopicDetailPage() {
     })),
   )
 
-  // Calculations for Summary
-  const totalMinutes = sections.reduce((acc, s) => {
-    return acc + (s.resourceList || []).reduce((sum, r) => sum + (r.estimatedMinutes || 0), 0)
-  }, 0)
+  // Topic-level estimate comes straight from the API (curated resource hours),
+  // shown once — not re-summed per section, which is what inflated the number.
+  const estimatedHours = data.estimatedHours || 0
   const estimatedTimeText =
-    totalMinutes > 60 ? `${Math.round(totalMinutes / 60)} hours` : `${totalMinutes || 45} min`
+    estimatedHours > 0 ? `${estimatedHours} ${estimatedHours === 1 ? 'hour' : 'hours'}` : '—'
 
   const objectives = getObjectives(topicName)
   const prerequisites = getPrerequisites(topicName)
 
-  const cols = 'grid-cols-[20px_22px_1fr_72px_104px_24px]'
+  const cols = 'grid-cols-[20px_22px_1fr_104px_24px]'
 
   const getSectionStatus = (secId: string): Status => {
     const progress = userProgress.find((p) => p.sectionId === secId)
@@ -382,16 +381,11 @@ export default function TopicDetailPage() {
                 <span />
                 <span>#</span>
                 <span>Section</span>
-                <span>Duration</span>
                 <span className="text-center">Status</span>
                 <span />
               </div>
               {sections.map((sec, idx) => {
                 const status = getSectionStatus(sec._id)
-                const secMinutes = (sec.resourceList || []).reduce(
-                  (sum, r) => sum + (r.estimatedMinutes || 0),
-                  0,
-                )
                 return (
                   <div
                     key={sec._id}
@@ -417,9 +411,6 @@ export default function TopicDetailPage() {
                           : 'Understand the core concepts of this section.'}
                       </p>
                     </div>
-                    <span className="text-text-muted text-sm">
-                      {secMinutes ? `${secMinutes} min` : '15 min'}
-                    </span>
                     <StatusBadge status={status} />
                     <StatusIcon status={status} />
                   </div>

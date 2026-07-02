@@ -2,7 +2,6 @@ import { useParams, useNavigate, Link, useSearchParams } from 'react-router'
 import type { IconType } from 'react-icons'
 import {
   RiArrowRightSLine,
-  RiTimeLine,
   RiBarChartBoxLine,
   RiBookOpenLine,
   RiCheckboxCircleLine,
@@ -137,13 +136,6 @@ export default function SectionDetailPage() {
 
   // Mock materials as requested
 
-  // Duration
-  const totalMinutes = (section.resourceList || []).reduce(
-    (sum, r) => sum + (r.estimatedMinutes || 0),
-    0,
-  )
-  const durationText = totalMinutes > 0 ? `${totalMinutes} min` : '15 min'
-
   const handleStartQuiz = () => {
     if (!quiz?.quizId) {
       toast.error('Quiz details are still loading. Please try again.')
@@ -197,13 +189,6 @@ export default function SectionDetailPage() {
         {/* Stats Card */}
         <div className="border-border-soft w-full shrink-0 rounded-2xl border bg-white p-5 shadow-sm lg:w-80 xl:w-96">
           <div className="space-y-4">
-            <div className="flex items-center justify-between text-sm">
-              <div className="text-text-secondary flex items-center gap-3">
-                <RiTimeLine className="text-brand-purple-600 text-lg" />
-                <span className="font-medium">Duration</span>
-              </div>
-              <span className="text-text-primary font-semibold">{durationText}</span>
-            </div>
             <div className="flex items-center justify-between text-sm">
               <div className="text-text-secondary flex items-center gap-3">
                 <RiBarChartBoxLine className="text-brand-purple-600 text-lg" />

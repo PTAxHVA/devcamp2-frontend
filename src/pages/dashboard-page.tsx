@@ -94,10 +94,6 @@ const DashboardPage = () => {
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <h2 className="text-text-primary text-xl font-bold">Weekly Progress</h2>
-                  <select className="select select-bordered select-sm rounded-full bg-white font-medium">
-                    <option>This week</option>
-                    <option>Last week</option>
-                  </select>
                 </div>
                 <WeeklyProgressChart counts={data.weeklyProgressCounts} />
               </div>
