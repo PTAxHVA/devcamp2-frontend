@@ -2,7 +2,6 @@ import { useParams, useNavigate, Link, useSearchParams } from 'react-router'
 import type { IconType } from 'react-icons'
 import {
   RiArrowRightSLine,
-  RiBarChartBoxLine,
   RiBookOpenLine,
   RiCheckboxCircleLine,
   RiInformationLine,
@@ -191,13 +190,6 @@ export default function SectionDetailPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between text-sm">
               <div className="text-text-secondary flex items-center gap-3">
-                <RiBarChartBoxLine className="text-brand-purple-600 text-lg" />
-                <span className="font-medium">Difficulty</span>
-              </div>
-              <span className="text-text-primary font-semibold">Beginner</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <div className="text-text-secondary flex items-center gap-3">
                 <RiBookOpenLine className="text-brand-purple-600 text-lg" />
                 <span className="font-medium">Topic</span>
               </div>
@@ -363,17 +355,9 @@ export default function SectionDetailPage() {
                 {quiz?.lastAttemptPassed ? 'View Results' : 'Start Quiz'}
               </button>
             ) : (
-              <div className="flex w-full flex-col items-stretch gap-1.5 sm:w-auto sm:items-end">
-                <button
-                  disabled
-                  title="Marking a section complete isn't available yet."
-                  className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-[#0B1221] px-6 py-3 text-sm font-bold text-white opacity-50 sm:w-auto"
-                >
-                  <RiCheckboxCircleLine className="text-emerald-400" />
-                  Complete Section
-                </button>
-                <span className="text-text-muted text-xs">Progress saving is coming soon.</span>
-              </div>
+              <p className="text-text-muted max-w-xs text-sm sm:text-right">
+                This section has no quiz — review the materials above, then continue.
+              </p>
             )}
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router'
 import {
   RiCheckFill,
+  RiCheckboxBlankCircleLine,
   RiTimeLine,
   RiBookOpenLine,
   RiLockLine,
@@ -10,6 +11,9 @@ import type { LearningTopic } from '../types'
 
 interface TopicDetailSidebarProps {
   topic: LearningTopic | null
+  // The full roadmap topic list — used to resolve prerequisite ids to real
+  // names + completion status (H8), so no raw ObjectId or fake tick is shown.
+  topics: LearningTopic[]
   roadmapId?: string | null
 }
 
@@ -48,7 +52,7 @@ const STATUS_CONFIG = {
   },
 }
 
-export default function TopicDetailSidebar({ topic, roadmapId }: TopicDetailSidebarProps) {
+export default function TopicDetailSidebar({ topic, topics, roadmapId }: TopicDetailSidebarProps) {
   const navigate = useNavigate()
   const q = roadmapId ? `?roadmapId=${roadmapId}` : ''
 
@@ -64,6 +68,15 @@ export default function TopicDetailSidebar({ topic, roadmapId }: TopicDetailSide
   }
 
   const cfg = STATUS_CONFIG[topic.status]
+
+  // Resolve prerequisite ids to their real topic name + completion status.
+  const prereqs = topic.prerequisiteTopicIds
+    .map((id) => {
+      const t = topics.find((tp) => tp.masterTopicId === id)
+      return t ? { name: t.title, completed: t.status === 'completed' } : null
+    })
+    .filter((p): p is { name: string; completed: boolean } => p !== null)
+
   const sectionProgress =
     topic.sectionTotal > 0 ? Math.round((topic.sectionCompleted / topic.sectionTotal) * 100) : 0
 
@@ -136,18 +149,20 @@ export default function TopicDetailSidebar({ topic, roadmapId }: TopicDetailSide
         </div>
 
         {/* Prerequisites */}
-        {topic.prerequisiteTopicIds.length > 0 && (
+        {prereqs.length > 0 && (
           <div className="mb-4">
             <h4 className="text-text-secondary mb-2 text-xs font-black tracking-wider uppercase">
               Prerequisites
             </h4>
             <div className="space-y-1.5">
-              {topic.prerequisiteTopicIds.map((id) => (
-                <div key={id} className="text-text-muted flex items-center gap-2 text-xs">
-                  <RiCheckFill className="shrink-0 text-sm text-emerald-500" />
-                  <span className="text-text-placeholder truncate font-mono text-[11px]">
-                    {id.slice(-8)}
-                  </span>
+              {prereqs.map((p) => (
+                <div key={p.name} className="text-text-muted flex items-center gap-2 text-xs">
+                  {p.completed ? (
+                    <RiCheckFill className="shrink-0 text-sm text-emerald-500" />
+                  ) : (
+                    <RiCheckboxBlankCircleLine className="text-text-placeholder shrink-0 text-sm" />
+                  )}
+                  <span className="text-text-secondary truncate text-[11px]">{p.name}</span>
                 </div>
               ))}
             </div>

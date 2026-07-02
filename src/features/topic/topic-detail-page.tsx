@@ -1,20 +1,15 @@
 import React from 'react'
-import { useParams, useNavigate, Link, useSearchParams } from 'react-router'
+import { useParams, useNavigate, useSearchParams } from 'react-router'
 import type { IconType } from 'react-icons'
 import {
   RiArrowLeftLine,
   RiArrowRightLine,
-  RiArrowRightSLine,
   RiListUnordered,
   RiFileList2Line,
-  RiBarChart2Line,
-  RiStarLine,
   RiCheckboxCircleFill,
   RiCheckboxBlankCircleLine,
   RiDraggable,
-  RiQuestionLine,
   RiBookOpenLine,
-  RiFocus3Line,
   RiTimeLine,
   RiExternalLinkLine,
   RiFileTextLine,
@@ -134,36 +129,6 @@ const getResourceIcon = (type: string): IconType => {
   }
 }
 
-// Fallback logic for Topic Prerequisites
-const getPrerequisites = (topicName: string): string[] => {
-  const name = topicName.toLowerCase()
-  if (name.includes('dom') || name.includes('event')) {
-    return ['HTML & CSS', 'JavaScript Basics']
-  }
-  if (name.includes('react') || name.includes('component')) {
-    return ['JavaScript Basics', 'HTML & CSS', 'Git & GitHub']
-  }
-  return ['Basic Web Development']
-}
-
-// Fallback logic for Topic Objectives
-const getObjectives = (topicName: string): string[] => {
-  const name = topicName.toLowerCase()
-  if (name.includes('dom') || name.includes('event')) {
-    return [
-      'Understand the structure of the DOM tree',
-      'Select and manipulate DOM elements',
-      'Handle user events effectively',
-      'Build interactive UI components',
-    ]
-  }
-  return [
-    'Understand core foundational concepts',
-    'Apply practical learning materials and guides',
-    'Build fully functioning mini projects',
-  ]
-}
-
 /* ================================ MAIN PAGE ================================== */
 export default function TopicDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -210,14 +175,13 @@ export default function TopicDetailPage() {
   const progressPercent =
     totalSections > 0 ? Math.round((completedSections / totalSections) * 100) : 0
 
-  // Flat-map resources across sections
+  // Flat-map the curated external resources across this topic's sections.
   const resources = sections.flatMap((sec) =>
     (sec.resourceList || []).map((r) => ({
       title: r.title,
       url: r.url,
       type: r.type,
       estimatedMinutes: r.estimatedMinutes,
-      sectionId: sec._id,
     })),
   )
 
@@ -226,9 +190,6 @@ export default function TopicDetailPage() {
   const estimatedHours = data.estimatedHours || 0
   const estimatedTimeText =
     estimatedHours > 0 ? `${estimatedHours} ${estimatedHours === 1 ? 'hour' : 'hours'}` : '—'
-
-  const objectives = getObjectives(topicName)
-  const prerequisites = getPrerequisites(topicName)
 
   const cols = 'grid-cols-[20px_22px_1fr_104px_24px]'
 
@@ -278,9 +239,6 @@ export default function TopicDetailPage() {
               <div className="flex-1">
                 <div className="flex flex-wrap items-center gap-3">
                   <h1 className="text-text-primary text-3xl font-bold">{topicName}</h1>
-                  <span className="bg-bg-lavender text-brand-purple-700 rounded-md px-2.5 py-1 text-xs font-semibold">
-                    Required
-                  </span>
                 </div>
                 {/* Progress */}
                 <div className="mt-3 flex items-center gap-4">
@@ -300,41 +258,6 @@ export default function TopicDetailPage() {
 
             <p className="text-text-secondary max-w-3xl leading-relaxed">{topicDescription}</p>
 
-            {/* Objectives + Prerequisites */}
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-              <Card className="p-6">
-                <div className="mb-4 flex items-center gap-2">
-                  <RiFocus3Line className="text-brand-purple-600 h-5 w-5" />
-                  <h3 className="text-text-primary font-semibold">Learning objectives</h3>
-                </div>
-                <ul className="space-y-2.5">
-                  {objectives.map((o) => (
-                    <li key={o} className="text-text-secondary flex items-start gap-2.5 text-sm">
-                      <span className="bg-brand-purple-400 mt-1.75 h-1.5 w-1.5 shrink-0 rounded-full" />
-                      {o}
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-
-              <Card className="p-6">
-                <div className="mb-4 flex items-center gap-2">
-                  <RiBookOpenLine className="text-brand-purple-600 h-5 w-5" />
-                  <h3 className="text-text-primary font-semibold">Prerequisites</h3>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {prerequisites.map((p) => (
-                    <span
-                      key={p}
-                      className="border-border-soft text-text-secondary rounded-lg border px-3 py-1.5 text-sm"
-                    >
-                      {p}
-                    </span>
-                  ))}
-                </div>
-              </Card>
-            </div>
-
             {/* Resources */}
             {resources.length > 0 && (
               <Card className="p-6">
@@ -343,9 +266,11 @@ export default function TopicDetailPage() {
                   {resources.slice(0, 8).map((r, index) => {
                     const Icon = getResourceIcon(r.type)
                     return (
-                      <Link
+                      <a
                         key={index}
-                        to={`/my-learning/topics/${id}/sections/${r.sectionId}${roadmapId ? `?roadmapId=${roadmapId}` : ''}`}
+                        href={r.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="border-border-soft hover:border-border-purple flex min-h-31 flex-col justify-between rounded-xl border p-4 text-left transition hover:shadow-sm"
                       >
                         <div className="flex gap-3">
@@ -365,7 +290,7 @@ export default function TopicDetailPage() {
                           {r.estimatedMinutes ? `${r.estimatedMinutes} min` : 'External link'}
                           <RiExternalLinkLine className="h-3.5 w-3.5" />
                         </p>
-                      </Link>
+                      </a>
                     )
                   })}
                 </div>
@@ -447,8 +372,6 @@ export default function TopicDetailPage() {
                 <StatRow icon={RiTimeLine} label="Estimated time" value={estimatedTimeText} />
                 <StatRow icon={RiListUnordered} label="Sections" value={totalSections} />
                 <StatRow icon={RiFileList2Line} label="Resources" value={resources.length} />
-                <StatRow icon={RiBarChart2Line} label="Difficulty" value="Intermediate" />
-                <StatRow icon={RiStarLine} label="Importance" value="High" />
               </div>
 
               <button
@@ -457,20 +380,6 @@ export default function TopicDetailPage() {
               >
                 Continue topic <RiArrowRightLine className="h-4 w-4" />
               </button>
-            </Card>
-
-            {/* Need help */}
-            <Card className="hover:border-border-purple cursor-pointer p-5 transition">
-              <div className="flex items-center gap-3">
-                <div className="bg-bg-lavender text-brand-purple-600 flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
-                  <RiQuestionLine className="h-5 w-5" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-text-primary text-sm font-semibold">Need help?</p>
-                  <p className="text-text-placeholder text-xs">Ask AI Assistant about this topic</p>
-                </div>
-                <RiArrowRightSLine className="text-text-placeholder h-5 w-5" />
-              </div>
             </Card>
           </aside>
         </div>

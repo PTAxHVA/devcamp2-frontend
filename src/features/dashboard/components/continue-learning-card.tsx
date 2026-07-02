@@ -7,9 +7,10 @@ export interface ContinueLearningData {
   userRoadmapId: string
   topicName: string
   sectionName: string
-  progressPercentage?: number
-  completedTopics?: number
-  totalTopics?: number
+  roadmapName: string
+  progressPercentage: number
+  completedSections: number
+  totalSections: number
 }
 
 export function ContinueLearningCard({
@@ -22,8 +23,8 @@ export function ContinueLearningCard({
   if (!continueLearning) return null
 
   const progress = continueLearning.progressPercentage || 0
-  const completed = continueLearning.completedTopics || 0
-  const total = continueLearning.totalTopics || 0
+  const completed = continueLearning.completedSections || 0
+  const total = continueLearning.totalSections || 0
 
   return (
     <div className="card overflow-hidden rounded-2xl border-none bg-[#F4F0FF] shadow-sm">
@@ -58,7 +59,7 @@ export function ContinueLearningCard({
             className="group text-text-primary flex w-fit cursor-pointer items-center gap-2 text-2xl font-bold"
             onClick={() => navigate(`/roadmaps/${continueLearning.userRoadmapId}`)}
           >
-            {continueLearning.sectionName}
+            {continueLearning.roadmapName}
             <FiExternalLink className="group-hover:text-primary text-text-placeholder h-5 w-5 transition-colors" />
           </h3>
           <div className="my-4 h-px w-full bg-slate-200/60"></div>
@@ -74,7 +75,7 @@ export function ContinueLearningCard({
               <div className="flex flex-col">
                 <span className="text-text-primary font-bold">{continueLearning.topicName}</span>
                 <span className="text-text-muted text-xs font-medium">
-                  {completed} of {total} topics completed
+                  {completed} of {total} sections completed
                 </span>
               </div>
             </div>

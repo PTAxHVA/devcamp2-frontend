@@ -32,7 +32,7 @@ export default function RoadmapCard({ data, isEnrolled = false }: RoadmapCardPro
   const navigate = useNavigate()
   const enroll = useEnrollRoadmap()
 
-  const { data: branches = [] } = useQuery<MasterBranch[]>({
+  const { data: branches = [], isLoading: branchesLoading } = useQuery<MasterBranch[]>({
     queryKey: ['master-roadmap-branches', data._id],
     queryFn: async () => {
       const res = await apiClient.get(`/master-roadmaps/${data._id}/branches`)
@@ -118,10 +118,10 @@ export default function RoadmapCard({ data, isEnrolled = false }: RoadmapCardPro
           ) : (
             <button
               onClick={handleEnroll}
-              disabled={enroll.isPending || branches.length === 0}
+              disabled={enroll.isPending || branchesLoading || branches.length === 0}
               className="bg-btn-primary-bg hover:bg-btn-primary-hover flex-1 rounded-xl py-2 text-sm font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {enroll.isPending ? (
+              {enroll.isPending || branchesLoading ? (
                 <span className="loading loading-spinner loading-xs" />
               ) : (
                 'Use roadmap'
