@@ -90,7 +90,7 @@ const DashboardPage = () => {
               quizAvg={data.stats.quizAvg}
             />
 
-            {data.weeklyProgressCounts && (
+            {data.weeklyProgressCounts?.some((count) => count > 0) && (
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <h2 className="text-text-primary text-xl font-bold">Weekly Progress</h2>
