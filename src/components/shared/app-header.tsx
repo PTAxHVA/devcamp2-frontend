@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router'
 import { Search, Bell, ChevronDown, User, Settings, LogOut } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
+import { useMe } from '@/features/profile/hooks/use-profile'
 
 export function AppHeader() {
   const user = useAuthStore((s) => s.user)
@@ -9,6 +10,7 @@ export function AppHeader() {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const { data: me } = useMe()
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -23,7 +25,8 @@ export function AppHeader() {
     navigate('/login')
   }
 
-  const initials = user?.username?.slice(0, 2).toUpperCase() ?? 'U'
+  const displayName = me?.username ?? user?.username ?? 'User'
+  const initials = displayName.slice(0, 2).toUpperCase()
 
   return (
     <header className="border-border-soft flex h-16 shrink-0 items-center gap-4 border-b bg-white px-6">
@@ -52,7 +55,7 @@ export function AppHeader() {
               {initials}
             </div>
             <span className="text-text-primary hidden text-sm font-semibold sm:block">
-              {user?.username ?? 'User'}
+              {displayName}
             </span>
             <ChevronDown className="text-text-muted hidden h-4 w-4 sm:block" />
           </button>
