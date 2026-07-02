@@ -6,7 +6,7 @@ import { useMyRoadmaps } from '@/features/learning/hooks/use-my-learning'
 
 export function AddAnotherRolePage() {
   const { data: allRoadmaps, isLoading, isError, refetch, isFetching } = useBrowseRoadmaps()
-  const { data: myRoadmaps } = useMyRoadmaps()
+  const { data: myRoadmaps, isLoading: isMyRoadmapsLoading } = useMyRoadmaps()
 
   // Roles the user already follows — exclude them so this page only offers NEW roles.
   const enrolled = new Set((myRoadmaps ?? []).map((r) => (r.roleName ?? '').toLowerCase()))
@@ -33,7 +33,7 @@ export function AddAnotherRolePage() {
         </p>
       </div>
 
-      {isLoading ? (
+      {isLoading || isMyRoadmapsLoading ? (
         <div className="flex justify-center py-20">
           <span className="loading loading-spinner loading-lg text-indigo-600" />
         </div>

@@ -34,6 +34,7 @@ export interface BETopicDetail {
   _id: string
   name: string
   description: string
+  estimatedHours: number
   resources: unknown[]
   orderIndex: number
   sectionList: BESection[]

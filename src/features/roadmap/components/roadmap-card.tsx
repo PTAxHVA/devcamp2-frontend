@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
 import { RiTimeLine, RiListUnordered, RiBarChartBoxLine } from 'react-icons/ri'
 import { apiClient } from '@/lib/api-client'
 import { useEnrollRoadmap } from '../hooks/use-enroll-roadmap'
+import { roadmapSlug } from '@/features/learning/lib/roadmap-slug'
 import RoadmapPreviewModal from './roadmap-preview-modal'
 
 interface MasterBranch {
@@ -21,11 +23,13 @@ interface RoadmapCardData {
 
 interface RoadmapCardProps {
   data: RoadmapCardData
+  isEnrolled?: boolean
 }
 
-export default function RoadmapCard({ data }: RoadmapCardProps) {
+export default function RoadmapCard({ data, isEnrolled = false }: RoadmapCardProps) {
   const displayTitle = data.roleName ?? 'Roadmap'
   const [previewOpen, setPreviewOpen] = useState(false)
+  const navigate = useNavigate()
   const enroll = useEnrollRoadmap()
 
   const { data: branches = [] } = useQuery<MasterBranch[]>({
@@ -104,17 +108,26 @@ export default function RoadmapCard({ data }: RoadmapCardProps) {
           >
             Preview
           </button>
-          <button
-            onClick={handleEnroll}
-            disabled={enroll.isPending || branches.length === 0}
-            className="bg-btn-primary-bg hover:bg-btn-primary-hover flex-1 rounded-xl py-2 text-sm font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {enroll.isPending ? (
-              <span className="loading loading-spinner loading-xs" />
-            ) : (
-              'Use roadmap'
-            )}
-          </button>
+          {isEnrolled ? (
+            <button
+              onClick={() => navigate(`/my-learning/${roadmapSlug(displayTitle)}`)}
+              className="bg-btn-primary-bg hover:bg-btn-primary-hover flex-1 rounded-xl py-2 text-sm font-bold text-white transition-colors"
+            >
+              Continue
+            </button>
+          ) : (
+            <button
+              onClick={handleEnroll}
+              disabled={enroll.isPending || branches.length === 0}
+              className="bg-btn-primary-bg hover:bg-btn-primary-hover flex-1 rounded-xl py-2 text-sm font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {enroll.isPending ? (
+                <span className="loading loading-spinner loading-xs" />
+              ) : (
+                'Use roadmap'
+              )}
+            </button>
+          )}
         </div>
       </div>
 
@@ -122,6 +135,7 @@ export default function RoadmapCard({ data }: RoadmapCardProps) {
         <RoadmapPreviewModal
           roadmapId={data._id}
           roleName={displayTitle}
+          isEnrolled={isEnrolled}
           onClose={() => setPreviewOpen(false)}
         />
       )}

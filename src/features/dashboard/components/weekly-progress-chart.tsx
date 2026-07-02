@@ -2,7 +2,7 @@ import { FiBarChart2 } from 'react-icons/fi'
 
 export function WeeklyProgressChart({ counts = [0, 0, 0, 0, 0, 0, 0] }: { counts?: number[] }) {
   const max = Math.max(1, ...counts)
-  const days = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN']
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
   return (
     <div className="card bg-base-100 border-base-200 animate-fade-in border p-4 shadow-sm transition-all hover:shadow-md">

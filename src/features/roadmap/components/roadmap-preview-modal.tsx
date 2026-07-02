@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router'
 import {
   RiCloseLine,
   RiListUnordered,
@@ -8,11 +9,13 @@ import {
 } from 'react-icons/ri'
 import { useMasterRoadmap } from '../hooks/use-master-roadmap'
 import { useEnrollRoadmap } from '../hooks/use-enroll-roadmap'
+import { roadmapSlug } from '@/features/learning/lib/roadmap-slug'
 import type { MasterBranch } from '../hooks/use-master-roadmap'
 
 interface RoadmapPreviewModalProps {
   roadmapId: string
   roleName?: string
+  isEnrolled?: boolean
   onClose: () => void
 }
 
@@ -83,9 +86,11 @@ function BranchTree({
 export default function RoadmapPreviewModal({
   roadmapId,
   roleName,
+  isEnrolled = false,
   onClose,
 }: RoadmapPreviewModalProps) {
   const { data, isLoading, isError, refetch, isFetching } = useMasterRoadmap(roadmapId)
+  const navigate = useNavigate()
   const enroll = useEnrollRoadmap()
   // Track which branches the user has explicitly deselected; default is all selected.
   const [deselectedBranches, setDeselectedBranches] = useState<Set<string>>(new Set())
@@ -212,23 +217,32 @@ export default function RoadmapPreviewModal({
               >
                 Close
               </button>
-              <button
-                onClick={() =>
-                  enroll.mutate({
-                    masterRoadmapId: roadmapId,
-                    roleName: title,
-                    branchSelections: [...selectedBranches],
-                  })
-                }
-                disabled={enroll.isPending || selectedBranches.size === 0}
-                className="bg-btn-primary-bg hover:bg-btn-primary-hover flex-1 rounded-xl py-3 text-sm font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {enroll.isPending ? (
-                  <span className="loading loading-spinner loading-xs" />
-                ) : (
-                  `Use roadmap (${selectedCount} branch${selectedCount === 1 ? '' : 'es'})`
-                )}
-              </button>
+              {isEnrolled ? (
+                <button
+                  onClick={() => navigate(`/my-learning/${roadmapSlug(title)}`)}
+                  className="bg-btn-primary-bg hover:bg-btn-primary-hover flex-1 rounded-xl py-3 text-sm font-bold text-white transition-colors"
+                >
+                  Continue learning
+                </button>
+              ) : (
+                <button
+                  onClick={() =>
+                    enroll.mutate({
+                      masterRoadmapId: roadmapId,
+                      roleName: title,
+                      branchSelections: [...selectedBranches],
+                    })
+                  }
+                  disabled={enroll.isPending || selectedBranches.size === 0}
+                  className="bg-btn-primary-bg hover:bg-btn-primary-hover flex-1 rounded-xl py-3 text-sm font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {enroll.isPending ? (
+                    <span className="loading loading-spinner loading-xs" />
+                  ) : (
+                    `Use roadmap (${selectedCount} branch${selectedCount === 1 ? '' : 'es'})`
+                  )}
+                </button>
+              )}
             </div>
           </>
         )}
