@@ -3,6 +3,7 @@ import { isAxiosError } from 'axios'
 import { apiClient } from '@/lib/api-client'
 import { logger } from '@/lib/logger'
 import type { DashboardData } from '@/features/dashboard/types'
+import { deriveCurrentWeekActivity } from '@/features/dashboard/lib/streak-activity'
 
 interface BEProgressStat {
   roadmapId: string
@@ -66,6 +67,20 @@ export function normalizeWeeklyProgressCounts(value: unknown): number[] | undefi
   return normalized.every((count) => Number.isFinite(count) && count >= 0) ? normalized : undefined
 }
 
+// Fallback per-day counts when the BE returns no usable `weeklyProgress` (older
+// deploy, cold-start race). Marks each day inside the current streak window as
+// active (1) using the SAME derivation the streak calendar falls back to, so the
+// Weekly Progress chart can never contradict the calendar. Returns undefined when
+// there is no activity, keeping the chart hidden rather than drawing an empty axis.
+export function deriveWeeklyCountsFromStreak(
+  currentStreak: number,
+  lastActivityDate: string | null,
+  today = new Date(),
+): number[] | undefined {
+  const activity = deriveCurrentWeekActivity(currentStreak, lastActivityDate, today)
+  return activity.some(Boolean) ? activity.map((active) => (active ? 1 : 0)) : undefined
+}
+
 export function useDashboard() {
   return useQuery<DashboardData>({
     queryKey: ['dashboard'],
@@ -117,27 +132,36 @@ export function useDashboard() {
         }
       }
 
+      const currentStreak = dashData.streak?.streak || 0
+      const lastActivityDate = dashData.streak?.lastActivityDate || null
+
       let todayCompleted = false
-      if (dashData.streak?.lastActivityDate) {
-        const lastDate = new Date(dashData.streak.lastActivityDate).toDateString()
+      if (lastActivityDate) {
+        const lastDate = new Date(lastActivityDate).toDateString()
         const today = new Date().toDateString()
         todayCompleted = lastDate === today
       }
 
       const totalProgress = roadmaps.reduce((acc, r) => acc + r.progressPercentage, 0)
       const avgProgress = roadmaps.length > 0 ? Math.round(totalProgress / roadmaps.length) : 0
+
+      // Primary source: BE per-day counts. When the BE omits/malforms the field
+      // (older deploy, cold-start race) fall back to the streak window so the chart
+      // stays consistent with the streak calendar instead of sitting empty while the
+      // calendar lights up "today" — the exact contradiction users reported.
       const weeklyProgressCounts =
         normalizeWeeklyProgressCounts(dashData.weeklyProgressCounts) ??
-        normalizeWeeklyProgressCounts(dashData.weeklyProgress)
+        normalizeWeeklyProgressCounts(dashData.weeklyProgress) ??
+        deriveWeeklyCountsFromStreak(currentStreak, lastActivityDate)
 
       return {
         continueLearning,
         roadmaps,
         weeklyProgressCounts,
         streak: {
-          currentStreak: dashData.streak?.streak || 0,
+          currentStreak,
           longestStreak: dashData.streak?.longestStreak || 0,
-          lastActivityDate: dashData.streak?.lastActivityDate || null,
+          lastActivityDate,
           activityDays: weeklyProgressCounts?.map((count) => count > 0),
           todayCompleted,
         },
