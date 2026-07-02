@@ -62,6 +62,10 @@ export function useSubmitQuiz(attemptId: string) {
       if (result.isPassed) {
         qc.invalidateQueries({ queryKey: ['dashboard'] })
         qc.invalidateQueries({ queryKey: ['streak'] })
+        qc.invalidateQueries({ queryKey: ['topic-detail'] })
+        qc.invalidateQueries({ queryKey: ['section-detail'] })
+        qc.invalidateQueries({ queryKey: ['section-quiz'] })
+        qc.invalidateQueries({ queryKey: ['roadmap-detail'] })
       }
     },
     onError: () => toast.error('Failed to submit quiz, please try again.'),
