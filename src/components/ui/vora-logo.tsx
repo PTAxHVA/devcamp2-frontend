@@ -2,6 +2,15 @@ interface LogoProps {
   className?: string
 }
 
+interface VoraMarkProps extends LogoProps {
+  /**
+   * Hide the mark from assistive tech. Use when a visible "VORA" label already sits
+   * beside it (e.g. inside <VoraWordmark />) so a screen reader doesn't read "VORA"
+   * twice. Standalone (collapsed sidebar) leave it false so the mark keeps its label.
+   */
+  decorative?: boolean
+}
+
 /**
  * VORA brand mark — a crisp, transparent, self-contained vector (no raster) so it
  * renders sharp at any size and stays legible on light or dark surfaces. Used on its
@@ -9,14 +18,13 @@ interface LogoProps {
  * The purple badge + white route-glyph is a placeholder mark; swap in the official
  * vector here when available.
  */
-export const VoraMark = ({ className = 'h-8 w-8' }: LogoProps) => (
+export const VoraMark = ({ className = 'h-8 w-8', decorative = false }: VoraMarkProps) => (
   <svg
     viewBox="0 0 32 32"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     className={className}
-    role="img"
-    aria-label="VORA"
+    {...(decorative ? { 'aria-hidden': true } : { role: 'img', 'aria-label': 'VORA' })}
   >
     <rect width="32" height="32" rx="9" fill="#6d28d9" />
     {/* Route "V": a path dipping to a waypoint at the base — evokes a roadmap checkpoint. */}
@@ -34,7 +42,7 @@ export const VoraMark = ({ className = 'h-8 w-8' }: LogoProps) => (
 /** Full logo: mark + "VORA" wordmark (page font, brand-navy) for the expanded sidebar. */
 export const VoraWordmark = ({ className = '' }: LogoProps) => (
   <div className={`flex items-center gap-2.5 ${className}`}>
-    <VoraMark className="h-8 w-8 shrink-0" />
+    <VoraMark decorative className="h-8 w-8 shrink-0" />
     <span className="text-brand-navy-900 text-2xl font-extrabold tracking-tight">VORA</span>
   </div>
 )
