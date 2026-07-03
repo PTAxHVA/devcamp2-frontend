@@ -31,7 +31,7 @@ export function useCompleteOnboarding() {
   const resetWizard = useWizardStore((s) => s.resetWizard)
 
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async (mode: 'accept' | 'customize') => {
       // 1. Resolve which master roadmap matches the chosen role + its branches.
       const list = await apiClient.get<ApiEnvelope<BrowseRoadmap[]>>('/master-roadmaps')
       const master = matchMasterRoadmap(answers.role as string | undefined, list.data.data)
@@ -48,19 +48,25 @@ export function useCompleteOnboarding() {
       await apiClient.post('/onboarding/questionnaire', questionnaire)
 
       // 3. Enroll → backend builds the personalized (SUGGESTED) roadmap.
-      await apiClient.post('/roadmaps', {
+      const enrollRes = await apiClient.post<ApiEnvelope<{ _id: string }>>('/roadmaps', {
         masterRoadmapId: master._id,
         branchSelections,
         sourceType: 'SUGGESTED',
       })
 
-      return { roleName: detail.data.data.roleName }
+      return { roleName: detail.data.data.roleName, userRoadmapId: enrollRes.data.data._id, mode }
     },
-    onSuccess: async () => {
+    onSuccess: async ({ userRoadmapId, mode }) => {
       resetWizard()
       await queryClient.invalidateQueries({ queryKey: ['my-roadmaps'] })
       queryClient.invalidateQueries({ queryKey: ['dashboard'] })
-      navigate('/dashboard')
+      // "Customize First" → the real, persistent editor (edits actually save);
+      // "Accept" → straight to the dashboard.
+      if (mode === 'customize' && userRoadmapId) {
+        navigate(`/roadmaps/${userRoadmapId}/edit`)
+      } else {
+        navigate('/dashboard')
+      }
     },
     onError: (err: unknown) => {
       const { code } = extractApiError(err)

@@ -1,5 +1,6 @@
-import { useNavigate } from 'react-router'
+import { useNavigate, useParams, Navigate } from 'react-router'
 import { FiCheck, FiGrid, FiCompass } from 'react-icons/fi'
+import { useRoadmapDetail } from '@/features/roadmap/hooks/use-roadmap-detail'
 
 /**
  * Roadmap-completion celebration. Reached at /roadmaps/:id/complete.
@@ -8,6 +9,24 @@ import { FiCheck, FiGrid, FiCompass } from 'react-icons/fi'
  */
 export function RoadmapCompletePage() {
   const navigate = useNavigate()
+  const { id } = useParams<{ id: string }>()
+  const { data, isLoading } = useRoadmapDetail(id ?? '')
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-32">
+        <span className="loading loading-spinner loading-lg text-indigo-600" />
+      </div>
+    )
+  }
+
+  // Only celebrate a genuinely 100%-complete roadmap (M4) — otherwise send the
+  // learner back to the roadmap instead of a false "Congratulations".
+  const allComplete =
+    !!data && data.topics.length > 0 && data.topics.every((t) => t.status === 'completed')
+  if (!allComplete) {
+    return <Navigate to={id ? `/roadmaps/${id}` : '/dashboard'} replace />
+  }
 
   return (
     <div className="animate-in fade-in zoom-in-95 mx-auto max-w-3xl p-6 duration-700">

@@ -4,12 +4,9 @@ import { useBrowseRoadmaps } from '@/features/roadmap/hooks/use-browse-roadmaps'
 import { useMyRoadmaps } from '@/features/learning/hooks/use-my-learning'
 import { enrolledMasterRoadmapIds } from '@/features/roadmap/lib/enrolled-roadmaps'
 
-type Tab = 'recommended' | 'all' | 'popular' | 'new'
-
 export default function BrowseRoadmapsPage() {
   const [search, setSearch] = useState('')
   const [role, setRole] = useState('all')
-  const [tab, setTab] = useState<Tab>('recommended')
 
   const { data: rawRoadmaps = [], isLoading, isError, isFetching, refetch } = useBrowseRoadmaps()
   const { data: myRoadmaps } = useMyRoadmaps()
@@ -20,25 +17,21 @@ export default function BrowseRoadmapsPage() {
     setRole('all')
   }
 
-  const filteredRoadmaps = useMemo(() => {
-    const lowerSearch = search.toLowerCase()
-    return rawRoadmaps.filter((r) => {
-      const matchSearch = !search || r.roleName.toLowerCase().includes(lowerSearch)
-      const matchRole = role === 'all' || r.roleName.toLowerCase().includes(role.toLowerCase())
-      return matchSearch && matchRole
-    })
-  }, [rawRoadmaps, search, role])
-
   const displayRoadmaps = useMemo(() => {
-    const arr = [...filteredRoadmaps]
-    if (tab === 'recommended' || tab === 'popular') {
-      return arr.sort((a, b) => a.roleName.localeCompare(b.roleName))
-    }
-    if (tab === 'new') {
-      return arr.reverse()
-    }
-    return arr // 'all' — API insertion order
-  }, [filteredRoadmaps, tab])
+    const lowerSearch = search.toLowerCase()
+    return rawRoadmaps
+      .filter((r) => {
+        // Search matches the role name OR the description (M11) — so "React" can
+        // surface the Frontend roadmap, not just an exact role-name hit.
+        const matchSearch =
+          !search ||
+          r.roleName.toLowerCase().includes(lowerSearch) ||
+          (r.description ?? '').toLowerCase().includes(lowerSearch)
+        const matchRole = role === 'all' || r.roleName.toLowerCase().includes(role.toLowerCase())
+        return matchSearch && matchRole
+      })
+      .sort((a, b) => a.roleName.localeCompare(b.roleName))
+  }, [rawRoadmaps, search, role])
 
   return (
     <div className="animate-in fade-in mx-auto w-full max-w-375 p-6 duration-500 lg:p-8">
@@ -78,23 +71,8 @@ export default function BrowseRoadmapsPage() {
         </button>
       </div>
 
-      <div className="border-border-soft mb-8 flex items-center justify-between border-b">
-        <div className="flex gap-6">
-          {(['recommended', 'all', 'popular', 'new'] as Tab[]).map((t) => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`pb-3 text-sm font-bold capitalize transition-colors ${
-                tab === t
-                  ? 'border-brand-purple-600 text-brand-purple-600 border-b-2'
-                  : 'text-text-muted hover:text-text-primary'
-              }`}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-        <div className="text-text-muted pb-3 text-sm font-medium">
+      <div className="border-border-soft mb-8 flex items-center justify-end border-b pb-3">
+        <div className="text-text-muted text-sm font-medium">
           {displayRoadmaps.length} roadmaps found
         </div>
       </div>

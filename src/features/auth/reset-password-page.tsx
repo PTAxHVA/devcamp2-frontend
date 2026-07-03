@@ -5,10 +5,11 @@ import { z } from 'zod'
 import { toast } from 'react-hot-toast'
 import ResetPasswordImg from '@/assets/reset-password.png'
 import { useResetPassword } from './hooks/use-reset-password'
+import { strongPassword } from '@/features/auth/auth-schemas'
 
 const resetSchema = z
   .object({
-    newPassword: z.string().min(8, 'Password must be at least 8 characters'),
+    newPassword: strongPassword,
     confirmPassword: z.string(),
   })
   .refine((d) => d.newPassword === d.confirmPassword, {

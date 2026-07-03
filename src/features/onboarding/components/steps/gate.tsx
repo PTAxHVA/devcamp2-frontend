@@ -14,7 +14,9 @@ export function StepGate({ onAccept, onCustomize, onChooseAnother, isSubmitting 
   const role = useWizardStore((s) => s.answers?.role as string | undefined)
   const { data: roadmaps } = useBrowseRoadmaps()
   const matched = matchMasterRoadmap(role, roadmaps ?? [])
-  const roadmapName = matched?.roleName ?? role
+  // Only use the resolved roadmap name; while the catalog loads fall through to the
+  // neutral "learning" label below rather than showing the raw lowercase role id (L7).
+  const roadmapName = matched?.roleName
 
   return (
     <div className="animate-in fade-in mx-auto mt-8 flex w-full max-w-2xl flex-col items-center gap-10 duration-700">
