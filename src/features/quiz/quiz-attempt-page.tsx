@@ -9,6 +9,7 @@ import { useQuizStore } from '@/features/quiz/quiz-store'
 import { useQuizAttempt } from '@/features/quiz/hooks/use-quiz-attempt'
 import { useSubmitQuiz } from '@/features/quiz/hooks/use-submit-quiz'
 import { useQuizTimer } from '@/features/quiz/hooks/use-quiz-timer'
+import { buildAnsweredPayload } from '@/features/quiz/lib/quiz-submission'
 
 // Section quizzes require >=80% to pass (product spec).
 const PASS_THRESHOLD = 80
@@ -48,16 +49,7 @@ export function QuizAttemptPage() {
   useEffect(() => reset, [reset])
 
   const buildPayload = useCallback(
-    () =>
-      questions.flatMap((q) => {
-        const val = answers[q.id]
-        if (val === undefined || val === '') return []
-        return [
-          q.type === 'mcq'
-            ? { questionId: q.id, selectedOptionId: val }
-            : { questionId: q.id, userInput: val },
-        ]
-      }),
+    () => buildAnsweredPayload(questions, answers),
     [answers, questions],
   )
 
@@ -67,23 +59,13 @@ export function QuizAttemptPage() {
       if (isTimedOut && typeof navigator !== 'undefined' && !navigator.onLine) return false
 
       const payload = buildPayload()
-      if (payload.length === 0) {
-        if (isTimedOut) {
-          // Timer expired with nothing answered. The backend rejects an empty
-          // submission (answers must have >=1), so exit gracefully instead of
-          // POSTing [] and stranding the user on a page with every button disabled.
-          if (timeoutToastAttemptId.current !== attemptId) {
-            timeoutToastAttemptId.current = attemptId
-            toast("Time's up. No answers were submitted.")
-          }
-          const target =
-            sectionId && topicId
-              ? `/my-learning/topics/${topicId}/sections/${sectionId}${roadmapId ? `?roadmapId=${roadmapId}` : ''}`
-              : '/dashboard'
-          navigate(target, { replace: true })
-          return true
-        }
 
+      // On timeout we submit whatever was answered — including an empty array. The
+      // backend accepts [], grades it 0% (fail), closes the attempt and starts the
+      // retry cooldown. Only a *manual* submit requires at least one answer; never
+      // early-return on an empty timeout payload, or the attempt stays open and the
+      // start endpoint keeps resuming it until the 12-minute abandoned reset.
+      if (!isTimedOut && payload.length === 0) {
         toast.error('Please answer at least one question before submitting.')
         return false
       }
@@ -110,7 +92,7 @@ export function QuizAttemptPage() {
       })
       return true
     },
-    [attemptId, buildPayload, navigate, submitQuiz, queryParamsStr, roadmapId, sectionId, topicId],
+    [attemptId, buildPayload, navigate, submitQuiz, queryParamsStr],
   )
 
   const autoSubmit = useCallback(() => {

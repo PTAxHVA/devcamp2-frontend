@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-interface SessionQuestion {
+export interface SessionQuestion {
   id: string
   type: 'mcq' | 'fill'
   content: string

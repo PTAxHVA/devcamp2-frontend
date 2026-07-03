@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
 import { apiClient } from '@/lib/api-client'
 import toast from 'react-hot-toast'
+import type { SubmitAnswer } from '@/features/quiz/lib/quiz-submission'
 
 export interface SubmitQuizResult {
   quizAttemptId: string
@@ -9,10 +10,6 @@ export interface SubmitQuizResult {
   isPassed: boolean
   cooldownUntil?: string | null
 }
-
-type SubmitAnswer =
-  | { questionId: string; selectedOptionId: string; userInput?: never }
-  | { questionId: string; userInput: string; selectedOptionId?: never }
 
 interface ExistingQuizResult {
   quizAttempt: {
@@ -63,8 +60,10 @@ export function useSubmitQuiz(attemptId: string) {
       // served stale (60s staleTime) — invalidate it so the pass/fail page
       // always renders the freshly graded attempt, not the previous one.
       qc.invalidateQueries({ queryKey: ['attempt-result', result.quizAttemptId] })
+
+      qc.invalidateQueries({ queryKey: ['dashboard'] })
+
       if (result.isPassed) {
-        qc.invalidateQueries({ queryKey: ['dashboard'] })
         qc.invalidateQueries({ queryKey: ['topic-detail'] })
         qc.invalidateQueries({ queryKey: ['section-detail'] })
         qc.invalidateQueries({ queryKey: ['section-quiz'] })
