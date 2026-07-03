@@ -61,9 +61,6 @@ export function useSubmitQuiz(attemptId: string) {
       // always renders the freshly graded attempt, not the previous one.
       qc.invalidateQueries({ queryKey: ['attempt-result', result.quizAttemptId] })
 
-      // Finishing an attempt is learning activity even when it is failed (or
-      // timed out). Always refresh the dashboard so Weekly Progress and Learning
-      // Streak do not keep the pre-attempt cache until its stale time elapses.
       qc.invalidateQueries({ queryKey: ['dashboard'] })
 
       if (result.isPassed) {

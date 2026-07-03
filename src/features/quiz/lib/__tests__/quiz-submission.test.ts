@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildAnsweredPayload, buildTimedOutPayload } from '@/features/quiz/lib/quiz-submission'
+import { buildAnsweredPayload } from '@/features/quiz/lib/quiz-submission'
 import type { SessionQuestion } from '@/features/quiz/quiz-store'
 
 const questions: SessionQuestion[] = [
@@ -23,24 +23,13 @@ describe('quiz submission payloads', () => {
     ])
   })
 
-  it('submits at most one answer when time expires', () => {
-    expect(buildTimedOutPayload(questions, { 'mcq-1': 'option-2', 'fill-1': 'answer' })).toEqual([
+  it('keeps completed answers and omits unanswered questions at timeout', () => {
+    expect(buildAnsweredPayload(questions, { 'mcq-1': 'option-2' })).toEqual([
       { questionId: 'mcq-1', selectedOptionId: 'option-2' },
     ])
   })
 
-  it('creates a gradable answer when time expires before any answer', () => {
-    expect(buildTimedOutPayload(questions, {})).toEqual([
-      {
-        questionId: 'fill-1',
-        userInput: '__QUIZ_TIME_EXPIRED_WITHOUT_ANSWER__',
-      },
-    ])
-  })
-
-  it('falls back to a valid option for an unanswered MCQ-only quiz', () => {
-    expect(buildTimedOutPayload([questions[0]], {})).toEqual([
-      { questionId: 'mcq-1', selectedOptionId: 'option-1' },
-    ])
+  it('returns an empty payload when no question was answered', () => {
+    expect(buildAnsweredPayload(questions, {})).toEqual([])
   })
 })

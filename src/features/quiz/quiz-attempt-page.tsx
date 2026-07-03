@@ -9,7 +9,7 @@ import { useQuizStore } from '@/features/quiz/quiz-store'
 import { useQuizAttempt } from '@/features/quiz/hooks/use-quiz-attempt'
 import { useSubmitQuiz } from '@/features/quiz/hooks/use-submit-quiz'
 import { useQuizTimer } from '@/features/quiz/hooks/use-quiz-timer'
-import { buildAnsweredPayload, buildTimedOutPayload } from '@/features/quiz/lib/quiz-submission'
+import { buildAnsweredPayload } from '@/features/quiz/lib/quiz-submission'
 
 // Section quizzes require >=80% to pass (product spec).
 const PASS_THRESHOLD = 80
@@ -49,10 +49,7 @@ export function QuizAttemptPage() {
   useEffect(() => reset, [reset])
 
   const buildPayload = useCallback(
-    (isTimedOut: boolean) =>
-      isTimedOut
-        ? buildTimedOutPayload(questions, answers)
-        : buildAnsweredPayload(questions, answers),
+    () => buildAnsweredPayload(questions, answers),
     [answers, questions],
   )
 
@@ -61,29 +58,9 @@ export function QuizAttemptPage() {
       if (!attemptId || submissionInFlight.current) return false
       if (isTimedOut && typeof navigator !== 'undefined' && !navigator.onLine) return false
 
-      const payload = buildPayload(isTimedOut)
-      if (isTimedOut && payload.length === 0) {
-        toast.error('Unable to finish this timed-out quiz. Please try again.')
-        return false
-      }
+      const payload = buildPayload()
 
-      if (payload.length === 0) {
-        if (isTimedOut) {
-          // Timer expired with nothing answered. The backend rejects an empty
-          // submission (answers must have >=1), so exit gracefully instead of
-          // POSTing [] and stranding the user on a page with every button disabled.
-          if (timeoutToastAttemptId.current !== attemptId) {
-            timeoutToastAttemptId.current = attemptId
-            toast("Time's up. No answers were submitted.")
-          }
-          const target =
-            sectionId && topicId
-              ? `/my-learning/topics/${topicId}/sections/${sectionId}${roadmapId ? `?roadmapId=${roadmapId}` : ''}`
-              : '/dashboard'
-          navigate(target, { replace: true })
-          return true
-        }
-
+      if (!isTimedOut && payload.length === 0) {
         toast.error('Please answer at least one question before submitting.')
         return false
       }
@@ -105,12 +82,12 @@ export function QuizAttemptPage() {
         },
         onSuccess: (result) =>
           navigate(
-            `/quizzes/${result.quizAttemptId}/result/${isTimedOut || !result.isPassed ? 'fail' : 'pass'}${queryParamsStr}`,
+            `/quizzes/${result.quizAttemptId}/result/${result.isPassed ? 'pass' : 'fail'}${queryParamsStr}`,
           ),
       })
       return true
     },
-    [attemptId, buildPayload, navigate, submitQuiz, queryParamsStr, roadmapId, sectionId, topicId],
+    [attemptId, buildPayload, navigate, submitQuiz, queryParamsStr],
   )
 
   const autoSubmit = useCallback(() => {
