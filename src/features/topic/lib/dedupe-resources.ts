@@ -9,7 +9,9 @@ export const dedupeResources = <T extends { url?: string | null; title?: string 
 ): T[] => {
   const seen = new Set<string>()
   return resources.filter((r) => {
-    const url = (r.url ?? '').trim().toLowerCase()
+    // Normalize the URL so trivial variants of the same link collapse: trim,
+    // lowercase, and drop a trailing slash (`.../docs` vs `.../docs/`).
+    const url = (r.url ?? '').trim().toLowerCase().replace(/\/+$/, '')
     const key = url || `title:${(r.title ?? '').trim().toLowerCase()}`
     if (seen.has(key)) return false
     seen.add(key)

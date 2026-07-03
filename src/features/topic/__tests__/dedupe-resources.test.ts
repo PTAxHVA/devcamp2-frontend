@@ -21,6 +21,14 @@ describe('dedupeResources (OBS-02)', () => {
     expect(out).toHaveLength(1)
   })
 
+  it('collapses URLs that differ only by a trailing slash', () => {
+    const out = dedupeResources([
+      { title: 'A', url: 'https://example.com/docs' },
+      { title: 'B', url: 'https://example.com/docs/' },
+    ])
+    expect(out).toHaveLength(1)
+  })
+
   it('falls back to title when URL is missing', () => {
     const out = dedupeResources([
       { title: 'Same', url: '' },
