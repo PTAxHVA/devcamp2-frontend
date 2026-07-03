@@ -63,11 +63,15 @@ export function useSubmitQuiz(attemptId: string) {
 
       qc.invalidateQueries({ queryKey: ['dashboard'] })
 
+      // A pass mirrors section progress to EVERY roadmap that shares the topic (BE
+      // SYNC-01), so refresh all cached roadmap-detail queries — including ones not
+      // currently mounted (refetchType 'all'), not just the roadmap being viewed.
+      qc.invalidateQueries({ queryKey: ['roadmap-detail'], refetchType: 'all' })
+
       if (result.isPassed) {
         qc.invalidateQueries({ queryKey: ['topic-detail'] })
         qc.invalidateQueries({ queryKey: ['section-detail'] })
         qc.invalidateQueries({ queryKey: ['section-quiz'] })
-        qc.invalidateQueries({ queryKey: ['roadmap-detail'] })
       }
     },
     onError: () => toast.error('Failed to submit quiz, please try again.'),

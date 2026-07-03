@@ -1,5 +1,6 @@
 import { RiCalendarCheckLine, RiTimeLine, RiFlagLine } from 'react-icons/ri'
 import type { LearningTopic } from './types'
+import { computeOverallSectionProgress } from './lib/progress-metrics'
 
 interface ProgressHeaderProps {
   topics: LearningTopic[]
@@ -7,8 +8,9 @@ interface ProgressHeaderProps {
 
 export default function ProgressHeader({ topics }: ProgressHeaderProps) {
   const completed = topics.filter((t) => t.status === 'completed')
-  const overallProgress =
-    topics.length > 0 ? Math.round((completed.length / topics.length) * 100) : 0
+  // Section-based overall %, consistent with the dashboard (OBS-01). The "X/Y topics"
+  // subtitle below still counts whole completed topics — a separate, labelled stat.
+  const overallProgress = computeOverallSectionProgress(topics)
 
   const remainingHours = topics
     .filter((t) => t.status !== 'completed')

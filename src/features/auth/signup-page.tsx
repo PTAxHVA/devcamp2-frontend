@@ -91,6 +91,7 @@ export default function SignupPage() {
               <input
                 id="username"
                 type="text"
+                autoComplete="name"
                 placeholder="Your name"
                 className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('username')}
@@ -108,6 +109,7 @@ export default function SignupPage() {
               <input
                 id="email"
                 type="email"
+                autoComplete="email"
                 placeholder="you@gmail.com"
                 className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('email')}
@@ -123,6 +125,7 @@ export default function SignupPage() {
               <input
                 id="password"
                 type="password"
+                autoComplete="new-password"
                 placeholder="••••••••"
                 className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('password')}
@@ -159,6 +162,7 @@ export default function SignupPage() {
               <input
                 id="confirmPassword"
                 type="password"
+                autoComplete="new-password"
                 placeholder="••••••••"
                 className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('confirmPassword')}

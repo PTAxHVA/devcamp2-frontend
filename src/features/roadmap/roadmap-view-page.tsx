@@ -100,8 +100,8 @@ const RoadmapViewPage = () => {
   const durationTotal = roadmapDetail.topics.reduce((sum, t) => sum + (t.estimatedHours || 0), 0)
 
   return (
-    <div className="flex h-full max-w-420">
-      <div className="flex flex-1 flex-col overflow-hidden bg-white p-6 lg:p-8">
+    <div className="flex min-h-full max-w-420 flex-col lg:h-full lg:flex-row">
+      <div className="flex h-[70vh] flex-col overflow-hidden bg-white p-6 lg:h-auto lg:flex-1 lg:p-8">
         <div className="w-full">
           <div className="mb-4 flex items-center justify-between">
             <button
@@ -149,7 +149,7 @@ const RoadmapViewPage = () => {
         />
       </div>
 
-      <aside className="border-border-soft flex w-95 shrink-0 flex-col border-l bg-white">
+      <aside className="border-border-soft flex w-full shrink-0 flex-col border-t bg-white lg:w-95 lg:border-t-0 lg:border-l">
         <div className="border-border-soft flex items-center justify-between border-b p-6 pb-4">
           <p className="text-brand-purple-600 text-xs font-bold tracking-wider uppercase">
             Selected Topic

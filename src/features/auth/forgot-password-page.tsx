@@ -59,6 +59,7 @@ export default function ForgotPasswordPage() {
                   <input
                     id="email"
                     type="email"
+                    autoComplete="email"
                     placeholder="you@gmail.com"
                     className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                     {...register('email')}

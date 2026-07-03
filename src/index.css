@@ -1,5 +1,9 @@
 @import 'tailwindcss';
-@plugin 'daisyui/index.js';
+/* Light-only product: ship just the light daisyUI theme so a dark-mode OS/browser
+   can never flip daisyUI tokens (e.g. bg-base-100) to a dark variant. */
+@plugin 'daisyui/index.js' {
+  themes: light --default;
+}
 
 @theme {
   /* ===============FONT STYLE=================== */
@@ -81,6 +85,11 @@
   --color-error-icon: #dc2626;
 }
 @layer base {
+  :root {
+    /* App is intentionally light-only — tell the UA so native controls (scrollbars,
+       date pickers, autofill) don't render dark when the OS is in dark mode. */
+    color-scheme: light;
+  }
   body {
     font-family: var(--font-primary);
     color: var(--color-text-primary);

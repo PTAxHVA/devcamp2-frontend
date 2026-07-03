@@ -175,13 +175,11 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-4">
+    <div className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-6 lg:px-8">
       {/* Header */}
       <div className="mb-2">
         <h1 className="text-text-primary text-2xl font-extrabold">Settings</h1>
-        <p className="text-text-muted mt-1 text-sm">
-          Manage your account, preferences, and application settings.
-        </p>
+        <p className="text-text-muted mt-1 text-sm">Manage your account details and security.</p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -226,7 +224,7 @@ export default function SettingsPage() {
                   disabled={updateProfile.isPending}
                   className="bg-btn-primary-bg hover:bg-btn-primary-hover rounded-lg px-5 py-2 text-sm font-semibold text-white transition disabled:opacity-60"
                 >
-                  {updateProfile.isPending ? 'Saving...' : 'Save change'}
+                  {updateProfile.isPending ? 'Saving...' : 'Save changes'}
                 </button>
               </div>
             </div>
@@ -261,7 +259,7 @@ export default function SettingsPage() {
               </div>
 
               {/* New + Confirm */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-text-primary text-xs font-semibold">New password</label>
                   <div className="relative">
@@ -337,17 +335,15 @@ export default function SettingsPage() {
         {/* ── Right column ── */}
         <div className="flex flex-col gap-4">
           {/* Account Actions */}
-          <Section
-            icon={LogOut}
-            title="Account actions"
-            subtitle="Manage your session and account."
-          >
+          <Section icon={LogOut} title="Account actions" subtitle="Sign out of your VORA session.">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <LogOut className="text-text-muted h-4 w-4" />
+                <div className="bg-bg-section flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
+                  <LogOut className="text-text-muted h-4 w-4" />
+                </div>
                 <div>
-                  <p className="text-text-primary text-sm font-medium">Logout</p>
-                  <p className="text-text-muted text-xs">Log out of your account on this device.</p>
+                  <p className="text-text-primary text-sm font-medium">Log out</p>
+                  <p className="text-text-muted text-xs">Sign out of VORA on this device.</p>
                 </div>
               </div>
               <button
@@ -360,13 +356,21 @@ export default function SettingsPage() {
           </Section>
 
           {/* Account Deactivation */}
-          <Section icon={User} title="Account Deactivation" subtitle="Deactivate your account.">
+          <Section
+            icon={User}
+            title="Account deactivation"
+            subtitle="Turn off access to your VORA account."
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <User className="text-text-muted h-4 w-4" />
+                <div className="bg-bg-section flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
+                  <User className="text-text-muted h-4 w-4" />
+                </div>
                 <div>
                   <p className="text-text-primary text-sm font-medium">Deactivate account</p>
-                  <p className="text-text-muted text-xs">Deactivate your account.</p>
+                  <p className="text-text-muted text-xs">
+                    You'll be signed out and can't sign in until reactivated.
+                  </p>
                 </div>
               </div>
               <button
