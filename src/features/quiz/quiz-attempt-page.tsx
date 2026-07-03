@@ -60,6 +60,11 @@ export function QuizAttemptPage() {
 
       const payload = buildPayload()
 
+      // On timeout we submit whatever was answered — including an empty array. The
+      // backend accepts [], grades it 0% (fail), closes the attempt and starts the
+      // retry cooldown. Only a *manual* submit requires at least one answer; never
+      // early-return on an empty timeout payload, or the attempt stays open and the
+      // start endpoint keeps resuming it until the 12-minute abandoned reset.
       if (!isTimedOut && payload.length === 0) {
         toast.error('Please answer at least one question before submitting.')
         return false
