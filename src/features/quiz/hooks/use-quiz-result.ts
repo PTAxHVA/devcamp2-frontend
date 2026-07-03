@@ -21,6 +21,7 @@ export interface ResultQuestion {
     questionId: string
     selectedOptionId?: string
     userInput?: string
+    // Server-graded verdict (stored per answer for MCQ + fill-in-blank).
     isCorrect?: boolean
   }
 }

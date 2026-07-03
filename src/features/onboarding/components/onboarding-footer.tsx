@@ -11,9 +11,6 @@ export const Footer = () => {
         <Link to="/terms" className="hover:text-text-secondary transition-colors">
           Terms
         </Link>
-        <Link to="/support" className="hover:text-text-secondary transition-colors">
-          Help
-        </Link>
       </div>
     </footer>
   )

@@ -69,4 +69,25 @@ describe('signupSchema', () => {
       signupSchema.safeParse({ ...valid, password: 'short', confirmPassword: 'short' }).success,
     ).toBe(false)
   })
+
+  it('rejects a password missing an uppercase letter (M6)', () => {
+    const pw = 'password123!'
+    expect(signupSchema.safeParse({ ...valid, password: pw, confirmPassword: pw }).success).toBe(
+      false,
+    )
+  })
+
+  it('rejects a password missing a number (M6)', () => {
+    const pw = 'Password!!!'
+    expect(signupSchema.safeParse({ ...valid, password: pw, confirmPassword: pw }).success).toBe(
+      false,
+    )
+  })
+
+  it('rejects a password missing a special character (M6)', () => {
+    const pw = 'Password123'
+    expect(signupSchema.safeParse({ ...valid, password: pw, confirmPassword: pw }).success).toBe(
+      false,
+    )
+  })
 })

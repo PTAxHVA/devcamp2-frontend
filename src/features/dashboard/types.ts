@@ -6,6 +6,10 @@ export interface DashboardData {
     userRoadmapId: string
     topicName: string
     sectionName: string
+    roadmapName: string
+    progressPercentage: number
+    completedSections: number
+    totalSections: number
   } | null
   roadmaps: Array<{
     id: string

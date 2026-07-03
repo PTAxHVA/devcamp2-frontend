@@ -14,6 +14,9 @@ export interface BaseNodeData extends Record<string, unknown> {
 
 export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
   const variant = data.variant || 'standard'
+  // Only the real (interactive) roadmap graph wires node clicks; the onboarding/demo
+  // preview is read-only, so it must not look clickable (L9 — no pointer/hover-lift).
+  const isInteractive = variant === 'standard'
   const getContainerStyles = () => {
     if (variant === 'onboarding') {
       switch (data.status) {
@@ -78,7 +81,9 @@ export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
 
   return (
     <div
-      className={`flex h-14 w-56 cursor-pointer items-center rounded-xl border-2 px-3 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg ${getContainerStyles()}`}
+      className={`flex h-14 w-56 items-center rounded-xl border-2 px-3 transition-all duration-300 ${
+        isInteractive ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-lg' : 'cursor-default'
+      } ${getContainerStyles()}`}
     >
       <Handle type="target" position={Position.Top} className="h-2 w-2 opacity-0" />
 

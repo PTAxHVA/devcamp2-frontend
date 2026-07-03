@@ -44,8 +44,14 @@ export function AppRoutes() {
 
       {/* Auth pages (Public Routes) */}
       <Route element={<AuthLayout />}>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
+        <Route
+          path="/login"
+          element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <LoginPage />}
+        />
+        <Route
+          path="/signup"
+          element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <SignupPage />}
+        />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
         {/* Giải pháp A: Giữ cả 2 route để link email cũ không bị 404 */}

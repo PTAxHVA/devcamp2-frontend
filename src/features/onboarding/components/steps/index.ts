@@ -1,4 +1,3 @@
-export * from './customize.tsx'
 export * from './generate.tsx'
 export * from './goal.tsx'
 export * from './path.tsx'

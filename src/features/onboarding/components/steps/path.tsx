@@ -107,8 +107,7 @@ export const StepLearningPath = () => {
       <div className="mb-12 text-left">
         <h1 className="text-text-primary mb-3 text-4xl font-bold">Choose your learning path</h1>
         <p className="text-text-secondary max-w-2xl text-lg font-medium">
-          Tell us your preferences so we can create a personalized frontend roadmap that matches
-          your goals with internet
+          Tell us your preferences so we can tailor your roadmap to match your goals.
         </p>
       </div>
 

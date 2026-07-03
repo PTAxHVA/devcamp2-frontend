@@ -3,6 +3,7 @@ import { FiX, FiRefreshCw, FiShield } from 'react-icons/fi'
 import { useQuizResult } from '@/features/quiz/hooks/use-quiz-result'
 import { useCooldownTimer } from '@/features/quiz/hooks/use-cooldown-timer'
 import { AnswerReview } from '@/features/quiz/components/answer-review'
+import { countCorrect } from '@/features/quiz/lib/count-correct'
 
 const PASS_THRESHOLD = 80
 
@@ -42,7 +43,7 @@ export function QuizResultFailPage() {
 
   const { score, quizId } = data.quizAttempt
   const total = data.questions.length
-  const correct = Math.round((score / 100) * total)
+  const correct = countCorrect(data.questions)
   const gap = Math.max(0, PASS_THRESHOLD - score)
 
   return (

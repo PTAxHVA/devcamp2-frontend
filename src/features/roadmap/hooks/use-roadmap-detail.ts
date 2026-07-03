@@ -13,6 +13,7 @@ export interface BEGraphTopic {
   masterTopicId: string
   userTopicId: string | null
   name: string
+  descriptionShort?: string
   status: 'locked' | 'available' | 'in_progress' | 'completed'
   orderIndex: number
   estimatedHours: number

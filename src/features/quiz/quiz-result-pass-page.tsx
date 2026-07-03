@@ -2,6 +2,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router'
 import { FiCheck } from 'react-icons/fi'
 import { useQuizResult } from '@/features/quiz/hooks/use-quiz-result'
 import { AnswerReview } from '@/features/quiz/components/answer-review'
+import { countCorrect } from '@/features/quiz/lib/count-correct'
 
 const PASS_THRESHOLD = 80
 
@@ -37,7 +38,7 @@ export function QuizResultPassPage() {
 
   const { score } = data.quizAttempt
   const total = data.questions.length
-  const correct = Math.round((score / 100) * total)
+  const correct = countCorrect(data.questions)
 
   return (
     <div className="animate-in fade-in zoom-in-95 mx-auto max-w-5xl p-6 duration-500">
@@ -71,7 +72,9 @@ export function QuizResultPassPage() {
               Passing score
             </p>
             <p className="mt-2 text-4xl font-black text-slate-800">{PASS_THRESHOLD}%</p>
-            <p className="mt-1 text-sm font-medium text-slate-500">Exceeded target</p>
+            <p className="mt-1 text-sm font-medium text-slate-500">
+              {score > PASS_THRESHOLD ? 'Exceeded target' : 'Target reached'}
+            </p>
           </div>
         </div>
       </div>

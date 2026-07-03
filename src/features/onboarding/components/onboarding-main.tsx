@@ -12,14 +12,19 @@ import {
   StepLearningPath,
   StepGenerating,
 } from './steps'
-import StepCustomize from './steps/customize'
 import { StepGate } from './steps/gate'
-import { steps, PREFERENCE_QUESTIONS, LEARNING_PATH_KEYS } from '../data/onboarding-data'
+import {
+  steps,
+  LEARNING_PATH_KEYS,
+  getPreferenceQuestions,
+  isFrontendFocusedRole,
+} from '../data/onboarding-data'
 import { useWizardStore } from '../onboarding-store'
 import { useCompleteOnboarding } from '../hooks/use-complete-onboarding'
 
 const OnboardingMain = () => {
   const { step: currentStep, answers, setAnswer, nextStep, prevStep, goToStep } = useWizardStore()
+  const role = answers?.role as string | undefined
   const completeOnboarding = useCompleteOnboarding()
   const navigate = useNavigate()
   const [direction, setDirection] = useState('next')
@@ -51,7 +56,7 @@ const OnboardingMain = () => {
         return !!answers?.level
       case 5:
         if (subStep === 1) {
-          return PREFERENCE_QUESTIONS.every((q) => {
+          return getPreferenceQuestions(role).every((q) => {
             if (q.required === false) return true
             const val = answers?.[q.id]
             return typeof val === 'string' ? val.trim().length > 0 : !!val
@@ -72,7 +77,14 @@ const OnboardingMain = () => {
 
     if (currentStep === 5 && subStep === 1) {
       setDirection('next')
-      setSubStep(2)
+      // Frontend/Fullstack get the frontend learning-path substep; other roles skip
+      // straight to the generating step (H11 — no frontend questions for backend).
+      if (isFrontendFocusedRole(role)) {
+        setSubStep(2)
+      } else {
+        nextStep()
+        setSubStep(1)
+      }
     } else if (currentStep === 5 && subStep === 2) {
       setDirection('next')
       nextStep()
@@ -86,14 +98,12 @@ const OnboardingMain = () => {
 
   const handleBack = () => {
     setErrorStepKey(null)
-    if (currentStep === 8) {
-      setDirection('back')
-      goToStep(7)
-    } else if (currentStep === 7) {
-      // Gate: back to the last user-input step (LearningPath), before AI generation.
+    if (currentStep === 7) {
+      // Gate: back to the last user-input step, before AI generation. Frontend roles
+      // land on the learning-path substep; others on the preferences substep (H11).
       setDirection('back')
       goToStep(5)
-      setSubStep(2)
+      setSubStep(isFrontendFocusedRole(role) ? 2 : 1)
     } else if (currentStep === 5 && subStep === 2) {
       setDirection('back')
       setSubStep(1)
@@ -101,7 +111,7 @@ const OnboardingMain = () => {
       setDirection('back')
       prevStep()
       if (currentStep - 1 === 5) {
-        setSubStep(2)
+        setSubStep(isFrontendFocusedRole(role) ? 2 : 1)
       }
     }
   }
@@ -122,7 +132,7 @@ const OnboardingMain = () => {
           .fade-only { animation: simpleFadeIn 0.4s ease-in-out forwards; }
         `}</style>
 
-        {currentStep !== 6 && currentStep !== 7 && currentStep !== 8 && (
+        {currentStep !== 6 && currentStep !== 7 && (
           <div className="mb-10 w-full">
             <Stepper currentStep={currentStep} />
           </div>
@@ -179,18 +189,9 @@ const OnboardingMain = () => {
           {currentStep === 6 && <StepGenerating />}
           {currentStep === 7 && (
             <StepGate
-              onAccept={() => completeOnboarding.mutate()}
-              onCustomize={() => {
-                setDirection('next')
-                goToStep(8)
-              }}
+              onAccept={() => completeOnboarding.mutate('accept')}
+              onCustomize={() => completeOnboarding.mutate('customize')}
               onChooseAnother={() => navigate('/roadmaps/browse')}
-              isSubmitting={completeOnboarding.isPending}
-            />
-          )}
-          {currentStep === 8 && (
-            <StepCustomize
-              onComplete={() => completeOnboarding.mutate()}
               isSubmitting={completeOnboarding.isPending}
             />
           )}
@@ -198,7 +199,7 @@ const OnboardingMain = () => {
 
         {currentStep !== 1 && (
           <div className="border-border-soft/60 mt-16 flex flex-col border-t pt-8">
-            {showValidationError && currentStep !== 6 && currentStep !== 7 && currentStep !== 8 && (
+            {showValidationError && currentStep !== 6 && currentStep !== 7 && (
               <p className="text-error-text mb-4 text-right text-sm font-medium">
                 Please complete this step before continuing.
               </p>
@@ -210,7 +211,7 @@ const OnboardingMain = () => {
               >
                 <RiArrowLeftLine className="mr-2 h-5 w-5" /> Back
               </button>
-              {currentStep !== 6 && currentStep !== 7 && currentStep !== 8 && (
+              {currentStep !== 6 && currentStep !== 7 && (
                 <button
                   onClick={handleNext}
                   className="btn h-12 rounded-xl border-none bg-[#0B1528] px-10 text-base font-semibold text-white transition-all hover:bg-[#15233e] hover:shadow-lg active:scale-95"

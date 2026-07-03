@@ -172,7 +172,7 @@ export default function MyLearningJourneyPage() {
         </div>
 
         <div className="w-full">
-          <TopicDetailSidebar topic={activeTopic} roadmapId={activeRoadmapId} />
+          <TopicDetailSidebar topic={activeTopic} topics={topics} roadmapId={activeRoadmapId} />
         </div>
       </div>
     </div>
