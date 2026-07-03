@@ -21,6 +21,7 @@ export interface ResultQuestion {
     questionId: string
     selectedOptionId?: string
     userInput?: string
+    isCorrect?: boolean
   }
 }
 
