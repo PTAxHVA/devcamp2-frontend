@@ -8,6 +8,8 @@ import { deriveCurrentWeekActivity } from '@/features/dashboard/lib/streak-activ
 interface BEProgressStat {
   roadmapId: string
   roadmapCompletionPercentage: number
+  totalSections?: number
+  totalCompletedSections?: number
 }
 
 interface BERoadmap {
@@ -44,6 +46,8 @@ interface BEDashboardRes {
   stats: {
     progress: BEProgressStat[]
     level: string
+    completedTopics?: number
+    quizAvg?: number | null
   }
   availableRolesForAdd?: BEAvailableRole[]
   weeklyProgress?: BEWeeklyProgress
@@ -123,12 +127,26 @@ export function useDashboard() {
           )
         }
 
+        // Feed the card the roadmap's real name + progress (H6) — it already lives
+        // in the mapped roadmaps list + the per-roadmap progress stat, it just
+        // wasn't threaded through, so the card showed 0% / "0 of 0".
+        const clRoadmap = roadmaps.find((rm) => rm.id === clItem.userRoadmapId)
+        const progressStat = dashData.stats?.progress?.find((p) => p.roadmapId === clItem.roadmapId)
+
         continueLearning = {
           sectionId: clItem.currentSection.sectionId,
           topicId: clItem.currentTopicId,
           userRoadmapId: clItem.userRoadmapId,
           topicName,
           sectionName: clItem.currentSection.name,
+          roadmapName: clRoadmap?.roleName ?? 'Current roadmap',
+          // Prefer the mapped roadmap's %, but fall back to the progress stat so the
+          // card can't show a false 0% if the /roadmaps join ever misses.
+          progressPercentage:
+            clRoadmap?.progressPercentage ??
+            (progressStat ? Math.round(progressStat.roadmapCompletionPercentage) : 0),
+          completedSections: progressStat?.totalCompletedSections ?? 0,
+          totalSections: progressStat?.totalSections ?? 0,
         }
       }
 
@@ -167,8 +185,10 @@ export function useDashboard() {
         },
         stats: {
           roadmapProgress: avgProgress,
-          completedTopics: -1,
-          quizAvg: -1,
+          // Real numbers from the BE (H5). Sentinel -1 → StatsGrid shows "--" when
+          // the field is absent (older deploy) or quizAvg is null (no attempts yet).
+          completedTopics: dashData.stats?.completedTopics ?? -1,
+          quizAvg: dashData.stats?.quizAvg ?? -1,
         },
         availableRolesForAdd: (dashData.availableRolesForAdd || []).map((r) => ({
           roadmapId: r.id,

@@ -1,6 +1,7 @@
 import { Link } from 'react-router'
 import { HiMiniAcademicCap, HiMiniPlus, HiMiniLockClosed } from 'react-icons/hi2'
 import type { DashboardData } from '@/features/dashboard/types'
+import { formatRoadmapSource } from '@/features/roadmap/lib/roadmap-source-label'
 
 interface MyRoadmapsGridProps {
   roadmaps: DashboardData['roadmaps']
@@ -8,13 +9,14 @@ interface MyRoadmapsGridProps {
 }
 
 const formatBadge = (type: DashboardData['roadmaps'][number]['sourceType']) => {
+  const text = formatRoadmapSource(type)
   switch (type) {
     case 'SUGGESTED':
-      return { text: 'Suggested', class: 'badge-primary badge-outline' }
+      return { text, class: 'badge-primary badge-outline' }
     case 'CUSTOMIZED':
-      return { text: 'Customized', class: 'badge-secondary badge-outline' }
+      return { text, class: 'badge-secondary badge-outline' }
     default:
-      return { text: String(type), class: 'badge-ghost' }
+      return { text, class: 'badge-ghost' }
   }
 }
 

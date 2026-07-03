@@ -1,26 +1,24 @@
 import { useState, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import type { Node } from '@xyflow/react'
-import toast from 'react-hot-toast'
 
 import {
   RiArrowLeftLine,
   RiBookmarkLine,
   RiTimeLine,
   RiListUnordered,
-  RiBarChartBoxLine,
   RiStarLine,
   RiCheckLine,
+  RiCheckboxBlankCircleLine,
   RiCheckboxCircleFill,
   RiArrowRightLine,
-  RiExternalLinkLine,
-  RiBookmark2Line,
   RiEditLine,
 } from 'react-icons/ri'
 
 import { RoadmapGraph } from './components/roadmap-graph'
 import { buildFlowGraph } from './lib/build-flow-graph'
 import { useRoadmapDetail } from './hooks/use-roadmap-detail'
+import { formatRoadmapSource } from './lib/roadmap-source-label'
 
 const RoadmapViewPage = () => {
   const { id } = useParams()
@@ -69,6 +67,14 @@ const RoadmapViewPage = () => {
     )
   }
 
+  if (roadmapDetail.topics.length === 0) {
+    return (
+      <div className="bg-bg-section text-text-muted flex h-screen items-center justify-center font-medium">
+        This roadmap has no topics yet.
+      </div>
+    )
+  }
+
   const selectedTopic =
     roadmapDetail.topics.find((t) => t.masterTopicId === currentTopicId) || roadmapDetail.topics[0]
 
@@ -79,13 +85,19 @@ const RoadmapViewPage = () => {
         ? 100
         : 0
 
-  const prereqNames = selectedTopic.prerequisiteTopicIds
-    .map((reqId) => roadmapDetail.topics.find((t) => t.masterTopicId === reqId)?.name)
-    .filter(Boolean)
+  // Resolve prerequisites to real topics in this roadmap, with their REAL completion
+  // status (NEW-5) — no more unconditional green ticks.
+  const prereqs = selectedTopic.prerequisiteTopicIds
+    .map((reqId) => {
+      const t = roadmapDetail.topics.find((tp) => tp.masterTopicId === reqId)
+      return t ? { name: t.name, completed: t.status === 'completed' } : null
+    })
+    .filter((p): p is { name: string; completed: boolean } => p !== null)
 
   const title = roadmapDetail.roadmap.roleName || 'Your Custom Roadmap'
   const topicsCount = roadmapDetail.topics.length
-  const durationTotal = roadmapDetail.topics.reduce((sum, t) => sum + (t.estimatedHours || 1), 0)
+  // Sum real estimates only — don't fabricate 1h for topics missing an estimate (NEW-4).
+  const durationTotal = roadmapDetail.topics.reduce((sum, t) => sum + (t.estimatedHours || 0), 0)
 
   return (
     <div className="flex h-full max-w-420">
@@ -114,17 +126,16 @@ const RoadmapViewPage = () => {
           </p>
 
           <div className="mb-6 flex flex-wrap items-center gap-4 text-xs font-medium">
-            <div className="border-border-soft text-text-secondary flex items-center gap-2 rounded-lg border px-3 py-1.5">
-              <RiTimeLine /> ~{durationTotal} hours
-            </div>
+            {durationTotal > 0 && (
+              <div className="border-border-soft text-text-secondary flex items-center gap-2 rounded-lg border px-3 py-1.5">
+                <RiTimeLine /> ~{durationTotal} hours
+              </div>
+            )}
             <div className="border-border-soft text-text-secondary flex items-center gap-2 rounded-lg border px-3 py-1.5">
               <RiListUnordered /> {topicsCount} topics
             </div>
-            <div className="border-border-soft text-text-secondary flex items-center gap-2 rounded-lg border px-3 py-1.5">
-              <RiBarChartBoxLine /> Adaptive
-            </div>
             <div className="border-border-purple bg-bg-lavender text-brand-purple-700 flex items-center gap-2 rounded-lg border px-3 py-1.5 tracking-wider uppercase">
-              <RiStarLine /> {roadmapDetail.roadmap.sourceType}
+              <RiStarLine /> {formatRoadmapSource(roadmapDetail.roadmap.sourceType)}
             </div>
           </div>
         </div>
@@ -163,17 +174,21 @@ const RoadmapViewPage = () => {
 
           <div className="mb-8">
             <h3 className="text-text-primary mb-3 text-sm font-bold">Prerequisites</h3>
-            {prereqNames.length > 0 ? (
+            {prereqs.length > 0 ? (
               <ul className="space-y-2.5">
-                {prereqNames.map((req) => (
+                {prereqs.map((req) => (
                   <li
-                    key={req}
+                    key={req.name}
                     className="text-text-secondary flex items-center gap-3 text-sm font-medium"
                   >
-                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
-                      <RiCheckLine className="text-xs" />
-                    </div>
-                    {req}
+                    {req.completed ? (
+                      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
+                        <RiCheckLine className="text-xs" />
+                      </div>
+                    ) : (
+                      <RiCheckboxBlankCircleLine className="text-text-placeholder h-5 w-5 shrink-0" />
+                    )}
+                    {req.name}
                   </li>
                 ))}
               </ul>
@@ -182,13 +197,14 @@ const RoadmapViewPage = () => {
             )}
           </div>
 
-          <div className="mb-8">
-            <h3 className="text-text-primary mb-2 text-sm font-bold">About this topic</h3>
-            <p className="text-text-secondary text-sm leading-relaxed">
-              Complete the sections in this topic to advance your knowledge of {selectedTopic.name}.
-              Estimated effort: {selectedTopic.estimatedHours} hours.
-            </p>
-          </div>
+          {selectedTopic.descriptionShort && (
+            <div className="mb-8">
+              <h3 className="text-text-primary mb-2 text-sm font-bold">About this topic</h3>
+              <p className="text-text-secondary text-sm leading-relaxed">
+                {selectedTopic.descriptionShort}
+              </p>
+            </div>
+          )}
 
           <div>
             <h3 className="text-text-primary mb-3 text-sm font-bold">Sections Included</h3>
@@ -203,24 +219,12 @@ const RoadmapViewPage = () => {
           </div>
         </div>
 
-        <div className="border-border-soft space-y-3 border-t bg-white p-6">
+        <div className="border-border-soft border-t bg-white p-6">
           <button
             onClick={handleGoToTopic}
             className="flex w-full cursor-pointer items-center justify-between rounded-xl bg-[#0B1528] px-5 py-3.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-slate-800"
           >
             Continue learning <RiArrowRightLine className="text-lg" />
-          </button>
-          <button
-            onClick={handleGoToTopic}
-            className="border-border-soft text-text-secondary hover:bg-bg-section flex w-full cursor-pointer items-center justify-between rounded-xl border bg-white px-5 py-3.5 text-sm font-bold transition-colors"
-          >
-            View topic details <RiExternalLinkLine className="text-text-placeholder text-lg" />
-          </button>
-          <button
-            onClick={() => toast.success('Saved to your bookmarks!')}
-            className="text-text-muted hover:text-brand-purple-600 mt-2 flex w-full cursor-pointer items-center justify-center gap-2 pt-2 text-sm font-medium transition-colors"
-          >
-            <RiBookmark2Line className="text-lg" /> Save for later
           </button>
         </div>
       </aside>
