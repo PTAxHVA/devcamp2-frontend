@@ -82,6 +82,7 @@ export default function ResetPasswordPage() {
               <input
                 id="newPassword"
                 type="password"
+                autoComplete="new-password"
                 placeholder="••••••••"
                 className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('newPassword')}
@@ -118,6 +119,7 @@ export default function ResetPasswordPage() {
               <input
                 id="confirmPassword"
                 type="password"
+                autoComplete="new-password"
                 placeholder="••••••••"
                 className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
                 {...register('confirmPassword')}

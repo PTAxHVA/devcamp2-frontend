@@ -19,6 +19,7 @@ import {
 } from 'react-icons/ri'
 
 import { useTopicDetail } from './hooks/use-topic-detail'
+import { dedupeResources } from './lib/dedupe-resources'
 
 /* --------------------------- Vòng tròn % ---------------------------- */
 interface CircularProgressProps {
@@ -175,14 +176,17 @@ export default function TopicDetailPage() {
   const progressPercent =
     totalSections > 0 ? Math.round((completedSections / totalSections) * 100) : 0
 
-  // Flat-map the curated external resources across this topic's sections.
-  const resources = sections.flatMap((sec) =>
-    (sec.resourceList || []).map((r) => ({
-      title: r.title,
-      url: r.url,
-      type: r.type,
-      estimatedMinutes: r.estimatedMinutes,
-    })),
+  // Flat-map the curated external resources across this topic's sections, then dedupe:
+  // the same link is attached to multiple sections, so it would otherwise repeat (OBS-02).
+  const resources = dedupeResources(
+    sections.flatMap((sec) =>
+      (sec.resourceList || []).map((r) => ({
+        title: r.title,
+        url: r.url,
+        type: r.type,
+        estimatedMinutes: r.estimatedMinutes,
+      })),
+    ),
   )
 
   // Topic-level estimate comes straight from the API (curated resource hours),

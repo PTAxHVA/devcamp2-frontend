@@ -61,13 +61,20 @@ export function useSubmitQuiz(attemptId: string) {
       // always renders the freshly graded attempt, not the previous one.
       qc.invalidateQueries({ queryKey: ['attempt-result', result.quizAttemptId] })
 
+      // Invalidate on every graded attempt: a fail still changes quizAvg + the
+      // continue-learning card (dashboard) and records the section as attempted, so
+      // the topic page shows it as "In Progress" instead of a stale "Not Started".
       qc.invalidateQueries({ queryKey: ['dashboard'] })
+      qc.invalidateQueries({ queryKey: ['topic-detail'] })
 
       if (result.isPassed) {
-        qc.invalidateQueries({ queryKey: ['topic-detail'] })
+        // A pass mirrors section progress to EVERY roadmap that shares the topic (BE
+        // SYNC-01), so refresh all cached roadmap-detail queries — including ones not
+        // currently mounted (refetchType 'all'), not just the roadmap being viewed. A
+        // fail changes no completed-section counts, so roadmap-detail stays put.
+        qc.invalidateQueries({ queryKey: ['roadmap-detail'], refetchType: 'all' })
         qc.invalidateQueries({ queryKey: ['section-detail'] })
         qc.invalidateQueries({ queryKey: ['section-quiz'] })
-        qc.invalidateQueries({ queryKey: ['roadmap-detail'] })
       }
     },
     onError: () => toast.error('Failed to submit quiz, please try again.'),
