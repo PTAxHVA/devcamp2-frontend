@@ -9,6 +9,7 @@ import { useQuizStore } from '@/features/quiz/quiz-store'
 import { useQuizAttempt } from '@/features/quiz/hooks/use-quiz-attempt'
 import { useSubmitQuiz } from '@/features/quiz/hooks/use-submit-quiz'
 import { useQuizTimer } from '@/features/quiz/hooks/use-quiz-timer'
+import { buildAnsweredPayload, buildTimedOutPayload } from '@/features/quiz/lib/quiz-submission'
 
 // Section quizzes require >=80% to pass (product spec).
 const PASS_THRESHOLD = 80
@@ -48,16 +49,10 @@ export function QuizAttemptPage() {
   useEffect(() => reset, [reset])
 
   const buildPayload = useCallback(
-    () =>
-      questions.flatMap((q) => {
-        const val = answers[q.id]
-        if (val === undefined || val === '') return []
-        return [
-          q.type === 'mcq'
-            ? { questionId: q.id, selectedOptionId: val }
-            : { questionId: q.id, userInput: val },
-        ]
-      }),
+    (isTimedOut: boolean) =>
+      isTimedOut
+        ? buildTimedOutPayload(questions, answers)
+        : buildAnsweredPayload(questions, answers),
     [answers, questions],
   )
 
@@ -66,7 +61,12 @@ export function QuizAttemptPage() {
       if (!attemptId || submissionInFlight.current) return false
       if (isTimedOut && typeof navigator !== 'undefined' && !navigator.onLine) return false
 
-      const payload = buildPayload()
+      const payload = buildPayload(isTimedOut)
+      if (isTimedOut && payload.length === 0) {
+        toast.error('Unable to finish this timed-out quiz. Please try again.')
+        return false
+      }
+
       if (payload.length === 0) {
         if (isTimedOut) {
           // Timer expired with nothing answered. The backend rejects an empty
@@ -105,7 +105,7 @@ export function QuizAttemptPage() {
         },
         onSuccess: (result) =>
           navigate(
-            `/quizzes/${result.quizAttemptId}/result/${result.isPassed ? 'pass' : 'fail'}${queryParamsStr}`,
+            `/quizzes/${result.quizAttemptId}/result/${isTimedOut || !result.isPassed ? 'fail' : 'pass'}${queryParamsStr}`,
           ),
       })
       return true
