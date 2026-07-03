@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router'
 import { RiMenuLine, RiUser3Line, RiSettings3Line, RiLogoutBoxRLine } from 'react-icons/ri'
 import { useMe } from '@/features/profile/hooks/use-profile'
 import { useAuthStore } from '@/stores/auth-store'
+import { queryClient } from '@/lib/query-client'
 
 interface NavbarProps {
   onMenuClick?: () => void
@@ -16,6 +17,9 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
 
   const handleLogout = () => {
     setAuth(null, null)
+    // Drop the previous user's cached queries so a next login in the same tab
+    // can't briefly show stale dashboard/profile data.
+    queryClient.clear()
     navigate('/login')
   }
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router'
 import { toast } from 'react-hot-toast'
 import axios from 'axios'
 import { useAuthStore } from '@/stores/auth-store'
+import { queryClient } from '@/lib/query-client'
 import {
   useMe,
   useUpdateProfile,
@@ -87,14 +88,20 @@ export default function SettingsPage() {
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
 
+  // Mirror the backend strongPassword policy (signup/reset/account change) so the
+  // checklist can't imply rules the API rejects.
   const passwordRules = [
     { label: 'At least 8 characters', test: (v: string) => v.length >= 8 },
-    { label: 'A number', test: (v: string) => /[0-9]/.test(v) },
     { label: 'An uppercase letter', test: (v: string) => /[A-Z]/.test(v) },
+    { label: 'A lowercase letter', test: (v: string) => /[a-z]/.test(v) },
+    { label: 'A number', test: (v: string) => /[0-9]/.test(v) },
+    { label: 'A special character', test: (v: string) => /[^A-Za-z0-9]/.test(v) },
   ]
 
   const logout = () => {
     setAuth(null, null)
+    // Clear the previous user's cached queries before returning to login.
+    queryClient.clear()
     navigate('/login')
   }
 
@@ -121,8 +128,8 @@ export default function SettingsPage() {
       toast.error('Enter your current password')
       return
     }
-    if (newPassword.length < 8) {
-      toast.error('New password must be at least 8 characters')
+    if (!passwordRules.every((rule) => rule.test(newPassword))) {
+      toast.error('New password does not meet all the requirements')
       return
     }
     if (newPassword !== confirmPassword) {
