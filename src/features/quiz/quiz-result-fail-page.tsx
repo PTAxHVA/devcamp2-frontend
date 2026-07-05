@@ -3,6 +3,7 @@ import { FiX, FiRefreshCw, FiShield } from 'react-icons/fi'
 import { useQuizResult } from '@/features/quiz/hooks/use-quiz-result'
 import { useCooldownTimer } from '@/features/quiz/hooks/use-cooldown-timer'
 import { AnswerReview } from '@/features/quiz/components/answer-review'
+import { MistakeCoach } from '@/features/quiz/components/mistake-coach'
 import { countCorrect } from '@/features/quiz/lib/count-correct'
 
 const PASS_THRESHOLD = 80
@@ -87,6 +88,8 @@ export function QuizResultFailPage() {
             <h3 className="mb-4 text-lg font-bold text-slate-800">Review your answers</h3>
             <AnswerReview questions={data.questions} />
           </div>
+
+          <MistakeCoach attemptId={data.quizAttempt.attemptId} questions={data.questions} />
         </div>
 
         <div className="rounded-3xl border bg-slate-50/50 p-8">

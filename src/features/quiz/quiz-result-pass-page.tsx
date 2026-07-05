@@ -4,6 +4,7 @@ import { FiCheck } from 'react-icons/fi'
 import toast from 'react-hot-toast'
 import { useQuizResult } from '@/features/quiz/hooks/use-quiz-result'
 import { AnswerReview } from '@/features/quiz/components/answer-review'
+import { MistakeCoach } from '@/features/quiz/components/mistake-coach'
 import { countCorrect } from '@/features/quiz/lib/count-correct'
 import { useTopicDetail } from '@/features/topic/hooks/use-topic-detail'
 import {
@@ -123,6 +124,13 @@ export function QuizResultPassPage() {
         <h3 className="mb-6 text-lg font-bold text-slate-800">Review your answers</h3>
         <AnswerReview questions={data.questions} />
       </div>
+
+      {/* Only when this pass still has missed questions (e.g. an 80% pass). */}
+      {correct < total && (
+        <div className="mt-8">
+          <MistakeCoach attemptId={data.quizAttempt.attemptId} questions={data.questions} />
+        </div>
+      )}
 
       <div className="mt-10 flex justify-end">
         <button
