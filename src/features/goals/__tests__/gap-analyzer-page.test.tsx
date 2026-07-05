@@ -38,11 +38,13 @@ const resultFixture: JobReadinessResult = {
 }
 
 const analyzeMutate = vi.fn()
+const analyzeReset = vi.fn()
 const addMutate = vi.fn()
 
 const mockAnalyze = (data: JobReadinessResult | undefined) => {
   ;(useAnalyzeJobReadiness as Mock).mockReturnValue({
     mutate: analyzeMutate,
+    reset: analyzeReset,
     isPending: false,
     data,
   })
@@ -58,6 +60,7 @@ const renderPage = () =>
 describe('GapAnalyzerPage', () => {
   beforeEach(() => {
     analyzeMutate.mockReset()
+    analyzeReset.mockReset()
     addMutate.mockReset()
     ;(useJobReadinessRoles as Mock).mockReturnValue({
       data: [ROLE, 'Junior Backend Developer'],
@@ -108,6 +111,16 @@ describe('GapAnalyzerPage', () => {
     expect(useAddMissingTopics).toHaveBeenCalledWith('ur-1')
     expect(addMutate).toHaveBeenCalledTimes(1)
     expect(addMutate.mock.calls[0][0]).toEqual(['t-react'])
+  })
+
+  it('clears a stale result when the target role changes', () => {
+    mockAnalyze(resultFixture)
+    renderPage()
+
+    fireEvent.change(screen.getByLabelText('Target role'), {
+      target: { value: 'Junior Backend Developer' },
+    })
+    expect(analyzeReset).toHaveBeenCalledTimes(1)
   })
 
   it('celebrates when the role has no missing topics', () => {

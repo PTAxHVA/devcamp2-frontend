@@ -46,8 +46,13 @@ export function GapAnalyzerPage() {
       <div className="border-border-soft flex flex-col gap-3 rounded-3xl border bg-white p-6 sm:flex-row sm:items-center">
         <select
           value={role}
-          onChange={(e) => setRole(e.target.value)}
-          disabled={rolesQuery.isLoading}
+          onChange={(e) => {
+            setRole(e.target.value)
+            // A different role makes the previous analysis stale — clear it so
+            // the dropdown and the result on screen can never disagree.
+            analyzeMutation.reset()
+          }}
+          disabled={rolesQuery.isLoading || analyzeMutation.isPending}
           aria-label="Target role"
           className="focus:border-brand-purple-500 border-border-soft w-full rounded-xl border bg-white px-4 py-2.5 text-sm font-medium outline-none sm:max-w-xs"
         >
