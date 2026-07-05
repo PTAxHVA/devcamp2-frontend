@@ -4,7 +4,7 @@ export default function ResetPasswordSuccessPage() {
   return (
     <div className="border-border-soft flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border shadow-sm md:flex-row">
       {/* ── Left: illustration ── */}
-      <div className="hidden w-1/2 items-center justify-center bg-[#f9f9fb] px-10 py-12 md:flex">
+      <div className="bg-bg-section hidden w-1/2 items-center justify-center px-10 py-12 md:flex">
         <div className="relative flex items-center justify-center">
           {/* Decorative dots */}
           <span className="bg-brand-purple-300 absolute top-0 left-4 h-2 w-2 rounded-full opacity-60" />
@@ -20,7 +20,7 @@ export default function ResetPasswordSuccessPage() {
           </span>
 
           {/* Main circle */}
-          <div className="border-brand-purple-300 flex h-36 w-36 items-center justify-center rounded-full border-4 bg-white shadow-sm">
+          <div className="border-brand-purple-300 bg-bg-card flex h-36 w-36 items-center justify-center rounded-full border-4 shadow-sm">
             <div className="bg-bg-lavender flex h-24 w-24 items-center justify-center rounded-full">
               <svg className="text-brand-purple-500 h-12 w-12" fill="none" viewBox="0 0 48 48">
                 <path
@@ -40,7 +40,7 @@ export default function ResetPasswordSuccessPage() {
       </div>
 
       {/* ── Right: message ── */}
-      <div className="flex w-full flex-col justify-center gap-6 bg-white px-10 py-16 md:w-1/2">
+      <div className="bg-bg-card flex w-full flex-col justify-center gap-6 px-10 py-16 md:w-1/2">
         <h1 className="text-text-primary text-3xl font-extrabold">Password reset successful!</h1>
         <p className="text-text-muted text-sm">
           Your password has been updated.

@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useSearchParams } from 'react-router'
 import { z } from 'zod'
 import { toast } from 'react-hot-toast'
+import { PasswordInput } from '@/components/ui/password-input'
 import ResetPasswordImg from '@/assets/reset-password.png'
 import { useResetPassword } from './hooks/use-reset-password'
 import { strongPassword } from '@/features/auth/auth-schemas'
@@ -66,7 +67,7 @@ export default function ResetPasswordPage() {
   return (
     <div className="border-border-soft flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border shadow-sm md:flex-row">
       {/* ── Left Side: Reset Password Form ── */}
-      <div className="flex w-full flex-col justify-between bg-white px-10 py-16 md:w-1/2">
+      <div className="bg-bg-card flex w-full flex-col justify-between px-10 py-16 md:w-1/2">
         <div className="flex-1">
           <h1 className="text-text-primary text-3xl font-extrabold">Reset password</h1>
           <p className="text-text-secondary mt-2 mb-6 text-sm">
@@ -79,9 +80,8 @@ export default function ResetPasswordPage() {
               <label className="text-text-primary text-sm font-semibold" htmlFor="newPassword">
                 New password
               </label>
-              <input
+              <PasswordInput
                 id="newPassword"
-                type="password"
                 autoComplete="new-password"
                 placeholder="••••••••"
                 className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
@@ -93,12 +93,12 @@ export default function ResetPasswordPage() {
             </div>
 
             {/* Password Validation Rules UI Block */}
-            <div className="flex flex-col gap-1 rounded-lg bg-gray-50 p-3 text-xs">
+            <div className="bg-bg-section flex flex-col gap-1 rounded-lg p-3 text-xs">
               {passwordRules.map((rule) => {
                 const isPassed = rule.test(newPasswordValue)
                 return (
                   <div key={rule.label} className="flex items-center gap-2">
-                    <span className={isPassed ? 'font-bold text-green-500' : 'text-gray-300'}>
+                    <span className={isPassed ? 'font-bold text-green-500' : 'text-text-disabled'}>
                       {isPassed ? '✓' : '○'}
                     </span>
                     <span
@@ -116,9 +116,8 @@ export default function ResetPasswordPage() {
               <label className="text-text-primary text-sm font-semibold" htmlFor="confirmPassword">
                 Confirm new password
               </label>
-              <input
+              <PasswordInput
                 id="confirmPassword"
-                type="password"
                 autoComplete="new-password"
                 placeholder="••••••••"
                 className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
@@ -155,9 +154,9 @@ export default function ResetPasswordPage() {
           </form>
 
           <div className="my-5 flex items-center gap-3">
-            <div className="h-px flex-1 bg-gray-200" />
+            <div className="bg-border-soft h-px flex-1" />
             <span className="text-text-placeholder text-xs">or</span>
-            <div className="h-px flex-1 bg-gray-200" />
+            <div className="bg-border-soft h-px flex-1" />
           </div>
 
           <Link to="/login" className="text-sm font-semibold text-indigo-600 hover:underline">
@@ -167,7 +166,7 @@ export default function ResetPasswordPage() {
       </div>
 
       {/* ── Right Side: Info Panel & Illustration ── */}
-      <div className="hidden w-1/2 flex-col items-center justify-center gap-6 bg-[#f9f9fb] px-10 py-12 md:flex">
+      <div className="bg-bg-section hidden w-1/2 flex-col items-center justify-center gap-6 px-10 py-12 md:flex">
         <img
           src={ResetPasswordImg}
           alt="Reset password"

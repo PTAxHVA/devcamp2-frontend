@@ -58,7 +58,7 @@ export default function TopicDetailSidebar({ topic, topics, roadmapId }: TopicDe
 
   if (!topic) {
     return (
-      <div className="border-border-soft rounded-2xl border bg-white p-8 text-center shadow-sm">
+      <div className="border-border-soft bg-bg-card rounded-2xl border p-8 text-center shadow-sm">
         <RiBookOpenLine className="text-text-disabled mx-auto mb-3 text-4xl" />
         <p className="text-text-placeholder text-sm font-medium">
           Click a topic on the map to see details
@@ -101,7 +101,7 @@ export default function TopicDetailSidebar({ topic, topics, roadmapId }: TopicDe
           : 'Locked'
 
   return (
-    <div className="border-border-soft sticky top-6 overflow-hidden rounded-2xl border bg-white shadow-sm">
+    <div className="border-border-soft bg-bg-card sticky top-6 overflow-hidden rounded-2xl border shadow-sm">
       {/* Status banner */}
       <div className={`flex items-center gap-2 border-b px-5 py-2.5 ${cfg.bg} ${cfg.borderB}`}>
         <span className={`h-2 w-2 shrink-0 rounded-full ${cfg.dot}`} />

@@ -21,7 +21,7 @@ export function PassportContent({ passport, passportUrl }: PassportContentProps)
 
   return (
     <>
-      <section className="border-border-soft rounded-3xl border bg-white p-6 sm:p-8">
+      <section className="border-border-soft bg-bg-card rounded-3xl border p-6 sm:p-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
           <div className="bg-brand-purple-500 flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-3xl font-black text-white">
             {passport.username.charAt(0).toUpperCase()}
@@ -85,7 +85,7 @@ export function PassportContent({ passport, passportUrl }: PassportContentProps)
 
       <PassportCertificates username={passport.username} roadmaps={passport.roadmaps} />
 
-      <section className="border-border-soft rounded-3xl border bg-white p-6">
+      <section className="border-border-soft bg-bg-card rounded-3xl border p-6">
         <h2 className="text-text-primary mb-4 text-sm font-bold">Share this passport</h2>
         <PassportSharePanel passportUrl={passportUrl} />
       </section>

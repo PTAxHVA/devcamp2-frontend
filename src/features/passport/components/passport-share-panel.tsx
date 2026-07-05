@@ -55,7 +55,7 @@ export function PassportSharePanel({ passportUrl, compact = false }: PassportSha
         </a>
       </div>
       <div className="flex shrink-0 flex-col items-center gap-1.5">
-        <div className="border-border-soft rounded-xl border bg-white p-2">
+        <div className="border-border-soft bg-bg-card rounded-xl border p-2">
           <QRCodeSVG value={passportUrl} size={compact ? 88 : 120} aria-label="Passport QR code" />
         </div>
         <p className="text-text-muted text-[10px] font-medium tracking-wide uppercase">

@@ -26,7 +26,7 @@ function Section({
   children: React.ReactNode
 }) {
   return (
-    <div className="border-border-soft flex flex-col gap-5 rounded-2xl border bg-white p-6">
+    <div className="border-border-soft bg-bg-card flex flex-col gap-5 rounded-2xl border p-6">
       <div className="flex items-start gap-3">
         <div className="bg-bg-lavender flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
           <Icon className="text-brand-purple-500 h-4 w-4" />
@@ -396,7 +396,7 @@ export default function SettingsPage() {
           aria-modal="true"
         >
           <div
-            className="animate-in zoom-in-95 relative w-full max-w-md overflow-hidden rounded-3xl bg-white p-6 shadow-xl duration-200 lg:p-8"
+            className="animate-in zoom-in-95 bg-bg-card relative w-full max-w-md overflow-hidden rounded-3xl p-6 shadow-xl duration-200 lg:p-8"
             onClick={(e) => e.stopPropagation()}
           >
             <button

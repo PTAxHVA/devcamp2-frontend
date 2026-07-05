@@ -42,7 +42,7 @@ export const StepGenerating = () => {
         {processSteps.map((step) => (
           <div
             key={step.id}
-            className="border-border-soft flex items-center gap-6 rounded-2xl border bg-white p-6 shadow-sm"
+            className="border-border-soft bg-bg-card flex items-center gap-6 rounded-2xl border p-6 shadow-sm"
           >
             <div className="bg-bg-lavender text-brand-purple-600 flex h-16 w-16 shrink-0 items-center justify-center rounded-full">
               {step.icon}

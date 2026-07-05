@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { useAuthStore } from '@/stores/auth-store'
 
 const mockUser = { id: '1', email: 'test@example.com', username: 'TestUser' }
@@ -40,5 +40,18 @@ describe('useAuthStore', () => {
 
     expect(useAuthStore.getState().token).toBe('new-token')
     expect(useAuthStore.getState().user?.username).toBe('NewUser')
+  })
+
+  // readUser() runs during module init, so re-import a fresh module with the bad
+  // value already staged to exercise the guard as it fires on boot.
+  it('boots logged-out (no throw) when the stored user JSON is corrupt', async () => {
+    localStorage.setItem('user', '{not valid json')
+    vi.resetModules()
+
+    const mod = await import('@/stores/auth-store')
+
+    expect(mod.useAuthStore.getState().user).toBeNull()
+    // The corrupt blob is dropped so it can't crash the next boot either.
+    expect(localStorage.getItem('user')).toBeNull()
   })
 })

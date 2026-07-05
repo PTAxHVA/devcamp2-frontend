@@ -12,7 +12,7 @@ import {
   RiArrowLeftSLine,
   RiCloseLine,
 } from 'react-icons/ri'
-import { VoraMark, VoraWordmark } from '@/components/ui/vora-logo'
+import Logo from '@/assets/Logo.svg'
 import { useIsMobile } from '@/hooks/use-is-mobile'
 
 const SIDEBAR_COLLAPSED_KEY = 'vora:sidebar-collapsed'
@@ -66,17 +66,26 @@ export const Sidebar = ({ mobileOpen = false, onClose }: SidebarProps) => {
 
   return (
     <aside
-      className={`border-border-soft fixed inset-y-0 left-0 z-40 flex h-full w-65 shrink-0 flex-col justify-between border-r bg-white transition-transform duration-300 ease-in-out md:relative md:inset-auto md:z-auto md:translate-x-0 md:transition-all ${
+      className={`border-border-soft bg-bg-card fixed inset-y-0 left-0 z-40 flex h-full w-65 shrink-0 flex-col justify-between border-r transition-transform duration-300 ease-in-out md:relative md:inset-auto md:z-auto md:translate-x-0 md:transition-all ${
         mobileOpen ? 'translate-x-0' : '-translate-x-full'
       } ${effectiveCollapsed ? 'md:w-22' : 'md:w-65'}`}
     >
       <div>
         {/* Header / Logo */}
         <div className={`flex h-20 items-center ${effectiveCollapsed ? 'justify-center' : 'px-8'}`}>
+          {/* Same brand asset as the auth + landing pages so the logo is consistent
+              app-wide. Collapsed: clip the wide logo to its left icon glyph. */}
           {effectiveCollapsed ? (
-            <VoraMark className="h-9 w-9" />
+            <span
+              className="flex h-9 w-9 items-center overflow-hidden dark:rounded-md dark:bg-white"
+              title="VORA"
+            >
+              <img src={Logo} alt="VORA" className="h-9 w-auto max-w-none object-left" />
+            </span>
           ) : (
-            <VoraWordmark className="overflow-hidden" />
+            <span className="inline-flex dark:rounded-lg dark:bg-white dark:p-1.5">
+              <img src={Logo} alt="VORA" className="h-auto w-32 object-contain" />
+            </span>
           )}
           <button
             onClick={onClose}
@@ -132,7 +141,7 @@ export const Sidebar = ({ mobileOpen = false, onClose }: SidebarProps) => {
         <button
           onClick={toggleCollapsed}
           title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-          className="hover:border-brand-purple-600 hover:bg-brand-purple-600 border-border-soft text-text-placeholder absolute top-24 -right-3.5 z-20 hidden h-7 w-7 place-items-center rounded-full border bg-white shadow-md transition-all duration-200 ease-out hover:scale-110 hover:text-white active:scale-95 md:grid"
+          className="hover:border-brand-purple-600 hover:bg-brand-purple-600 border-border-soft text-text-placeholder bg-bg-card absolute top-24 -right-3.5 z-20 hidden h-7 w-7 place-items-center rounded-full border shadow-md transition-all duration-200 ease-out hover:scale-110 hover:text-white active:scale-95 md:grid"
         >
           <RiArrowLeftSLine
             className={`h-5 w-5 transition-transform duration-300 ${

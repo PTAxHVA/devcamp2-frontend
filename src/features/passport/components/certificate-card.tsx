@@ -35,7 +35,7 @@ export function CertificateCard({
   return (
     <div
       className={cn(
-        'certificate-print-area border-brand-purple-300 rounded-[1.75rem] border-4 bg-white p-2',
+        'certificate-print-area border-brand-purple-300 bg-bg-card rounded-[1.75rem] border-4 p-2',
         printTarget && 'print-target',
       )}
     >

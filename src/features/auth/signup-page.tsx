@@ -2,6 +2,7 @@ import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from 'react-router'
 import { RiMapPinLine, RiLineChartLine, RiLightbulbLine } from 'react-icons/ri'
+import { PasswordInput } from '@/components/ui/password-input'
 import RoadmapSignup from '@/assets/roadmap-signup.png'
 import { signupSchema, type SignupInput } from '@/features/auth/auth-schemas'
 import { useSignup } from '@/features/auth/hooks/use-signup'
@@ -68,7 +69,7 @@ export default function SignupPage() {
   return (
     <div className="border-border-soft flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border shadow-sm md:flex-row">
       {/* ── Left Side: Signup Form ── */}
-      <div className="flex w-full flex-col justify-between bg-white px-10 py-16 md:w-1/2">
+      <div className="bg-bg-card flex w-full flex-col justify-between px-10 py-16 md:w-1/2">
         <div className="flex-1">
           <h1 className="text-text-primary text-3xl font-extrabold">Create an account</h1>
           <p className="text-text-secondary mt-2 mb-6 text-sm">
@@ -122,9 +123,8 @@ export default function SignupPage() {
               <label className="text-text-primary text-sm font-semibold" htmlFor="password">
                 Password
               </label>
-              <input
+              <PasswordInput
                 id="password"
-                type="password"
                 autoComplete="new-password"
                 placeholder="••••••••"
                 className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
@@ -136,12 +136,12 @@ export default function SignupPage() {
             </div>
 
             {/* Password Validation Rules UI Block */}
-            <div className="flex flex-col gap-1 rounded-lg bg-gray-50 p-3 text-xs">
+            <div className="bg-bg-section flex flex-col gap-1 rounded-lg p-3 text-xs">
               {passwordRules.map((rule) => {
                 const isPassed = rule.test(passwordValue)
                 return (
                   <div key={rule.label} className="flex items-center gap-2">
-                    <span className={isPassed ? 'font-bold text-green-500' : 'text-gray-300'}>
+                    <span className={isPassed ? 'font-bold text-green-500' : 'text-text-disabled'}>
                       {isPassed ? '✓' : '○'}
                     </span>
                     <span
@@ -159,9 +159,8 @@ export default function SignupPage() {
               <label className="text-text-primary text-sm font-semibold" htmlFor="confirmPassword">
                 Confirm password
               </label>
-              <input
+              <PasswordInput
                 id="confirmPassword"
-                type="password"
                 autoComplete="new-password"
                 placeholder="••••••••"
                 className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
@@ -221,7 +220,7 @@ export default function SignupPage() {
       </div>
 
       {/* ── Right Side: Info Panel & Feature Previews ── */}
-      <div className="hidden w-1/2 flex-col gap-8 bg-[#f9f9fb] px-10 py-12 md:flex">
+      <div className="bg-bg-section hidden w-1/2 flex-col gap-8 px-10 py-12 md:flex">
         <div>
           <h2 className="text-text-primary mb-2 text-xl font-bold">
             Personalized. Focused. Effective.

@@ -6,7 +6,10 @@ export const Navbar = () => {
     <header className="border-base-200 bg-base-100 sticky top-0 z-50 border-b">
       <div className="navbar mx-auto h-20 max-w-450 px-4">
         <div className="flex-1">
-          <img src={Logo} alt="VORA Logo" className="h-auto w-48 object-contain" />
+          {/* Dark-on-white raster logo → white chip on dark surfaces so it stays legible. */}
+          <span className="inline-flex dark:rounded-lg dark:bg-white dark:p-1.5">
+            <img src={Logo} alt="VORA Logo" className="h-auto w-48 object-contain" />
+          </span>
         </div>
         <div className="flex-none gap-2 sm:gap-4">
           <Link to="/login" className="btn btn-ghost font-semibold">

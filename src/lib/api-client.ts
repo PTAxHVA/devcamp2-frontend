@@ -1,6 +1,7 @@
 import axios from 'axios'
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios'
 import toast from 'react-hot-toast'
+import { useAuthStore } from '@/stores/auth-store'
 
 export interface ApiError {
   code: string | undefined
@@ -88,8 +89,10 @@ apiClient.interceptors.response.use(
     toast.dismiss(COLD_START_TOAST_ID)
 
     if (error.response?.status === 401) {
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
+      // Clear auth through the store so localStorage AND useAuthStore stay in sync.
+      // Wiping only localStorage (as before) left a stale token/user "floating" in
+      // the store whenever the redirect was skipped (e.g. already on /login).
+      useAuthStore.getState().setAuth(null, null)
       if (window.location.pathname !== '/login') {
         window.location.assign('/login')
       }

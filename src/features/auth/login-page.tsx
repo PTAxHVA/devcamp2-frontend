@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from 'react-router'
 import { RiBookOpenLine, RiLineChartLine } from 'react-icons/ri'
+import { PasswordInput } from '@/components/ui/password-input'
 import RoadmapPreview from '@/assets/roadmap-login.png'
 import { loginSchema, type LoginInput } from '@/features/auth/auth-schemas'
 import { useLogin } from '@/features/auth/hooks/use-login'
@@ -37,7 +38,7 @@ export default function LoginPage() {
   return (
     <div className="border-border-soft flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border shadow-sm md:flex-row">
       {/* ── Left: Form ── */}
-      <div className="flex w-full flex-col justify-between bg-white px-10 py-12 md:w-1/2">
+      <div className="bg-bg-card flex w-full flex-col justify-between px-10 py-12 md:w-1/2">
         <div className="flex-1">
           <h1 className="text-text-primary mb-2 text-4xl font-extrabold">Welcome back</h1>
           <p className="text-text-placeholder mb-8 text-sm">
@@ -64,9 +65,8 @@ export default function LoginPage() {
               <label className="text-text-primary text-sm font-semibold" htmlFor="password">
                 Password
               </label>
-              <input
+              <PasswordInput
                 id="password"
-                type="password"
                 autoComplete="current-password"
                 placeholder="••••••••"
                 className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
@@ -106,7 +106,7 @@ export default function LoginPage() {
       </div>
 
       {/* ── Right: Info panel ── */}
-      <div className="hidden w-1/2 flex-col items-center justify-center gap-8 bg-[#f9f9fb] px-10 py-12 md:flex">
+      <div className="bg-bg-section hidden w-1/2 flex-col items-center justify-center gap-8 px-10 py-12 md:flex">
         <div className="text-center">
           <h2 className="text-text-primary mb-2 text-xl font-bold">
             Your learning roadmap, personalized

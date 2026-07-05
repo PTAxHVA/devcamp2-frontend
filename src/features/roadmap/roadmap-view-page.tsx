@@ -101,7 +101,7 @@ const RoadmapViewPage = () => {
 
   return (
     <div className="flex min-h-full max-w-420 flex-col lg:h-full lg:flex-row">
-      <div className="flex h-[70vh] flex-col overflow-hidden bg-white p-6 lg:h-auto lg:flex-1 lg:p-8">
+      <div className="bg-bg-card flex h-[70vh] flex-col overflow-hidden p-6 lg:h-auto lg:flex-1 lg:p-8">
         <div className="w-full">
           <div className="mb-4 flex items-center justify-between">
             <button
@@ -149,7 +149,7 @@ const RoadmapViewPage = () => {
         />
       </div>
 
-      <aside className="border-border-soft flex w-full shrink-0 flex-col border-t bg-white lg:w-95 lg:border-t-0 lg:border-l">
+      <aside className="border-border-soft bg-bg-card flex w-full shrink-0 flex-col border-t lg:w-95 lg:border-t-0 lg:border-l">
         <div className="border-border-soft flex items-center justify-between border-b p-6 pb-4">
           <p className="text-brand-purple-600 text-xs font-bold tracking-wider uppercase">
             Selected Topic
@@ -219,7 +219,7 @@ const RoadmapViewPage = () => {
           </div>
         </div>
 
-        <div className="border-border-soft border-t bg-white p-6">
+        <div className="border-border-soft bg-bg-card border-t p-6">
           <button
             onClick={handleGoToTopic}
             className="flex w-full cursor-pointer items-center justify-between rounded-xl bg-[#0B1528] px-5 py-3.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-slate-800"
