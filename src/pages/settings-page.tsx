@@ -26,7 +26,7 @@ function Section({
   children: React.ReactNode
 }) {
   return (
-    <div className="border-border-soft flex flex-col gap-5 rounded-2xl border bg-white p-6">
+    <div className="border-border-soft bg-bg-card flex flex-col gap-5 rounded-2xl border p-6">
       <div className="flex items-start gap-3">
         <div className="bg-bg-lavender flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
           <Icon className="text-brand-purple-500 h-4 w-4" />
@@ -365,7 +365,7 @@ export default function SettingsPage() {
             title="Account deactivation"
             subtitle="Turn off access to your VORA account."
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="bg-bg-section flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
                   <User className="text-text-muted h-4 w-4" />
@@ -379,7 +379,7 @@ export default function SettingsPage() {
               </div>
               <button
                 onClick={() => setShowDeactivatePassword(true)}
-                className="border-border-input text-text-primary hover:bg-bg-section rounded-lg border px-4 py-2 text-sm font-semibold transition"
+                className="border-border-input text-text-primary hover:bg-bg-section shrink-0 rounded-lg border px-4 py-2 text-sm font-semibold whitespace-nowrap transition"
               >
                 Deactivate account
               </button>
@@ -396,7 +396,7 @@ export default function SettingsPage() {
           aria-modal="true"
         >
           <div
-            className="animate-in zoom-in-95 relative w-full max-w-md overflow-hidden rounded-3xl bg-white p-6 shadow-xl duration-200 lg:p-8"
+            className="animate-in zoom-in-95 bg-bg-card relative w-full max-w-md overflow-hidden rounded-3xl p-6 shadow-xl duration-200 lg:p-8"
             onClick={(e) => e.stopPropagation()}
           >
             <button

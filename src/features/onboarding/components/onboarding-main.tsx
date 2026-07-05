@@ -117,9 +117,9 @@ const OnboardingMain = () => {
   }
 
   return (
-    <div className="text-text-primary flex min-h-screen flex-col bg-white font-sans">
+    <div className="text-text-primary bg-bg-card flex min-h-screen flex-col font-sans">
       <NavBar />
-      <main className="relative mx-auto flex min-h-screen w-full max-w-300 flex-1 flex-col overflow-x-hidden px-6 py-12">
+      <main className="relative mx-auto flex w-full max-w-300 flex-1 flex-col overflow-x-hidden px-6 py-12">
         <div className="pointer-events-none fixed top-[-10%] left-[-5%] -z-10 h-125 w-125 rounded-full bg-indigo-200/20 blur-[120px]"></div>
         <div className="pointer-events-none fixed right-[-5%] bottom-[-10%] -z-10 h-150 w-150 rounded-full bg-purple-200/20 blur-[150px]"></div>
 

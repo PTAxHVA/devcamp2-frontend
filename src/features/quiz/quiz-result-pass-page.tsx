@@ -68,7 +68,7 @@ export function QuizResultPassPage() {
         <p className="font-semibold text-red-600">Unable to load the result.</p>
         <button
           onClick={() => navigate('/dashboard')}
-          className="mt-4 rounded-xl border border-slate-200 bg-white px-5 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50"
+          className="border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section mt-4 rounded-xl border px-5 py-2 text-sm font-bold"
         >
           Back to Dashboard
         </button>
@@ -83,44 +83,48 @@ export function QuizResultPassPage() {
   return (
     <div className="animate-in fade-in zoom-in-95 mx-auto max-w-5xl p-6 duration-500">
       <div className="mb-10 flex flex-col items-center border-b pb-10 text-center">
-        <div className="relative mb-6 flex h-24 w-24 items-center justify-center rounded-full border-4 border-indigo-100 bg-white text-indigo-600 shadow-lg">
+        <div className="bg-bg-card relative mb-6 flex h-24 w-24 items-center justify-center rounded-full border-4 border-indigo-100 text-indigo-600 shadow-lg">
           <div className="absolute inset-0 animate-ping rounded-full bg-indigo-50 opacity-75 duration-1000"></div>
           <FiCheck className="relative z-10 h-12 w-12" />
         </div>
-        <h1 className="text-4xl font-black tracking-tight text-slate-800">
+        <h1 className="text-text-primary text-4xl font-black tracking-tight">
           Great job! You passed!
         </h1>
-        <p className="mt-3 text-lg font-medium text-slate-500">
+        <p className="text-text-muted mt-3 text-lg font-medium">
           You've completed this section and are one step closer to your goal.
         </p>
 
-        <div className="mt-10 flex gap-16 rounded-3xl border bg-white p-6 shadow-sm">
+        <div className="bg-bg-card mt-10 flex gap-16 rounded-3xl border p-6 shadow-sm">
           <div className="text-center">
-            <p className="text-xs font-bold tracking-wider text-slate-400 uppercase">Your score</p>
-            <p className="mt-2 text-4xl font-black text-slate-800">{score}%</p>
-            <p className="mt-1 text-sm font-medium text-slate-500">
+            <p className="text-text-placeholder text-xs font-bold tracking-wider uppercase">
+              Your score
+            </p>
+            <p className="text-text-primary mt-2 text-4xl font-black">{score}%</p>
+            <p className="text-text-muted mt-1 text-sm font-medium">
               {correct} / {total} correct
             </p>
           </div>
           <div className="border-r border-l px-16 text-center">
-            <p className="text-xs font-bold tracking-wider text-slate-400 uppercase">Result</p>
+            <p className="text-text-placeholder text-xs font-bold tracking-wider uppercase">
+              Result
+            </p>
             <p className="mt-2 text-4xl font-black text-indigo-600">Pass</p>
             <p className="mt-1 text-sm font-medium text-indigo-600/70">Well done!</p>
           </div>
           <div className="text-center">
-            <p className="text-xs font-bold tracking-wider text-slate-400 uppercase">
+            <p className="text-text-placeholder text-xs font-bold tracking-wider uppercase">
               Passing score
             </p>
-            <p className="mt-2 text-4xl font-black text-slate-800">{PASS_THRESHOLD}%</p>
-            <p className="mt-1 text-sm font-medium text-slate-500">
+            <p className="text-text-primary mt-2 text-4xl font-black">{PASS_THRESHOLD}%</p>
+            <p className="text-text-muted mt-1 text-sm font-medium">
               {score > PASS_THRESHOLD ? 'Exceeded target' : 'Target reached'}
             </p>
           </div>
         </div>
       </div>
 
-      <div className="rounded-3xl border bg-white p-8 shadow-sm">
-        <h3 className="mb-6 text-lg font-bold text-slate-800">Review your answers</h3>
+      <div className="bg-bg-card rounded-3xl border p-8 shadow-sm">
+        <h3 className="text-text-primary mb-6 text-lg font-bold">Review your answers</h3>
         <AnswerReview questions={data.questions} />
       </div>
 

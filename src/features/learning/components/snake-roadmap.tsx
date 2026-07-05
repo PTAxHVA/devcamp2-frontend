@@ -29,14 +29,14 @@ export default function RoadmapSnakePath({
   }
 
   return (
-    <div className="border-border-soft relative mt-4 w-full overflow-hidden rounded-3xl border bg-white p-6 shadow-sm">
+    <div className="border-border-soft bg-bg-card relative mt-4 w-full overflow-hidden rounded-3xl border p-6 shadow-sm">
       {/* Legend */}
       <div className="mb-3 flex flex-wrap items-center gap-4">
         {[
           { color: 'bg-emerald-500', label: 'Completed' },
           { color: 'bg-amber-500', label: 'In Progress' },
           { color: 'bg-purple-300', label: 'Ready to Start' },
-          { color: 'bg-slate-200', label: 'Locked' },
+          { color: 'bg-border-soft', label: 'Locked' },
         ].map(({ color, label }) => (
           <div
             key={label}
@@ -95,8 +95,8 @@ export default function RoadmapSnakePath({
                   // 4 states: slate/gray (locked), purple (available/ready), emerald (completed),
                   // amber (in progress). "available" = prerequisites met, user can start now.
                   let ringCls = isActive
-                    ? 'bg-white ring-2 ring-slate-400'
-                    : 'bg-white ring-1 ring-slate-200'
+                    ? 'bg-bg-card ring-2 ring-slate-400'
+                    : 'bg-bg-card ring-1 ring-slate-200'
                   let circleCls = isActive
                     ? 'bg-slate-600 text-white'
                     : 'bg-bg-section text-text-placeholder'
@@ -111,25 +111,25 @@ export default function RoadmapSnakePath({
                   let tooltipArrow = 'border-t-slate-700'
 
                   if (typeNode?.type === 'start') {
-                    ringCls = 'bg-white ring-1 ring-emerald-200'
+                    ringCls = 'bg-bg-card ring-1 ring-emerald-200'
                     circleCls = 'bg-emerald-500 text-white'
                     labelCls = 'text-text-muted font-semibold tracking-widest uppercase text-[10px]'
                     icon = <RiStarFill size={20} />
                   } else if (typeNode?.type === 'finish') {
-                    ringCls = 'bg-white ring-1 ring-slate-200'
-                    circleCls = 'bg-slate-200 text-text-muted'
+                    ringCls = 'bg-bg-card ring-1 ring-slate-200'
+                    circleCls = 'bg-border-soft text-text-muted'
                     labelCls =
                       'text-text-placeholder font-semibold tracking-widest uppercase text-[10px]'
                     icon = <RiFlagFill size={20} />
                   } else if (isCompleted) {
-                    ringCls = 'bg-white ring-1 ring-emerald-200'
+                    ringCls = 'bg-bg-card ring-1 ring-emerald-200'
                     circleCls = 'bg-emerald-500 text-white'
                     labelCls = 'text-text-secondary font-medium'
                     icon = <RiCheckFill size={22} />
                     tooltipBg = 'bg-emerald-600'
                     tooltipArrow = 'border-t-emerald-600'
                   } else if (isInProgress) {
-                    ringCls = 'bg-white ring-1 ring-amber-200'
+                    ringCls = 'bg-bg-card ring-1 ring-amber-200'
                     circleCls = 'bg-amber-500 text-white'
                     labelCls = 'text-text-secondary font-semibold'
                     icon = <RiPlayMiniFill size={22} />
@@ -137,8 +137,8 @@ export default function RoadmapSnakePath({
                     tooltipArrow = 'border-t-amber-500'
                   } else if (isAvailable) {
                     ringCls = isActive
-                      ? 'bg-white ring-2 ring-purple-300'
-                      : 'bg-white ring-2 ring-purple-200'
+                      ? 'bg-bg-card ring-2 ring-purple-300'
+                      : 'bg-bg-card ring-2 ring-purple-200'
                     circleCls = 'bg-purple-100 text-purple-700'
                     labelCls = 'text-purple-700 font-semibold'
                     tooltipBg = 'bg-purple-700'

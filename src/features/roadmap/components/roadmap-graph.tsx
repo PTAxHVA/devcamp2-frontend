@@ -46,7 +46,7 @@ export const RoadmapGraph = ({
       }`}
     >
       {withUI && (
-        <div className="border-border-soft text-text-secondary absolute top-6 left-6 z-10 flex items-center gap-5 rounded-xl border bg-white/90 p-3 text-xs font-semibold shadow-sm backdrop-blur-sm">
+        <div className="border-border-soft text-text-secondary bg-bg-card/90 absolute top-6 left-6 z-10 flex items-center gap-5 rounded-xl border p-3 text-xs font-semibold shadow-sm backdrop-blur-sm">
           <div className="flex items-center gap-1.5">
             <div className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-white">
               <RiCheckLine className="text-[10px]" />
@@ -54,13 +54,13 @@ export const RoadmapGraph = ({
             Completed
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="border-brand-purple-600 flex h-4 w-4 items-center justify-center rounded-full border-2 bg-white">
+            <div className="border-brand-purple-600 bg-bg-card flex h-4 w-4 items-center justify-center rounded-full border-2">
               <div className="bg-brand-purple-600 h-1.5 w-1.5 rounded-full" />
             </div>
             Current
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="border-border-input h-4 w-4 rounded-full border-2 bg-white" />
+            <div className="border-border-input bg-bg-card h-4 w-4 rounded-full border-2" />
             Available
           </div>
           <div className="flex items-center gap-1.5">
@@ -87,17 +87,21 @@ export const RoadmapGraph = ({
         elementsSelectable={!isReadOnly}
         panOnDrag={!isReadOnly}
         zoomOnScroll={!isReadOnly}
+        // Double-click zoom is on by default in React Flow. In a read-only preview
+        // (e.g. the landing hero) that let a stray double-click zoom the graph in with
+        // no controls to reset it, stranding the view. Keep the preview locked/static.
+        zoomOnDoubleClick={!isReadOnly}
         // Always allow pinch-to-zoom on touch devices, even in read-only previews.
         zoomOnPinch={isMobile || !isReadOnly}
         proOptions={{ hideAttribution: true }}
       >
         {withUI && !isReadOnly && (
-          <Controls className="[&>button]:border-border-soft! top-auto! bottom-6! left-6! flex! flex-col-reverse! gap-1! border-none! shadow-sm! [&>button]:h-8! [&>button]:w-8! [&>button]:rounded-lg! [&>button]:border! [&>button]:bg-white!" />
+          <Controls className="[&>button]:border-border-soft! [&>button]:bg-bg-card! top-auto! bottom-6! left-6! flex! flex-col-reverse! gap-1! border-none! shadow-sm! [&>button]:h-8! [&>button]:w-8! [&>button]:rounded-lg! [&>button]:border!" />
         )}
 
         {withUI && (
           <MiniMap
-            className="border-brand-purple-100! right-6! bottom-6! h-28! w-40! rounded-xl! border-2! bg-white! shadow-sm!"
+            className="border-brand-purple-100! bg-bg-card! right-6! bottom-6! h-28! w-40! rounded-xl! border-2! shadow-sm!"
             nodeColor={(node) => {
               const data = node.data as BaseNodeData
               if (data?.status === 'completed') return '#10b981'

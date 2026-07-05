@@ -86,13 +86,13 @@ export const HeroSection = () => {
                 <span>Done</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="border-brand-purple-500 flex h-5 w-5 items-center justify-center rounded-full border-[3px] bg-white">
+                <div className="border-brand-purple-500 bg-bg-card flex h-5 w-5 items-center justify-center rounded-full border-[3px]">
                   <div className="bg-brand-purple-700 h-2 w-2 rounded-full" />
                 </div>
                 <span>Current</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="border-border-input h-5 w-5 rounded-full border-2 bg-white" />
+                <div className="border-border-input bg-bg-card h-5 w-5 rounded-full border-2" />
                 <span>Upcoming</span>
               </div>
             </div>

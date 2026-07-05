@@ -29,8 +29,8 @@ export function AddAnotherRolePage() {
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 shadow-sm">
           <FiCompass className="h-8 w-8" />
         </div>
-        <h1 className="text-3xl font-extrabold text-slate-800">Add a new goal</h1>
-        <p className="mt-2 font-medium text-slate-500">
+        <h1 className="text-text-primary text-3xl font-extrabold">Add a new goal</h1>
+        <p className="text-text-muted mt-2 font-medium">
           Choose a new role to learn alongside your current roadmap.
         </p>
       </div>
@@ -51,18 +51,18 @@ export function AddAnotherRolePage() {
           </button>
         </div>
       ) : available.length === 0 ? (
-        <div className="mx-auto max-w-md rounded-2xl border border-slate-100 bg-white py-12 text-center shadow-sm">
-          <p className="text-lg font-bold text-slate-700">
+        <div className="bg-bg-card mx-auto max-w-md rounded-2xl border border-slate-100 py-12 text-center shadow-sm">
+          <p className="text-text-secondary text-lg font-bold">
             {atCap ? "You've reached the maximum of 2 active roadmaps" : 'No new roles available'}
           </p>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="text-text-muted mt-1 text-sm">
             {atCap
               ? 'Remove a roadmap from your dashboard first to add a different one.'
               : "You're already following every roadmap we offer."}
           </p>
           <Link
             to="/roadmaps/browse"
-            className="mt-4 inline-block rounded-xl border border-slate-200 px-5 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50"
+            className="border-border-soft text-text-secondary hover:bg-bg-section mt-4 inline-block rounded-xl border px-5 py-2 text-sm font-bold"
           >
             Browse all roadmaps
           </Link>

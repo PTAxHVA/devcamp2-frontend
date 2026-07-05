@@ -40,7 +40,7 @@ export const StepIntro = ({ onStart }: { onStart: () => void }) => {
           ].map((item, idx) => (
             <div
               key={idx}
-              className="border-border-soft flex gap-4 rounded-xl border p-4 transition-all hover:bg-white hover:shadow-sm"
+              className="border-border-soft hover:bg-bg-card flex gap-4 rounded-xl border p-4 transition-all hover:shadow-sm"
             >
               <div className="bg-bg-lavender text-brand-purple-600 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
                 <item.icon className="h-6 w-6" />
@@ -62,7 +62,7 @@ export const StepIntro = ({ onStart }: { onStart: () => void }) => {
       </div>
 
       <div className="border-border-soft bg-bg-section w-full flex-1 rounded-3xl border p-8 shadow-inner">
-        <div className="border-border-soft rounded-2xl border bg-white p-6 shadow-sm">
+        <div className="border-border-soft bg-bg-card rounded-2xl border p-6 shadow-sm">
           <h4 className="text-text-primary mb-6 text-center font-bold">
             Your personalized roadmap
           </h4>
@@ -70,7 +70,7 @@ export const StepIntro = ({ onStart }: { onStart: () => void }) => {
             <div className="border-brand-purple-200 bg-bg-lavender flex h-10 w-32 items-center justify-center rounded border text-xs font-bold">
               Web Fundamentals
             </div>
-            <div className="h-8 w-px bg-slate-200"></div>
+            <div className="bg-border-soft h-8 w-px"></div>
             <div className="flex gap-4">
               <div className="border-border-soft flex h-10 w-28 items-center justify-center rounded border text-xs font-bold">
                 HTML & CSS
@@ -79,7 +79,7 @@ export const StepIntro = ({ onStart }: { onStart: () => void }) => {
                 JS Basics
               </div>
             </div>
-            <div className="h-8 w-px bg-slate-200"></div>
+            <div className="bg-border-soft h-8 w-px"></div>
             <div className="border-border-soft flex h-10 w-32 items-center justify-center rounded border text-xs font-bold">
               DOM & Events
             </div>

@@ -140,7 +140,7 @@ export function QuizAttemptPage() {
         <p className="mt-1 text-sm text-red-500">Please try again.</p>
         <button
           onClick={() => navigate(-1)}
-          className="mt-5 rounded-xl border border-slate-200 bg-white px-5 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50"
+          className="border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section mt-5 rounded-xl border px-5 py-2 text-sm font-bold"
         >
           Go back
         </button>
@@ -178,7 +178,7 @@ export function QuizAttemptPage() {
           >
             ← Back to lesson
           </button>
-          <h1 className="text-3xl font-extrabold text-slate-800">Quiz</h1>
+          <h1 className="text-text-primary text-3xl font-extrabold">Quiz</h1>
         </div>
         <p className="rounded-full bg-indigo-50 px-4 py-1 font-bold text-indigo-600">
           Question {currentIndex + 1} of {total}
@@ -194,7 +194,7 @@ export function QuizAttemptPage() {
       <div className="grid flex-1 grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Question */}
         <div className="col-span-1 flex flex-col lg:col-span-2">
-          <div key={current.id} className="flex-1 rounded-2xl border bg-white p-8 shadow-sm">
+          <div key={current.id} className="bg-bg-card flex-1 rounded-2xl border p-8 shadow-sm">
             {current.type === 'mcq' ? (
               <McqQuestion
                 question={current}
@@ -246,8 +246,8 @@ export function QuizAttemptPage() {
 
         {/* Sidebar */}
         <div className="col-span-1 space-y-6">
-          <div className="rounded-2xl border bg-white p-6 shadow-sm">
-            <h3 className="mb-6 font-bold text-slate-800">Quiz summary</h3>
+          <div className="bg-bg-card rounded-2xl border p-6 shadow-sm">
+            <h3 className="text-text-primary mb-6 font-bold">Quiz summary</h3>
             <div className="space-y-6">
               <div className="flex items-center gap-4">
                 <div
@@ -256,11 +256,11 @@ export function QuizAttemptPage() {
                   <FiClock className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold tracking-wider text-slate-500 uppercase">
+                  <p className="text-text-muted text-xs font-bold tracking-wider uppercase">
                     {isExpired ? 'Time expired' : 'Time remaining'}
                   </p>
                   <p
-                    className={`text-2xl font-black ${isUrgent ? 'text-red-600' : 'text-slate-800'}`}
+                    className={`text-2xl font-black ${isUrgent ? 'text-red-600' : 'text-text-primary'}`}
                   >
                     {formatted}
                   </p>
@@ -271,10 +271,10 @@ export function QuizAttemptPage() {
                   <FiZap className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold tracking-wider text-slate-500 uppercase">
+                  <p className="text-text-muted text-xs font-bold tracking-wider uppercase">
                     Score to pass
                   </p>
-                  <p className="text-2xl font-black text-slate-800">{PASS_THRESHOLD}%</p>
+                  <p className="text-text-primary text-2xl font-black">{PASS_THRESHOLD}%</p>
                 </div>
               </div>
             </div>

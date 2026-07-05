@@ -38,7 +38,7 @@ export const StepPreferences = () => {
                     <select
                       value={(answers?.[q.id] as string) || ''}
                       onChange={(e) => setAnswer(q.id, e.target.value)}
-                      className="focus:border-brand-purple-400 focus:ring-brand-purple-400 border-border-soft text-text-secondary w-full cursor-pointer appearance-none rounded-lg border bg-white px-4 py-3 focus:ring-1 focus:outline-none"
+                      className="focus:border-brand-purple-400 focus:ring-brand-purple-400 border-border-soft text-text-secondary bg-bg-card w-full cursor-pointer appearance-none rounded-lg border px-4 py-3 focus:ring-1 focus:outline-none"
                     >
                       <option value="" disabled>
                         {q.placeholder}
@@ -57,7 +57,7 @@ export const StepPreferences = () => {
                     value={(answers?.[q.id] as string) || ''}
                     onChange={(e) => setAnswer(q.id, e.target.value)}
                     placeholder={q.placeholder}
-                    className="focus:border-brand-purple-400 focus:ring-brand-purple-400 border-border-soft text-text-secondary w-full resize-none rounded-lg border bg-white px-4 py-3 focus:ring-1 focus:outline-none"
+                    className="focus:border-brand-purple-400 focus:ring-brand-purple-400 border-border-soft text-text-secondary bg-bg-card w-full resize-none rounded-lg border px-4 py-3 focus:ring-1 focus:outline-none"
                   ></textarea>
                 )}
               </div>

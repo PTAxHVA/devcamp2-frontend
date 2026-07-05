@@ -37,7 +37,7 @@ export function PassportCertificates({ username, roadmaps }: PassportCertificate
               <button
                 type="button"
                 onClick={() => handlePrint(index)}
-                className="border-border-input text-text-primary hover:bg-bg-section inline-flex items-center gap-1.5 rounded-lg border bg-white px-3.5 py-2 text-xs font-semibold transition"
+                className="border-border-input text-text-primary hover:bg-bg-section bg-bg-card inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-xs font-semibold transition"
               >
                 <FiPrinter className="h-3.5 w-3.5" /> Print / save as PDF
               </button>

@@ -7,7 +7,7 @@ import { isQuestionCorrect } from '@/features/quiz/lib/count-correct'
  */
 export function AnswerReview({ questions }: { questions: ResultQuestion[] }) {
   if (questions.length === 0) {
-    return <p className="text-sm text-slate-500">No answers to review.</p>
+    return <p className="text-text-muted text-sm">No answers to review.</p>
   }
 
   return (
@@ -23,7 +23,7 @@ export function AnswerReview({ questions }: { questions: ResultQuestion[] }) {
 
         return (
           <li key={q._id} className={`rounded-xl border p-4 ${tone}`}>
-            <p className="font-semibold text-slate-800">
+            <p className="text-text-primary font-semibold">
               Q{i + 1}. {q.content}
             </p>
             <p className={`mt-1 text-sm font-medium ${label}`}>

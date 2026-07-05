@@ -33,7 +33,7 @@ export function QuizResultFailPage() {
         <p className="font-semibold text-red-600">Unable to load the result.</p>
         <button
           onClick={() => navigate('/dashboard')}
-          className="mt-4 rounded-xl border border-slate-200 bg-white px-5 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50"
+          className="border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section mt-4 rounded-xl border px-5 py-2 text-sm font-bold"
         >
           Back to Dashboard
         </button>
@@ -49,12 +49,12 @@ export function QuizResultFailPage() {
   return (
     <div className="animate-in fade-in mx-auto max-w-5xl p-6 duration-500">
       <div className="mb-8 flex items-center gap-5 border-b pb-6">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-red-100 bg-white text-red-500 shadow-sm">
+        <div className="bg-bg-card flex h-16 w-16 items-center justify-center rounded-full border-4 border-red-100 text-red-500 shadow-sm">
           <FiX className="h-8 w-8" />
         </div>
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">Quiz failed</h1>
-          <p className="mt-1 font-medium text-slate-500">
+          <h1 className="text-text-primary text-3xl font-extrabold tracking-tight">Quiz failed</h1>
+          <p className="text-text-muted mt-1 font-medium">
             Keep going! Review your answers below and try again—you're improving.
           </p>
         </div>
@@ -62,41 +62,41 @@ export function QuizResultFailPage() {
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <div className="space-y-8">
-          <div className="flex items-center justify-between rounded-2xl border bg-white p-6 shadow-sm">
+          <div className="bg-bg-card flex items-center justify-between rounded-2xl border p-6 shadow-sm">
             <div>
-              <p className="text-xs font-bold tracking-wider text-slate-400 uppercase">
+              <p className="text-text-placeholder text-xs font-bold tracking-wider uppercase">
                 Your score
               </p>
               <p className="mt-1 text-5xl font-black text-red-500">{score}%</p>
-              <p className="mt-2 text-sm font-medium text-slate-500">
+              <p className="text-text-muted mt-2 text-sm font-medium">
                 {correct} / {total} correct
               </p>
             </div>
             <div className="border-l pl-8">
-              <p className="text-xs font-bold tracking-wider text-slate-400 uppercase">
+              <p className="text-text-placeholder text-xs font-bold tracking-wider uppercase">
                 Passing score
               </p>
-              <p className="mt-1 text-5xl font-black text-slate-800">{PASS_THRESHOLD}%</p>
-              <p className="mt-2 text-sm font-medium text-slate-500">
+              <p className="text-text-primary mt-1 text-5xl font-black">{PASS_THRESHOLD}%</p>
+              <p className="text-text-muted mt-2 text-sm font-medium">
                 You're {gap}% away from passing
               </p>
             </div>
           </div>
 
           <div>
-            <h3 className="mb-4 text-lg font-bold text-slate-800">Review your answers</h3>
+            <h3 className="text-text-primary mb-4 text-lg font-bold">Review your answers</h3>
             <AnswerReview questions={data.questions} />
           </div>
         </div>
 
-        <div className="rounded-3xl border bg-slate-50/50 p-8">
-          <div className="mb-8 flex items-start gap-4 rounded-2xl border border-green-200 bg-white p-5 shadow-sm">
+        <div className="bg-bg-section/50 rounded-3xl border p-8">
+          <div className="bg-bg-card mb-8 flex items-start gap-4 rounded-2xl border border-green-200 p-5 shadow-sm">
             <div className="mt-1 rounded-full bg-green-100 p-2 text-green-600">
               <FiShield className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-lg font-bold text-slate-800">Don't worry</p>
-              <p className="font-medium text-slate-500">
+              <p className="text-text-primary text-lg font-bold">Don't worry</p>
+              <p className="text-text-muted font-medium">
                 Your attempt was recorded. Review the questions and retry when you're ready.
               </p>
             </div>
@@ -107,7 +107,7 @@ export function QuizResultFailPage() {
               className={`btn h-14 flex-1 rounded-xl text-base font-bold transition-all ${
                 isExpired
                   ? 'border-none bg-slate-900 text-white hover:-translate-y-0.5 hover:bg-slate-800'
-                  : 'cursor-not-allowed border-none bg-slate-200 text-slate-400'
+                  : 'bg-border-soft text-text-placeholder cursor-not-allowed border-none'
               }`}
               disabled={!isExpired}
               onClick={() => {
@@ -128,7 +128,7 @@ export function QuizResultFailPage() {
                   navigate('/dashboard')
                 }
               }}
-              className="btn h-14 flex-1 rounded-xl border-slate-200 bg-white text-base font-bold text-slate-700 hover:bg-slate-50"
+              className="btn border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section h-14 flex-1 rounded-xl text-base font-bold"
             >
               Back to topic
             </button>

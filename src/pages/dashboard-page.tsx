@@ -44,7 +44,7 @@ const DashboardPage = () => {
         </div>
         <Link
           to="/roadmaps/browse"
-          className="btn btn-outline btn-sm border-border-input hover:bg-bg-section rounded-full bg-white px-4 shadow-sm"
+          className="btn btn-outline btn-sm border-border-input hover:bg-bg-section bg-bg-card rounded-full px-4 shadow-sm"
         >
           Browse all Roadmaps <FiExternalLink className="ml-1" />
         </Link>

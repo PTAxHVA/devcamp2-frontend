@@ -2,11 +2,16 @@ import { Navbar, HeroSection, HowItWorks, Footer } from '@/features/landing/comp
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-base-100 text-base-content">
+    <div className="bg-base-100 text-base-content flex min-h-screen flex-col">
       <Navbar />
-      <main className="flex-1">
+      <main className="flex flex-1 flex-col">
         <HeroSection />
-        <HowItWorks />
+        {/* "How it works" + the flex-grow slack share the section background, so on
+            tall (2K/4K) screens the footer stays pinned to the bottom without a bare
+            white void opening up between the content and the footer. */}
+        <div className="bg-bg-section flex flex-1 flex-col">
+          <HowItWorks />
+        </div>
       </main>
       <Footer />
     </div>

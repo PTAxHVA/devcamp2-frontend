@@ -42,10 +42,10 @@ function BranchTree({
                 className={`mt-3 h-3 w-3 shrink-0 rounded-full border-2 transition-colors ${
                   isSelected
                     ? 'border-brand-purple-600 bg-brand-purple-600'
-                    : 'border-slate-300 bg-white'
+                    : 'border-border-input bg-bg-card'
                 }`}
               />
-              {!isLast && <div className="w-0.5 flex-1 bg-slate-200" style={{ minHeight: 28 }} />}
+              {!isLast && <div className="bg-border-soft w-0.5 flex-1" style={{ minHeight: 28 }} />}
             </div>
 
             {/* Branch card (toggle) */}
@@ -54,14 +54,14 @@ function BranchTree({
               className={`mb-3 flex w-full items-start gap-3 rounded-2xl border p-4 text-left transition-all ${
                 isSelected
                   ? 'border-brand-purple-200 bg-bg-lavender'
-                  : 'border-border-soft bg-bg-section hover:border-slate-300'
+                  : 'border-border-soft bg-bg-section hover:border-border-input'
               }`}
             >
               <div
                 className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${
                   isSelected
                     ? 'border-brand-purple-600 bg-brand-purple-600 text-white'
-                    : 'border-slate-300'
+                    : 'border-border-input'
                 }`}
               >
                 {isSelected && <RiCheckLine className="h-3 w-3" />}
@@ -144,7 +144,7 @@ export default function RoadmapPreviewModal({
       aria-modal="true"
     >
       <div
-        className="animate-in zoom-in-95 relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-6 shadow-xl duration-200 lg:p-8"
+        className="animate-in zoom-in-95 bg-bg-card relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl p-6 shadow-xl duration-200 lg:p-8"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -205,7 +205,7 @@ export default function RoadmapPreviewModal({
                 />
               </div>
             ) : (
-              <div className="mb-6 flex items-center gap-2 text-sm text-slate-400">
+              <div className="text-text-placeholder mb-6 flex items-center gap-2 text-sm">
                 <RiCircleLine /> No content available yet.
               </div>
             )}

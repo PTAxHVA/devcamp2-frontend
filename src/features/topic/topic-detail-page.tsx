@@ -20,6 +20,7 @@ import {
 
 import { useTopicDetail } from './hooks/use-topic-detail'
 import { dedupeResources } from './lib/dedupe-resources'
+import { safeUrl } from '@/lib/utils'
 
 /* --------------------------- Vòng tròn % ---------------------------- */
 interface CircularProgressProps {
@@ -94,7 +95,7 @@ interface CardProps {
 }
 
 const Card = ({ className = '', children }: CardProps) => (
-  <div className={`border-border-soft rounded-2xl border bg-white ${className}`}>{children}</div>
+  <div className={`border-border-soft bg-bg-card rounded-2xl border ${className}`}>{children}</div>
 )
 
 interface StatRowProps {
@@ -247,7 +248,7 @@ export default function TopicDetailPage() {
                 {/* Progress */}
                 <div className="mt-3 flex items-center gap-4">
                   <span className="text-text-secondary text-sm font-medium">Progress</span>
-                  <div className="h-2 w-full max-w-75 overflow-hidden rounded-full bg-slate-200">
+                  <div className="bg-border-soft h-2 w-full max-w-75 overflow-hidden rounded-full">
                     <div
                       className="bg-brand-purple-600 h-full rounded-full transition-all duration-700"
                       style={{ width: `${progressPercent}%` }}
@@ -272,7 +273,7 @@ export default function TopicDetailPage() {
                     return (
                       <a
                         key={index}
-                        href={r.url}
+                        href={safeUrl(r.url)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="border-border-soft hover:border-border-purple flex min-h-31 flex-col justify-between rounded-xl border p-4 text-left transition hover:shadow-sm"
@@ -361,7 +362,7 @@ export default function TopicDetailPage() {
                   <p className="text-text-muted text-sm">
                     {completedSections} of {totalSections} sections completed
                   </p>
-                  <div className="mt-2 h-1.5 w-32 overflow-hidden rounded-full bg-slate-200">
+                  <div className="bg-border-soft mt-2 h-1.5 w-32 overflow-hidden rounded-full">
                     <div
                       className="bg-brand-purple-600 h-full rounded-full"
                       style={{ width: `${progressPercent}%` }}

@@ -14,7 +14,17 @@ interface AuthState {
 
 const readUser = (): AuthUser | null => {
   const raw = localStorage.getItem('user')
-  return raw ? (JSON.parse(raw) as AuthUser) : null
+  if (!raw) return null
+  try {
+    return JSON.parse(raw) as AuthUser
+  } catch {
+    // A corrupt/partial 'user' blob would otherwise throw here — and this runs
+    // during module init (inside create()), before React mounts, so ErrorBoundary
+    // can't catch it and the whole app renders a blank white screen. Drop the bad
+    // value and boot logged-out instead.
+    localStorage.removeItem('user')
+    return null
+  }
 }
 
 export const useAuthStore = create<AuthState>((set) => ({

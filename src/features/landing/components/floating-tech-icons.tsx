@@ -12,17 +12,17 @@ import { BiLogoPostgresql } from 'react-icons/bi'
 import { TbBrandAmongUs } from 'react-icons/tb'
 const FloatingTechIcons = () => {
   return (
-    <div className="absolute inset-0 pointer-events-none z-0">
-      <FaReact className="absolute top-[15%] left-[35%] text-[#61DAFB] w-12 h-12 opacity-50 animate-float hidden md:block" />
-      <FaHtml5 className="absolute top-[40%] left-[45%] text-[#E34F26] w-16 h-16 opacity-20 animate-float-delayed" />
-      <FaCss3Alt className="absolute bottom-20 left-[5%] text-[#1572B6] w-14 h-14 opacity-20 animate-float-slow hidden lg:block" />
-      <FaNodeJs className="absolute bottom-[10%] left-[30%] text-[#339933] w-10 h-10 opacity-20 animate-float-delayed hidden md:block" />
-      <FaPython className="absolute bottom-10 right-[40%] text-[#3776AB] w-12 h-12 opacity-20 animate-float hidden lg:block" />
-      <FaCode className="absolute rotate-30 top-30 right-[80%] text-[#3776AB] w-12 h-12 opacity-15 animate-float hidden lg:block" />
-      <FaAngular className="absolute rotate-2 bottom-[-10%] right-[80%] text-[#E34F26] w-12 h-12 opacity-15 animate-float hidden lg:block" />
-      <BiLogoPostgresql className="absolute rotate-2 bottom-[-10%] left-[80%] text-blue-700 w-12 h-12 opacity-30 animate-float hidden lg:block" />
-      <FaRust className="absolute rotate-2 bottom-[20%] left-[80%] text-blue-300 w-12 h-12 opacity-30 animate-float hidden lg:block" />
-      <TbBrandAmongUs className="absolute rotate-2 bottom-[29%] right-[10%] text-red-400 w-12 h-12 opacity-30 animate-float hidden lg:block" />
+    <div className="pointer-events-none absolute inset-0 z-0">
+      <FaReact className="animate-float absolute top-[15%] left-[35%] hidden h-12 w-12 text-[#61DAFB] opacity-50 md:block" />
+      <FaHtml5 className="animate-float-delayed absolute top-[40%] left-[45%] h-16 w-16 text-[#E34F26] opacity-20" />
+      <FaCss3Alt className="animate-float-slow absolute bottom-20 left-[5%] hidden h-14 w-14 text-[#1572B6] opacity-20 lg:block" />
+      <FaNodeJs className="animate-float-delayed absolute bottom-[10%] left-[30%] hidden h-10 w-10 text-[#339933] opacity-20 md:block" />
+      <FaPython className="animate-float absolute right-[40%] bottom-10 hidden h-12 w-12 text-[#3776AB] opacity-20 lg:block" />
+      <FaCode className="animate-float absolute top-30 right-[80%] hidden h-12 w-12 rotate-30 text-[#3776AB] opacity-15 lg:block" />
+      <FaAngular className="animate-float absolute right-[80%] bottom-[-10%] hidden h-12 w-12 rotate-2 text-[#E34F26] opacity-15 lg:block" />
+      <BiLogoPostgresql className="animate-float absolute bottom-[-10%] left-[80%] hidden h-12 w-12 rotate-2 text-blue-700 opacity-30 lg:block" />
+      <FaRust className="animate-float absolute bottom-[20%] left-[80%] hidden h-12 w-12 rotate-2 text-blue-300 opacity-30 lg:block" />
+      <TbBrandAmongUs className="animate-float absolute right-[10%] bottom-[29%] hidden h-12 w-12 rotate-2 text-red-400 opacity-30 lg:block" />
     </div>
   )
 }
