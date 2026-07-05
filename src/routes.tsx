@@ -29,6 +29,7 @@ import { RoadmapCompletePage } from '@/pages/roadmap-complete-page'
 import { AddAnotherRolePage } from '@/pages/add-another-role-page'
 import { TermsPage, PrivacyPage } from '@/pages/legal-pages'
 import { PublicPassportPage } from '@/features/passport/public-passport-page'
+import { MyPassportPage } from '@/features/passport/my-passport-page'
 
 export function AppRoutes() {
   return (
@@ -91,6 +92,7 @@ export function AppRoutes() {
 
           <Route path="/my-learning" element={<MylearningJourneyPage />} />
           <Route path="/my-learning/:slug" element={<MylearningJourneyPage />} />
+          <Route path="/passport" element={<MyPassportPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/settings" element={<SettingsPage />} />
 

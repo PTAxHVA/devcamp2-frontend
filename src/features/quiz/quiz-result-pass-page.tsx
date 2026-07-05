@@ -6,7 +6,11 @@ import { useQuizResult } from '@/features/quiz/hooks/use-quiz-result'
 import { AnswerReview } from '@/features/quiz/components/answer-review'
 import { countCorrect } from '@/features/quiz/lib/count-correct'
 import { useTopicDetail } from '@/features/topic/hooks/use-topic-detail'
-import { buildPassportNudge } from '@/features/passport/lib/passport-share'
+import {
+  buildPassportNudge,
+  hasNudgedAttempt,
+  markNudgedAttempt,
+} from '@/features/passport/lib/passport-share'
 
 const PASS_THRESHOLD = 80
 
@@ -21,12 +25,15 @@ export function QuizResultPassPage() {
   // Passport nudge: one toast per pass inviting the learner to share the skill
   // they just verified. Waits for the topic name when a topicId is available,
   // but never blocks on it (generic copy if the lookup errors or is absent).
+  // Guarded per attempt in sessionStorage so reopening this URL doesn't re-toast.
   const topicDetail = useTopicDetail(topicId ?? '')
   const hasNudged = useRef(false)
   useEffect(() => {
-    if (hasNudged.current || !data) return
+    if (hasNudged.current || !data || !attemptId) return
     if (topicId && topicDetail.isLoading) return
+    if (hasNudgedAttempt(attemptId)) return
     hasNudged.current = true
+    markNudgedAttempt(attemptId)
     toast(
       (t) => (
         <span className="text-sm">
@@ -36,7 +43,7 @@ export function QuizResultPassPage() {
             className="text-brand-purple-600 font-bold underline"
             onClick={() => {
               toast.dismiss(t.id)
-              navigate('/settings')
+              navigate('/passport')
             }}
           >
             Share your Passport
@@ -45,7 +52,7 @@ export function QuizResultPassPage() {
       ),
       { icon: '🎖️', duration: 8000, id: 'passport-nudge' },
     )
-  }, [data, topicId, topicDetail.isLoading, topicDetail.data?.name, navigate])
+  }, [attemptId, data, topicId, topicDetail.isLoading, topicDetail.data?.name, navigate])
 
   if (isLoading) {
     return (

@@ -1,18 +1,30 @@
 import { FiAward } from 'react-icons/fi'
 import { VoraWordmark } from '@/components/ui/vora-logo'
+import { cn } from '@/lib/utils'
 
 interface CertificateCardProps {
   username: string
   roleName: string | null
   topicsCount: number
+  /**
+   * Marks this card as the one window.print() outputs (`.print-target` in the
+   * index.css @media print rules). Default true for single-certificate pages;
+   * pages listing several certificates toggle it per card before printing.
+   */
+  printTarget?: boolean
 }
 
 /**
- * Printable roadmap-completion certificate. `certificate-print-area` is picked
- * up by the @media print rules in index.css so window.print() outputs ONLY this
- * card. KISS: browser print → "Save as PDF", no PDF library.
+ * Printable roadmap-completion certificate. `certificate-print-area print-target`
+ * is picked up by the @media print rules in index.css so window.print() outputs
+ * ONLY this card. KISS: browser print → "Save as PDF", no PDF library.
  */
-export function CertificateCard({ username, roleName, topicsCount }: CertificateCardProps) {
+export function CertificateCard({
+  username,
+  roleName,
+  topicsCount,
+  printTarget = true,
+}: CertificateCardProps) {
   const issuedOn = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -21,7 +33,12 @@ export function CertificateCard({ username, roleName, topicsCount }: Certificate
   const roadmapLabel = roleName ? `the ${roleName} roadmap` : 'their VORA roadmap'
 
   return (
-    <div className="certificate-print-area border-brand-purple-300 rounded-[1.75rem] border-4 bg-white p-2">
+    <div
+      className={cn(
+        'certificate-print-area border-brand-purple-300 rounded-[1.75rem] border-4 bg-white p-2',
+        printTarget && 'print-target',
+      )}
+    >
       <div className="border-border-soft flex flex-col items-center gap-5 rounded-3xl border px-6 py-10 text-center sm:px-12">
         <VoraWordmark />
         <div>

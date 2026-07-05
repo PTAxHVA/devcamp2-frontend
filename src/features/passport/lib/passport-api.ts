@@ -5,6 +5,14 @@ export interface PassportVerifiedTopic {
   masteryPct: number
 }
 
+export interface PassportRoadmap {
+  name: string
+  topicsCount: number
+  verifiedCount: number
+  /** Every topic of this roadmap quiz-verified → earns a completion certificate. */
+  isCompleted: boolean
+}
+
 /** Payload of GET /p/:shareToken — public, PII-free by contract (no email/ids). */
 export interface PublicPassport {
   username: string
@@ -12,7 +20,7 @@ export interface PublicPassport {
   streak: number
   longestStreak: number
   verifiedTopics: PassportVerifiedTopic[]
-  roadmaps: { name: string }[]
+  roadmaps: PassportRoadmap[]
   completedCount: number
   totalCount: number
 }

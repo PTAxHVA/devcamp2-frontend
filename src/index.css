@@ -96,17 +96,19 @@
     background-color: var(--color-bg-soft);
   }
 }
-/* Print ONLY the roadmap-completion certificate: visibility (not display) keeps
-   the layout box so the card can be re-anchored to the top of the printed page. */
+/* Print ONLY the targeted completion certificate. Scoped with :has() so pages
+   WITHOUT a print-target certificate keep normal browser printing, and pages
+   listing several certificates print just the one whose card is targeted.
+   visibility (not display) keeps the layout box for re-anchoring to the top. */
 @media print {
-  body * {
+  body:has(.certificate-print-area.print-target) * {
     visibility: hidden;
   }
-  .certificate-print-area,
-  .certificate-print-area * {
+  .certificate-print-area.print-target,
+  .certificate-print-area.print-target * {
     visibility: visible;
   }
-  .certificate-print-area {
+  .certificate-print-area.print-target {
     position: absolute;
     top: 0;
     left: 0;

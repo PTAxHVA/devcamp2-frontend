@@ -22,7 +22,9 @@ const passportFixture: PublicPassport = {
     { name: 'React Basics', masteryPct: 96 },
     { name: 'JavaScript Fundamentals', masteryPct: 88 },
   ],
-  roadmaps: [{ name: 'Frontend Web Developer' }],
+  roadmaps: [
+    { name: 'Frontend Web Developer', topicsCount: 4, verifiedCount: 2, isCompleted: false },
+  ],
   completedCount: 2,
   totalCount: 4,
 }
@@ -62,6 +64,28 @@ describe('PublicPassportPage', () => {
     expect(screen.getByRole('progressbar')).toHaveTextContent('50%')
     expect(screen.getByText('Beginner')).toBeInTheDocument()
     expect(screen.getByText('Frontend Web Developer')).toBeInTheDocument()
+
+    // No completed roadmap → no certificate section on the public page.
+    expect(screen.queryByText('Certificate of Completion')).not.toBeInTheDocument()
+  })
+
+  it('renders a printable certificate on the public page for each completed roadmap', async () => {
+    mockedFetch.mockResolvedValue({
+      ...passportFixture,
+      roadmaps: [
+        { name: 'Backend Web Developer', topicsCount: 2, verifiedCount: 2, isCompleted: true },
+        { name: 'Frontend Web Developer', topicsCount: 4, verifiedCount: 2, isCompleted: false },
+      ],
+    })
+    renderPage()
+
+    expect(await screen.findByText('Certificate of Completion')).toBeInTheDocument()
+    expect(screen.getByText(/has completed the Backend Web Developer roadmap/)).toBeInTheDocument()
+    // Only the COMPLETED roadmap earns a certificate.
+    expect(
+      screen.queryByText(/has completed the Frontend Web Developer roadmap/),
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Print \/ save as PDF/ })).toBeInTheDocument()
   })
 
   it('shows the not-found state instead of redirecting when the link is invalid or private', async () => {

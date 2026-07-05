@@ -5,6 +5,8 @@ import {
   buildPassportUrl,
   calcPassportCompletionPct,
   formatSkillLevel,
+  hasNudgedAttempt,
+  markNudgedAttempt,
 } from '../lib/passport-share'
 
 describe('buildPassportUrl', () => {
@@ -54,5 +56,15 @@ describe('formatSkillLevel', () => {
     expect(formatSkillLevel('BEGINNER')).toBe('Beginner')
     expect(formatSkillLevel('INTERMEDIATE')).toBe('Intermediate')
     expect(formatSkillLevel('')).toBe('')
+  })
+})
+
+describe('nudge per-attempt guard', () => {
+  it('marks an attempt as nudged so reopening the result page stays silent', () => {
+    sessionStorage.clear()
+    expect(hasNudgedAttempt('attempt-1')).toBe(false)
+    markNudgedAttempt('attempt-1')
+    expect(hasNudgedAttempt('attempt-1')).toBe(true)
+    expect(hasNudgedAttempt('attempt-2')).toBe(false)
   })
 })
