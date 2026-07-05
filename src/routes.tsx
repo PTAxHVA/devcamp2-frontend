@@ -30,6 +30,7 @@ import { AddAnotherRolePage } from '@/pages/add-another-role-page'
 import { TermsPage, PrivacyPage } from '@/pages/legal-pages'
 import { PublicPassportPage } from '@/features/passport/public-passport-page'
 import { MyPassportPage } from '@/features/passport/my-passport-page'
+import { GapAnalyzerPage } from '@/features/goals/gap-analyzer-page'
 
 export function AppRoutes() {
   return (
@@ -96,14 +97,7 @@ export function AppRoutes() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/settings" element={<SettingsPage />} />
 
-          <Route
-            path="/goals"
-            element={
-              <div className="text-text-placeholder flex h-full items-center justify-center text-2xl font-bold">
-                🚧 Goals (Coming soon)
-              </div>
-            }
-          />
+          <Route path="/goals" element={<GapAnalyzerPage />} />
           <Route
             path="/ai-assistant"
             element={
