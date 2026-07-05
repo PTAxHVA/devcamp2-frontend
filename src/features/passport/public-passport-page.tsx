@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router'
 import { FiAward, FiMap, FiZap } from 'react-icons/fi'
 import { VoraWordmark } from '@/components/ui/vora-logo'
 import { usePublicPassport } from './hooks/use-passport'
+import { isPassportNotFoundError } from './lib/passport-api'
 import { buildPassportUrl, calcPassportCompletionPct, formatSkillLevel } from './lib/passport-share'
 import { PassportBadgeGrid } from './components/passport-badge-grid'
 import { PassportSharePanel } from './components/passport-share-panel'
@@ -14,7 +15,7 @@ import { PassportSharePanel } from './components/passport-share-panel'
  */
 export function PublicPassportPage() {
   const { shareToken } = useParams<{ shareToken: string }>()
-  const { data, isLoading, isError } = usePublicPassport(shareToken ?? '')
+  const { data, isLoading, isError, error, refetch } = usePublicPassport(shareToken ?? '')
 
   return (
     <div className="bg-bg-soft min-h-screen">
@@ -37,14 +38,29 @@ export function PublicPassportPage() {
           </div>
         )}
 
-        {isError && (
-          <div className="border-border-soft mx-auto mt-16 w-full max-w-md rounded-2xl border bg-white p-8 text-center">
-            <p className="text-text-primary text-lg font-bold">Passport not found</p>
-            <p className="text-text-muted mt-2 text-sm">
-              This link doesn't exist or its owner has turned sharing off.
-            </p>
-          </div>
-        )}
+        {isError &&
+          (isPassportNotFoundError(error) ? (
+            <div className="border-border-soft mx-auto mt-16 w-full max-w-md rounded-2xl border bg-white p-8 text-center">
+              <p className="text-text-primary text-lg font-bold">Passport not found</p>
+              <p className="text-text-muted mt-2 text-sm">
+                This link doesn't exist or its owner has turned sharing off.
+              </p>
+            </div>
+          ) : (
+            <div className="border-border-soft mx-auto mt-16 w-full max-w-md rounded-2xl border bg-white p-8 text-center">
+              <p className="text-text-primary text-lg font-bold">Couldn't load this passport</p>
+              <p className="text-text-muted mt-2 text-sm">
+                The server may just be waking up — give it a few seconds.
+              </p>
+              <button
+                type="button"
+                onClick={() => refetch()}
+                className="bg-btn-primary-bg hover:bg-btn-primary-hover mt-5 rounded-lg px-5 py-2 text-sm font-semibold text-white transition"
+              >
+                Try again
+              </button>
+            </div>
+          ))}
 
         {data && (
           <>

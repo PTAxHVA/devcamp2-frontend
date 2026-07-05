@@ -44,3 +44,8 @@ export const fetchPublicPassport = async (shareToken: string): Promise<PublicPas
   const res = await publicClient.get<ApiEnvelope<PublicPassport>>(`/p/${shareToken}`)
   return res.data.data
 }
+
+/** True only for the API's 404 (unknown token / owner turned sharing off) — a
+ *  network error or 5xx (e.g. Render cold start) must NOT read as "not found". */
+export const isPassportNotFoundError = (error: unknown): boolean =>
+  axios.isAxiosError(error) && error.response?.status === 404

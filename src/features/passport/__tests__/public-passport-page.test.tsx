@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter, Route, Routes } from 'react-router'
+import { AxiosError, AxiosHeaders, type AxiosResponse } from 'axios'
 import { PublicPassportPage } from '../public-passport-page'
 import { fetchPublicPassport, type PublicPassport } from '../lib/passport-api'
 
@@ -64,13 +65,29 @@ describe('PublicPassportPage', () => {
   })
 
   it('shows the not-found state instead of redirecting when the link is invalid or private', async () => {
-    mockedFetch.mockRejectedValue(new Error('Request failed with status code 404'))
+    const notFound = new AxiosError('Request failed with status code 404')
+    notFound.response = { status: 404, data: {} } as AxiosResponse
+    mockedFetch.mockRejectedValue(notFound)
     renderPage()
 
     expect(await screen.findByText('Passport not found')).toBeInTheDocument()
     expect(
       screen.getByText(/doesn't exist or its owner has turned sharing off/i),
     ).toBeInTheDocument()
+  })
+
+  it('shows a retryable loading-failure state (not "not found") for network/cold-start errors', async () => {
+    mockedFetch.mockRejectedValue(
+      new AxiosError('Network Error', 'ERR_NETWORK', { headers: new AxiosHeaders() }),
+    )
+    renderPage()
+
+    // The hook retries non-404 failures twice (cold-start tolerance) before erroring.
+    expect(
+      await screen.findByText("Couldn't load this passport", undefined, { timeout: 8000 }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument()
+    expect(screen.queryByText('Passport not found')).not.toBeInTheDocument()
   })
 
   it('renders the empty-badges hint for a passport with no verified topics yet', async () => {

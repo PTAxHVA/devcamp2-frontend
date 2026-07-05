@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
 import {
   fetchPublicPassport,
+  isPassportNotFoundError,
   type PassportSettings,
   type PublicPassport,
 } from '../lib/passport-api'
@@ -17,7 +18,8 @@ export function usePublicPassport(shareToken: string) {
     queryFn: () => fetchPublicPassport(shareToken),
     enabled: !!shareToken,
     // 404 means "unknown link or owner made it private" — retrying won't help.
-    retry: false,
+    // Anything else (network blip, Render cold-start 5xx) gets two retries.
+    retry: (failureCount, error) => !isPassportNotFoundError(error) && failureCount < 2,
   })
 }
 
