@@ -1,17 +1,9 @@
 @import 'tailwindcss';
-/* Light is the default theme; dark is opt-in via `data-theme="dark"` on <html>,
-   driven by the theme toggle (see stores/theme-store.ts). No `--prefersdark` here:
-   the OS setting only picks the initial theme for the "System" preference, which
-   the store resolves in JS — daisyUI must not flip themes on its own. */
+/* Light-only product: ship just the light daisyUI theme so a dark-mode OS/browser
+   can never flip daisyUI tokens (e.g. bg-base-100) to a dark variant. */
 @plugin 'daisyui/index.js' {
-  themes:
-    light --default,
-    dark;
+  themes: light --default;
 }
-
-/* Drive Tailwind's `dark:` variant off our explicit theme attribute (not the OS
-   media query) so `dark:` utilities match the toggle exactly. */
-@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
 @theme {
   /* ===============FONT STYLE=================== */
@@ -92,74 +84,10 @@
   --color-error-text: #991b1b;
   --color-error-icon: #dc2626;
 }
-
-/* ============================================================================
-   DARK THEME
-   Every semantic token above compiles to `var(--color-*)`, so re-pointing those
-   variables under `[data-theme="dark"]` recolours the whole app without touching
-   component markup — as long as components use the semantic tokens (bg-bg-card,
-   text-text-primary, …) rather than raw palette colours. daisyUI's own base-*
-   vars are overridden here too so its components stay in sync.
-   `:root[data-theme]` outranks both `:root` (from @theme) and daisyUI's plain
-   `[data-theme]`, so these win the cascade.
-   ============================================================================ */
-:root[data-theme='dark'] {
-  color-scheme: dark;
-
-  /* Surfaces: darkest page → progressively lighter elevated surfaces. */
-  --color-bg-white: #172033;
-  --color-bg-card: #172033;
-  --color-bg-soft: #0b1220;
-  --color-bg-section: #101a2c;
-  --color-bg-blue-soft: #0f1a2e;
-  --color-bg-lavender: #241d3d;
-
-  /* Text: inverted lightness, kept slightly desaturated to avoid glare. */
-  --color-text-primary: #e8edf5;
-  --color-text-secondary: #b7c2d4;
-  --color-text-muted: #8a97ab;
-  --color-text-placeholder: #64748b;
-  --color-text-disabled: #475569;
-
-  /* Borders. */
-  --color-border-default: #2c3a54;
-  --color-border-soft: #243049;
-  --color-border-input: #33415a;
-  --color-border-navy: #1d4b7e;
-
-  /* Brand: lift the deep purple/navy so they stay legible as text/accents on dark. */
-  --color-brand-purple-700: #b197fc;
-  --color-brand-navy-900: #dbe6f5;
-
-  /* Buttons. */
-  --color-btn-secondary-bg: #172033;
-  --color-btn-secondary-text: #c4b5fd;
-  --color-btn-disabled-bg: #243049;
-  --color-btn-disabled-text: #64748b;
-
-  /* Forms. */
-  --color-input-bg: #101a2c;
-  --color-input-border: #33415a;
-  --color-input-icon: #8a97ab;
-  --color-input-placeholder: #64748b;
-
-  /* Alerts: dim the fill, brighten text/icon for contrast on dark. */
-  --color-error-bg: #3a1c1c;
-  --color-error-border: #7f1d1d;
-  --color-error-text: #fca5a5;
-  --color-error-icon: #f87171;
-
-  /* daisyUI base tokens, matched to the surfaces above. */
-  --color-base-100: #172033;
-  --color-base-200: #101a2c;
-  --color-base-300: #0b1220;
-  --color-base-content: #e8edf5;
-}
-
 @layer base {
   :root {
-    /* Default (light) UA hint for native controls (scrollbars, date pickers,
-       autofill). The dark theme flips this to `dark` above. */
+    /* App is intentionally light-only — tell the UA so native controls (scrollbars,
+       date pickers, autofill) don't render dark when the OS is in dark mode. */
     color-scheme: light;
   }
   body {

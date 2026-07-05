@@ -1,15 +1,7 @@
 import { Link, useNavigate } from 'react-router'
-import {
-  RiMenuLine,
-  RiUser3Line,
-  RiSettings3Line,
-  RiLogoutBoxRLine,
-  RiMoonLine,
-  RiSunLine,
-} from 'react-icons/ri'
+import { RiMenuLine, RiUser3Line, RiSettings3Line, RiLogoutBoxRLine } from 'react-icons/ri'
 import { useMe } from '@/features/profile/hooks/use-profile'
 import { useAuthStore } from '@/stores/auth-store'
-import { useThemeStore } from '@/stores/theme-store'
 import { queryClient } from '@/lib/query-client'
 
 interface NavbarProps {
@@ -20,8 +12,6 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
   const { data: me } = useMe()
   const navigate = useNavigate()
   const setAuth = useAuthStore((s) => s.setAuth)
-  const theme = useThemeStore((s) => s.theme)
-  const toggleTheme = useThemeStore((s) => s.toggleTheme)
   const initials = me?.username?.slice(0, 2).toUpperCase() ?? '??'
   const displayName = me?.username ?? ''
 
@@ -43,20 +33,15 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
         <RiMenuLine className="h-6 w-6" />
       </button>
 
-      <div className="ml-auto flex items-center gap-2 sm:gap-3">
-        <button
-          onClick={toggleTheme}
-          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
-          className="text-text-secondary hover:bg-bg-section flex h-9 w-9 items-center justify-center rounded-full transition-colors"
-        >
-          {theme === 'dark' ? (
-            <RiSunLine className="h-5 w-5" />
-          ) : (
-            <RiMoonLine className="h-5 w-5" />
-          )}
-        </button>
+      {/* Desktop greeting — fills the otherwise-empty top bar with the signed-in
+          learner's name instead of leaving dead space. */}
+      {displayName && (
+        <p className="text-text-secondary hidden text-sm font-medium md:block">
+          Welcome back, <span className="text-text-primary font-semibold">{displayName}</span>
+        </p>
+      )}
 
+      <div className="ml-auto flex items-center gap-2 sm:gap-3">
         <div className="dropdown dropdown-end">
           <div
             tabIndex={0}

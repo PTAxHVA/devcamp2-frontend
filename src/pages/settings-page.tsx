@@ -365,7 +365,7 @@ export default function SettingsPage() {
             title="Account deactivation"
             subtitle="Turn off access to your VORA account."
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="bg-bg-section flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
                   <User className="text-text-muted h-4 w-4" />
@@ -379,7 +379,7 @@ export default function SettingsPage() {
               </div>
               <button
                 onClick={() => setShowDeactivatePassword(true)}
-                className="border-border-input text-text-primary hover:bg-bg-section rounded-lg border px-4 py-2 text-sm font-semibold transition"
+                className="border-border-input text-text-primary hover:bg-bg-section shrink-0 rounded-lg border px-4 py-2 text-sm font-semibold whitespace-nowrap transition"
               >
                 Deactivate account
               </button>

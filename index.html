@@ -2,17 +2,6 @@
 <html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
-    <!-- Set the theme before first paint so a dark-mode user never sees a light flash. -->
-    <script>
-      ;(function () {
-        try {
-          document.documentElement.setAttribute(
-            'data-theme',
-            localStorage.getItem('vora:theme') === 'dark' ? 'dark' : 'light',
-          )
-        } catch (e) {}
-      })()
-    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
