@@ -96,6 +96,25 @@
     background-color: var(--color-bg-soft);
   }
 }
+/* Print ONLY the roadmap-completion certificate: visibility (not display) keeps
+   the layout box so the card can be re-anchored to the top of the printed page. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .certificate-print-area,
+  .certificate-print-area * {
+    visibility: visible;
+  }
+  .certificate-print-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin: 0;
+  }
+}
+
 @keyframes float {
   0%,
   100% {

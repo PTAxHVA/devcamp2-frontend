@@ -1,16 +1,19 @@
 import { useNavigate, useParams, Navigate } from 'react-router'
-import { FiCheck, FiGrid, FiCompass } from 'react-icons/fi'
+import { FiCheck, FiCompass, FiGrid, FiPrinter } from 'react-icons/fi'
 import { useRoadmapDetail } from '@/features/roadmap/hooks/use-roadmap-detail'
+import { useMe } from '@/features/profile/hooks/use-profile'
+import { CertificateCard } from '@/features/passport/components/certificate-card'
 
 /**
  * Roadmap-completion celebration. Reached at /roadmaps/:id/complete.
- * Stats (topics, duration, certificate) are intentionally omitted until a
- * completion-summary endpoint exists — we don't show fabricated numbers.
+ * Includes a printable certificate (window.print + @media print isolation in
+ * index.css) — real data only: username, role name, and topic count.
  */
 export function RoadmapCompletePage() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
   const { data, isLoading } = useRoadmapDetail(id ?? '')
+  const { data: me } = useMe()
 
   if (isLoading) {
     return (
@@ -60,6 +63,26 @@ export function RoadmapCompletePage() {
           </button>
         </div>
       </div>
+
+      {/* Printable certificate — rendered once the owner's username is known */}
+      {me?.username && data && (
+        <div className="mt-6 flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold text-slate-800">Your certificate</h2>
+            <button
+              onClick={() => window.print()}
+              className="btn h-10 rounded-xl border-slate-200 bg-white px-5 text-sm font-bold text-slate-700 hover:bg-slate-50"
+            >
+              <FiPrinter className="mr-2 h-4 w-4" /> Print / save as PDF
+            </button>
+          </div>
+          <CertificateCard
+            username={me.username}
+            roleName={data.roadmap.roleName}
+            topicsCount={data.topics.length}
+          />
+        </div>
+      )}
     </div>
   )
 }

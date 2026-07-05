@@ -28,6 +28,7 @@ import SettingsPage from '@/pages/settings-page'
 import { RoadmapCompletePage } from '@/pages/roadmap-complete-page'
 import { AddAnotherRolePage } from '@/pages/add-another-role-page'
 import { TermsPage, PrivacyPage } from '@/pages/legal-pages'
+import { PublicPassportPage } from '@/features/passport/public-passport-page'
 
 export function AppRoutes() {
   return (
@@ -41,6 +42,8 @@ export function AppRoutes() {
       <Route path="/demo-roadmap" element={<DemoRoadmapPage />} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
+      {/* Verified Skill Passport — PUBLIC on purpose (shared link/QR), no auth guard */}
+      <Route path="/p/:shareToken" element={<PublicPassportPage />} />
 
       {/* Auth pages (Public Routes) */}
       <Route element={<AuthLayout />}>
