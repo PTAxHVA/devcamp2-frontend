@@ -10,6 +10,7 @@ import {
   useUpdateAccount,
   useDeactivateAccount,
 } from '@/features/profile/hooks/use-profile'
+import { PassportSettingsCard } from '@/features/passport/components/passport-settings-card'
 import { User, Lock, LogOut, Eye, EyeOff, Mail, X } from 'lucide-react'
 
 // Section card wrapper
@@ -334,6 +335,9 @@ export default function SettingsPage() {
 
         {/* ── Right column ── */}
         <div className="flex flex-col gap-4">
+          {/* Verified Skill Passport sharing */}
+          <PassportSettingsCard />
+
           {/* Account Actions */}
           <Section icon={LogOut} title="Account actions" subtitle="Sign out of your VORA session.">
             <div className="flex items-center justify-between">
