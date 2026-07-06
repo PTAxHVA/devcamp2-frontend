@@ -45,8 +45,11 @@ test.describe('Happy path', () => {
     // Step 5b — Learning path
     await page.getByRole('button', { name: /personalize/i }).click()
 
-    // Step 6 — Generating animation (auto-advances after 3s)
-    await page.waitForTimeout(4_000)
+    // Step 6 — Generating: the real AI suggestion runs here; the reveal shows the
+    // personalization reason and a Continue button once the request settles
+    // (typically ~12s: 10s Gemini timeout server-side + reveal dwell; the global
+    // 60s actionTimeout covers Render cold starts).
+    await page.getByRole('button', { name: /continue/i }).click()
 
     // Step 7 — Gate screen: click Accept & Start Learning
     await page.getByRole('button', { name: /accept/i }).click()
