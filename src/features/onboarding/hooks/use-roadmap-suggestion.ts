@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
 import type { BrowseRoadmap } from '@/features/roadmap/hooks/use-browse-roadmaps'
 import type { MasterRoadmapPreview } from '@/features/roadmap/hooks/use-master-roadmap'
+import { resolveDefaultBranchSelection } from '@/features/roadmap/lib/branch-selection'
 import { useWizardStore, type RoadmapSuggestion } from '../onboarding-store'
 import { mapAnswersToQuestionnaire, matchMasterRoadmap } from '../lib/map-questionnaire'
 
@@ -48,7 +49,9 @@ export function useRoadmapSuggestion() {
       const detail = await apiClient.get<ApiEnvelope<MasterRoadmapPreview>>(
         `/master-roadmaps/${master._id}`,
       )
-      const branchIds = detail.data.data.branches.map((b) => b._id)
+      // Default path per exclusive fork group — MUST match useCompleteOnboarding's
+      // resolution exactly, or suggestionMatchesTarget drops the AI order.
+      const branchIds = resolveDefaultBranchSelection(detail.data.data.branches)
       if (branchIds.length === 0) throw new Error('Selected roadmap has no branches.')
 
       // The AI reads the questionnaire server-side — it must be saved first.

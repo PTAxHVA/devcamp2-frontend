@@ -5,6 +5,7 @@ import { apiClient, extractApiError } from '@/lib/api-client'
 import { logger } from '@/lib/logger'
 import type { BrowseRoadmap } from '@/features/roadmap/hooks/use-browse-roadmaps'
 import type { MasterRoadmapPreview } from '@/features/roadmap/hooks/use-master-roadmap'
+import { resolveDefaultBranchSelection } from '@/features/roadmap/lib/branch-selection'
 import { useWizardStore, type RoadmapSuggestion } from '../onboarding-store'
 import { mapAnswersToQuestionnaire, matchMasterRoadmap } from '../lib/map-questionnaire'
 
@@ -72,7 +73,9 @@ export function useCompleteOnboarding() {
       const detail = await apiClient.get<ApiEnvelope<MasterRoadmapPreview>>(
         `/master-roadmaps/${master._id}`,
       )
-      const branchSelections = detail.data.data.branches.map((b) => b._id)
+      // Default path per exclusive fork group — same resolution as
+      // useRoadmapSuggestion, so the suggested branch set always matches here.
+      const branchSelections = resolveDefaultBranchSelection(detail.data.data.branches)
       if (branchSelections.length === 0) throw new Error('Selected roadmap has no branches.')
 
       // 2. Persist the questionnaire (learner profile) before enrolling.

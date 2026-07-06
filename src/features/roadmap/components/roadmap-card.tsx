@@ -6,11 +6,7 @@ import { apiClient } from '@/lib/api-client'
 import { useEnrollRoadmap } from '../hooks/use-enroll-roadmap'
 import { roadmapSlug } from '@/features/learning/lib/roadmap-slug'
 import RoadmapPreviewModal from './roadmap-preview-modal'
-
-interface MasterBranch {
-  _id: string
-  name: string
-}
+import { resolveDefaultBranchSelection, type ForkableBranch } from '../lib/branch-selection'
 
 interface RoadmapCardData {
   _id: string
@@ -32,7 +28,7 @@ export default function RoadmapCard({ data, isEnrolled = false }: RoadmapCardPro
   const navigate = useNavigate()
   const enroll = useEnrollRoadmap()
 
-  const { data: branches = [], isLoading: branchesLoading } = useQuery<MasterBranch[]>({
+  const { data: branches = [], isLoading: branchesLoading } = useQuery<ForkableBranch[]>({
     queryKey: ['master-roadmap-branches', data._id],
     queryFn: async () => {
       const res = await apiClient.get(`/master-roadmaps/${data._id}/branches`)
@@ -41,11 +37,13 @@ export default function RoadmapCard({ data, isEnrolled = false }: RoadmapCardPro
     staleTime: 5 * 60 * 1000,
   })
 
+  // Quick-enroll uses the default path per exclusive group (the BE rejects
+  // selecting two branches of one group); picking a path lives in the preview.
   const handleEnroll = () =>
     enroll.mutate({
       masterRoadmapId: data._id,
       roleName: displayTitle,
-      branchSelections: branches.map((b) => b._id),
+      branchSelections: resolveDefaultBranchSelection(branches),
     })
 
   const gradientCls = displayTitle.toLowerCase().includes('frontend')

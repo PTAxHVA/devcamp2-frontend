@@ -14,6 +14,28 @@ vi.mock('@/lib/api-client', () => ({
 
 const MASTER = { _id: 'm1', roleName: 'Frontend Web' }
 const DETAIL = { _id: 'm1', roleName: 'Frontend Web', branches: [{ _id: 'b1' }, { _id: 'b2' }] }
+// A forked roadmap: mandatory core + a mutually-exclusive Database group.
+const DETAIL_FORKED = {
+  _id: 'm1',
+  roleName: 'Backend Web',
+  branches: [
+    { _id: 'core', name: 'Core', isMandatory: true, orderIndex: 0 },
+    {
+      _id: 'mongo',
+      name: 'MongoDB',
+      selectionGroup: 'Database',
+      isMutuallyExclusive: true,
+      orderIndex: 1,
+    },
+    {
+      _id: 'pg',
+      name: 'PostgreSQL',
+      selectionGroup: 'Database',
+      isMutuallyExclusive: true,
+      orderIndex: 2,
+    },
+  ],
+}
 
 const SUGGESTION: RoadmapSuggestion = {
   masterRoadmapId: 'm1',
@@ -109,6 +131,25 @@ describe('useCompleteOnboarding', () => {
     expect(enrollCalls()[0][1]).toEqual({
       masterRoadmapId: 'm1',
       branchSelections: ['b1', 'b2'],
+      sourceType: 'SUGGESTED',
+    })
+  })
+
+  it('enrolls with only the default branch of an exclusive fork group', async () => {
+    ;(apiClient.get as Mock).mockImplementation((url: string) => {
+      if (url === '/master-roadmaps') return Promise.resolve(envelope([MASTER]))
+      if (url === '/master-roadmaps/m1') return Promise.resolve(envelope(DETAIL_FORKED))
+      return Promise.reject(new Error(`unexpected GET ${url}`))
+    })
+    mockPosts([() => Promise.resolve(envelope({ _id: 'ur1' }))])
+
+    await runMutation()
+
+    // core (ungrouped) + MongoDB (lowest orderIndex of the group) — never both
+    // group branches, or the backend rejects with BRANCH_GROUP_CONFLICT.
+    expect(enrollCalls()[0][1]).toEqual({
+      masterRoadmapId: 'm1',
+      branchSelections: ['core', 'mongo'],
       sourceType: 'SUGGESTED',
     })
   })

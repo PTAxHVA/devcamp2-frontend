@@ -1,86 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
-import {
-  RiCloseLine,
-  RiListUnordered,
-  RiGitBranchLine,
-  RiCheckLine,
-  RiCircleLine,
-} from 'react-icons/ri'
+import { RiCloseLine, RiListUnordered, RiGitBranchLine, RiCircleLine } from 'react-icons/ri'
 import { useMasterRoadmap } from '../hooks/use-master-roadmap'
 import { useEnrollRoadmap } from '../hooks/use-enroll-roadmap'
 import { roadmapSlug } from '@/features/learning/lib/roadmap-slug'
-import type { MasterBranch } from '../hooks/use-master-roadmap'
+import { applyBranchToggle, resolveDefaultBranchSelection } from '../lib/branch-selection'
+import BranchTree from './branch-tree'
 
 interface RoadmapPreviewModalProps {
   roadmapId: string
   roleName?: string
   isEnrolled?: boolean
   onClose: () => void
-}
-
-/** Minimal tree: branches rendered as connected nodes in a vertical column. */
-function BranchTree({
-  branches,
-  selected,
-  onToggle,
-}: {
-  branches: MasterBranch[]
-  selected: Set<string>
-  onToggle: (id: string) => void
-}) {
-  return (
-    <div className="relative flex flex-col gap-0">
-      {branches.map((b, idx) => {
-        const isSelected = selected.has(b._id)
-        const isLast = idx === branches.length - 1
-        return (
-          <div key={b._id} className="flex items-start gap-3">
-            {/* Vertical connector line + node dot */}
-            <div className="flex flex-col items-center" style={{ width: 24, minWidth: 24 }}>
-              <div
-                className={`mt-3 h-3 w-3 shrink-0 rounded-full border-2 transition-colors ${
-                  isSelected
-                    ? 'border-brand-purple-600 bg-brand-purple-600'
-                    : 'border-border-input bg-bg-card'
-                }`}
-              />
-              {!isLast && <div className="bg-border-soft w-0.5 flex-1" style={{ minHeight: 28 }} />}
-            </div>
-
-            {/* Branch card (toggle) */}
-            <button
-              onClick={() => onToggle(b._id)}
-              className={`mb-3 flex w-full items-start gap-3 rounded-2xl border p-4 text-left transition-all ${
-                isSelected
-                  ? 'border-brand-purple-200 bg-bg-lavender'
-                  : 'border-border-soft bg-bg-section hover:border-border-input'
-              }`}
-            >
-              <div
-                className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${
-                  isSelected
-                    ? 'border-brand-purple-600 bg-brand-purple-600 text-white'
-                    : 'border-border-input'
-                }`}
-              >
-                {isSelected && <RiCheckLine className="h-3 w-3" />}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-text-primary text-sm font-bold">{b.name}</p>
-                {b.description && (
-                  <p className="text-text-muted mt-0.5 line-clamp-2 text-xs">{b.description}</p>
-                )}
-              </div>
-              <span className="text-text-placeholder shrink-0 text-xs font-semibold">
-                {b.topicCount} topics
-              </span>
-            </button>
-          </div>
-        )
-      })}
-    </div>
-  )
 }
 
 export default function RoadmapPreviewModal({
@@ -92,19 +23,14 @@ export default function RoadmapPreviewModal({
   const { data, isLoading, isError, refetch, isFetching } = useMasterRoadmap(roadmapId)
   const navigate = useNavigate()
   const enroll = useEnrollRoadmap()
-  // Track which branches the user has explicitly deselected; default is all selected.
-  const [deselectedBranches, setDeselectedBranches] = useState<Set<string>>(new Set())
+  // null = user hasn't touched the picker yet → derive the default selection
+  // (all ungrouped branches + the default path per exclusive fork group).
+  const [selected, setSelected] = useState<Set<string> | null>(null)
 
-  const allBranchIds = useMemo(
-    () => new Set(data?.branches?.map((b) => b._id) ?? []),
-    [data?.branches],
+  const selectedBranches = useMemo(
+    () => selected ?? new Set(resolveDefaultBranchSelection(data?.branches ?? [])),
+    [selected, data?.branches],
   )
-
-  const selectedBranches = useMemo(() => {
-    const result = new Set(allBranchIds)
-    deselectedBranches.forEach((id) => result.delete(id))
-    return result
-  }, [allBranchIds, deselectedBranches])
 
   // Close on Escape for keyboard users.
   useEffect(() => {
@@ -113,21 +39,8 @@ export default function RoadmapPreviewModal({
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
-  const toggleBranch = (id: string) => {
-    if (!selectedBranches.has(id)) {
-      setDeselectedBranches((prev) => {
-        const next = new Set(prev)
-        next.delete(id)
-        return next
-      })
-    } else if (selectedBranches.size > 1) {
-      setDeselectedBranches((prev) => {
-        const next = new Set(prev)
-        next.add(id)
-        return next
-      })
-    }
-  }
+  const toggleBranch = (id: string) =>
+    setSelected(applyBranchToggle(data?.branches ?? [], selectedBranches, id))
 
   const title = data?.roleName ?? roleName ?? 'Roadmap'
   const branches = data?.branches ?? []
@@ -193,7 +106,11 @@ export default function RoadmapPreviewModal({
 
             <div className="mb-2 flex items-center justify-between">
               <h3 className="text-text-primary text-sm font-bold">Choose your learning path</h3>
-              <span className="text-text-muted text-xs">Click to select / deselect</span>
+              <span className="text-text-muted text-xs">
+                {branches.some((b) => b.selectionGroup && b.isMutuallyExclusive)
+                  ? 'Pick one path where the roadmap splits'
+                  : 'Click to select / deselect'}
+              </span>
             </div>
 
             {branches.length > 0 ? (
