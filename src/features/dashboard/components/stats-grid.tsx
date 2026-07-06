@@ -63,7 +63,12 @@ export function StatsGrid({
               >
                 <Icon className={`h-6 w-6 ${stat.textClass}`} />
               </div>
-              <h3 className="text-base-content/70 text-sm font-medium">{stat.label}</h3>
+              {/* Fixed two-line label box: at widths where only SOME labels wrap
+                  (e.g. ~1700px effective), the values sat on different baselines —
+                  "first two low, last two floating" (Y5). */}
+              <h3 className="text-base-content/70 flex min-h-10 items-center justify-center text-sm font-medium">
+                {stat.label}
+              </h3>
               <p className="text-base-content mt-1 text-3xl font-bold">{stat.value}</p>
             </div>
           </div>
