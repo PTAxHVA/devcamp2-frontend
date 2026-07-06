@@ -13,6 +13,7 @@ import {
 import { useMasterRoadmap } from '@/features/roadmap/hooks/use-master-roadmap'
 import { buildFlowGraph } from '@/features/roadmap/lib/build-flow-graph'
 import SwitchPathPanel, { type PathSwap } from './components/switch-path-panel'
+import { resolveIncomingTopics } from './lib/resolve-incoming-topics'
 import {
   ReactFlow,
   Background,
@@ -245,10 +246,11 @@ export default function EditCurrentRoadmapPage() {
   // Persisting still goes through the normal Save → PATCH, so the remove-gate,
   // canonical reorder and edit-log behave exactly as for manual edits.
   const handleSwitchPath = (swap: PathSwap) => {
-    const incoming = (availableTopics ?? []).filter((t) =>
-      swap.addTopicIds.includes(t.masterTopicId),
-    )
-    if (incoming.length !== swap.addTopicIds.length) {
+    // topicMeta first, server list second: available-topics reflects the SAVED
+    // enrollment, so right after an unsaved switch it contains neither side's
+    // original topic — topicMeta still does, which makes switching back work.
+    const incoming = resolveIncomingTopics(swap.addTopicIds, topicMeta, availableTopics)
+    if (!incoming) {
       toast.error('The other path is still loading — try again in a moment.')
       return
     }
@@ -257,6 +259,10 @@ export default function EditCurrentRoadmapPage() {
     setTopicMeta((prev) => {
       const next = new Map(prev)
       for (const topic of incoming) {
+        // Keep the original entry for topics the editor already knew — it holds
+        // the REAL hasProgress/section counts (a restored started topic must
+        // keep its remove-gate).
+        if (topic.alreadyKnown) continue
         next.set(topic.masterTopicId, {
           name: topic.name,
           status: 'available',

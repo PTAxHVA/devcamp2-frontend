@@ -134,6 +134,11 @@ export interface ForkContext {
 /**
  * Map an enrollment onto the roadmap's (first) exclusive group. Returns null
  * when the master roadmap has no fork, so callers can skip all fork UI.
+ *
+ * Demo-scale: `alternative` is the first OTHER branch of the group — with a
+ * 3-way fork the ghost node + switch panel would surface only one alternative
+ * (the preview radio already handles N branches). Extend if a group ever
+ * ships more than two branches.
  */
 export function deriveForkContext(
   branches: ForkableBranch[],
