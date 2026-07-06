@@ -14,6 +14,7 @@ interface ApiEnvelope<T> {
 interface SuggestResponse {
   suggestedTopics: { id: string; name: string }[]
   explanation: string
+  source?: 'ai' | 'fallback'
 }
 
 /**
@@ -60,7 +61,7 @@ export function useRoadmapSuggestion() {
         masterRoadmapId: master._id,
         branchSelections: branchIds,
       })
-      const { suggestedTopics, explanation } = res.data.data
+      const { suggestedTopics, explanation, source } = res.data.data
 
       return {
         masterRoadmapId: master._id,
@@ -70,6 +71,7 @@ export function useRoadmapSuggestion() {
         // Boundary guard: never trust the wire shape — a missing/null
         // explanation must degrade to the default copy, not crash the reveal.
         explanation: typeof explanation === 'string' ? explanation : '',
+        source,
       }
     },
   })

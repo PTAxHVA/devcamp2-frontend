@@ -90,7 +90,11 @@ export const StepGenerating = ({ onContinue, minDwellMs = MIN_DWELL_MS }: StepGe
 
   if (isPending || !dwellDone) return <WorkingState />
 
-  const explanation = data && data.explanation.trim().length > 0 ? data.explanation : DEFAULT_REASON
+  // Server-side degrade (Gemini down → source 'fallback') carries an internal
+  // notice as its explanation — show the friendly default copy instead.
+  const aiBusy = data?.source === 'fallback'
+  const explanation =
+    data && !aiBusy && data.explanation.trim().length > 0 ? data.explanation : DEFAULT_REASON
 
   const handleContinue = () => {
     // Pin the suggestion (or its absence) for the gate's enroll call.
@@ -117,6 +121,11 @@ export const StepGenerating = ({ onContinue, minDwellMs = MIN_DWELL_MS }: StepGe
           Why this order
         </p>
         <p className="text-text-primary text-base leading-relaxed">{explanation}</p>
+        {aiBusy && (
+          <p className="text-text-muted mt-2 text-sm">
+            AI personalization is busy right now — showing this roadmap's standard order.
+          </p>
+        )}
       </div>
 
       {data && data.topics.length > 0 && (

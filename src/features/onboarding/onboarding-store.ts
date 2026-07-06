@@ -23,6 +23,8 @@ export interface RoadmapSuggestion {
   orderedTopicIds: string[]
   topics: SuggestedTopic[]
   explanation: string
+  /** 'fallback' = server degraded (Gemini down) — the reveal shows default copy instead. */
+  source?: 'ai' | 'fallback'
 }
 
 interface WizardStore {

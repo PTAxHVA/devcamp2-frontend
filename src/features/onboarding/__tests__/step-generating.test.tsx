@@ -58,7 +58,9 @@ describe('StepGenerating', () => {
   it('reveals the AI reason and topic order, and pins the suggestion on Continue', async () => {
     mockHappyGets()
     mockPosts(() =>
-      Promise.resolve(envelope({ suggestedTopics: SUGGESTED_TOPICS, explanation: EXPLANATION })),
+      Promise.resolve(
+        envelope({ suggestedTopics: SUGGESTED_TOPICS, explanation: EXPLANATION, source: 'ai' }),
+      ),
     )
     const onContinue = renderStep()
 
@@ -78,7 +80,31 @@ describe('StepGenerating', () => {
       orderedTopicIds: ['t1', 't2'],
       topics: SUGGESTED_TOPICS,
       explanation: EXPLANATION,
+      source: 'ai',
     })
+  })
+
+  it('shows the default copy (not the internal notice) when the server degraded to fallback', async () => {
+    mockHappyGets()
+    // Gemini down server-side → 200 with default order + an internal notice.
+    mockPosts(() =>
+      Promise.resolve(
+        envelope({
+          suggestedTopics: SUGGESTED_TOPICS,
+          explanation: 'AI is currently not available, showing the default roadmap',
+          source: 'fallback',
+        }),
+      ),
+    )
+    renderStep()
+
+    expect(await screen.findByText(DEFAULT_REASON)).toBeInTheDocument()
+    expect(
+      screen.queryByText('AI is currently not available, showing the default roadmap'),
+    ).not.toBeInTheDocument()
+    expect(screen.getByText(/AI personalization is busy right now/)).toBeInTheDocument()
+    // The (default) order is still valid and shown.
+    expect(screen.getByText('HTML Fundamentals')).toBeInTheDocument()
   })
 
   it('shows the default reason when the server sends no usable explanation', async () => {
