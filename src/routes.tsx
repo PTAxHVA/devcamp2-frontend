@@ -1,6 +1,5 @@
-import { Routes, Route, Navigate } from 'react-router'
+import { Routes, Route } from 'react-router'
 import LandingPage from './pages/landing-page'
-import { isAuthenticated } from '@/lib/auth'
 import OnboardingMain from '@/features/onboarding/components/onboarding-main'
 import DashboardPage from '@/pages/dashboard-page'
 import SectionDetailPage from '@/features/section/section-detail-page'
@@ -21,6 +20,7 @@ import ForgotPasswordPage from './features/auth/forgot-password-page'
 import ResetPasswordPage from './features/auth/reset-password-page'
 import ResetPasswordSuccessPage from './features/auth/reset-password-success-page'
 import { ProtectedRoute } from '@/components/shared/protected-route'
+import { PublicOnlyRoute } from '@/components/shared/public-only-route'
 import NotFoundPage from '@/pages/not-found-page'
 import ProfilePage from '@/pages/profile-page'
 import SettingsPage from '@/pages/settings-page'
@@ -35,11 +35,10 @@ import { GapAnalyzerPage } from '@/features/goals/gap-analyzer-page'
 export function AppRoutes() {
   return (
     <Routes>
-      {/* Landing — nếu đã login thì về dashboard */}
-      <Route
-        path="/"
-        element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <LandingPage />}
-      />
+      {/* Landing — nếu đã login thì về dashboard (reactive gate, xem PublicOnlyRoute) */}
+      <Route element={<PublicOnlyRoute />}>
+        <Route path="/" element={<LandingPage />} />
+      </Route>
 
       <Route path="/demo-roadmap" element={<DemoRoadmapPage />} />
       <Route path="/terms" element={<TermsPage />} />
@@ -49,14 +48,10 @@ export function AppRoutes() {
 
       {/* Auth pages (Public Routes) */}
       <Route element={<AuthLayout />}>
-        <Route
-          path="/login"
-          element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <LoginPage />}
-        />
-        <Route
-          path="/signup"
-          element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <SignupPage />}
-        />
+        <Route element={<PublicOnlyRoute />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+        </Route>
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
         {/* Giải pháp A: Giữ cả 2 route để link email cũ không bị 404 */}
