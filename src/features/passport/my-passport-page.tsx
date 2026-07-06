@@ -58,7 +58,7 @@ export function MyPassportPage() {
       </div>
 
       {!isPublic && (
-        <div className="border-border-soft flex flex-col items-center gap-4 rounded-3xl border bg-white p-10 text-center">
+        <div className="border-border-soft bg-bg-card flex flex-col items-center gap-4 rounded-3xl border p-10 text-center">
           <div className="bg-bg-lavender flex h-14 w-14 items-center justify-center rounded-2xl">
             <RiPassportLine className="text-brand-purple-500 h-7 w-7" />
           </div>
@@ -97,7 +97,7 @@ export function MyPassportPage() {
             />
           )}
           {passportQuery.isError && (
-            <div className="border-border-soft rounded-2xl border bg-white p-8 text-center">
+            <div className="border-border-soft bg-bg-card rounded-2xl border p-8 text-center">
               <p className="text-text-muted text-sm">
                 Couldn't load your passport preview — please try again.
               </p>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { NavLink, useLocation } from 'react-router'
+import { Link, NavLink, useLocation } from 'react-router'
 import { TbTargetArrow } from 'react-icons/tb'
 import {
   RiHome6Line,
@@ -73,11 +73,14 @@ export const Sidebar = ({ mobileOpen = false, onClose }: SidebarProps) => {
       <div>
         {/* Header / Logo */}
         <div className={`flex h-20 items-center ${effectiveCollapsed ? 'justify-center' : 'px-8'}`}>
-          {effectiveCollapsed ? (
-            <VoraMark className="h-9 w-9" />
-          ) : (
-            <VoraWordmark className="overflow-hidden" />
-          )}
+          {/* Logo links home so clicking the brand returns to the dashboard. */}
+          <Link to="/dashboard" aria-label="VORA — go to dashboard" onClick={onClose}>
+            {effectiveCollapsed ? (
+              <VoraMark className="h-9 w-9" />
+            ) : (
+              <VoraWordmark className="overflow-hidden" />
+            )}
+          </Link>
           <button
             onClick={onClose}
             aria-label="Close menu"

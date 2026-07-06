@@ -21,7 +21,7 @@ function RoadmapCard({
   total: number
 }) {
   return (
-    <div className="border-border-soft flex min-w-0 flex-1 flex-col gap-3 rounded-xl border bg-white p-4">
+    <div className="border-border-soft bg-bg-card flex min-w-0 flex-1 flex-col gap-3 rounded-xl border p-4">
       {/* Abstract roadmap illustration — shows the real roadmap title, no fabricated topic names */}
       <div className="bg-bg-section flex h-24 w-full items-center justify-center rounded-lg">
         <div className="text-text-muted flex flex-col items-center gap-1.5 opacity-60 select-none">
@@ -98,7 +98,7 @@ export default function ProfilePage() {
     : '—'
 
   return (
-    <div className="flex items-start gap-5">
+    <div className="mx-auto flex w-full max-w-6xl items-start gap-5 px-4 py-6 md:px-8">
       {/* ── Left (main) ── */}
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         {/* Header */}
@@ -108,7 +108,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Profile card */}
-        <div className="border-border-soft flex items-start gap-5 rounded-2xl border bg-white p-6">
+        <div className="border-border-soft bg-bg-card flex items-start gap-5 rounded-2xl border p-6">
           {/* Avatar */}
           <div className="bg-brand-purple-300/30 flex h-20 w-20 shrink-0 items-center justify-center rounded-full">
             <div className="bg-brand-purple-300/50 text-brand-purple-600 flex h-12 w-12 items-center justify-center rounded-full text-xl font-bold">
@@ -141,7 +141,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Active Roadmaps */}
-        <div className="border-border-soft flex flex-col gap-4 rounded-2xl border bg-white p-6">
+        <div className="border-border-soft bg-bg-card flex flex-col gap-4 rounded-2xl border p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-text-primary text-sm font-bold">Active roadmaps</p>
@@ -164,7 +164,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Banner */}
-        <div className="border-border-soft flex items-center justify-between gap-4 rounded-2xl border bg-white p-5">
+        <div className="border-border-soft bg-bg-card flex items-center justify-between gap-4 rounded-2xl border p-5">
           <div className="flex items-center gap-4">
             <Star className="h-8 w-8 shrink-0 text-yellow-400" />
             <div>
@@ -186,7 +186,7 @@ export default function ProfilePage() {
       {/* ── Right (stats + activity) ── */}
       <div className="flex w-72 shrink-0 flex-col gap-4">
         {/* Learning stats */}
-        <div className="border-border-soft flex flex-col gap-4 rounded-2xl border bg-white p-5">
+        <div className="border-border-soft bg-bg-card flex flex-col gap-4 rounded-2xl border p-5">
           <p className="text-text-primary text-sm font-bold">Learning stats</p>
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1">

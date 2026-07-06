@@ -21,7 +21,7 @@ const features = [
 
 export default function OnboardingLayout() {
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="bg-bg-card flex min-h-screen flex-col">
       {/* Navbar */}
       <header className="border-base-200 bg-base-100 sticky top-0 z-50 border-b">
         <div className="navbar mx-auto h-20 max-w-screen-xl px-4">
@@ -80,12 +80,12 @@ export default function OnboardingLayout() {
               <div className="text-text-primary text-sm font-bold">50K+</div>
               <div className="text-text-placeholder text-xs">Learners worldwide</div>
             </div>
-            <div className="h-8 w-px bg-gray-200" />
+            <div className="bg-border-soft h-8 w-px" />
             <div>
               <div className="text-text-primary text-sm font-bold">Expert verified</div>
               <div className="text-text-placeholder text-xs">Curriculum you can trust</div>
             </div>
-            <div className="h-8 w-px bg-gray-200" />
+            <div className="bg-border-soft h-8 w-px" />
             <div>
               <div className="text-text-primary text-sm font-bold">Real results</div>
               <div className="text-text-placeholder text-xs">Build skills and ship project</div>
@@ -95,7 +95,7 @@ export default function OnboardingLayout() {
 
         {/* Right - Roadmap Image */}
         <div className="flex w-full max-w-md flex-1 items-center justify-center">
-          <div className="border-border-soft w-full rounded-2xl border bg-white p-5 shadow-sm">
+          <div className="border-border-soft bg-bg-card w-full rounded-2xl border p-5 shadow-sm">
             <div className="mb-3 text-center">
               <div className="text-text-primary text-sm font-semibold">
                 Your personalized roadmap

@@ -23,28 +23,28 @@ export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
         case 'completed':
           return 'border-border-soft bg-bg-section text-text-primary'
         case 'current':
-          return 'border-brand-purple-600 bg-white ring-2 ring-brand-purple-100 text-brand-purple-700'
+          return 'border-brand-purple-600 bg-bg-card ring-2 ring-brand-purple-100 text-brand-purple-700'
         default:
-          return 'border-slate-800 bg-white text-text-primary'
+          return 'border-slate-800 bg-bg-card text-text-primary'
       }
     }
     switch (data.status) {
       case 'completed':
-        return 'border-emerald-500 bg-white text-text-primary'
+        return 'border-emerald-500 bg-bg-card text-text-primary'
       case 'current':
-        return 'border-brand-purple-600 bg-white text-brand-purple-700 ring-4 ring-brand-purple-100 font-bold shadow-md'
+        return 'border-brand-purple-600 bg-bg-card text-brand-purple-700 ring-4 ring-brand-purple-100 font-bold shadow-md'
       case 'locked':
         return 'border-border-soft bg-bg-section text-text-placeholder border-dashed'
       case 'upcoming':
       default:
-        return 'border-border-soft bg-white text-text-secondary'
+        return 'border-border-soft bg-bg-card text-text-secondary'
     }
   }
   const renderIndicator = () => {
     if (variant === 'onboarding') {
       if (data.status === 'completed') {
         return (
-          <div className="text-text-muted flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-200">
+          <div className="text-text-muted bg-border-soft flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
             <RiCheckFill className="h-3.5 w-3.5" />
           </div>
         )
@@ -67,12 +67,12 @@ export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
           </div>
         )}
         {data.status === 'current' && (
-          <div className="border-border-purple flex h-5 w-5 items-center justify-center rounded-full border-2 bg-white">
+          <div className="border-border-purple bg-bg-card flex h-5 w-5 items-center justify-center rounded-full border-2">
             <div className="bg-brand-purple-600 h-2 w-2 rounded-full" />
           </div>
         )}
         {data.status === 'upcoming' && (
-          <div className="border-border-input h-5 w-5 rounded-full border-2 bg-white" />
+          <div className="border-border-input bg-bg-card h-5 w-5 rounded-full border-2" />
         )}
         {data.status === 'locked' && <RiLockLine className="text-text-placeholder h-5 w-5" />}
       </div>

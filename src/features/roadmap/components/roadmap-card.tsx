@@ -61,7 +61,7 @@ export default function RoadmapCard({ data, isEnrolled = false }: RoadmapCardPro
       : 'text-text-placeholder'
 
   return (
-    <div className="border-border-soft flex h-full flex-col justify-between rounded-3xl border bg-white p-5 shadow-sm transition-all hover:shadow-md">
+    <div className="border-border-soft bg-bg-card flex h-full flex-col justify-between rounded-3xl border p-5 shadow-sm transition-all hover:shadow-md">
       <div
         className={`mb-4 flex h-36 items-center justify-center rounded-2xl border border-transparent p-4 text-center ${gradientCls}`}
       >

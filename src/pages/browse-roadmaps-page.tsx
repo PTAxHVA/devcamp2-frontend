@@ -48,7 +48,7 @@ export default function BrowseRoadmapsPage() {
         <select
           value={role}
           onChange={(e) => setRole(e.target.value)}
-          className="focus:border-brand-purple-500 border-border-soft rounded-xl border bg-white px-4 py-2.5 text-sm font-medium outline-none"
+          className="focus:border-brand-purple-500 border-border-soft bg-bg-card rounded-xl border px-4 py-2.5 text-sm font-medium outline-none"
         >
           <option value="all">All Roles</option>
           <option value="frontend">Frontend</option>

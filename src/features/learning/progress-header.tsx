@@ -33,7 +33,7 @@ export default function ProgressHeader({ topics }: ProgressHeaderProps) {
     topics.find((t) => t.status === 'in_progress') ?? topics.find((t) => t.status !== 'completed')
 
   return (
-    <div className="border-border-soft grid grid-cols-2 gap-4 rounded-2xl border bg-white p-5 shadow-sm md:grid-cols-4">
+    <div className="border-border-soft bg-bg-card grid grid-cols-2 gap-4 rounded-2xl border p-5 shadow-sm md:grid-cols-4">
       <div className="border-border-soft flex items-center gap-3 border-r pr-4">
         <div className="text-brand-purple-600 relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-sm font-black ring-4 ring-indigo-100">
           {overallProgress}%

@@ -47,7 +47,7 @@ export function PassportSettingsCard() {
   }
 
   return (
-    <div className="border-border-soft flex flex-col gap-5 rounded-2xl border bg-white p-6">
+    <div className="border-border-soft bg-bg-card flex flex-col gap-5 rounded-2xl border p-6">
       <div className="flex items-start gap-3">
         <div className="bg-bg-lavender flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
           <Share2 className="text-brand-purple-500 h-4 w-4" />

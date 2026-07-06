@@ -27,7 +27,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="border-border-soft flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl border shadow-sm md:flex-row">
-      <div className="flex w-full flex-col justify-between bg-white px-10 py-16 md:w-1/2">
+      <div className="bg-bg-card flex w-full flex-col justify-between px-10 py-16 md:w-1/2">
         <div className="flex-1">
           {forgot.isSuccess ? (
             <div className="flex flex-col gap-4">
@@ -79,9 +79,9 @@ export default function ForgotPasswordPage() {
               </form>
 
               <div className="my-5 flex items-center gap-3">
-                <div className="h-px flex-1 bg-gray-200" />
+                <div className="bg-border-soft h-px flex-1" />
                 <span className="text-text-placeholder text-xs">or</span>
-                <div className="h-px flex-1 bg-gray-200" />
+                <div className="bg-border-soft h-px flex-1" />
               </div>
 
               <Link to="/login" className="text-sm font-semibold text-indigo-600 hover:underline">
@@ -92,7 +92,7 @@ export default function ForgotPasswordPage() {
         </div>
       </div>
 
-      <div className="hidden w-1/2 flex-col items-center justify-center gap-6 bg-[#f9f9fb] px-10 py-12 md:flex">
+      <div className="bg-bg-section hidden w-1/2 flex-col items-center justify-center gap-6 px-10 py-12 md:flex">
         <img
           src={ForgotPasswordImg}
           alt="Forgot password"

@@ -65,7 +65,7 @@ export default function MyLearningJourneyPage() {
 
   if (!roadmaps || roadmaps.length === 0) {
     return (
-      <div className="border-border-soft mx-auto my-20 max-w-md rounded-2xl border bg-white p-10 text-center shadow-sm">
+      <div className="border-border-soft bg-bg-card mx-auto my-20 max-w-md rounded-2xl border p-10 text-center shadow-sm">
         <RiBookOpenLine className="text-text-disabled mx-auto mb-4 text-5xl" />
         <p className="text-text-secondary text-lg font-bold">No active roadmaps</p>
         <p className="text-text-muted mt-1 text-sm">
@@ -86,7 +86,7 @@ export default function MyLearningJourneyPage() {
     }
     // Explicit slug, but the user isn't following that roadmap.
     return (
-      <div className="border-border-soft mx-auto my-20 max-w-md rounded-2xl border bg-white p-10 text-center shadow-sm">
+      <div className="border-border-soft bg-bg-card mx-auto my-20 max-w-md rounded-2xl border p-10 text-center shadow-sm">
         <RiBookOpenLine className="text-text-disabled mx-auto mb-4 text-5xl" />
         <p className="text-text-secondary text-lg font-bold">You're not following this roadmap</p>
         <p className="text-text-muted mt-1 text-sm">
@@ -139,7 +139,7 @@ export default function MyLearningJourneyPage() {
 
         {/* Roadmap switcher — only shown when user has 2 active roadmaps */}
         {roadmaps.length > 1 && (
-          <div className="border-border-soft flex items-center gap-1 rounded-xl border bg-white p-1 shadow-sm">
+          <div className="border-border-soft bg-bg-card flex items-center gap-1 rounded-xl border p-1 shadow-sm">
             {roadmaps.map((r, idx) => (
               <button
                 key={r._id}

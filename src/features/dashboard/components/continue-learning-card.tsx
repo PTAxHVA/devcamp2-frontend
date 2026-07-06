@@ -32,7 +32,7 @@ export function ContinueLearningCard({
         {/* Vòng tròn Progress */}
         <div className="flex-shrink-0">
           <div
-            className="radial-progress text-primary border-[6px] border-[#EAE2FF] bg-white shadow-sm"
+            className="radial-progress text-primary bg-bg-card border-[6px] border-[#EAE2FF] shadow-sm"
             style={
               {
                 '--value': progress,
@@ -62,14 +62,14 @@ export function ContinueLearningCard({
             {continueLearning.roadmapName}
             <FiExternalLink className="group-hover:text-primary text-text-placeholder h-5 w-5 transition-colors" />
           </h3>
-          <div className="my-4 h-px w-full bg-slate-200/60"></div>
+          <div className="bg-border-soft/60 my-4 h-px w-full"></div>
 
           <div>
             <p className="text-text-muted mb-2 text-[11px] font-bold tracking-widest uppercase">
               Next up
             </p>
             <div className="flex items-center gap-3">
-              <div className="border-border-soft text-text-secondary flex h-8 w-8 items-center justify-center rounded-md border bg-white font-bold shadow-sm">
+              <div className="border-border-soft text-text-secondary bg-bg-card flex h-8 w-8 items-center justify-center rounded-md border font-bold shadow-sm">
                 {completed}
               </div>
               <div className="flex flex-col">
@@ -96,7 +96,7 @@ export function ContinueLearningCard({
           Continue Learning <FiArrowRight className="ml-1 h-4 w-4" />
         </button>
         <button
-          className="btn btn-outline border-border-soft text-text-secondary hover:border-border-input hover:bg-bg-section rounded-lg bg-white px-5"
+          className="btn btn-outline border-border-soft text-text-secondary hover:border-border-input hover:bg-bg-section bg-bg-card rounded-lg px-5"
           onClick={() => navigate(`/roadmaps/${continueLearning.userRoadmapId}`)}
         >
           View Roadmap <FiExternalLink className="ml-1 h-4 w-4" />

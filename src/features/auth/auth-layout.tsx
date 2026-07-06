@@ -1,13 +1,13 @@
-import Logo from '@/assets/Logo.svg'
 import { Link, Outlet } from 'react-router'
+import { VoraWordmark } from '@/components/ui/vora-logo'
 
 export default function AuthLayout() {
   return (
-    <div className="flex min-h-screen flex-col bg-[#f5f5f5]">
+    <div className="bg-bg-soft flex min-h-screen flex-col">
       {/* Header — logo góc trái, nhất quán mọi trang auth */}
-      <header className="border-border-soft border-b bg-white px-8 py-4">
-        <Link to="/">
-          <img src={Logo} alt="VORA" className="h-auto w-36 object-contain" />
+      <header className="border-border-soft bg-bg-card border-b px-8 py-4">
+        <Link to="/" aria-label="VORA home">
+          <VoraWordmark />
         </Link>
       </header>
 

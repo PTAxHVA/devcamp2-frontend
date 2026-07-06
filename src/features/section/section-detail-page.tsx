@@ -21,6 +21,7 @@ import { useSectionDetail } from './hooks/use-section-detail'
 import { useTopicDetail } from '@/features/topic/hooks/use-topic-detail'
 import { useSectionQuiz } from './hooks/use-section-quiz'
 import { QUIZ_PASS_THRESHOLD } from '@/constants/learning'
+import { safeUrl } from '@/lib/utils'
 
 // Resource icon helper
 const getResourceIcon = (type: string): IconType => {
@@ -186,7 +187,7 @@ export default function SectionDetailPage() {
         </div>
 
         {/* Stats Card */}
-        <div className="border-border-soft w-full shrink-0 rounded-2xl border bg-white p-5 shadow-sm lg:w-80 xl:w-96">
+        <div className="border-border-soft bg-bg-card w-full shrink-0 rounded-2xl border p-5 shadow-sm lg:w-80 xl:w-96">
           <div className="space-y-4">
             <div className="flex items-center justify-between text-sm">
               <div className="text-text-secondary flex items-center gap-3">
@@ -202,7 +203,7 @@ export default function SectionDetailPage() {
       {/* Main Split Content */}
       <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
         {/* Outcomes */}
-        <div className="border-border-soft rounded-2xl border bg-white p-6 shadow-sm md:p-8">
+        <div className="border-border-soft bg-bg-card rounded-2xl border p-6 shadow-sm md:p-8">
           <h2 className="text-text-primary mb-2 text-lg font-bold">Learning outcomes</h2>
           <p className="text-text-secondary mb-6 text-sm">
             By the end of this section, you will be able to:
@@ -228,7 +229,7 @@ export default function SectionDetailPage() {
         </div>
 
         {/* Materials */}
-        <div className="border-border-soft rounded-2xl border bg-white p-6 shadow-sm md:p-8">
+        <div className="border-border-soft bg-bg-card rounded-2xl border p-6 shadow-sm md:p-8">
           <h2 className="text-text-primary mb-2 text-lg font-bold">Learning materials</h2>
           <p className="text-text-secondary mb-6 text-sm">
             Review the resources below to prepare for the quiz.
@@ -239,7 +240,7 @@ export default function SectionDetailPage() {
               return (
                 <a
                   key={mat.url || mat.title}
-                  href={mat.url}
+                  href={safeUrl(mat.url)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group border-border-soft hover:border-border-purple flex items-center gap-4 rounded-xl border p-4 transition-all hover:shadow-sm"
@@ -288,7 +289,7 @@ export default function SectionDetailPage() {
             }
             className="group flex w-full cursor-pointer items-center gap-4 text-left sm:w-auto"
           >
-            <div className="border-border-soft text-text-secondary group-hover:border-border-input flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border bg-white transition-colors">
+            <div className="border-border-soft text-text-secondary group-hover:border-border-input bg-bg-card flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-colors">
               <RiArrowLeftLine />
             </div>
             <div>
@@ -309,7 +310,7 @@ export default function SectionDetailPage() {
             to={`/my-learning/topics/${topicId}${qRoadmap}`}
             className="group flex w-full cursor-pointer items-center gap-4 text-left sm:w-auto"
           >
-            <div className="border-border-soft text-text-secondary group-hover:border-border-input flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border bg-white transition-colors">
+            <div className="border-border-soft text-text-secondary group-hover:border-border-input bg-bg-card flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-colors">
               <RiArrowLeftLine />
             </div>
             <div>
@@ -339,7 +340,7 @@ export default function SectionDetailPage() {
                 onClick={() =>
                   navigate(`/my-learning/topics/${topicId}/sections/${nextSection._id}${qRoadmap}`)
                 }
-                className="border-border-soft text-text-secondary hover:bg-bg-section flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border bg-white px-6 py-2.5 text-sm font-bold transition-colors sm:w-auto"
+                className="border-border-soft text-text-secondary hover:bg-bg-section bg-bg-card flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border px-6 py-2.5 text-sm font-bold transition-colors sm:w-auto"
               >
                 Next Section <RiArrowRightLine />
               </button>

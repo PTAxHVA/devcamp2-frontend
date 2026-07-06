@@ -75,12 +75,12 @@ export default function Step1Welcome({ onNext }: StepProps) {
             <div className="text-text-primary text-sm font-bold">50K+</div>
             <div className="text-text-placeholder text-xs">Learners worldwide</div>
           </div>
-          <div className="h-8 w-px bg-gray-200" />
+          <div className="bg-border-soft h-8 w-px" />
           <div>
             <div className="text-text-primary text-sm font-bold">Expert verified</div>
             <div className="text-text-placeholder text-xs">Curriculum you can trust</div>
           </div>
-          <div className="h-8 w-px bg-gray-200" />
+          <div className="bg-border-soft h-8 w-px" />
           <div>
             <div className="text-text-primary text-sm font-bold">Real results</div>
             <div className="text-text-placeholder text-xs">Build skills and ship project</div>

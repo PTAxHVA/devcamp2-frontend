@@ -295,7 +295,7 @@ export default function EditCurrentRoadmapPage() {
   const hasChanges = removedIds.length > 0 || addedIds.length > 0
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 flex h-full w-full flex-col bg-white p-6 duration-500 ease-out lg:p-8">
+    <div className="animate-in fade-in slide-in-from-bottom-4 bg-bg-card flex h-full w-full flex-col p-6 duration-500 ease-out lg:p-8">
       {/* Header */}
       <div className="mb-6">
         <button
@@ -334,7 +334,7 @@ export default function EditCurrentRoadmapPage() {
       {/* Main Container */}
       <div className="flex min-h-150 flex-1 flex-col gap-6 lg:flex-row">
         {/* === CANVAS === */}
-        <div className="border-border-soft flex flex-1 flex-col rounded-2xl border bg-white">
+        <div className="border-border-soft bg-bg-card flex flex-1 flex-col rounded-2xl border">
           <div className="border-border-soft flex flex-wrap items-center justify-between border-b p-4">
             <div className="relative flex items-center gap-2">
               <button
@@ -355,7 +355,7 @@ export default function EditCurrentRoadmapPage() {
               {pickerOpen && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setPickerOpen(false)} />
-                  <div className="border-border-soft absolute top-full left-0 z-20 mt-2 w-72 overflow-hidden rounded-xl border bg-white shadow-lg">
+                  <div className="border-border-soft bg-bg-card absolute top-full left-0 z-20 mt-2 w-72 overflow-hidden rounded-xl border shadow-lg">
                     <div className="border-border-soft flex items-center justify-between border-b px-4 py-3">
                       <h3 className="text-text-primary text-sm font-bold">Add Topics</h3>
                       <button
@@ -435,7 +435,7 @@ export default function EditCurrentRoadmapPage() {
         {/* === TOPIC DETAILS (read-only) ===
             Mobile: bottom sheet that slides up. Desktop (lg+): static sidebar. */}
         <div
-          className={`border-border-soft flex flex-col border bg-white shadow-sm transition-transform duration-300 ease-out lg:static! lg:z-auto lg:max-h-none lg:w-100 lg:translate-y-0 lg:overflow-visible lg:rounded-2xl ${
+          className={`border-border-soft bg-bg-card flex flex-col border shadow-sm transition-transform duration-300 ease-out lg:static! lg:z-auto lg:max-h-none lg:w-100 lg:translate-y-0 lg:overflow-visible lg:rounded-2xl ${
             sheetOpen ? 'translate-y-0' : 'translate-y-full'
           } fixed inset-x-0 bottom-0 z-40 max-h-[75vh] overflow-y-auto rounded-t-2xl p-6`}
         >
@@ -513,7 +513,7 @@ export default function EditCurrentRoadmapPage() {
           }`}
         >
           <div
-            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-sm ${
+            className={`bg-bg-card flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-sm ${
               aiFeedback?.severity === 'warning' ? 'text-orange-500' : 'text-brand-purple-600'
             }`}
           >
@@ -543,7 +543,7 @@ export default function EditCurrentRoadmapPage() {
         <div className="flex shrink-0 gap-3">
           <button
             onClick={() => navigate(-1)}
-            className="border-border-soft text-text-secondary hover:bg-bg-section rounded-xl border bg-white px-6 py-2.5 font-bold transition"
+            className="border-border-soft text-text-secondary hover:bg-bg-section bg-bg-card rounded-xl border px-6 py-2.5 font-bold transition"
           >
             Cancel
           </button>

@@ -37,14 +37,14 @@ export function PublicPassportPage() {
 
         {isError &&
           (isPassportNotFoundError(error) ? (
-            <div className="border-border-soft mx-auto mt-16 w-full max-w-md rounded-2xl border bg-white p-8 text-center">
+            <div className="border-border-soft bg-bg-card mx-auto mt-16 w-full max-w-md rounded-2xl border p-8 text-center">
               <p className="text-text-primary text-lg font-bold">Passport not found</p>
               <p className="text-text-muted mt-2 text-sm">
                 This link doesn't exist or its owner has turned sharing off.
               </p>
             </div>
           ) : (
-            <div className="border-border-soft mx-auto mt-16 w-full max-w-md rounded-2xl border bg-white p-8 text-center">
+            <div className="border-border-soft bg-bg-card mx-auto mt-16 w-full max-w-md rounded-2xl border p-8 text-center">
               <p className="text-text-primary text-lg font-bold">Couldn't load this passport</p>
               <p className="text-text-muted mt-2 text-sm">
                 The server may just be waking up — give it a few seconds.

@@ -9,7 +9,7 @@ interface PassportBadgeGridProps {
 export function PassportBadgeGrid({ topics }: PassportBadgeGridProps) {
   if (topics.length === 0) {
     return (
-      <div className="border-border-soft text-text-muted rounded-2xl border-2 border-dashed bg-white p-8 text-center text-sm">
+      <div className="border-border-soft text-text-muted bg-bg-card rounded-2xl border-2 border-dashed p-8 text-center text-sm">
         No verified skills yet — badges appear here after every section quiz of a topic is passed.
       </div>
     )
@@ -20,7 +20,7 @@ export function PassportBadgeGrid({ topics }: PassportBadgeGridProps) {
       {topics.map((topic) => (
         <div
           key={topic.name}
-          className="border-border-soft hover:border-border-purple group rounded-2xl border bg-white p-4 transition"
+          className="border-border-soft hover:border-border-purple group bg-bg-card rounded-2xl border p-4 transition"
         >
           <div className="flex items-start gap-3">
             <div className="bg-bg-lavender flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">

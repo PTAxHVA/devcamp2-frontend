@@ -13,7 +13,7 @@ export const StepLevel = ({ selectedLevel, setSelectedLevel }: StepLevelProps) =
           key={level.id}
           data-testid="level-card"
           onClick={() => setSelectedLevel(level.id)}
-          className={`relative flex min-h-70 cursor-pointer flex-col items-center justify-center rounded-2xl bg-white p-8 text-center transition-all duration-300 ${
+          className={`bg-bg-card relative flex min-h-70 cursor-pointer flex-col items-center justify-center rounded-2xl p-8 text-center transition-all duration-300 ${
             selectedLevel === level.id
               ? 'border-brand-purple-300 bg-bg-lavender/10 ring-brand-purple-300 -translate-y-1 border-2 shadow-[0_8px_30px_-4px_rgba(109,40,217,0.1)] ring-2'
               : 'border-border-soft hover:border-border-input border shadow-sm hover:-translate-y-1 hover:shadow-xl'
