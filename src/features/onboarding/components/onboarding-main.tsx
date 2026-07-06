@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { RiArrowLeftLine, RiArrowRightLine } from 'react-icons/ri'
 import { useNavigate } from 'react-router'
 import { NavBar, Footer } from '@/features/onboarding/components'
@@ -35,16 +35,6 @@ const OnboardingMain = () => {
   // tự động hết hiệu lực khi currentStep/subStep đổi, tránh setState trong effect.
   const [errorStepKey, setErrorStepKey] = useState<string | null>(null)
   const showValidationError = errorStepKey === `${currentStep}-${subStep}`
-
-  useEffect(() => {
-    if (currentStep === 6) {
-      const timer = setTimeout(() => {
-        setDirection('next')
-        goToStep(7)
-      }, 3000)
-      return () => clearTimeout(timer)
-    }
-  }, [currentStep, goToStep])
 
   const isCurrentStepValid = (): boolean => {
     switch (currentStep) {
@@ -186,7 +176,14 @@ const OnboardingMain = () => {
 
           {currentStep === 5 && subStep === 1 && <StepPreferences />}
           {currentStep === 5 && subStep === 2 && <StepLearningPath />}
-          {currentStep === 6 && <StepGenerating />}
+          {currentStep === 6 && (
+            <StepGenerating
+              onContinue={() => {
+                setDirection('next')
+                goToStep(7)
+              }}
+            />
+          )}
           {currentStep === 7 && (
             <StepGate
               onAccept={() => completeOnboarding.mutate('accept')}

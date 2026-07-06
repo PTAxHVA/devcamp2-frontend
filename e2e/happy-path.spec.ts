@@ -12,19 +12,21 @@ test.describe('Happy path', () => {
   test('signup → onboarding → enroll → dashboard', async ({ page }) => {
     // ── 1. Signup ─────────────────────────────────────────────────────────────
     await page.goto('/signup')
-    await page.getByPlaceholder(/username/i).fill(testUsername)
-    await page.getByPlaceholder(/email/i).fill(testEmail)
-    await page.getByPlaceholder(/password/i).fill(testPassword)
-    await page.getByRole('button', { name: /sign up/i }).click()
+    await page.locator('#username').fill(testUsername)
+    await page.locator('#email').fill(testEmail)
+    await page.locator('#password').fill(testPassword)
+    await page.locator('#confirmPassword').fill(testPassword)
+    await page.getByRole('checkbox').check()
+    await page.getByRole('button', { name: /create account/i }).click()
 
     // Should land on onboarding
     await expect(page).toHaveURL(/onboarding/, { timeout: 15_000 })
 
     // ── 2. Onboarding wizard ───────────────────────────────────────────────────
-    // Step 1 — Intro: click Get Started
-    await page.getByRole('button', { name: /get started/i }).click()
+    // Step 1 — Intro
+    await page.getByRole('button', { name: /start personalization/i }).click()
 
-    // Step 2 — Role: pick first available role card
+    // Step 2 — Role: first card = frontend (drives the frontend learning-path substep)
     await page.locator('[data-testid="role-card"]').first().click()
     await page.getByRole('button', { name: /continue/i }).click()
 
@@ -36,17 +38,25 @@ test.describe('Happy path', () => {
     await page.locator('[data-testid="level-card"]').first().click()
     await page.getByRole('button', { name: /continue/i }).click()
 
-    // Step 5a — Preferences: click Continue if enabled
-    const prefContinue = page.getByRole('button', { name: /continue/i })
-    if (await prefContinue.isEnabled()) {
-      await prefContinue.click()
+    // Step 5a — Preferences: every required question is a select; answer them all
+    const prefSelects = page.locator('select')
+    const prefCount = await prefSelects.count()
+    for (let i = 0; i < prefCount; i++) {
+      await prefSelects.nth(i).selectOption({ index: 1 })
     }
+    await page.getByRole('button', { name: /continue/i }).click()
 
-    // Step 5b — Learning path
-    await page.getByRole('button', { name: /personalize/i }).click()
+    // Step 5b — Learning path: framework / styling / project direction
+    await page.getByText('React', { exact: true }).click()
+    await page.getByText('Tailwind CSS', { exact: true }).click()
+    await page.getByText('Portfolio', { exact: true }).click()
+    await page.getByRole('button', { name: /personalize your roadmap/i }).click()
 
-    // Step 6 — Generating animation (auto-advances after 3s)
-    await page.waitForTimeout(4_000)
+    // Step 6 — Generating: the real AI suggestion runs here; the reveal shows the
+    // personalization reason and a Continue button once the request settles
+    // (typically ~12s: 10s Gemini timeout server-side + reveal dwell; the global
+    // 60s actionTimeout covers Render cold starts).
+    await page.getByRole('button', { name: /continue/i }).click()
 
     // Step 7 — Gate screen: click Accept & Start Learning
     await page.getByRole('button', { name: /accept/i }).click()

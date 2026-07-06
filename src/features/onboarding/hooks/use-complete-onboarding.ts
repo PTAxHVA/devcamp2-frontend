@@ -5,7 +5,7 @@ import { apiClient, extractApiError } from '@/lib/api-client'
 import { logger } from '@/lib/logger'
 import type { BrowseRoadmap } from '@/features/roadmap/hooks/use-browse-roadmaps'
 import type { MasterRoadmapPreview } from '@/features/roadmap/hooks/use-master-roadmap'
-import { useWizardStore } from '../onboarding-store'
+import { useWizardStore, type RoadmapSuggestion } from '../onboarding-store'
 import { mapAnswersToQuestionnaire, matchMasterRoadmap } from '../lib/map-questionnaire'
 
 interface ApiEnvelope<T> {
@@ -13,21 +13,53 @@ interface ApiEnvelope<T> {
   data: T
 }
 
+interface EnrollBody {
+  masterRoadmapId: string
+  branchSelections: string[]
+  sourceType: 'SUGGESTED'
+  orderedTopicIds?: string[]
+}
+
+/**
+ * The AI order may only be attached when the suggestion was computed for this
+ * exact roadmap + branch set — a stale suggestion (e.g. the user went back and
+ * changed role after the generating step) must fall back to the default order.
+ */
+export function suggestionMatchesTarget(
+  suggestion: RoadmapSuggestion | null,
+  masterRoadmapId: string,
+  branchSelections: string[],
+): suggestion is RoadmapSuggestion {
+  return (
+    suggestion !== null &&
+    suggestion.masterRoadmapId === masterRoadmapId &&
+    suggestion.branchIds.length === branchSelections.length &&
+    [...suggestion.branchIds].sort().join('|') === [...branchSelections].sort().join('|')
+  )
+}
+
+const enroll = (body: EnrollBody) => apiClient.post<ApiEnvelope<{ _id: string }>>('/roadmaps', body)
+
 /**
  * Final onboarding step. Persists the questionnaire and enrolls the user into
  * the master roadmap for their chosen role, then lands them on the dashboard.
  *
- * Order matters: the questionnaire (the learner profile) must exist before
- * enroll triggers AI suggest, otherwise the backend can't personalize the
- * roadmap. Flow:
+ * The AI personalization itself runs earlier, on the generating step (see
+ * useRoadmapSuggestion): its topic order is pinned in the wizard store and
+ * attached here as `orderedTopicIds` so the enrolled roadmap matches exactly
+ * what the learner was shown. Every degraded path (no suggestion, stale
+ * suggestion, server rejecting the order) enrolls with the server's default
+ * order — the pre-AI behavior. Flow:
  *   1. resolve the master roadmap + its branches from the chosen role
- *   2. POST /onboarding/questionnaire  (mapped answers + selected branch ids)
+ *   2. POST /onboarding/questionnaire  (idempotent upsert — the generating
+ *      step already saved it; re-saving covers a failed suggestion run)
  *   3. POST /roadmaps                  (enroll → SUGGESTED roadmap)
  */
 export function useCompleteOnboarding() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const answers = useWizardStore((s) => s.answers)
+  const suggestion = useWizardStore((s) => s.suggestion)
   const resetWizard = useWizardStore((s) => s.resetWizard)
 
   return useMutation({
@@ -47,12 +79,27 @@ export function useCompleteOnboarding() {
       const questionnaire = mapAnswersToQuestionnaire(answers, branchSelections)
       await apiClient.post('/onboarding/questionnaire', questionnaire)
 
-      // 3. Enroll → backend builds the personalized (SUGGESTED) roadmap.
-      const enrollRes = await apiClient.post<ApiEnvelope<{ _id: string }>>('/roadmaps', {
+      // 3. Enroll → the SUGGESTED roadmap, using the AI order when it applies.
+      const base: EnrollBody = {
         masterRoadmapId: master._id,
         branchSelections,
         sourceType: 'SUGGESTED',
-      })
+      }
+      let enrollRes
+      if (suggestionMatchesTarget(suggestion, master._id, branchSelections)) {
+        try {
+          enrollRes = await enroll({ ...base, orderedTopicIds: suggestion.orderedTopicIds })
+        } catch (err) {
+          // Never let the AI order block enrollment: if the server rejects it
+          // (e.g. content changed since the suggestion was computed — rejected
+          // before anything is written), retry once with the default order.
+          if (extractApiError(err).code !== 'INVALID_TOPIC_ORDER') throw err
+          logger.warn('onboarding', 'Suggested order rejected — enrolling with default order')
+          enrollRes = await enroll(base)
+        }
+      } else {
+        enrollRes = await enroll(base)
+      }
 
       return { roleName: detail.data.data.roleName, userRoadmapId: enrollRes.data.data._id, mode }
     },
