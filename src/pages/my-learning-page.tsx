@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router'
-import { RiBookOpenLine } from 'react-icons/ri'
+import { RiBookOpenLine, RiEditLine, RiTimeLine, RiListUnordered, RiStarLine } from 'react-icons/ri'
+import { formatRoadmapSource } from '../features/roadmap/lib/roadmap-source-label'
 import ProgressHeader from '../features/learning/progress-header'
 import RoadmapSnakePath from '../features/learning/components/snake-roadmap'
 import TopicDetailSidebar from '../features/learning/components/topic-side-bar'
@@ -123,6 +124,8 @@ export default function MyLearningJourneyPage() {
   }
 
   const { roadmap, topics } = roadmapDetail
+  // Sum real estimates only — don't fabricate hours for topics missing one.
+  const durationTotal = topics.reduce((sum, t) => sum + (t.estimatedHours || 0), 0)
 
   return (
     <div className="mx-auto w-full max-w-375 p-6 lg:p-8">
@@ -135,26 +138,53 @@ export default function MyLearningJourneyPage() {
           <p className="text-text-muted mt-0.5 text-sm">
             Follow your roadmap step by step and keep moving forward.
           </p>
+
+          {/* Roadmap-level metadata (moved here when /roadmaps/:id was folded in). */}
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-xs font-medium">
+            {durationTotal > 0 && (
+              <div className="border-border-soft text-text-secondary flex items-center gap-2 rounded-lg border px-3 py-1.5">
+                <RiTimeLine /> ~{durationTotal} hours
+              </div>
+            )}
+            <div className="border-border-soft text-text-secondary flex items-center gap-2 rounded-lg border px-3 py-1.5">
+              <RiListUnordered /> {topics.length} topics
+            </div>
+            <div className="border-border-purple bg-bg-lavender text-brand-purple-700 flex items-center gap-2 rounded-lg border px-3 py-1.5 tracking-wider uppercase">
+              <RiStarLine /> {formatRoadmapSource(roadmap.sourceType)}
+            </div>
+          </div>
         </div>
 
-        {/* Roadmap switcher — only shown when user has 2 active roadmaps */}
-        {roadmaps.length > 1 && (
-          <div className="border-border-soft bg-bg-card flex items-center gap-1 rounded-xl border p-1 shadow-sm">
-            {roadmaps.map((r, idx) => (
-              <button
-                key={r._id}
-                onClick={() => navigate(`/my-learning/${roadmapSlug(r.roleName)}`)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-bold whitespace-nowrap transition-all ${
-                  r._id === activeRoadmapId
-                    ? 'bg-brand-purple-600 text-white shadow-sm'
-                    : 'text-text-muted hover:bg-bg-section hover:text-text-secondary'
-                }`}
-              >
-                {r.roleName ?? `Roadmap ${idx + 1}`}
-              </button>
-            ))}
-          </div>
-        )}
+        <div className="flex flex-col items-end gap-3">
+          {/* Edit roadmap — the entry point that used to live on /roadmaps/:id. */}
+          {activeRoadmapId && (
+            <button
+              onClick={() => navigate(`/roadmaps/${activeRoadmapId}/edit`)}
+              className="border-border-soft text-text-secondary hover:bg-bg-section flex cursor-pointer items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-semibold transition-colors"
+            >
+              <RiEditLine /> Edit roadmap
+            </button>
+          )}
+
+          {/* Roadmap switcher — only shown when user has 2 active roadmaps */}
+          {roadmaps.length > 1 && (
+            <div className="border-border-soft bg-bg-card flex items-center gap-1 rounded-xl border p-1 shadow-sm">
+              {roadmaps.map((r, idx) => (
+                <button
+                  key={r._id}
+                  onClick={() => navigate(`/my-learning/${roadmapSlug(r.roleName)}`)}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-bold whitespace-nowrap transition-all ${
+                    r._id === activeRoadmapId
+                      ? 'bg-brand-purple-600 text-white shadow-sm'
+                      : 'text-text-muted hover:bg-bg-section hover:text-text-secondary'
+                  }`}
+                >
+                  {r.roleName ?? `Roadmap ${idx + 1}`}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Main grid */}

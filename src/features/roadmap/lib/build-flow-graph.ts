@@ -61,6 +61,14 @@ export function deriveTopicStatuses(topics: BEGraphTopic[]): Map<string, Backend
 const VERTICAL_GAP = 140
 const COLUMN_X = 0
 const EDGE_COLOR = '#CBD5E1'
+const EDGE_COLOR_DONE = '#10b981'
+
+/** An edge is "traveled" once its source topic is completed — draw it as an
+ * emerald trail (thicker) so the graph shows how far the learner has come. */
+const edgeStyleFor = (sourceStatus: BackendStatus | undefined) =>
+  sourceStatus === 'completed'
+    ? { stroke: EDGE_COLOR_DONE, strokeWidth: 2.5 }
+    : { stroke: EDGE_COLOR, strokeWidth: 2 }
 
 export interface FlowGraph {
   nodes: Node<BaseNodeData>[]
@@ -107,7 +115,7 @@ export function buildFlowGraph(
           source: edge.source,
           target: edge.target,
           type: 'smoothstep',
-          style: { stroke: EDGE_COLOR, strokeWidth: 2 },
+          style: edgeStyleFor(statusById.get(edge.source)),
         }))
       : // Demo opt-in only: backend sent no prerequisite edges (demo seed has empty
         // dependsOn). Chain topics sequentially by orderIndex so the graph reads as a
@@ -117,7 +125,7 @@ export function buildFlowGraph(
           source: ordered[index].masterTopicId,
           target: topic.masterTopicId,
           type: 'smoothstep',
-          style: { stroke: EDGE_COLOR, strokeWidth: 2 },
+          style: edgeStyleFor(statusById.get(ordered[index].masterTopicId)),
         }))
 
   // Fork indicator: a dashed ghost node for the not-chosen branch, next to the

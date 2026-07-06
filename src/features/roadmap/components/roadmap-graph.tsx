@@ -1,7 +1,6 @@
 import React from 'react'
 import {
   ReactFlow,
-  MiniMap,
   Controls,
   Background,
   type Node,
@@ -99,20 +98,7 @@ export const RoadmapGraph = ({
           <Controls className="[&>button]:border-border-soft! [&>button]:bg-bg-card! top-auto! bottom-6! left-6! flex! flex-col-reverse! gap-1! border-none! shadow-sm! [&>button]:h-8! [&>button]:w-8! [&>button]:rounded-lg! [&>button]:border!" />
         )}
 
-        {withUI && (
-          <MiniMap
-            className="border-brand-purple-100! bg-bg-card! right-6! bottom-6! h-28! w-40! rounded-xl! border-2! shadow-sm!"
-            nodeColor={(node) => {
-              const data = node.data as BaseNodeData
-              if (data?.status === 'completed') return '#10b981'
-              if (data?.status === 'current') return '#7c3aed'
-              return '#cbd5e1'
-            }}
-            maskColor="rgba(124, 58, 237, 0.04)"
-          />
-        )}
-
-        <Background gap={16} size={1} color="#cbd5e1" />
+        <Background gap={20} size={1.5} color="#e2e8f0" />
       </ReactFlow>
     </div>
   )

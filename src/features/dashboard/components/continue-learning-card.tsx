@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router'
 import { FiArrowRight, FiExternalLink } from 'react-icons/fi'
+import { roadmapSlug } from '@/features/learning/lib/roadmap-slug'
 
 export interface ContinueLearningData {
   sectionId: string
@@ -57,7 +58,7 @@ export function ContinueLearningCard({
           </p>
           <h3
             className="group text-text-primary flex w-fit cursor-pointer items-center gap-2 text-2xl font-bold"
-            onClick={() => navigate(`/roadmaps/${continueLearning.userRoadmapId}`)}
+            onClick={() => navigate(`/my-learning/${roadmapSlug(continueLearning.roadmapName)}`)}
           >
             {continueLearning.roadmapName}
             <FiExternalLink className="group-hover:text-primary text-text-placeholder h-5 w-5 transition-colors" />
@@ -97,7 +98,7 @@ export function ContinueLearningCard({
         </button>
         <button
           className="btn btn-outline border-border-soft text-text-secondary hover:border-border-input hover:bg-bg-section bg-bg-card rounded-lg px-5"
-          onClick={() => navigate(`/roadmaps/${continueLearning.userRoadmapId}`)}
+          onClick={() => navigate(`/my-learning/${roadmapSlug(continueLearning.roadmapName)}`)}
         >
           View Roadmap <FiExternalLink className="ml-1 h-4 w-4" />
         </button>
