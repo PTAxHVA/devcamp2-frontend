@@ -1,6 +1,7 @@
 import type { Edge, Node } from '@xyflow/react'
 import type { BERoadmapDetail, BEGraphTopic } from '../hooks/use-roadmap-detail'
 import type { BaseNodeData, NodeStatus } from '../components/base-roadmap-node'
+import type { ForkContext } from './branch-selection'
 
 type BackendStatus = 'completed' | 'in_progress' | 'available' | 'locked'
 
@@ -75,10 +76,15 @@ export interface FlowGraph {
  * seed has empty `dependsOn`): it chains topics by `orderIndex` so the graph reads
  * as a connected path. It is OFF by default so a genuinely flat authed roadmap is
  * never drawn with fabricated prerequisite arrows.
+ *
+ * `forkContext` (view page only) draws the roadmap's fork: one dashed, inert
+ * "ghost" node for the NOT-chosen branch of the exclusive group, hanging off the
+ * fork predecessor beside the chosen topic. Consumers that don't pass it (editor,
+ * demo) render exactly as before.
  */
 export function buildFlowGraph(
   data: BERoadmapDetail,
-  opts: { synthesizeSequentialEdges?: boolean } = {},
+  opts: { synthesizeSequentialEdges?: boolean; forkContext?: ForkContext | null } = {},
 ): FlowGraph {
   const ordered = [...data.topics].sort((a, b) => a.orderIndex - b.orderIndex)
   const statusById = deriveTopicStatuses(data.topics)
@@ -113,6 +119,44 @@ export function buildFlowGraph(
           type: 'smoothstep',
           style: { stroke: EDGE_COLOR, strokeWidth: 2 },
         }))
+
+  // Fork indicator: a dashed ghost node for the not-chosen branch, next to the
+  // chosen fork topic, fed by a dashed edge from the fork predecessor. Only when
+  // exactly one side of the fork is enrolled AND the fork has a predecessor to
+  // hang the ghost edge off (first-topic forks just get the page banner).
+  const fork = opts.forkContext
+  if (
+    fork &&
+    fork.state === 'single' &&
+    fork.alternative &&
+    fork.forkTopicId &&
+    fork.predecessorTopicId
+  ) {
+    const forkIndex = ordered.findIndex((t) => t.masterTopicId === fork.forkTopicId)
+    if (forkIndex >= 0) {
+      const ghostId = `ghost:${fork.alternative._id}`
+      nodes.push({
+        id: ghostId,
+        type: 'roadmapNode',
+        position: { x: COLUMN_X + 320, y: forkIndex * VERTICAL_GAP },
+        selectable: false,
+        draggable: false,
+        data: {
+          label: fork.alternative.name,
+          status: 'upcoming',
+          variant: 'ghost',
+          hint: `${fork.selectionGroup}: switch paths in Customize`,
+        },
+      })
+      edges.push({
+        id: `e-ghost-${fork.predecessorTopicId}-${ghostId}`,
+        source: fork.predecessorTopicId,
+        target: ghostId,
+        type: 'smoothstep',
+        style: { stroke: EDGE_COLOR, strokeWidth: 2, strokeDasharray: '6 4' },
+      })
+    }
+  }
 
   return { nodes, edges }
 }

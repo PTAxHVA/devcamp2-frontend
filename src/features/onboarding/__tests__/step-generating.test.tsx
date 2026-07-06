@@ -12,6 +12,28 @@ vi.mock('@/lib/api-client', () => ({
 
 const MASTER = { _id: 'm1', roleName: 'Frontend Web' }
 const DETAIL = { _id: 'm1', roleName: 'Frontend Web', branches: [{ _id: 'b1' }, { _id: 'b2' }] }
+// A forked roadmap: mandatory core + a mutually-exclusive Database group.
+const DETAIL_FORKED = {
+  _id: 'm1',
+  roleName: 'Backend Web',
+  branches: [
+    { _id: 'core', name: 'Core', isMandatory: true, orderIndex: 0 },
+    {
+      _id: 'mongo',
+      name: 'MongoDB',
+      selectionGroup: 'Database',
+      isMutuallyExclusive: true,
+      orderIndex: 1,
+    },
+    {
+      _id: 'pg',
+      name: 'PostgreSQL',
+      selectionGroup: 'Database',
+      isMutuallyExclusive: true,
+      orderIndex: 2,
+    },
+  ],
+}
 const SUGGESTED_TOPICS = [
   { id: 't1', name: 'HTML Fundamentals' },
   { id: 't2', name: 'CSS Fundamentals' },
@@ -82,6 +104,29 @@ describe('StepGenerating', () => {
       explanation: EXPLANATION,
       source: 'ai',
     })
+  })
+
+  it('personalizes with only the default branch of an exclusive fork group', async () => {
+    ;(apiClient.get as Mock).mockImplementation((url: string) => {
+      if (url === '/master-roadmaps') return Promise.resolve(envelope([MASTER]))
+      if (url === '/master-roadmaps/m1') return Promise.resolve(envelope(DETAIL_FORKED))
+      return Promise.reject(new Error(`unexpected GET ${url}`))
+    })
+    mockPosts(() =>
+      Promise.resolve(
+        envelope({ suggestedTopics: SUGGESTED_TOPICS, explanation: EXPLANATION, source: 'ai' }),
+      ),
+    )
+    renderStep()
+
+    expect(await screen.findByText(EXPLANATION)).toBeInTheDocument()
+    // Suggest targets core + default fork branch — the same resolution enroll
+    // uses, so suggestionMatchesTarget keeps holding on the gate.
+    const suggestCall = (apiClient.post as Mock).mock.calls.find(
+      (call) => call[0] === '/ai/roadmap-suggest',
+    )
+    expect(suggestCall?.[1]).toEqual({ masterRoadmapId: 'm1', branchSelections: ['core', 'mongo'] })
+    expect(useWizardStore.getState().suggestion).toBeNull() // not pinned until Continue
   })
 
   it('shows the default copy (not the internal notice) when the server degraded to fallback', async () => {

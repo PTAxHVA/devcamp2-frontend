@@ -5,7 +5,14 @@ export interface MasterBranch {
   _id: string
   name: string
   description?: string
+  /** Fork metadata: branches sharing a selectionGroup with isMutuallyExclusive are a choose-one set. */
+  selectionGroup?: string | null
+  isMutuallyExclusive?: boolean
+  isMandatory?: boolean
+  orderIndex?: number
   topicCount: number
+  /** Ordered master-topic ids of this branch. */
+  topicIds?: string[]
 }
 
 export interface MasterRoadmapPreview {

@@ -10,7 +10,9 @@ import {
   useAvailableTopics,
   type AvailableTopic,
 } from '@/features/roadmap/hooks/use-available-topics'
+import { useMasterRoadmap } from '@/features/roadmap/hooks/use-master-roadmap'
 import { buildFlowGraph } from '@/features/roadmap/lib/build-flow-graph'
+import SwitchPathPanel, { type PathSwap } from './components/switch-path-panel'
 import {
   ReactFlow,
   Background,
@@ -77,6 +79,9 @@ export default function EditCurrentRoadmapPage() {
 
   const { data, isLoading, isError } = useRoadmapDetail(roadmapId ?? '')
   const { data: availableTopics, isLoading: isLoadingTopics } = useAvailableTopics(roadmapId ?? '')
+  // Master branches carry the fork metadata (selectionGroup + topicIds) that
+  // powers the "Learning path" switch card for forked roadmaps.
+  const { data: masterPreview } = useMasterRoadmap(data?.roadmap.masterRoadmapId)
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<BaseNodeData>>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
@@ -235,6 +240,52 @@ export default function EditCurrentRoadmapPage() {
     aiFeedbackMutation.mutate({ action: 'add', topicId: topic.masterTopicId })
   }
 
+  // Swap the fork path on the CANVAS in one pass (single relayout — applying the
+  // remove and the add through the individual handlers would read stale state).
+  // Persisting still goes through the normal Save → PATCH, so the remove-gate,
+  // canonical reorder and edit-log behave exactly as for manual edits.
+  const handleSwitchPath = (swap: PathSwap) => {
+    const incoming = (availableTopics ?? []).filter((t) =>
+      swap.addTopicIds.includes(t.masterTopicId),
+    )
+    if (incoming.length !== swap.addTopicIds.length) {
+      toast.error('The other path is still loading — try again in a moment.')
+      return
+    }
+    const removeSet = new Set(swap.removeTopicIds)
+
+    setTopicMeta((prev) => {
+      const next = new Map(prev)
+      for (const topic of incoming) {
+        next.set(topic.masterTopicId, {
+          name: topic.name,
+          status: 'available',
+          estimatedHours: topic.estimatedHours,
+          sectionTotal: topic.sectionTotal,
+          sectionCompleted: 0,
+          hasProgress: false,
+        })
+      }
+      return next
+    })
+
+    const remaining = nodes.filter((n) => !removeSet.has(n.id))
+    const newNodes: Node<BaseNodeData>[] = incoming.map((topic, i) => ({
+      id: topic.masterTopicId,
+      type: 'roadmapNode',
+      position: { x: COLUMN_X, y: (remaining.length + i) * VERTICAL_GAP },
+      data: { number: String(remaining.length + i + 1), label: topic.name, status: 'upcoming' },
+    }))
+    relayout([...remaining, ...newNodes])
+    setSelectedId(incoming[0]?.masterTopicId ?? remaining[0]?.id ?? null)
+
+    // Advisory only (same as manual add/remove) — last response wins the banner.
+    for (const topicId of swap.removeTopicIds)
+      aiFeedbackMutation.mutate({ action: 'remove', topicId })
+    for (const topicId of swap.addTopicIds) aiFeedbackMutation.mutate({ action: 'add', topicId })
+    toast.success(`Switched to the ${swap.toName} path — press Save changes to apply.`)
+  }
+
   const saveMutation = useMutation({
     mutationFn: async () => {
       const res = await apiClient.patch(`/roadmaps/${roadmapId}`, {
@@ -330,6 +381,15 @@ export default function EditCurrentRoadmapPage() {
           </button>
         </div>
       )}
+
+      {/* Learning-path switch (only for roadmaps with a fork group) */}
+      <SwitchPathPanel
+        branches={masterPreview?.branches}
+        canvasTopicIds={nodes.map((n) => n.id)}
+        hasProgressOn={(topicId) => topicMeta.get(topicId)?.hasProgress ?? false}
+        isBusy={saveMutation.isPending || isLoadingTopics}
+        onSwitch={handleSwitchPath}
+      />
 
       {/* Main Container */}
       <div className="flex min-h-150 flex-1 flex-col gap-6 lg:flex-row">

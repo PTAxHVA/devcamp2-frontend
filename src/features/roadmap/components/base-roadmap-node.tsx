@@ -1,21 +1,24 @@
 import { Handle, Position } from '@xyflow/react'
-import { RiCheckFill, RiLockLine } from 'react-icons/ri'
+import { RiCheckFill, RiGitBranchLine, RiLockLine } from 'react-icons/ri'
 
 export type NodeStatus = 'completed' | 'current' | 'upcoming' | 'locked'
 
-export type NodeVariant = 'standard' | 'onboarding'
+export type NodeVariant = 'standard' | 'onboarding' | 'ghost'
 
 export interface BaseNodeData extends Record<string, unknown> {
   label: string
   number?: string
   status: NodeStatus
   variant?: NodeVariant
+  /** Optional hover hint (native tooltip) — used by the ghost fork node. */
+  hint?: string
 }
 
 export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
   const variant = data.variant || 'standard'
   // Only the real (interactive) roadmap graph wires node clicks; the onboarding/demo
   // preview is read-only, so it must not look clickable (L9 — no pointer/hover-lift).
+  // The ghost fork node (the not-chosen path) is likewise inert.
   const isInteractive = variant === 'standard'
   const getContainerStyles = () => {
     if (variant === 'onboarding') {
@@ -27,6 +30,10 @@ export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
         default:
           return 'border-slate-800 bg-bg-card text-text-primary'
       }
+    }
+    if (variant === 'ghost') {
+      // The alternative fork path: visible but clearly not part of the enrollment.
+      return 'border-border-input bg-bg-section text-text-placeholder border-dashed opacity-80'
     }
     switch (data.status) {
       case 'completed':
@@ -41,6 +48,13 @@ export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
     }
   }
   const renderIndicator = () => {
+    if (variant === 'ghost') {
+      return (
+        <div className="flex w-6 shrink-0 justify-center">
+          <RiGitBranchLine className="text-text-placeholder h-4 w-4" />
+        </div>
+      )
+    }
     if (variant === 'onboarding') {
       if (data.status === 'completed') {
         return (
@@ -81,6 +95,7 @@ export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
 
   return (
     <div
+      title={data.hint}
       className={`flex h-14 w-56 items-center rounded-xl border-2 px-3 transition-all duration-300 ${
         isInteractive ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-lg' : 'cursor-default'
       } ${getContainerStyles()}`}

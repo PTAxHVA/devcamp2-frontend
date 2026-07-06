@@ -13,11 +13,14 @@ import {
   RiCheckboxCircleFill,
   RiArrowRightLine,
   RiEditLine,
+  RiGitBranchLine,
 } from 'react-icons/ri'
 
 import { RoadmapGraph } from './components/roadmap-graph'
 import { buildFlowGraph } from './lib/build-flow-graph'
 import { useRoadmapDetail } from './hooks/use-roadmap-detail'
+import { useMasterRoadmap } from './hooks/use-master-roadmap'
+import { deriveForkContext } from './lib/branch-selection'
 import { formatRoadmapSource } from './lib/roadmap-source-label'
 
 const RoadmapViewPage = () => {
@@ -25,6 +28,18 @@ const RoadmapViewPage = () => {
   const navigate = useNavigate()
 
   const { data: roadmapDetail, isLoading, isError } = useRoadmapDetail(id as string)
+
+  // Fork context: map the enrollment onto the master roadmap's exclusive branch
+  // group (if any) so the graph can show the not-chosen path as a ghost node.
+  const { data: masterPreview } = useMasterRoadmap(roadmapDetail?.roadmap.masterRoadmapId)
+  const masterBranches = masterPreview?.branches
+  const forkContext = useMemo(() => {
+    if (!roadmapDetail || !masterBranches) return null
+    const enrolledInOrder = [...roadmapDetail.topics]
+      .sort((a, b) => a.orderIndex - b.orderIndex)
+      .map((t) => t.masterTopicId)
+    return deriveForkContext(masterBranches, enrolledInOrder)
+  }, [roadmapDetail, masterBranches])
 
   // Tracks explicit user selection; null means "use the first topic as default."
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null)
@@ -34,11 +49,16 @@ const RoadmapViewPage = () => {
 
   const { layoutedNodes, layoutedEdges } = useMemo(() => {
     if (!roadmapDetail) return { layoutedNodes: [], layoutedEdges: [] }
-    const { nodes, edges } = buildFlowGraph(roadmapDetail, { synthesizeSequentialEdges: true })
+    const { nodes, edges } = buildFlowGraph(roadmapDetail, {
+      synthesizeSequentialEdges: true,
+      forkContext,
+    })
     return { layoutedNodes: nodes, layoutedEdges: edges }
-  }, [roadmapDetail])
+  }, [roadmapDetail, forkContext])
 
   const handleNodeClick = (_event: React.MouseEvent, node: Node) => {
+    // The ghost fork node (the not-chosen path) is not a real topic — ignore it.
+    if (node.id.startsWith('ghost:')) return
     setSelectedTopicId(node.id)
   }
 
@@ -139,6 +159,21 @@ const RoadmapViewPage = () => {
             </div>
           </div>
         </div>
+
+        {forkContext?.state === 'single' && forkContext.current && (
+          <div className="border-border-purple bg-bg-lavender text-brand-purple-700 mb-4 flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold">
+            <RiGitBranchLine className="shrink-0 text-base" />
+            <span>
+              {forkContext.selectionGroup} path: <strong>{forkContext.current.name}</strong>
+              {forkContext.alternative && (
+                <span className="text-brand-purple-600 font-medium">
+                  {' '}
+                  — you can switch to {forkContext.alternative.name} anytime in Edit roadmap
+                </span>
+              )}
+            </span>
+          </div>
+        )}
 
         <RoadmapGraph
           nodes={layoutedNodes}
