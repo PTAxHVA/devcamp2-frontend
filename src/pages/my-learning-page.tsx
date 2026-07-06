@@ -4,6 +4,7 @@ import { RiBookOpenLine, RiEditLine, RiTimeLine, RiListUnordered, RiStarLine } f
 import { formatRoadmapSource } from '../features/roadmap/lib/roadmap-source-label'
 import ProgressHeader from '../features/learning/progress-header'
 import RoadmapSnakePath from '../features/learning/components/snake-roadmap'
+import ForkPathBanner from '../features/learning/components/fork-path-banner'
 import TopicDetailSidebar from '../features/learning/components/topic-side-bar'
 import { useMyRoadmaps, useRoadmapDetail } from '../features/learning/hooks/use-my-learning'
 import { roadmapSlug } from '../features/learning/lib/roadmap-slug'
@@ -191,6 +192,11 @@ export default function MyLearningJourneyPage() {
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
         <div className="flex flex-col gap-4 lg:col-span-2">
           <ProgressHeader topics={topics} />
+          <ForkPathBanner
+            masterRoadmapId={roadmap.masterRoadmapId}
+            roadmapId={activeRoadmapId}
+            topics={topics}
+          />
           <RoadmapSnakePath
             topics={topics}
             activeTopicId={activeTopic?.masterTopicId}
