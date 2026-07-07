@@ -10,7 +10,10 @@ interface LegalPageProps {
 function LegalPage({ title, updated, children }: LegalPageProps) {
   return (
     <div className="mx-auto max-w-2xl px-6 py-12">
-      <Link to="/" className="text-sm text-indigo-600 hover:underline">
+      <Link
+        to="/"
+        className="focus-visible:ring-brand-purple-300 text-sm text-indigo-600 transition-colors duration-200 hover:text-indigo-700 hover:underline focus-visible:ring-2 focus-visible:outline-none"
+      >
         ← Back to home
       </Link>
       <h1 className="text-text-primary mt-4 text-3xl font-extrabold">{title}</h1>

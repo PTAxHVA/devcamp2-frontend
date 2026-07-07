@@ -40,7 +40,7 @@ const DemoRoadmapPage = () => {
         <p className="text-error">Unable to load the demo roadmap. Please try again.</p>
         <button
           onClick={() => navigate('/')}
-          className="border-border-soft text-text-secondary hover:bg-bg-section flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold transition"
+          className="border-border-soft text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           <RiArrowLeftLine className="h-4 w-4" /> Back to home
         </button>
@@ -53,7 +53,7 @@ const DemoRoadmapPage = () => {
       <header className="border-border-soft shrink-0 border-b px-8 py-4">
         <button
           onClick={() => navigate('/')}
-          className="text-text-secondary hover:text-text-primary mb-2 flex cursor-pointer items-center gap-2 text-sm font-medium transition"
+          className="text-text-secondary hover:text-text-primary focus-visible:ring-brand-purple-300 mb-2 flex cursor-pointer items-center gap-2 text-sm font-medium transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           <RiArrowLeftLine className="h-4 w-4" /> Back to home
         </button>

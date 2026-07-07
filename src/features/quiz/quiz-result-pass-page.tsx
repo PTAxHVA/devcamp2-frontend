@@ -10,6 +10,7 @@ import { useTopicDetail } from '@/features/topic/hooks/use-topic-detail'
 import {
   buildPassportNudge,
   hasNudgedAttempt,
+  isTopicFullyVerified,
   markNudgedAttempt,
 } from '@/features/passport/lib/passport-share'
 
@@ -23,25 +24,27 @@ export function QuizResultPassPage() {
   const roadmapId = searchParams.get('roadmapId')
   const { data, isLoading, isError } = useQuizResult(attemptId ?? '')
 
-  // Passport nudge: one toast per pass inviting the learner to share the skill
-  // they just verified. Waits for the topic name when a topicId is available,
-  // but never blocks on it (generic copy if the lookup errors or is absent).
-  // Guarded per attempt in sessionStorage so reopening this URL doesn't re-toast.
+  // Passport nudge: show only when this pass leaves the whole topic verified,
+  // matching the Passport/dashboard completed-topic rule.
   const topicDetail = useTopicDetail(topicId ?? '')
+  const topicData = topicDetail.data
+  const isTopicDetailLoading = topicDetail.isLoading
+  const isTopicDetailFetching = topicDetail.isFetching
   const hasNudged = useRef(false)
   useEffect(() => {
-    if (hasNudged.current || !data || !attemptId) return
-    if (topicId && topicDetail.isLoading) return
+    if (hasNudged.current || !data || !attemptId || !topicId) return
+    if (isTopicDetailLoading || isTopicDetailFetching) return
+    if (!topicData || !isTopicFullyVerified(topicData)) return
     if (hasNudgedAttempt(attemptId)) return
     hasNudged.current = true
     markNudgedAttempt(attemptId)
     toast(
       (t) => (
         <span className="text-sm">
-          {buildPassportNudge(topicDetail.data?.name)}{' '}
+          {buildPassportNudge(topicData.name)}{' '}
           <button
             type="button"
-            className="text-brand-purple-600 font-bold underline"
+            className="text-brand-purple-600 hover:text-brand-purple-700 focus-visible:ring-brand-purple-300 font-bold underline transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
             onClick={() => {
               toast.dismiss(t.id)
               navigate('/passport')
@@ -53,7 +56,7 @@ export function QuizResultPassPage() {
       ),
       { icon: '🎖️', duration: 8000, id: 'passport-nudge' },
     )
-  }, [attemptId, data, topicId, topicDetail.isLoading, topicDetail.data?.name, navigate])
+  }, [attemptId, data, isTopicDetailFetching, isTopicDetailLoading, navigate, topicData, topicId])
 
   if (isLoading) {
     return (
@@ -69,7 +72,7 @@ export function QuizResultPassPage() {
         <p className="font-semibold text-red-600">Unable to load the result.</p>
         <button
           onClick={() => navigate('/dashboard')}
-          className="border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section mt-4 rounded-xl border px-5 py-2 text-sm font-bold"
+          className="border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 mt-4 rounded-xl border px-5 py-2 text-sm font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           Back to Dashboard
         </button>
@@ -147,7 +150,7 @@ export function QuizResultPassPage() {
               navigate('/dashboard')
             }
           }}
-          className="btn h-14 rounded-xl bg-slate-900 px-10 text-lg font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-slate-800"
+          className="btn focus-visible:ring-brand-purple-300 h-14 rounded-xl bg-slate-900 px-10 text-lg font-bold text-white shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-800 focus-visible:ring-2"
         >
           Continue →
         </button>

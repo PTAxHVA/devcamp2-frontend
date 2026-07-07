@@ -157,14 +157,14 @@ export default function SectionDetailPage() {
       <div className="mb-8 flex flex-wrap items-center gap-2 text-sm font-medium">
         <Link
           to="/dashboard"
-          className="text-brand-purple-600 hover:text-brand-purple-700 cursor-pointer transition-colors"
+          className="text-brand-purple-600 hover:text-brand-purple-700 cursor-pointer transition-colors duration-200"
         >
           Learn
         </Link>
         <RiArrowRightSLine className="text-text-placeholder" />
         <Link
           to={`/my-learning/topics/${topicId}${qRoadmap}`}
-          className="text-brand-purple-600 hover:text-brand-purple-700 cursor-pointer transition-colors"
+          className="text-brand-purple-600 hover:text-brand-purple-700 cursor-pointer transition-colors duration-200"
         >
           {topic.name}
         </Link>
@@ -243,7 +243,7 @@ export default function SectionDetailPage() {
                   href={safeUrl(mat.url)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group border-border-soft hover:border-border-purple flex items-center gap-4 rounded-xl border p-4 transition-all hover:shadow-sm"
+                  className="group border-border-soft hover:border-border-purple hover:bg-bg-section/50 focus-visible:ring-brand-purple-300 flex items-center gap-4 rounded-xl border p-4 transition-all duration-200 hover:shadow-sm focus-visible:ring-2 focus-visible:outline-none"
                 >
                   <div className="bg-bg-lavender text-brand-purple-600 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
                     <Icon className="text-xl" />
@@ -252,7 +252,7 @@ export default function SectionDetailPage() {
                     <p className="text-text-placeholder mb-0.5 text-xs font-bold tracking-wider uppercase">
                       {getResourceTypeLabel(mat.type)}
                     </p>
-                    <p className="text-text-primary group-hover:text-brand-purple-700 text-sm font-bold transition-colors">
+                    <p className="text-text-primary group-hover:text-brand-purple-700 text-sm font-bold transition-colors duration-200">
                       {mat.title}
                     </p>
                   </div>
@@ -287,19 +287,19 @@ export default function SectionDetailPage() {
             onClick={() =>
               navigate(`/my-learning/topics/${topicId}/sections/${prevSection._id}${qRoadmap}`)
             }
-            className="group flex w-full cursor-pointer items-center gap-4 text-left sm:w-auto"
+            className="group focus-visible:ring-brand-purple-300 flex w-full cursor-pointer items-center gap-4 text-left transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none sm:w-auto"
           >
-            <div className="border-border-soft text-text-secondary group-hover:border-border-input bg-bg-card flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-colors">
+            <div className="border-border-soft text-text-secondary group-hover:border-border-input bg-bg-card flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-colors duration-200">
               <RiArrowLeftLine />
             </div>
             <div>
               <p className="text-text-muted mb-0.5 text-xs font-bold tracking-wider uppercase">
                 Previous Section
               </p>
-              <p className="text-text-primary group-hover:text-brand-purple-700 text-sm font-semibold transition-colors">
+              <p className="text-text-primary group-hover:text-brand-purple-700 text-sm font-semibold transition-colors duration-200">
                 Section {currentIdx}
                 <br />
-                <span className="text-text-secondary group-hover:text-brand-purple-600 font-medium transition-colors">
+                <span className="text-text-secondary group-hover:text-brand-purple-600 font-medium transition-colors duration-200">
                   {prevSection.name}
                 </span>
               </p>
@@ -308,16 +308,16 @@ export default function SectionDetailPage() {
         ) : (
           <Link
             to={`/my-learning/topics/${topicId}${qRoadmap}`}
-            className="group flex w-full cursor-pointer items-center gap-4 text-left sm:w-auto"
+            className="group focus-visible:ring-brand-purple-300 flex w-full cursor-pointer items-center gap-4 text-left transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none sm:w-auto"
           >
-            <div className="border-border-soft text-text-secondary group-hover:border-border-input bg-bg-card flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-colors">
+            <div className="border-border-soft text-text-secondary group-hover:border-border-input bg-bg-card flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-colors duration-200">
               <RiArrowLeftLine />
             </div>
             <div>
               <p className="text-text-muted mb-0.5 text-xs font-bold tracking-wider uppercase">
                 Topic Details
               </p>
-              <p className="text-text-primary group-hover:text-brand-purple-700 text-sm font-semibold transition-colors">
+              <p className="text-text-primary group-hover:text-brand-purple-700 text-sm font-semibold transition-colors duration-200">
                 Back to topic overview
               </p>
             </div>
@@ -340,7 +340,7 @@ export default function SectionDetailPage() {
                 onClick={() =>
                   navigate(`/my-learning/topics/${topicId}/sections/${nextSection._id}${qRoadmap}`)
                 }
-                className="border-border-soft text-text-secondary hover:bg-bg-section bg-bg-card flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border px-6 py-2.5 text-sm font-bold transition-colors sm:w-auto"
+                className="border-border-soft text-text-secondary hover:bg-bg-section bg-bg-card focus-visible:ring-brand-purple-300 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border px-6 py-2.5 text-sm font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none sm:w-auto"
               >
                 Next Section <RiArrowRightLine />
               </button>
@@ -350,7 +350,7 @@ export default function SectionDetailPage() {
               <button
                 onClick={handleStartQuiz}
                 disabled={isQuizLoading}
-                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#0B1221] px-6 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-slate-800 disabled:opacity-50 sm:w-auto"
+                className="focus-visible:ring-brand-purple-300 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#0B1221] px-6 py-3 text-sm font-bold text-white shadow-sm transition-colors duration-200 hover:bg-slate-800 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50 sm:w-auto"
               >
                 <RiSparklingFill className="text-brand-purple-300 animate-pulse" />{' '}
                 {quiz?.lastAttemptPassed ? 'View Results' : 'Start Quiz'}

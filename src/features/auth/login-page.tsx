@@ -55,7 +55,7 @@ export default function LoginPage() {
                 type="email"
                 autoComplete="email"
                 placeholder="Enter your email"
-                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
+                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition-colors duration-200 outline-none focus:border-indigo-400"
                 {...register('email')}
               />
               {errors.email && <p className="text-error-text text-xs">{errors.email.message}</p>}
@@ -69,7 +69,7 @@ export default function LoginPage() {
                 id="password"
                 autoComplete="current-password"
                 placeholder="••••••••"
-                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
+                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition-colors duration-200 outline-none focus:border-indigo-400"
                 {...register('password')}
               />
               {errors.password && (
@@ -78,7 +78,10 @@ export default function LoginPage() {
             </div>
 
             <div className="flex items-center justify-end">
-              <Link to="/forgot-password" className="text-sm text-indigo-600 hover:underline">
+              <Link
+                to="/forgot-password"
+                className="focus-visible:ring-brand-purple-300 text-sm text-indigo-600 transition-colors duration-200 hover:text-indigo-700 hover:underline focus-visible:ring-2 focus-visible:outline-none"
+              >
                 Forgot password?
               </Link>
             </div>
@@ -86,7 +89,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={login.isPending}
-              className="w-full rounded-lg bg-[#001a57] py-2.5 text-sm font-semibold text-white transition hover:bg-[#002080] disabled:opacity-60"
+              className="focus-visible:ring-brand-purple-300 w-full rounded-lg bg-[#001a57] py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#002080] focus-visible:ring-2 focus-visible:outline-none disabled:opacity-60"
             >
               {login.isPending ? 'Logging in...' : 'Login'}
             </button>
@@ -94,7 +97,10 @@ export default function LoginPage() {
 
           <p className="text-text-placeholder mt-6 text-center text-sm">
             Don't have an account?{' '}
-            <Link to="/signup" className="font-semibold text-indigo-600 hover:underline">
+            <Link
+              to="/signup"
+              className="focus-visible:ring-brand-purple-300 font-semibold text-indigo-600 transition-colors duration-200 hover:text-indigo-700 hover:underline focus-visible:ring-2 focus-visible:outline-none"
+            >
               Sign up
             </Link>
           </p>

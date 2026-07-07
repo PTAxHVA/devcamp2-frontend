@@ -95,6 +95,13 @@
     color: var(--color-text-primary);
     background-color: var(--color-bg-soft);
   }
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed !important;
+  }
 }
 /* Print ONLY the targeted completion certificate. Scoped with :has() so pages
    WITHOUT a print-target certificate keep normal browser printing, and pages

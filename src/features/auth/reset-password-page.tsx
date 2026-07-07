@@ -84,7 +84,7 @@ export default function ResetPasswordPage() {
                 id="newPassword"
                 autoComplete="new-password"
                 placeholder="••••••••"
-                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
+                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition-colors duration-200 outline-none focus:border-indigo-400"
                 {...register('newPassword')}
               />
               {errors.newPassword && (
@@ -120,7 +120,7 @@ export default function ResetPasswordPage() {
                 id="confirmPassword"
                 autoComplete="new-password"
                 placeholder="••••••••"
-                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
+                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition-colors duration-200 outline-none focus:border-indigo-400"
                 {...register('confirmPassword')}
               />
               {errors.confirmPassword && (
@@ -132,7 +132,7 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={reset.isPending || !token}
-              className="w-full rounded-lg bg-[#001a57] py-2.5 text-sm font-semibold text-white transition hover:bg-[#002080] disabled:opacity-60"
+              className="focus-visible:ring-brand-purple-300 w-full rounded-lg bg-[#001a57] py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#002080] focus-visible:ring-2 focus-visible:outline-none disabled:opacity-60"
             >
               {reset.isPending ? 'Processing...' : 'Reset password'}
             </button>
@@ -145,7 +145,7 @@ export default function ResetPasswordPage() {
                 </p>
                 <Link
                   to="/forgot-password"
-                  className="text-xs font-bold text-indigo-600 hover:underline"
+                  className="focus-visible:ring-brand-purple-300 text-xs font-bold text-indigo-600 transition-colors duration-200 hover:text-indigo-700 hover:underline focus-visible:ring-2 focus-visible:outline-none"
                 >
                   Request a new reset link →
                 </Link>
@@ -159,7 +159,10 @@ export default function ResetPasswordPage() {
             <div className="bg-border-soft h-px flex-1" />
           </div>
 
-          <Link to="/login" className="text-sm font-semibold text-indigo-600 hover:underline">
+          <Link
+            to="/login"
+            className="focus-visible:ring-brand-purple-300 text-sm font-semibold text-indigo-600 transition-colors duration-200 hover:text-indigo-700 hover:underline focus-visible:ring-2 focus-visible:outline-none"
+          >
             ← Back to login
           </Link>
         </div>

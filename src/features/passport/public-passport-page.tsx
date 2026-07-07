@@ -22,7 +22,7 @@ export function PublicPassportPage() {
         </Link>
         <Link
           to="/"
-          className="border-border-purple text-brand-purple-600 hover:bg-bg-lavender rounded-lg border px-4 py-2 text-xs font-semibold transition"
+          className="border-border-purple text-brand-purple-600 hover:bg-bg-lavender focus-visible:ring-brand-purple-300 rounded-lg border px-4 py-2 text-xs font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           Start learning on VORA →
         </Link>
@@ -52,7 +52,7 @@ export function PublicPassportPage() {
               <button
                 type="button"
                 onClick={() => refetch()}
-                className="bg-btn-primary-bg hover:bg-btn-primary-hover mt-5 rounded-lg px-5 py-2 text-sm font-semibold text-white transition"
+                className="bg-btn-primary-bg hover:bg-btn-primary-hover focus-visible:ring-brand-purple-300 mt-5 rounded-lg px-5 py-2 text-sm font-semibold text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
               >
                 Try again
               </button>

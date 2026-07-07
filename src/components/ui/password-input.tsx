@@ -29,7 +29,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
           aria-pressed={show}
           // Keep the eye out of the tab order — it's a convenience, not a field.
           tabIndex={-1}
-          className="text-text-muted hover:text-text-secondary absolute inset-y-0 right-0 flex items-center pr-3.5"
+          className="text-text-muted hover:text-text-secondary focus-visible:ring-brand-purple-300 absolute inset-y-0 right-0 flex items-center pr-3.5 transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           {show ? <RiEyeOffLine className="h-5 w-5" /> : <RiEyeLine className="h-5 w-5" />}
         </button>

@@ -38,7 +38,7 @@ export function AddMissingPanel({ missing }: AddMissingPanelProps) {
         </p>
         <Link
           to="/roadmaps/browse"
-          className="bg-btn-primary-bg hover:bg-btn-primary-hover mt-4 inline-block rounded-lg px-5 py-2 text-sm font-semibold text-white transition"
+          className="bg-btn-primary-bg hover:bg-btn-primary-hover focus-visible:ring-brand-purple-300 mt-4 inline-block rounded-lg px-5 py-2 text-sm font-semibold text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           Browse roadmaps
         </Link>
@@ -74,7 +74,7 @@ export function AddMissingPanel({ missing }: AddMissingPanelProps) {
           value={roadmapId}
           onChange={(e) => setPickedRoadmapId(e.target.value)}
           aria-label="Roadmap to add topics to"
-          className="focus:border-brand-purple-500 border-border-soft mt-3 w-full rounded-xl border bg-white px-4 py-2.5 text-sm font-medium outline-none sm:max-w-xs"
+          className="focus:border-brand-purple-500 border-border-soft mt-3 w-full rounded-xl border bg-white px-4 py-2.5 text-sm font-medium transition-colors duration-200 outline-none sm:max-w-xs"
         >
           {activeRoadmaps.map((r) => (
             <option key={r._id} value={r._id}>
@@ -95,7 +95,7 @@ export function AddMissingPanel({ missing }: AddMissingPanelProps) {
             type="button"
             onClick={handleAdd}
             disabled={addMutation.isPending}
-            className="bg-btn-primary-bg hover:bg-btn-primary-hover mt-4 inline-flex items-center gap-1.5 rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition disabled:opacity-60"
+            className="bg-btn-primary-bg hover:bg-btn-primary-hover focus-visible:ring-brand-purple-300 mt-4 inline-flex items-center gap-1.5 rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-60"
           >
             <FiPlus className="h-4 w-4" />
             {addMutation.isPending
@@ -106,7 +106,10 @@ export function AddMissingPanel({ missing }: AddMissingPanelProps) {
       ) : (
         <p className="text-text-muted mt-2 text-sm">
           The missing topics are already in your roadmap or not offered by it — open{' '}
-          <Link to="/my-learning" className="text-brand-purple-600 font-semibold hover:underline">
+          <Link
+            to="/my-learning"
+            className="text-brand-purple-600 hover:text-brand-purple-700 focus-visible:ring-brand-purple-300 font-semibold transition-colors duration-200 hover:underline focus-visible:ring-2 focus-visible:outline-none"
+          >
             My Learning
           </Link>{' '}
           to start verifying them.

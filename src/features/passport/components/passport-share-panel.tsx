@@ -39,7 +39,7 @@ export function PassportSharePanel({ passportUrl, compact = false }: PassportSha
           <button
             type="button"
             onClick={handleCopy}
-            className="bg-btn-primary-bg hover:bg-btn-primary-hover flex shrink-0 items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold text-white transition"
+            className="bg-btn-primary-bg hover:bg-btn-primary-hover focus-visible:ring-brand-purple-300 flex shrink-0 items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
           >
             {isCopied ? <FiCheck className="h-3.5 w-3.5" /> : <FiCopy className="h-3.5 w-3.5" />}
             {isCopied ? 'Copied' : 'Copy link'}
@@ -49,7 +49,7 @@ export function PassportSharePanel({ passportUrl, compact = false }: PassportSha
           href={buildLinkedInShareUrl(passportUrl)}
           target="_blank"
           rel="noreferrer"
-          className="border-border-purple text-brand-purple-600 hover:bg-bg-lavender inline-flex w-fit items-center gap-1.5 rounded-lg border px-3.5 py-2 text-xs font-semibold transition"
+          className="border-border-purple text-brand-purple-600 hover:bg-bg-lavender focus-visible:ring-brand-purple-300 inline-flex w-fit items-center gap-1.5 rounded-lg border px-3.5 py-2 text-xs font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           <FiLinkedin className="h-3.5 w-3.5" /> Share on LinkedIn
         </a>

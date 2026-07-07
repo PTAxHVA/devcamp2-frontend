@@ -42,7 +42,7 @@ const DashboardPage = () => {
         </div>
         <Link
           to="/roadmaps/browse"
-          className="btn btn-outline btn-sm border-border-input hover:bg-bg-section bg-bg-card rounded-full px-4 shadow-sm"
+          className="btn btn-outline btn-sm border-border-input hover:bg-bg-section bg-bg-card focus-visible:ring-brand-purple-300 rounded-full px-4 shadow-sm transition-colors duration-200 focus-visible:ring-2"
         >
           Browse all Roadmaps <FiExternalLink className="ml-1" />
         </Link>
@@ -67,7 +67,7 @@ const DashboardPage = () => {
                 <h2 className="text-text-primary text-xl font-bold">My Roadmaps</h2>
                 <Link
                   to="/roadmaps/browse"
-                  className="text-primary flex items-center gap-1 text-sm font-bold hover:underline"
+                  className="text-primary hover:text-brand-purple-700 focus-visible:ring-brand-purple-300 flex items-center gap-1 text-sm font-bold transition-colors duration-200 hover:underline focus-visible:ring-2 focus-visible:outline-none"
                 >
                   View all <span className="text-lg leading-none">›</span>
                 </Link>

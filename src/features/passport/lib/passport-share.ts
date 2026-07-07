@@ -14,6 +14,24 @@ export const buildPassportNudge = (topicName?: string | null): string =>
 export const calcPassportCompletionPct = (completedCount: number, totalCount: number): number =>
   totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0
 
+interface TopicVerificationDetail {
+  sectionList: Array<{ _id: string; isPublished: boolean }>
+  userProgress: Array<{ sectionId: string; isCompleted: boolean }>
+}
+
+export const isTopicFullyVerified = (detail: TopicVerificationDetail): boolean => {
+  const publishedSections = detail.sectionList.filter((section) => section.isPublished)
+  if (publishedSections.length === 0) return false
+
+  const completedSectionIds = new Set(
+    detail.userProgress
+      .filter((progress) => progress.isCompleted)
+      .map((progress) => progress.sectionId),
+  )
+
+  return publishedSections.every((section) => completedSectionIds.has(section._id))
+}
+
 /** "BEGINNER" → "Beginner" for display chips. */
 export const formatSkillLevel = (level: string): string =>
   level.length > 0 ? level.charAt(0).toUpperCase() + level.slice(1).toLowerCase() : level

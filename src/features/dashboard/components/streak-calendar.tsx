@@ -37,7 +37,7 @@ export function StreakCalendar({
   })
 
   return (
-    <div className="card bg-base-100 border-base-200 animate-fade-in border p-4 shadow-sm transition-all hover:shadow-md">
+    <div className="card bg-base-100 border-base-200 animate-fade-in border p-4 shadow-sm">
       <div className="mb-4 flex items-center gap-2">
         <FiCalendar className="text-primary h-5 w-5" />
         <h3 className="font-bold">This Week</h3>
@@ -50,7 +50,7 @@ export function StreakCalendar({
             <div key={i} className="flex flex-col items-center gap-1">
               <span className="text-base-content/40 text-xs font-medium">{short}</span>
               <div
-                className={`flex h-10 w-10 items-center justify-center rounded-lg transition-all duration-300 hover:scale-110 ${
+                className={`flex h-10 w-10 items-center justify-center rounded-lg ${
                   isActive
                     ? 'bg-primary text-primary-content shadow-md'
                     : 'bg-base-200 text-base-content/40'

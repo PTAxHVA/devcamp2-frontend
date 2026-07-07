@@ -48,7 +48,7 @@ export default function BrowseRoadmapsPage() {
         <select
           value={role}
           onChange={(e) => setRole(e.target.value)}
-          className="focus:border-brand-purple-500 border-border-soft bg-bg-card rounded-xl border px-4 py-2.5 text-sm font-medium outline-none"
+          className="focus:border-brand-purple-500 border-border-soft bg-bg-card rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors duration-200 outline-none"
         >
           <option value="all">All Roles</option>
           <option value="frontend">Frontend</option>
@@ -60,12 +60,12 @@ export default function BrowseRoadmapsPage() {
           placeholder="Search roadmaps..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="focus:border-brand-purple-500 border-border-soft min-w-50 flex-1 rounded-xl border px-4 py-2.5 text-sm outline-none"
+          className="focus:border-brand-purple-500 border-border-soft min-w-50 flex-1 rounded-xl border px-4 py-2.5 text-sm transition-colors duration-200 outline-none"
         />
 
         <button
           onClick={clearFilters}
-          className="border-border-soft text-text-secondary hover:bg-bg-section rounded-xl border px-4 py-2.5 text-sm font-bold transition-colors"
+          className="border-border-soft text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 rounded-xl border px-4 py-2.5 text-sm font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           Clear filters
         </button>
@@ -88,7 +88,7 @@ export default function BrowseRoadmapsPage() {
           <button
             onClick={() => refetch()}
             disabled={isFetching}
-            className="rounded-xl bg-red-500 px-5 py-2 text-sm font-bold text-white transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60"
+            className="focus-visible:ring-brand-purple-300 rounded-xl bg-red-500 px-5 py-2 text-sm font-bold text-white transition-colors duration-200 hover:bg-red-600 focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isFetching ? <span className="loading loading-spinner loading-xs" /> : 'Try again'}
           </button>

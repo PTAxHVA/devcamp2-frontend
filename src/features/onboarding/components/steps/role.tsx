@@ -14,7 +14,7 @@ export const StepRole = ({ selectedRole, setSelectedRole }: StepRoleProps) => {
           key={role.id}
           data-testid="role-card"
           onClick={() => setSelectedRole(role.id)}
-          className={`bg-bg-card relative flex min-h-80 cursor-pointer flex-col rounded-2xl p-10 transition-all duration-300 ${
+          className={`bg-bg-card relative flex min-h-80 cursor-pointer flex-col rounded-2xl p-10 transition-all duration-200 ${
             selectedRole === role.id
               ? 'border-brand-purple-300 ring-brand-purple-300 -translate-y-1 border-2 shadow-[0_8px_30px_-4px_rgba(109,40,217,0.1)] ring-2'
               : 'border-border-soft hover:border-border-input border shadow-sm hover:-translate-y-1 hover:shadow-xl'
@@ -22,14 +22,14 @@ export const StepRole = ({ selectedRole, setSelectedRole }: StepRoleProps) => {
         >
           <div className="absolute top-4 right-4 flex items-center justify-center">
             <div
-              className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all duration-300 ${selectedRole === role.id ? 'border-brand-purple-600' : 'border-border-input'} `}
+              className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors duration-200 ${selectedRole === role.id ? 'border-brand-purple-600' : 'border-border-input'} `}
             >
               {selectedRole === role.id && (
                 <div className="bg-brand-purple-600 h-3 w-3 rounded-full"></div>
               )}
             </div>
           </div>
-          <div className="border-border-soft bg-bg-section/70 mb-8 flex h-24 items-center justify-center rounded-xl border transition-transform duration-300">
+          <div className="border-border-soft bg-bg-section/70 mb-8 flex h-24 items-center justify-center rounded-xl border transition-transform duration-200">
             {role.icon}
           </div>
           <div className="flex-1">

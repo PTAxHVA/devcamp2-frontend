@@ -140,7 +140,7 @@ export function QuizAttemptPage() {
         <p className="mt-1 text-sm text-red-500">Please try again.</p>
         <button
           onClick={() => navigate(-1)}
-          className="border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section mt-5 rounded-xl border px-5 py-2 text-sm font-bold"
+          className="border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 mt-5 rounded-xl border px-5 py-2 text-sm font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           Go back
         </button>
@@ -174,7 +174,7 @@ export function QuizAttemptPage() {
                 navigate(-1)
               }
             }}
-            className="mb-2 flex items-center font-bold text-indigo-600 hover:underline"
+            className="focus-visible:ring-brand-purple-300 mb-2 flex items-center font-bold text-indigo-600 transition-colors duration-200 hover:text-indigo-700 hover:underline focus-visible:ring-2 focus-visible:outline-none"
           >
             ← Back to lesson
           </button>
@@ -213,7 +213,7 @@ export function QuizAttemptPage() {
               <button
                 onClick={prev}
                 disabled={isFirst || isExpired || isSubmitPending}
-                className="btn btn-ghost font-bold text-indigo-600 disabled:opacity-40"
+                className="btn btn-ghost focus-visible:ring-brand-purple-300 font-bold text-indigo-600 transition-colors duration-200 focus-visible:ring-2 disabled:opacity-40"
               >
                 <HiMiniArrowLeft className="h-5 w-5" /> Previous
               </button>
@@ -221,7 +221,7 @@ export function QuizAttemptPage() {
                 <button
                   onClick={handleSubmit}
                   disabled={isSubmitPending || isExpired}
-                  className="btn h-12 rounded-xl bg-slate-900 px-8 text-white hover:bg-slate-800"
+                  className="btn focus-visible:ring-brand-purple-300 h-12 rounded-xl bg-slate-900 px-8 text-white transition-colors duration-200 hover:bg-slate-800 focus-visible:ring-2"
                 >
                   {isSubmitPending ? (
                     <span className="loading loading-spinner loading-sm" />
@@ -235,7 +235,7 @@ export function QuizAttemptPage() {
                 <button
                   onClick={next}
                   disabled={isExpired || isSubmitPending}
-                  className="btn h-12 rounded-xl bg-slate-900 px-8 text-white hover:bg-slate-800"
+                  className="btn focus-visible:ring-brand-purple-300 h-12 rounded-xl bg-slate-900 px-8 text-white transition-colors duration-200 hover:bg-slate-800 focus-visible:ring-2"
                 >
                   Next <HiMiniArrowRight className="h-5 w-5" />
                 </button>

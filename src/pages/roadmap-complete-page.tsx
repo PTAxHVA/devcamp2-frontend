@@ -51,13 +51,13 @@ export function RoadmapCompletePage() {
         <div className="relative z-10 mt-2 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
           <button
             onClick={() => navigate('/dashboard')}
-            className="btn h-12 rounded-xl bg-slate-900 px-8 font-bold text-white hover:-translate-y-0.5 hover:bg-slate-800"
+            className="btn focus-visible:ring-brand-purple-300 h-12 rounded-xl bg-slate-900 px-8 font-bold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-800 focus-visible:ring-2"
           >
             <FiGrid className="mr-2 h-5 w-5" /> Back to dashboard
           </button>
           <button
             onClick={() => navigate('/roadmaps/browse')}
-            className="btn border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section h-12 rounded-xl px-8 font-bold"
+            className="btn border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 h-12 rounded-xl px-8 font-bold transition-colors duration-200 focus-visible:ring-2"
           >
             <FiCompass className="mr-2 h-5 w-5" /> Explore more roadmaps
           </button>
@@ -71,7 +71,7 @@ export function RoadmapCompletePage() {
             <h2 className="text-text-primary text-sm font-bold">Your certificate</h2>
             <button
               onClick={() => window.print()}
-              className="btn border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section h-10 rounded-xl px-5 text-sm font-bold"
+              className="btn border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 h-10 rounded-xl px-5 text-sm font-bold transition-colors duration-200 focus-visible:ring-2"
             >
               <FiPrinter className="mr-2 h-4 w-4" /> Print / save as PDF
             </button>

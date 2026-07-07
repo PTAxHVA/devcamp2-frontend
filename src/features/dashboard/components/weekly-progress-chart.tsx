@@ -9,7 +9,7 @@ export function WeeklyProgressChart({ counts = [0, 0, 0, 0, 0, 0, 0] }: { counts
   const ticks = Array.from({ length: niceMax / 2 + 1 }, (_, i) => niceMax - i * 2)
 
   return (
-    <div className="card bg-base-100 border-base-200 animate-fade-in border p-4 shadow-sm transition-all hover:shadow-md">
+    <div className="card bg-base-100 border-base-200 animate-fade-in border p-4 shadow-sm">
       <div className="mb-4 flex items-center gap-2">
         <FiBarChart2 className="text-brand-purple-600 h-5 w-5" />
         <h3 className="font-bold">Weekly Progress</h3>
@@ -35,7 +35,7 @@ export function WeeklyProgressChart({ counts = [0, 0, 0, 0, 0, 0, 0] }: { counts
               {counts.map((count, i) => (
                 <div key={DAYS[i]} className="group flex h-full w-full items-end">
                   <div
-                    className="bg-brand-purple-300/40 group-hover:bg-brand-purple-500 w-full rounded-t-sm transition-all duration-500"
+                    className="bg-brand-purple-300/40 group-hover:bg-brand-purple-500 w-full rounded-t-sm transition-colors duration-200"
                     style={{
                       height: `${(count / niceMax) * 100}%`,
                       minHeight: count > 0 ? '4px' : '0',

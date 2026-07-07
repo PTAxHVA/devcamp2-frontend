@@ -28,7 +28,7 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
       <button
         onClick={onMenuClick}
         aria-label="Open menu"
-        className="text-text-secondary md:hidden"
+        className="text-text-secondary hover:text-brand-purple-600 focus-visible:ring-brand-purple-300 rounded-lg transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none md:hidden"
       >
         <RiMenuLine className="h-6 w-6" />
       </button>
@@ -47,7 +47,7 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
             tabIndex={0}
             role="button"
             aria-label="Account menu"
-            className="flex cursor-pointer items-center gap-3"
+            className="hover:text-brand-purple-600 focus-visible:ring-brand-purple-300 flex cursor-pointer items-center gap-3 rounded-xl transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
           >
             <div className="bg-bg-lavender text-brand-purple-700 flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold">
               {initials}
@@ -69,7 +69,7 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
               </Link>
             </li>
             <li>
-              <button onClick={handleLogout} className="text-error">
+              <button onClick={handleLogout} className="text-error transition-colors duration-200">
                 <RiLogoutBoxRLine className="h-4 w-4" /> Log out
               </button>
             </li>

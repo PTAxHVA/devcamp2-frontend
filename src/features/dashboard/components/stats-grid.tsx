@@ -53,10 +53,7 @@ export function StatsGrid({
       {stats.map((stat) => {
         const { Icon } = stat
         return (
-          <div
-            key={stat.id}
-            className="card bg-base-100 border-base-200 border shadow-sm transition-shadow duration-200 hover:shadow-md"
-          >
+          <div key={stat.id} className="card bg-base-100 border-base-200 border shadow-sm">
             <div className="card-body items-center p-5 text-center">
               <div
                 className={`mb-2 flex h-12 w-12 items-center justify-center rounded-full ${stat.bgClass}`}

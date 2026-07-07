@@ -39,7 +39,7 @@ export function StepGate({ onAccept, onCustomize, onChooseAnother, isSubmitting 
         <button
           onClick={onAccept}
           disabled={isSubmitting}
-          className="border-brand-purple-200 bg-bg-lavender hover:bg-brand-purple-100 flex w-full items-center gap-5 rounded-2xl border-2 px-6 py-5 text-left transition-all disabled:cursor-not-allowed disabled:opacity-60"
+          className="border-brand-purple-200 bg-bg-lavender hover:bg-brand-purple-100 focus-visible:ring-brand-purple-300 flex w-full items-center gap-5 rounded-2xl border-2 px-6 py-5 text-left transition-all duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
         >
           <div className="bg-brand-purple-600 flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-white">
             {isSubmitting ? (
@@ -60,7 +60,7 @@ export function StepGate({ onAccept, onCustomize, onChooseAnother, isSubmitting 
         <button
           onClick={onCustomize}
           disabled={isSubmitting}
-          className="border-border-soft hover:bg-bg-section flex w-full items-center gap-5 rounded-2xl border-2 px-6 py-5 text-left transition-all disabled:opacity-50"
+          className="border-border-soft hover:bg-bg-section focus-visible:ring-brand-purple-300 flex w-full items-center gap-5 rounded-2xl border-2 px-6 py-5 text-left transition-all duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
         >
           <div className="bg-bg-section flex h-12 w-12 shrink-0 items-center justify-center rounded-full">
             <RiListSettingsLine className="text-text-secondary h-6 w-6" />
@@ -77,7 +77,7 @@ export function StepGate({ onAccept, onCustomize, onChooseAnother, isSubmitting 
         <button
           onClick={onChooseAnother}
           disabled={isSubmitting}
-          className="border-border-soft hover:bg-bg-section flex w-full items-center gap-5 rounded-2xl border-2 px-6 py-5 text-left transition-all disabled:opacity-50"
+          className="border-border-soft hover:bg-bg-section focus-visible:ring-brand-purple-300 flex w-full items-center gap-5 rounded-2xl border-2 px-6 py-5 text-left transition-all duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
         >
           <div className="bg-bg-section flex h-12 w-12 shrink-0 items-center justify-center rounded-full">
             <RiSearchLine className="text-text-secondary h-6 w-6" />

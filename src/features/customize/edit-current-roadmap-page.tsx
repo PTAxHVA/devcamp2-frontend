@@ -341,7 +341,7 @@ export default function EditCurrentRoadmapPage() {
         <p className="text-text-primary font-bold">Failed to load this roadmap.</p>
         <button
           onClick={() => navigate(-1)}
-          className="border-border-soft text-text-secondary hover:bg-bg-section rounded-xl border px-5 py-2 font-semibold"
+          className="border-border-soft text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 rounded-xl border px-5 py-2 font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           Go back
         </button>
@@ -357,7 +357,7 @@ export default function EditCurrentRoadmapPage() {
       <div className="mb-6">
         <button
           onClick={() => navigate(-1)}
-          className="text-brand-purple-600 hover:text-brand-purple-700 mb-3 flex items-center gap-2 text-sm font-semibold transition"
+          className="text-brand-purple-600 hover:text-brand-purple-700 focus-visible:ring-brand-purple-300 mb-3 flex items-center gap-2 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           <RiArrowLeftLine /> Back
         </button>
@@ -369,7 +369,7 @@ export default function EditCurrentRoadmapPage() {
 
       {/* Alert Warning */}
       {showAlert && (
-        <div className="mb-6 flex items-start justify-between rounded-xl border border-orange-200 bg-orange-50 p-4 transition-all">
+        <div className="mb-6 flex items-start justify-between rounded-xl border border-orange-200 bg-orange-50 p-4">
           <div className="flex gap-3">
             <RiAlertLine className="mt-0.5 text-lg text-orange-500" />
             <div>
@@ -381,7 +381,7 @@ export default function EditCurrentRoadmapPage() {
           </div>
           <button
             onClick={() => setShowAlert(false)}
-            className="rounded-lg p-1 text-orange-500 hover:bg-orange-100"
+            className="focus-visible:ring-brand-purple-300 rounded-lg p-1 text-orange-500 transition-colors duration-200 hover:bg-orange-100 focus-visible:ring-2 focus-visible:outline-none"
           >
             <RiCloseLine className="text-xl" />
           </button>
@@ -406,14 +406,14 @@ export default function EditCurrentRoadmapPage() {
               <button
                 onClick={handleRemoveTopic}
                 disabled={!selectedId || selectedMeta?.hasProgress}
-                className="border-border-soft text-text-secondary hover:bg-bg-section flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold disabled:opacity-40"
+                className="border-border-soft text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-40"
               >
                 <RiSubtractLine className="text-error-text" /> Remove topic
               </button>
 
               <button
                 onClick={() => setPickerOpen((o) => !o)}
-                className={`border-border-soft flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold transition-colors ${pickerOpen ? 'bg-brand-purple-600 text-white' : 'text-text-secondary hover:bg-bg-section'}`}
+                className={`border-border-soft focus-visible:ring-brand-purple-300 flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none ${pickerOpen ? 'bg-brand-purple-600 text-white' : 'text-text-secondary hover:bg-bg-section'}`}
               >
                 <RiAddLine /> Add topic
               </button>
@@ -426,7 +426,7 @@ export default function EditCurrentRoadmapPage() {
                       <h3 className="text-text-primary text-sm font-bold">Add Topics</h3>
                       <button
                         onClick={() => setPickerOpen(false)}
-                        className="text-text-placeholder hover:text-text-secondary"
+                        className="text-text-placeholder hover:text-text-secondary focus-visible:ring-brand-purple-300 rounded-lg transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
                       >
                         <RiCloseLine className="text-xl" />
                       </button>
@@ -445,7 +445,7 @@ export default function EditCurrentRoadmapPage() {
                           {filteredAvailableTopics.map((topic) => (
                             <li
                               key={topic.masterTopicId}
-                              className="hover:bg-bg-section flex items-center justify-between gap-3 rounded-lg p-3"
+                              className="hover:bg-bg-section flex items-center justify-between gap-3 rounded-lg p-3 transition-colors duration-200"
                             >
                               <div className="min-w-0">
                                 <p className="text-text-primary truncate text-sm font-semibold">
@@ -457,7 +457,7 @@ export default function EditCurrentRoadmapPage() {
                               </div>
                               <button
                                 onClick={() => handleAddTopic(topic)}
-                                className="text-brand-purple-600 hover:bg-bg-lavender flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs font-bold transition"
+                                className="text-brand-purple-600 hover:bg-bg-lavender focus-visible:ring-brand-purple-300 flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
                               >
                                 <RiAddLine /> Add
                               </button>
@@ -511,7 +511,7 @@ export default function EditCurrentRoadmapPage() {
             <button
               onClick={() => setSheetOpen(false)}
               aria-label="Close topic details"
-              className="text-text-placeholder hover:bg-bg-section absolute -top-2 right-0 rounded-lg p-1"
+              className="text-text-placeholder hover:bg-bg-section focus-visible:ring-brand-purple-300 absolute -top-2 right-0 rounded-lg p-1 transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
             >
               <RiCloseLine className="text-xl" />
             </button>
@@ -609,14 +609,14 @@ export default function EditCurrentRoadmapPage() {
         <div className="flex shrink-0 gap-3">
           <button
             onClick={() => navigate(-1)}
-            className="border-border-soft text-text-secondary hover:bg-bg-section bg-bg-card rounded-xl border px-6 py-2.5 font-bold transition"
+            className="border-border-soft text-text-secondary hover:bg-bg-section bg-bg-card focus-visible:ring-brand-purple-300 rounded-xl border px-6 py-2.5 font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
           >
             Cancel
           </button>
           <button
             onClick={() => saveMutation.mutate()}
             disabled={saveMutation.isPending || !hasChanges}
-            className="flex items-center gap-2 rounded-xl bg-[#0B1528] px-6 py-2.5 font-bold text-white transition hover:bg-slate-800 disabled:opacity-50"
+            className="focus-visible:ring-brand-purple-300 flex items-center gap-2 rounded-xl bg-[#0B1528] px-6 py-2.5 font-bold text-white transition-colors duration-200 hover:bg-slate-800 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
           >
             {saveMutation.isPending && <RiLoader4Line className="animate-spin" />}
             Save changes

@@ -60,12 +60,12 @@ export default function Step1Welcome({ onNext }: StepProps) {
 
         <button
           onClick={onNext}
-          className="btn flex w-full items-center justify-center gap-2 rounded-xl border-none bg-indigo-700 px-6 py-3 text-sm font-semibold text-white shadow-md hover:bg-indigo-800"
+          className="btn focus-visible:ring-brand-purple-300 flex w-full items-center justify-center gap-2 rounded-xl border-none bg-indigo-700 px-6 py-3 text-sm font-semibold text-white shadow-md transition-colors duration-200 hover:bg-indigo-800 focus-visible:ring-2"
         >
           Start personalization <FiArrowRight />
         </button>
 
-        <button className="mt-4 text-left text-xs text-indigo-500 hover:underline">
+        <button className="focus-visible:ring-brand-purple-300 mt-4 text-left text-xs text-indigo-500 transition-colors duration-200 hover:text-indigo-700 hover:underline focus-visible:ring-2 focus-visible:outline-none">
           ← Back to dashboard
         </button>
 

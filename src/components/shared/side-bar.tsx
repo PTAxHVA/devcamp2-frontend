@@ -57,16 +57,16 @@ export const Sidebar = ({ mobileOpen = false, onClose }: SidebarProps) => {
 
     return `flex items-center ${
       effectiveCollapsed ? 'justify-center' : 'gap-3 px-4'
-    } py-3 rounded-xl transition-all ${
+    } py-3 rounded-xl transition-all duration-200 focus-visible:ring-2 focus-visible:ring-brand-purple-300 focus-visible:outline-none ${
       isActive
         ? 'bg-bg-lavender text-brand-purple-700 font-semibold'
-        : 'text-text-muted hover:bg-bg-section font-medium'
+        : 'text-text-muted hover:bg-bg-section hover:text-text-secondary font-medium'
     }`
   }
 
   return (
     <aside
-      className={`border-border-soft fixed inset-y-0 left-0 z-40 flex h-full w-65 shrink-0 flex-col justify-between border-r bg-white transition-transform duration-300 ease-in-out md:relative md:inset-auto md:z-auto md:translate-x-0 md:transition-all ${
+      className={`border-border-soft fixed inset-y-0 left-0 z-40 flex h-full w-65 shrink-0 flex-col justify-between border-r bg-white transition-transform duration-300 ease-in-out md:relative md:inset-auto md:z-auto md:translate-x-0 md:transition-none ${
         mobileOpen ? 'translate-x-0' : '-translate-x-full'
       } ${effectiveCollapsed ? 'md:w-22' : 'md:w-65'}`}
     >
@@ -84,7 +84,7 @@ export const Sidebar = ({ mobileOpen = false, onClose }: SidebarProps) => {
           <button
             onClick={onClose}
             aria-label="Close menu"
-            className="text-text-muted hover:text-text-secondary ml-auto md:hidden"
+            className="text-text-muted hover:text-text-secondary focus-visible:ring-brand-purple-300 ml-auto rounded-lg transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none md:hidden"
           >
             <RiCloseLine className="h-6 w-6" />
           </button>
@@ -138,7 +138,7 @@ export const Sidebar = ({ mobileOpen = false, onClose }: SidebarProps) => {
           className="hover:border-brand-purple-600 hover:bg-brand-purple-600 border-border-soft text-text-placeholder absolute top-24 -right-3.5 z-20 hidden h-7 w-7 place-items-center rounded-full border bg-white shadow-md transition-all duration-200 ease-out hover:scale-110 hover:text-white active:scale-95 md:grid"
         >
           <RiArrowLeftSLine
-            className={`h-5 w-5 transition-transform duration-300 ${
+            className={`h-5 w-5 transition-transform duration-200 ${
               isCollapsed ? 'rotate-180' : ''
             }`}
           />

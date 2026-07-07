@@ -37,7 +37,7 @@ export default function ForgotPasswordPage() {
               </p>
               <Link
                 to="/login"
-                className="mt-4 text-sm font-semibold text-indigo-600 hover:underline"
+                className="focus-visible:ring-brand-purple-300 mt-4 text-sm font-semibold text-indigo-600 transition-colors duration-200 hover:text-indigo-700 hover:underline focus-visible:ring-2 focus-visible:outline-none"
               >
                 ← Back to login
               </Link>
@@ -61,7 +61,7 @@ export default function ForgotPasswordPage() {
                     type="email"
                     autoComplete="email"
                     placeholder="you@gmail.com"
-                    className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
+                    className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition-colors duration-200 outline-none focus:border-indigo-400"
                     {...register('email')}
                   />
                   {errors.email && (
@@ -72,7 +72,7 @@ export default function ForgotPasswordPage() {
                 <button
                   type="submit"
                   disabled={forgot.isPending}
-                  className="w-full rounded-lg bg-[#001a57] py-2.5 text-sm font-semibold text-white transition hover:bg-[#002080] disabled:opacity-60"
+                  className="focus-visible:ring-brand-purple-300 w-full rounded-lg bg-[#001a57] py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#002080] focus-visible:ring-2 focus-visible:outline-none disabled:opacity-60"
                 >
                   {forgot.isPending ? 'Sending...' : 'Send reset link'}
                 </button>
@@ -84,7 +84,10 @@ export default function ForgotPasswordPage() {
                 <div className="bg-border-soft h-px flex-1" />
               </div>
 
-              <Link to="/login" className="text-sm font-semibold text-indigo-600 hover:underline">
+              <Link
+                to="/login"
+                className="focus-visible:ring-brand-purple-300 text-sm font-semibold text-indigo-600 transition-colors duration-200 hover:text-indigo-700 hover:underline focus-visible:ring-2 focus-visible:outline-none"
+              >
                 ← Back to login
               </Link>
             </>

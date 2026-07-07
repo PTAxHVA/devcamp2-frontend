@@ -29,8 +29,12 @@ export default function OnboardingLayout() {
             <img src={Logo} alt="VORA Logo" className="h-auto w-48 object-contain" />
           </div>
           <div className="flex-none gap-2 sm:gap-4">
-            <button className="btn btn-ghost font-semibold">Login</button>
-            <button className="btn btn-primary font-semibold">Get Started</button>
+            <button className="btn btn-ghost focus-visible:ring-brand-purple-300 font-semibold transition-colors duration-200 focus-visible:ring-2">
+              Login
+            </button>
+            <button className="btn btn-primary focus-visible:ring-brand-purple-300 font-semibold transition-colors duration-200 focus-visible:ring-2">
+              Get Started
+            </button>
           </div>
         </div>
       </header>
@@ -66,11 +70,11 @@ export default function OnboardingLayout() {
             ))}
           </div>
 
-          <button className="btn flex w-full items-center justify-center gap-2 rounded-xl border-none bg-indigo-700 px-6 py-3 text-sm font-semibold text-white shadow-md hover:bg-indigo-800">
+          <button className="btn focus-visible:ring-brand-purple-300 flex w-full items-center justify-center gap-2 rounded-xl border-none bg-indigo-700 px-6 py-3 text-sm font-semibold text-white shadow-md transition-colors duration-200 hover:bg-indigo-800 focus-visible:ring-2">
             Start personalization <FiArrowRight />
           </button>
 
-          <button className="mt-4 text-left text-xs text-indigo-500 hover:underline">
+          <button className="focus-visible:ring-brand-purple-300 mt-4 text-left text-xs text-indigo-500 transition-colors duration-200 hover:text-indigo-700 hover:underline focus-visible:ring-2 focus-visible:outline-none">
             ← Back to dashboard
           </button>
 

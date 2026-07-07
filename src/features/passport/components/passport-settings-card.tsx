@@ -85,7 +85,7 @@ export function PassportSettingsCard() {
             <Link
               to={`/p/${passport?.shareToken ?? ''}`}
               target="_blank"
-              className="border-border-input text-text-primary hover:bg-bg-section inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-xs font-semibold transition"
+              className="border-border-input text-text-primary hover:bg-bg-section focus-visible:ring-brand-purple-300 inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-xs font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
             >
               <ExternalLink className="h-3.5 w-3.5" /> View my passport
             </Link>
@@ -95,14 +95,14 @@ export function PassportSettingsCard() {
                   type="button"
                   onClick={handleRegenerate}
                   disabled={updatePassport.isPending}
-                  className="rounded-lg bg-red-600 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-red-700 disabled:bg-red-400"
+                  className="focus-visible:ring-brand-purple-300 rounded-lg bg-red-600 px-3.5 py-2 text-xs font-semibold text-white transition-colors duration-200 hover:bg-red-700 focus-visible:ring-2 focus-visible:outline-none disabled:bg-red-400"
                 >
                   Confirm — old link will stop working
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsConfirmingRegenerate(false)}
-                  className="border-border-input text-text-primary hover:bg-bg-section rounded-lg border px-3.5 py-2 text-xs font-semibold transition"
+                  className="border-border-input text-text-primary hover:bg-bg-section focus-visible:ring-brand-purple-300 rounded-lg border px-3.5 py-2 text-xs font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
                 >
                   Cancel
                 </button>
@@ -112,7 +112,7 @@ export function PassportSettingsCard() {
                 type="button"
                 onClick={() => setIsConfirmingRegenerate(true)}
                 disabled={updatePassport.isPending}
-                className="border-border-input text-text-primary hover:bg-bg-section inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-xs font-semibold transition disabled:opacity-60"
+                className="border-border-input text-text-primary hover:bg-bg-section focus-visible:ring-brand-purple-300 inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-xs font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-60"
               >
                 <RefreshCw className="h-3.5 w-3.5" /> Regenerate link
               </button>

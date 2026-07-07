@@ -10,7 +10,7 @@ export const Stepper = ({ currentStep }: StepperProps) => {
     <div className="relative mx-auto mb-10 flex w-full max-w-700 items-center justify-between">
       <div className="bg-border-soft absolute top-4 right-0 left-0 z-0 h-0.5 -translate-y-1/2"></div>
       <div
-        className="bg-brand-purple-600 absolute top-4 left-0 z-0 h-0.5 -translate-y-1/2 transition-all duration-700 ease-in-out"
+        className="bg-brand-purple-600 absolute top-4 left-0 z-0 h-0.5 -translate-y-1/2"
         style={{ width: `${(currentStep - 1) * 25}%` }}
       ></div>
 
@@ -25,7 +25,7 @@ export const Stepper = ({ currentStep }: StepperProps) => {
             className="bg-bg-card relative z-10 flex flex-col items-center gap-2 px-4"
           >
             <div
-              className={`flex items-center justify-center rounded-full transition-all duration-500 ease-out ${
+              className={`flex items-center justify-center rounded-full transition-colors duration-200 ease-out ${
                 isActive
                   ? 'border-brand-purple-600 text-brand-purple-600 shadow-brand-purple-200 bg-bg-card -mt-1 h-10 w-10 border-2 text-lg font-bold shadow-md'
                   : isCompleted
@@ -36,7 +36,7 @@ export const Stepper = ({ currentStep }: StepperProps) => {
               {isCompleted ? <RiCheckLine className="h-5 w-5" /> : stepNum}
             </div>
             <span
-              className={`text-sm transition-colors duration-300 ${isActive ? 'text-brand-purple-600 font-bold' : isCompleted ? 'text-text-primary font-semibold' : 'text-text-placeholder font-medium'} `}
+              className={`text-sm transition-colors duration-200 ${isActive ? 'text-brand-purple-600 font-bold' : isCompleted ? 'text-text-primary font-semibold' : 'text-text-placeholder font-medium'} `}
             >
               {step}
             </span>

@@ -227,7 +227,7 @@ export default function TopicDetailPage() {
         {/* Back */}
         <button
           onClick={handleBackToRoadmap}
-          className="text-text-secondary hover:text-text-primary flex cursor-pointer items-center gap-2 text-sm font-medium transition"
+          className="text-text-secondary hover:text-text-primary focus-visible:ring-brand-purple-300 flex cursor-pointer items-center gap-2 text-sm font-medium transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           <RiArrowLeftLine className="h-4 w-4" />
           Back to Roadmap
@@ -250,7 +250,7 @@ export default function TopicDetailPage() {
                   <span className="text-text-secondary text-sm font-medium">Progress</span>
                   <div className="bg-border-soft h-2 w-full max-w-75 overflow-hidden rounded-full">
                     <div
-                      className="bg-brand-purple-600 h-full rounded-full transition-all duration-700"
+                      className="bg-brand-purple-600 h-full rounded-full"
                       style={{ width: `${progressPercent}%` }}
                     />
                   </div>
@@ -276,7 +276,7 @@ export default function TopicDetailPage() {
                         href={safeUrl(r.url)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="border-border-soft hover:border-border-purple flex min-h-31 flex-col justify-between rounded-xl border p-4 text-left transition hover:shadow-sm"
+                        className="border-border-soft hover:border-border-purple hover:bg-bg-section/50 focus-visible:ring-brand-purple-300 flex min-h-31 flex-col justify-between rounded-xl border p-4 text-left transition-all duration-200 hover:shadow-sm focus-visible:ring-2 focus-visible:outline-none"
                       >
                         <div className="flex gap-3">
                           <div className="bg-bg-lavender text-brand-purple-600 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
@@ -324,7 +324,7 @@ export default function TopicDetailPage() {
                         `/my-learning/topics/${id}/sections/${sec._id}${roadmapId ? `?roadmapId=${roadmapId}` : ''}`,
                       )
                     }
-                    className={`grid ${cols} border-border-soft hover:bg-bg-section/60 cursor-pointer items-center gap-4 border-t px-2 py-4 transition`}
+                    className={`grid ${cols} border-border-soft hover:bg-bg-section/60 cursor-pointer items-center gap-4 border-t px-2 py-4 transition-colors duration-200`}
                   >
                     <RiDraggable className="text-text-disabled h-4 w-4" />
                     <span className="text-text-placeholder text-sm">{idx + 1}</span>
@@ -381,7 +381,7 @@ export default function TopicDetailPage() {
 
               <button
                 onClick={handleContinueTopic}
-                className="mt-5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#0B1221] py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+                className="focus-visible:ring-brand-purple-300 mt-5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#0B1221] py-3.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-slate-800 focus-visible:ring-2 focus-visible:outline-none"
               >
                 Continue topic <RiArrowRightLine className="h-4 w-4" />
               </button>
