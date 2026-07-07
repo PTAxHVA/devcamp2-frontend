@@ -1,4 +1,5 @@
 import { HiOutlineCheckCircle } from 'react-icons/hi2'
+import { QuestionContent } from '@/features/quiz/components/question-content'
 
 interface McqQuestionProps {
   question: {
@@ -13,9 +14,9 @@ interface McqQuestionProps {
 export function McqQuestion({ question, selectedId, onSelect }: McqQuestionProps) {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 w-full duration-500">
-      <h3 className="text-base-content mb-6 text-xl leading-relaxed font-bold">
-        {question.content}
-      </h3>
+      <div className="text-base-content mb-6 text-xl leading-relaxed font-bold">
+        <QuestionContent text={question.content} />
+      </div>
       <div className="flex flex-col gap-3">
         {question.options?.map((option) => {
           const isSelected = selectedId === option.id
@@ -35,7 +36,9 @@ export function McqQuestion({ question, selectedId, onSelect }: McqQuestionProps
                 checked={isSelected}
                 onChange={() => onSelect(option.id)}
               />
-              <span className="flex-1 text-base font-medium">{option.content}</span>
+              <div className="flex-1 text-base font-medium">
+                <QuestionContent text={option.content} />
+              </div>
 
               {isSelected && (
                 <HiOutlineCheckCircle className="text-primary h-7 w-7 animate-bounce" />

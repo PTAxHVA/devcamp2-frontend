@@ -1,4 +1,5 @@
 import { HiOutlinePencilSquare } from 'react-icons/hi2'
+import { QuestionContent } from '@/features/quiz/components/question-content'
 
 interface FillQuestionProps {
   question: {
@@ -13,9 +14,9 @@ export function FillQuestion({ question, value, onChange }: FillQuestionProps) {
   const hasValue = value.trim().length > 0
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 w-full duration-500">
-      <h3 className="text-base-content mb-6 text-xl leading-relaxed font-bold">
-        {question.content}
-      </h3>
+      <div className="text-base-content mb-6 text-xl leading-relaxed font-bold">
+        <QuestionContent text={question.content} />
+      </div>
       <div className="flex flex-col gap-3">
         <label
           className={`flex cursor-text items-center gap-4 rounded-xl border-2 p-4 transition-all duration-300 focus-within:shadow-md hover:shadow-md ${

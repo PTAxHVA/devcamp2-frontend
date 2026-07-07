@@ -1,5 +1,6 @@
 import type { ResultQuestion } from '@/features/quiz/hooks/use-quiz-result'
 import { isQuestionCorrect } from '@/features/quiz/lib/count-correct'
+import { QuestionContent } from '@/features/quiz/components/question-content'
 
 /**
  * Per-question review of a submitted attempt. Both MCQ and fill-in-blank answers
@@ -23,13 +24,21 @@ export function AnswerReview({ questions }: { questions: ResultQuestion[] }) {
 
         return (
           <li key={q._id} className={`rounded-xl border p-4 ${tone}`}>
-            <p className="text-text-primary font-semibold">
-              Q{i + 1}. {q.content}
-            </p>
-            <p className={`mt-1 text-sm font-medium ${label}`}>
+            <div className="text-text-primary font-semibold">
+              Q{i + 1}. <QuestionContent text={q.content} />
+            </div>
+            <div className={`mt-1 text-sm font-medium ${label}`}>
               {correct ? 'Correct' : 'Incorrect'}
-              {answerText ? ` — "${answerText}"` : ' — not answered'}
-            </p>
+              {answerText ? (
+                <>
+                  {' — "'}
+                  <QuestionContent text={answerText} />
+                  {'"'}
+                </>
+              ) : (
+                ' — not answered'
+              )}
+            </div>
           </li>
         )
       })}

@@ -5,6 +5,7 @@ import { extractApiError } from '@/lib/api-client'
 import { useExplainMistakes } from '@/features/quiz/hooks/use-explain-mistakes'
 import { isQuestionCorrect } from '@/features/quiz/lib/count-correct'
 import type { ResultQuestion } from '@/features/quiz/hooks/use-quiz-result'
+import { QuestionContent } from '@/features/quiz/components/question-content'
 
 /** Only http(s) resource links are rendered — never javascript:/data: URLs. */
 const isSafeUrl = (url: string) => /^https?:\/\//i.test(url)
@@ -89,14 +90,18 @@ export function MistakeCoach({ attemptId, questions }: MistakeCoachProps) {
                 key={e.questionId}
                 className="rounded-xl border border-indigo-100 bg-indigo-50/40 p-4"
               >
-                <p className="text-text-primary font-semibold">
-                  {questionTextById.get(e.questionId) ?? `Question ${i + 1}`}
-                </p>
-                <p className="text-text-secondary mt-2 text-sm font-medium">{e.why}</p>
-                <p className="mt-1 text-sm font-medium text-indigo-700">
+                <div className="text-text-primary font-semibold">
+                  <QuestionContent
+                    text={questionTextById.get(e.questionId) ?? `Question ${i + 1}`}
+                  />
+                </div>
+                <div className="text-text-secondary mt-2 text-sm font-medium">
+                  <QuestionContent text={e.why} />
+                </div>
+                <div className="mt-1 text-sm font-medium text-indigo-700">
                   <FiBookOpen className="mr-1 inline h-4 w-4" />
-                  {e.reviewHint}
-                </p>
+                  <QuestionContent text={e.reviewHint} />
+                </div>
               </li>
             ))}
           </ul>
