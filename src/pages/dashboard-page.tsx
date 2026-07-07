@@ -8,11 +8,9 @@ import { WeeklyProgressChart } from '@/features/dashboard/components/weekly-prog
 import { StreakCalendar } from '@/features/dashboard/components/streak-calendar'
 import { Link } from 'react-router'
 import { FiExternalLink } from 'react-icons/fi'
-import { useAuthStore } from '@/stores/auth-store'
 
 const DashboardPage = () => {
   const { data, isLoading, isError } = useDashboard()
-  const authUser = useAuthStore((s) => s.user)
 
   if (isLoading) {
     return <DashboardSkeleton />
@@ -28,15 +26,15 @@ const DashboardPage = () => {
 
   if (!data) return null
 
-  const displayName = authUser?.username || data.userName || 'Student'
-
   return (
     <div className="fade-in animate-in mx-auto h-full w-full max-w-[1400px] p-6 duration-500 lg:p-8">
-      {/* 1. Header Khu vực Lời chào */}
+      {/* 1. Header — the personal "Welcome back, name" greeting lives in the top
+          bar (nav-bar); repeating it here stacked the same message twice within
+          ~100px (BN2a). */}
       <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <div>
           <h1 className="text-text-primary text-3xl font-extrabold tracking-tight">
-            Welcome back, {displayName}!
+            Your learning dashboard
           </h1>
           <p className="text-base-content/60 mt-2 font-medium">
             Pick up where you left off and keep building your skills.

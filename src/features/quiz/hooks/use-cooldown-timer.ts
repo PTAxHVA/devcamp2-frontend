@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react'
 
-/** Whole seconds remaining until `target` (never negative). 0 when no target. */
+/**
+ * Whole seconds remaining until `target` (never negative). 0 when no target.
+ * Rounded UP: with floor, isExpired flipped true up to ~1s before the server
+ * deadline, so an immediate "Retry quiz" click was guaranteed to hit the
+ * COOLDOWN_ACTIVE 409 and bounce back to the fail page (NEW-1).
+ */
 function secondsUntil(target: string | Date | null): number {
   if (!target) return 0
-  return Math.max(0, Math.floor((new Date(target).getTime() - Date.now()) / 1000))
+  return Math.max(0, Math.ceil((new Date(target).getTime() - Date.now()) / 1000))
 }
 
 /**

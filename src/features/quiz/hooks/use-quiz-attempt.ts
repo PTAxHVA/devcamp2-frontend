@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react'
 import { isAxiosError } from 'axios'
 import { useNavigate } from 'react-router'
+import { useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
 import { apiClient } from '@/lib/api-client'
 import { useQuizStore, type QuizStore } from '@/features/quiz/quiz-store'
+import { readRetryAfterMs, cooldownDeadlineFrom } from '@/features/quiz/lib/cooldown-conflict'
+import type { QuizResultData } from '@/features/quiz/hooks/use-quiz-result'
 
 interface BEQuestion {
   _id: string
@@ -55,6 +59,7 @@ function getConflictAttemptId(payload: unknown): string | undefined {
 
 export function useQuizAttempt(quizId: string) {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<unknown>(null)
   const setAttempt = useQuizStore((state: QuizStore) => state.initAttempt)
@@ -124,6 +129,28 @@ export function useQuizAttempt(quizId: string) {
         }
 
         if (status === 409 && code === 'COOLDOWN_ACTIVE' && attemptId) {
+          // The server says the cooldown hasn't expired (client clock ran a touch
+          // ahead, or the retry raced the deadline). Re-arm the fail page's
+          // countdown from the server-authoritative remaining duration and say
+          // why we bounced — instead of silently ping-ponging with an enabled
+          // Retry button against a stale cached deadline (NEW-1).
+          const retryAfterMs = readRetryAfterMs(payload)
+          if (retryAfterMs !== undefined) {
+            const deadline = cooldownDeadlineFrom(retryAfterMs)
+            queryClient.setQueryData<QuizResultData>(['attempt-result', attemptId], (old) =>
+              old
+                ? { ...old, quizAttempt: { ...old.quizAttempt, cooldownUntil: deadline } }
+                : undefined,
+            )
+            // Fixed id: a duplicate conflict (e.g. dev double-mount firing two
+            // starts) updates the one toast instead of stacking a second.
+            toast(`Hold on — you can retry in ${Math.max(1, Math.ceil(retryAfterMs / 1000))}s.`, {
+              id: 'quiz-cooldown-resync',
+            })
+          } else {
+            // Older backend without retryAfterMs — still explain the bounce.
+            toast('Hold on — that quiz is still cooling down.', { id: 'quiz-cooldown-resync' })
+          }
           navigate(`/quizzes/${attemptId}/result/fail${window.location.search}`, { replace: true })
           return
         }
@@ -159,7 +186,7 @@ export function useQuizAttempt(quizId: string) {
       clearRetry()
       window.removeEventListener('online', handleOnline)
     }
-  }, [navigate, quizId, setAttempt])
+  }, [navigate, queryClient, quizId, setAttempt])
 
   return { isLoading, error }
 }

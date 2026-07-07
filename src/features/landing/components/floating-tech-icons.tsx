@@ -12,7 +12,11 @@ import { BiLogoPostgresql } from 'react-icons/bi'
 import { TbBrandAmongUs } from 'react-icons/tb'
 const FloatingTechIcons = () => {
   return (
-    <div className="pointer-events-none absolute inset-0 z-0">
+    // overflow-hidden: this layer is anchored to the (viewport-sized) initial
+    // containing block — no positioned ancestor — so the bottom-[-10%] icons used
+    // to poke below the document and add a dead scroll strip under the footer on
+    // 2K/4K screens (NEW-3: 139px @2560, 211px @3840).
+    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
       <FaReact className="animate-float absolute top-[15%] left-[35%] hidden h-12 w-12 text-[#61DAFB] opacity-50 md:block" />
       <FaHtml5 className="animate-float-delayed absolute top-[40%] left-[45%] h-16 w-16 text-[#E34F26] opacity-20" />
       <FaCss3Alt className="animate-float-slow absolute bottom-20 left-[5%] hidden h-14 w-14 text-[#1572B6] opacity-20 lg:block" />

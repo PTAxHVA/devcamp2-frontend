@@ -16,7 +16,12 @@ export default function MyLearningJourneyPage() {
   // Selection is scoped to its roadmap so it's ignored once the user switches roadmaps.
   const [selected, setSelected] = useState<{ roadmapId: string; topicId: string } | null>(null)
 
-  const { data: roadmaps, isLoading: loadingList } = useMyRoadmaps()
+  const {
+    data: roadmaps,
+    isLoading: loadingList,
+    isError: listError,
+    refetch: refetchList,
+  } = useMyRoadmaps()
 
   // Resolve which roadmap the URL slug points at (e.g. "front-end" -> Frontend roadmap).
   const activeRoadmap = useMemo(() => {
@@ -61,6 +66,23 @@ export default function MyLearningJourneyPage() {
     return (
       <div className="flex w-full items-center justify-center py-32">
         <span className="loading loading-spinner loading-lg text-brand-purple-600" />
+      </div>
+    )
+  }
+
+  // A failed request is NOT "no roadmaps": during a server hiccup the old code fell
+  // into the empty state below and looked like the learner's data was gone (NEW-2).
+  if (listError) {
+    return (
+      <div className="border-error-border bg-error-bg text-error-text mx-auto my-20 max-w-md rounded-2xl border p-8 text-center">
+        <p className="text-lg font-bold">Couldn't load your roadmaps</p>
+        <p className="mt-1 text-sm">Please check your connection and try again.</p>
+        <button
+          onClick={() => void refetchList()}
+          className="border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section mt-5 rounded-xl border px-5 py-2 text-sm font-bold transition-colors"
+        >
+          Try again
+        </button>
       </div>
     )
   }

@@ -15,8 +15,11 @@
       name="description"
       content="VORA gives beginner web developers a curated, role-specific learning roadmap with quiz-verified progress."
     />
+    <!-- No og:url: the SPA serves this file for EVERY route, and scrapers
+         (LinkedIn et al.) treat og:url as the canonical link — a hardcoded root
+         here rewrote shared /p/<token> passport cards to point at "/" (Y2).
+         Without it, scrapers fall back to the URL that was actually shared. -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://devcamp2-frontend.vercel.app/" />
     <meta property="og:title" content="VORA — Verified Online Roadmap Advisor" />
     <meta
       property="og:description"
