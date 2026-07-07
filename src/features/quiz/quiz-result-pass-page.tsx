@@ -10,6 +10,7 @@ import { useTopicDetail } from '@/features/topic/hooks/use-topic-detail'
 import {
   buildPassportNudge,
   hasNudgedAttempt,
+  isTopicFullyVerified,
   markNudgedAttempt,
 } from '@/features/passport/lib/passport-share'
 
@@ -23,22 +24,24 @@ export function QuizResultPassPage() {
   const roadmapId = searchParams.get('roadmapId')
   const { data, isLoading, isError } = useQuizResult(attemptId ?? '')
 
-  // Passport nudge: one toast per pass inviting the learner to share the skill
-  // they just verified. Waits for the topic name when a topicId is available,
-  // but never blocks on it (generic copy if the lookup errors or is absent).
-  // Guarded per attempt in sessionStorage so reopening this URL doesn't re-toast.
+  // Passport nudge: show only when this pass leaves the whole topic verified,
+  // matching the Passport/dashboard completed-topic rule.
   const topicDetail = useTopicDetail(topicId ?? '')
+  const topicData = topicDetail.data
+  const isTopicDetailLoading = topicDetail.isLoading
+  const isTopicDetailFetching = topicDetail.isFetching
   const hasNudged = useRef(false)
   useEffect(() => {
-    if (hasNudged.current || !data || !attemptId) return
-    if (topicId && topicDetail.isLoading) return
+    if (hasNudged.current || !data || !attemptId || !topicId) return
+    if (isTopicDetailLoading || isTopicDetailFetching) return
+    if (!topicData || !isTopicFullyVerified(topicData)) return
     if (hasNudgedAttempt(attemptId)) return
     hasNudged.current = true
     markNudgedAttempt(attemptId)
     toast(
       (t) => (
         <span className="text-sm">
-          {buildPassportNudge(topicDetail.data?.name)}{' '}
+          {buildPassportNudge(topicData.name)}{' '}
           <button
             type="button"
             className="text-brand-purple-600 font-bold underline"
@@ -53,7 +56,7 @@ export function QuizResultPassPage() {
       ),
       { icon: '🎖️', duration: 8000, id: 'passport-nudge' },
     )
-  }, [attemptId, data, topicId, topicDetail.isLoading, topicDetail.data?.name, navigate])
+  }, [attemptId, data, isTopicDetailFetching, isTopicDetailLoading, navigate, topicData, topicId])
 
   if (isLoading) {
     return (

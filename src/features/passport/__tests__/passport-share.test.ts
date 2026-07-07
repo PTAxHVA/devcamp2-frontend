@@ -6,6 +6,7 @@ import {
   calcPassportCompletionPct,
   formatSkillLevel,
   hasNudgedAttempt,
+  isTopicFullyVerified,
   markNudgedAttempt,
 } from '../lib/passport-share'
 
@@ -66,5 +67,51 @@ describe('nudge per-attempt guard', () => {
     markNudgedAttempt('attempt-1')
     expect(hasNudgedAttempt('attempt-1')).toBe(true)
     expect(hasNudgedAttempt('attempt-2')).toBe(false)
+  })
+})
+
+describe('isTopicFullyVerified', () => {
+  it('requires every published section to have completed progress', () => {
+    expect(
+      isTopicFullyVerified({
+        sectionList: [
+          { _id: 'section-1', isPublished: true },
+          { _id: 'section-2', isPublished: true },
+        ],
+        userProgress: [{ sectionId: 'section-1', isCompleted: true }],
+      }),
+    ).toBe(false)
+
+    expect(
+      isTopicFullyVerified({
+        sectionList: [
+          { _id: 'section-1', isPublished: true },
+          { _id: 'section-2', isPublished: true },
+        ],
+        userProgress: [
+          { sectionId: 'section-1', isCompleted: true },
+          { sectionId: 'section-2', isCompleted: true },
+        ],
+      }),
+    ).toBe(true)
+  })
+
+  it('ignores unpublished sections and returns false when nothing is published', () => {
+    expect(
+      isTopicFullyVerified({
+        sectionList: [
+          { _id: 'section-1', isPublished: true },
+          { _id: 'draft-section', isPublished: false },
+        ],
+        userProgress: [{ sectionId: 'section-1', isCompleted: true }],
+      }),
+    ).toBe(true)
+
+    expect(
+      isTopicFullyVerified({
+        sectionList: [{ _id: 'draft-section', isPublished: false }],
+        userProgress: [{ sectionId: 'draft-section', isCompleted: true }],
+      }),
+    ).toBe(false)
   })
 })
