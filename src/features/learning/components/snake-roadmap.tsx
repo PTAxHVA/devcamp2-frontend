@@ -158,21 +158,25 @@ export default function RoadmapSnakePath({
                         nextNode &&
                         (isNextUnlocked ? (
                           <div
-                            className={`absolute top-1/2 z-0 h-1 ${horizSpan} -translate-y-1/2 rounded-full bg-emerald-200 ${isReverse ? 'right-1/2' : 'left-1/2'}`}
+                            className={`absolute top-1/2 z-0 h-1.5 ${horizSpan} -translate-y-1/2 rounded-full bg-emerald-300 ${isReverse ? 'right-1/2' : 'left-1/2'}`}
                           />
                         ) : (
                           <div
-                            className={`absolute top-1/2 z-0 ${horizSpan} border-border-soft border-t-2 border-dashed ${isReverse ? 'right-1/2' : 'left-1/2'}`}
+                            className={`absolute top-1/2 z-0 -translate-y-1/2 ${horizSpan} border-border-input border-t-[3px] border-dashed ${isReverse ? 'right-1/2' : 'left-1/2'}`}
                           />
                         ))}
 
-                      {/* U-turn connector */}
+                      {/* U-turn connector. Its top/bottom borders must line up with
+                          the node centers of this row and the next. Node centers are
+                          162px apart (66px node height + 96px row gap), so the box is
+                          165px tall (162 + the two 3px borders) and nudged up 1.5px so
+                          each border's CENTER — not its edge — sits on a node line. */}
                       {isLastInRow && !isLastRow && nextNode && (
                         <div
-                          className={`absolute top-1/2 z-0 h-40 w-[70%] ${isNextUnlocked ? 'border-solid border-emerald-200' : 'border-border-soft border-dashed'} border-t-2 border-b-2 ${
+                          className={`absolute top-[calc(50%-1.5px)] z-0 h-[165px] w-[70%] ${isNextUnlocked ? 'border-solid border-emerald-300' : 'border-border-input border-dashed'} border-t-[3px] border-b-[3px] ${
                             isReverse
-                              ? 'right-1/2 rounded-l-[80px] border-l-2'
-                              : 'left-1/2 rounded-r-[80px] border-r-2'
+                              ? 'right-1/2 rounded-l-[80px] border-l-[3px]'
+                              : 'left-1/2 rounded-r-[80px] border-r-[3px]'
                           } `}
                         />
                       )}

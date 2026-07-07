@@ -84,7 +84,14 @@ export function useMyRoadmaps() {
 
 export function useRoadmapDetail(roadmapId: string | null | undefined) {
   return useQuery<UserRoadmapDetail>({
-    queryKey: ['roadmap-detail', roadmapId],
+    // Distinct full key from features/roadmap/hooks/use-roadmap-detail.ts: both
+    // hooks GET /roadmaps/:id but return different shapes (this one maps name->title
+    // and re-derives status). Sharing the exact ['roadmap-detail', id] key let one
+    // hook read the other's cached shape, so `title` came back undefined in the
+    // snake roadmap. The trailing 'my-learning' keeps this a separate cache entry
+    // while staying matched by both invalidateQueries(['roadmap-detail']) (passed
+    // quiz) and (['roadmap-detail', roadmapId]) (edit roadmap / job-readiness).
+    queryKey: ['roadmap-detail', roadmapId, 'my-learning'],
     enabled: !!roadmapId,
     queryFn: async () => {
       const res = await apiClient.get(`/roadmaps/${roadmapId}`)

@@ -37,11 +37,11 @@ export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
     }
     switch (data.status) {
       case 'completed':
-        return 'border-emerald-500 bg-bg-card text-text-primary'
+        return 'border-emerald-200 bg-bg-card text-text-primary'
       case 'current':
-        return 'border-brand-purple-600 bg-bg-card text-brand-purple-700 ring-4 ring-brand-purple-100 font-bold shadow-md'
+        return 'border-brand-purple-500 bg-bg-lavender text-brand-purple-700 ring-4 ring-brand-purple-100 font-bold shadow-md'
       case 'locked':
-        return 'border-border-soft bg-bg-section text-text-placeholder border-dashed'
+        return 'border-border-soft bg-bg-section/60 text-text-placeholder border-dashed'
       case 'upcoming':
       default:
         return 'border-border-soft bg-bg-card text-text-secondary'
@@ -72,31 +72,39 @@ export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
       )
     }
 
-    // Standard Render
-    return (
-      <div className="flex w-6 shrink-0 justify-center">
-        {data.status === 'completed' && (
-          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white">
-            <RiCheckFill className="h-3.5 w-3.5" />
+    // Standard Render — a numbered step badge whose color tracks status, so the
+    // graph reads as an ordered path at a glance (not just anonymous dots).
+    const badgeBase =
+      'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold'
+    switch (data.status) {
+      case 'completed':
+        return (
+          <div className={`${badgeBase} bg-emerald-500 text-white`}>
+            <RiCheckFill className="h-4 w-4" />
           </div>
-        )}
-        {data.status === 'current' && (
-          <div className="border-border-purple bg-bg-card flex h-5 w-5 items-center justify-center rounded-full border-2">
-            <div className="bg-brand-purple-600 h-2 w-2 rounded-full" />
+        )
+      case 'current':
+        return <div className={`${badgeBase} bg-brand-purple-600 text-white`}>{data.number}</div>
+      case 'locked':
+        return (
+          <div className={`${badgeBase} bg-bg-section text-text-placeholder`}>
+            <RiLockLine className="h-3.5 w-3.5" />
           </div>
-        )}
-        {data.status === 'upcoming' && (
-          <div className="border-border-input bg-bg-card h-5 w-5 rounded-full border-2" />
-        )}
-        {data.status === 'locked' && <RiLockLine className="text-text-placeholder h-5 w-5" />}
-      </div>
-    )
+        )
+      case 'upcoming':
+      default:
+        return (
+          <div className={`${badgeBase} border-border-soft text-text-muted border bg-white`}>
+            {data.number}
+          </div>
+        )
+    }
   }
 
   return (
     <div
       title={data.hint}
-      className={`flex h-14 w-56 items-center rounded-xl border-2 px-3 transition-all duration-300 ${
+      className={`flex h-14 w-64 items-center rounded-xl border-2 px-3 transition-all duration-300 ${
         isInteractive ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-lg' : 'cursor-default'
       } ${getContainerStyles()}`}
     >
@@ -104,7 +112,9 @@ export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
 
       {renderIndicator()}
 
-      <div className="ml-2 flex-1 truncate px-1 text-center text-sm font-semibold">
+      <div
+        className={`ml-2.5 flex-1 truncate px-1 text-sm font-semibold ${variant === 'standard' ? 'text-left' : 'text-center'}`}
+      >
         {data.label}
       </div>
 

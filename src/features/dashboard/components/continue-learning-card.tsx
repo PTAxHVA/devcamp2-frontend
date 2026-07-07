@@ -55,6 +55,9 @@ export function ContinueLearningCard({
           <p className="text-primary mb-1 text-xs font-bold tracking-widest uppercase">
             Current roadmap
           </p>
+          {/* Navigate by id, not by a slug derived from roadmapName: roadmapName can
+              be a display fallback that round-trips to no roadmap. /roadmaps/:id
+              resolves the real roleName server-side and redirects to my-learning. */}
           <h3
             className="group text-text-primary flex w-fit cursor-pointer items-center gap-2 text-2xl font-bold"
             onClick={() => navigate(`/roadmaps/${continueLearning.userRoadmapId}`)}

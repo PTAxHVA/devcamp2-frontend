@@ -2,6 +2,7 @@ import { Link } from 'react-router'
 import { HiMiniAcademicCap, HiMiniPlus, HiMiniLockClosed } from 'react-icons/hi2'
 import type { DashboardData } from '@/features/dashboard/types'
 import { formatRoadmapSource } from '@/features/roadmap/lib/roadmap-source-label'
+import { roadmapSlug } from '@/features/learning/lib/roadmap-slug'
 
 interface MyRoadmapsGridProps {
   roadmaps: DashboardData['roadmaps']
@@ -36,7 +37,7 @@ export function MyRoadmapsGrid({ roadmaps, hasAvailableRoles }: MyRoadmapsGridPr
         return (
           <Link
             key={roadmap.id}
-            to={`/roadmaps/${roadmap.id}`}
+            to={`/my-learning/${roadmapSlug(roadmap.roleName)}`}
             className="card bg-base-100 border-base-200 hover:border-primary/40 group focus:ring-primary border no-underline shadow-sm transition-all duration-200 hover:shadow-md focus:border-transparent focus:ring-2 focus:outline-none"
           >
             <div className="card-body flex h-full flex-col gap-4 p-5">
