@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router'
 import { FiArrowRight, FiExternalLink } from 'react-icons/fi'
-import { roadmapSlug } from '@/features/learning/lib/roadmap-slug'
 
 export interface ContinueLearningData {
   sectionId: string
@@ -56,9 +55,12 @@ export function ContinueLearningCard({
           <p className="text-primary mb-1 text-xs font-bold tracking-widest uppercase">
             Current roadmap
           </p>
+          {/* Navigate by id, not by a slug derived from roadmapName: roadmapName can
+              be a display fallback that round-trips to no roadmap. /roadmaps/:id
+              resolves the real roleName server-side and redirects to my-learning. */}
           <h3
             className="group text-text-primary flex w-fit cursor-pointer items-center gap-2 text-2xl font-bold"
-            onClick={() => navigate(`/my-learning/${roadmapSlug(continueLearning.roadmapName)}`)}
+            onClick={() => navigate(`/roadmaps/${continueLearning.userRoadmapId}`)}
           >
             {continueLearning.roadmapName}
             <FiExternalLink className="group-hover:text-primary text-text-placeholder h-5 w-5 transition-colors" />
@@ -98,7 +100,7 @@ export function ContinueLearningCard({
         </button>
         <button
           className="btn btn-outline border-border-soft text-text-secondary hover:border-border-input hover:bg-bg-section bg-bg-card rounded-lg px-5"
-          onClick={() => navigate(`/my-learning/${roadmapSlug(continueLearning.roadmapName)}`)}
+          onClick={() => navigate(`/roadmaps/${continueLearning.userRoadmapId}`)}
         >
           View Roadmap <FiExternalLink className="ml-1 h-4 w-4" />
         </button>
