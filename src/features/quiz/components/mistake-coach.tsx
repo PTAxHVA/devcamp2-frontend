@@ -62,7 +62,7 @@ export function MistakeCoach({ attemptId, questions }: MistakeCoachProps) {
             type="button"
             onClick={handleReview}
             disabled={explain.isPending}
-            className="btn disabled:bg-border-soft disabled:text-text-placeholder h-12 shrink-0 rounded-xl border-none bg-indigo-600 px-6 font-bold text-white hover:bg-indigo-700"
+            className="btn disabled:bg-border-soft disabled:text-text-placeholder focus-visible:ring-brand-purple-300 h-12 shrink-0 rounded-xl border-none bg-indigo-600 px-6 font-bold text-white transition-colors duration-200 hover:bg-indigo-700 focus-visible:ring-2"
           >
             {explain.isPending ? (
               <>
@@ -118,7 +118,7 @@ export function MistakeCoach({ attemptId, questions }: MistakeCoachProps) {
                       href={r.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="border-border-soft bg-bg-card text-text-secondary inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-semibold hover:border-indigo-300 hover:text-indigo-700"
+                      className="border-border-soft bg-bg-card text-text-secondary focus-visible:ring-brand-purple-300 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors duration-200 hover:border-indigo-300 hover:text-indigo-700 focus-visible:ring-2 focus-visible:outline-none"
                     >
                       {r.title}
                       <FiExternalLink className="h-3.5 w-3.5" />

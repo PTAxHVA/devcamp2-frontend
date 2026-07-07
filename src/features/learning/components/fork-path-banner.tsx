@@ -53,7 +53,7 @@ export default function ForkPathBanner({
       {roadmapId && (
         <Link
           to={`/roadmaps/${roadmapId}/edit`}
-          className="border-brand-purple-600 text-brand-purple-600 hover:bg-bg-lavender flex shrink-0 items-center gap-2 rounded-xl border-2 px-4 py-2 text-sm font-bold transition-colors"
+          className="border-brand-purple-600 text-brand-purple-600 hover:bg-bg-lavender focus-visible:ring-brand-purple-300 flex shrink-0 items-center gap-2 rounded-xl border-2 px-4 py-2 text-sm font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           <RiArrowLeftRightLine /> Switch path
         </Link>

@@ -40,7 +40,7 @@ export const StepIntro = ({ onStart }: { onStart: () => void }) => {
           ].map((item, idx) => (
             <div
               key={idx}
-              className="border-border-soft hover:bg-bg-card flex gap-4 rounded-xl border p-4 transition-all hover:shadow-sm"
+              className="border-border-soft hover:bg-bg-card flex gap-4 rounded-xl border p-4 transition-all duration-200 hover:shadow-sm"
             >
               <div className="bg-bg-lavender text-brand-purple-600 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
                 <item.icon className="h-6 w-6" />
@@ -55,7 +55,7 @@ export const StepIntro = ({ onStart }: { onStart: () => void }) => {
 
         <button
           onClick={onStart}
-          className="flex w-fit items-center gap-3 rounded-xl bg-[#0B1528] px-10 py-4 text-lg font-bold text-white transition-all hover:bg-[#15233e] hover:shadow-lg active:scale-95"
+          className="focus-visible:ring-brand-purple-300 flex w-fit items-center gap-3 rounded-xl bg-[#0B1528] px-10 py-4 text-lg font-bold text-white transition-all duration-200 hover:bg-[#15233e] hover:shadow-lg focus-visible:ring-2 focus-visible:outline-none active:scale-95"
         >
           Start personalization <RiArrowRightLine className="h-5 w-5" />
         </button>

@@ -45,7 +45,7 @@ function RoadmapCard({
       {/* Progress bar */}
       <div className="bg-border-soft h-1.5 w-full overflow-hidden rounded-full">
         <div
-          className="bg-brand-purple-500 h-full rounded-full transition-all"
+          className="bg-brand-purple-500 h-full rounded-full"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -134,7 +134,7 @@ export default function ProfilePage() {
           {/* Edit button */}
           <button
             onClick={() => navigate('/settings')}
-            className="border-border-input text-text-primary hover:bg-bg-section flex shrink-0 items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition"
+            className="border-border-input text-text-primary hover:bg-bg-section focus-visible:ring-brand-purple-300 flex shrink-0 items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
           >
             <Pencil className="h-3.5 w-3.5" /> Edit profile
           </button>
@@ -149,7 +149,7 @@ export default function ProfilePage() {
             </div>
             <button
               onClick={() => navigate('/my-learning')}
-              className="text-brand-purple-500 flex items-center gap-1 text-xs font-semibold hover:underline"
+              className="text-brand-purple-500 hover:text-brand-purple-700 focus-visible:ring-brand-purple-300 flex items-center gap-1 text-xs font-semibold transition-colors duration-200 hover:underline focus-visible:ring-2 focus-visible:outline-none"
             >
               View all roadmaps <ExternalLink className="h-3 w-3" />
             </button>
@@ -176,7 +176,7 @@ export default function ProfilePage() {
           </div>
           <button
             onClick={() => navigate('/roadmaps/browse')}
-            className="bg-brand-purple-500 hover:bg-brand-purple-600 shrink-0 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition"
+            className="bg-brand-purple-500 hover:bg-brand-purple-600 focus-visible:ring-brand-purple-300 shrink-0 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
           >
             Explore Roadmaps
           </button>

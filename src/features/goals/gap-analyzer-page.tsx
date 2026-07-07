@@ -54,7 +54,7 @@ export function GapAnalyzerPage() {
           }}
           disabled={rolesQuery.isLoading || analyzeMutation.isPending}
           aria-label="Target role"
-          className="focus:border-brand-purple-500 border-border-soft w-full rounded-xl border bg-white px-4 py-2.5 text-sm font-medium outline-none sm:max-w-xs"
+          className="focus:border-brand-purple-500 border-border-soft w-full rounded-xl border bg-white px-4 py-2.5 text-sm font-medium transition-colors duration-200 outline-none sm:max-w-xs"
         >
           <option value="">
             {rolesQuery.isLoading ? 'Loading roles…' : 'Choose a target role…'}
@@ -69,7 +69,7 @@ export function GapAnalyzerPage() {
           type="button"
           onClick={handleAnalyze}
           disabled={!role || analyzeMutation.isPending}
-          className="bg-btn-primary-bg hover:bg-btn-primary-hover rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition disabled:opacity-60"
+          className="bg-btn-primary-bg hover:bg-btn-primary-hover focus-visible:ring-brand-purple-300 rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-60"
         >
           {analyzeMutation.isPending ? 'Analyzing…' : 'Analyze my readiness'}
         </button>
@@ -81,7 +81,7 @@ export function GapAnalyzerPage() {
           <button
             type="button"
             onClick={() => rolesQuery.refetch()}
-            className="text-brand-purple-600 mt-1 text-sm font-semibold hover:underline"
+            className="text-brand-purple-600 hover:text-brand-purple-700 focus-visible:ring-brand-purple-300 mt-1 text-sm font-semibold transition-colors duration-200 hover:underline focus-visible:ring-2 focus-visible:outline-none"
           >
             Try again
           </button>

@@ -127,7 +127,7 @@ export default function TopicDetailSidebar({ topic, topics, roadmapId }: TopicDe
             </div>
             <div className="bg-bg-section h-2 w-full overflow-hidden rounded-full">
               <div
-                className={`h-full transition-all duration-300 ${cfg.bar}`}
+                className={`h-full transition-all duration-200 ${cfg.bar}`}
                 style={{ width: `${sectionProgress}%` }}
               />
             </div>
@@ -173,7 +173,7 @@ export default function TopicDetailSidebar({ topic, topics, roadmapId }: TopicDe
         <button
           disabled={!canNavigate}
           onClick={() => canNavigate && navigate(`/my-learning/topics/${topic.masterTopicId}${q}`)}
-          className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all ${
+          className={`focus-visible:ring-brand-purple-300 flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-all duration-200 focus-visible:ring-2 focus-visible:outline-none ${
             !canNavigate
               ? 'bg-bg-section text-text-placeholder cursor-not-allowed'
               : topic.status === 'completed'

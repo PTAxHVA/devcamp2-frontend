@@ -44,7 +44,7 @@ export function QuizResultPassPage() {
           {buildPassportNudge(topicData.name)}{' '}
           <button
             type="button"
-            className="text-brand-purple-600 font-bold underline"
+            className="text-brand-purple-600 hover:text-brand-purple-700 focus-visible:ring-brand-purple-300 font-bold underline transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
             onClick={() => {
               toast.dismiss(t.id)
               navigate('/passport')
@@ -72,7 +72,7 @@ export function QuizResultPassPage() {
         <p className="font-semibold text-red-600">Unable to load the result.</p>
         <button
           onClick={() => navigate('/dashboard')}
-          className="border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section mt-4 rounded-xl border px-5 py-2 text-sm font-bold"
+          className="border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 mt-4 rounded-xl border px-5 py-2 text-sm font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           Back to Dashboard
         </button>
@@ -150,7 +150,7 @@ export function QuizResultPassPage() {
               navigate('/dashboard')
             }
           }}
-          className="btn h-14 rounded-xl bg-slate-900 px-10 text-lg font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-slate-800"
+          className="btn focus-visible:ring-brand-purple-300 h-14 rounded-xl bg-slate-900 px-10 text-lg font-bold text-white shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-800 focus-visible:ring-2"
         >
           Continue →
         </button>

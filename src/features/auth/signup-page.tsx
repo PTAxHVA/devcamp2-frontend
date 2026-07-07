@@ -94,7 +94,7 @@ export default function SignupPage() {
                 type="text"
                 autoComplete="name"
                 placeholder="Your name"
-                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
+                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition-colors duration-200 outline-none focus:border-indigo-400"
                 {...register('username')}
               />
               {errors.username && (
@@ -112,7 +112,7 @@ export default function SignupPage() {
                 type="email"
                 autoComplete="email"
                 placeholder="you@gmail.com"
-                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
+                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition-colors duration-200 outline-none focus:border-indigo-400"
                 {...register('email')}
               />
               {errors.email && <p className="text-error-text text-xs">{errors.email.message}</p>}
@@ -127,7 +127,7 @@ export default function SignupPage() {
                 id="password"
                 autoComplete="new-password"
                 placeholder="••••••••"
-                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
+                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition-colors duration-200 outline-none focus:border-indigo-400"
                 {...register('password')}
               />
               {errors.password && (
@@ -163,7 +163,7 @@ export default function SignupPage() {
                 id="confirmPassword"
                 autoComplete="new-password"
                 placeholder="••••••••"
-                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition outline-none focus:border-indigo-400"
+                className="border-border-soft w-full rounded-lg border px-4 py-2.5 text-sm transition-colors duration-200 outline-none focus:border-indigo-400"
                 {...register('confirmPassword')}
               />
               {errors.confirmPassword && (
@@ -181,11 +181,17 @@ export default function SignupPage() {
                 />
                 <span className="text-text-secondary text-xs leading-normal">
                   I agree to the{' '}
-                  <Link to="/terms" className="font-medium text-indigo-600 hover:underline">
+                  <Link
+                    to="/terms"
+                    className="focus-visible:ring-brand-purple-300 font-medium text-indigo-600 transition-colors duration-200 hover:text-indigo-700 hover:underline focus-visible:ring-2 focus-visible:outline-none"
+                  >
                     Terms of Service
                   </Link>{' '}
                   and{' '}
-                  <Link to="/privacy" className="font-medium text-indigo-600 hover:underline">
+                  <Link
+                    to="/privacy"
+                    className="focus-visible:ring-brand-purple-300 font-medium text-indigo-600 transition-colors duration-200 hover:text-indigo-700 hover:underline focus-visible:ring-2 focus-visible:outline-none"
+                  >
                     Privacy Policy
                   </Link>
                   .
@@ -200,7 +206,7 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={signup.isPending}
-              className="mt-2 w-full rounded-lg bg-[#001a57] py-2.5 text-sm font-semibold text-white transition hover:bg-[#002080] disabled:opacity-60"
+              className="focus-visible:ring-brand-purple-300 mt-2 w-full rounded-lg bg-[#001a57] py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#002080] focus-visible:ring-2 focus-visible:outline-none disabled:opacity-60"
             >
               {signup.isPending ? 'Creating account...' : 'Create account'}
             </button>
@@ -208,7 +214,10 @@ export default function SignupPage() {
 
           <p className="text-text-secondary mt-5 text-center text-sm">
             Already have an account?{' '}
-            <Link to="/login" className="font-semibold text-indigo-600 hover:underline">
+            <Link
+              to="/login"
+              className="focus-visible:ring-brand-purple-300 font-semibold text-indigo-600 transition-colors duration-200 hover:text-indigo-700 hover:underline focus-visible:ring-2 focus-visible:outline-none"
+            >
               Log in
             </Link>
           </p>

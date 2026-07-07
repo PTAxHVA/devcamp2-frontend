@@ -104,7 +104,7 @@ export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
   return (
     <div
       title={data.hint}
-      className={`flex h-14 w-64 items-center rounded-xl border-2 px-3 transition-all duration-300 ${
+      className={`flex h-14 w-64 items-center rounded-xl border-2 px-3 transition-all duration-200 ${
         isInteractive ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-lg' : 'cursor-default'
       } ${getContainerStyles()}`}
     >

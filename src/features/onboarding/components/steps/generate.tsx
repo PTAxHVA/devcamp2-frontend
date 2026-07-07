@@ -149,7 +149,7 @@ export const StepGenerating = ({ onContinue, minDwellMs = MIN_DWELL_MS }: StepGe
 
       <button
         onClick={handleContinue}
-        className="btn h-12 rounded-xl border-none bg-[#0B1528] px-10 text-base font-semibold text-white transition-all hover:bg-[#15233e] hover:shadow-lg active:scale-95"
+        className="btn focus-visible:ring-brand-purple-300 h-12 rounded-xl border-none bg-[#0B1528] px-10 text-base font-semibold text-white transition-all duration-200 hover:bg-[#15233e] hover:shadow-lg focus-visible:ring-2 active:scale-95"
       >
         Continue
         <RiArrowRightLine className="ml-2 h-5 w-5" />

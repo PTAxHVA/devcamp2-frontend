@@ -33,7 +33,7 @@ export default function BranchTree({
         const isMandatory = Boolean(b.isMandatory) && group === null
         const groupStartsHere = group !== null && rows[idx - 1]?.group !== group
 
-        const cardCls = `mb-3 flex w-full items-start gap-3 rounded-2xl border p-4 text-left transition-all ${
+        const cardCls = `mb-3 flex w-full items-start gap-3 rounded-2xl border p-4 text-left transition-all duration-200 focus-visible:ring-2 focus-visible:ring-brand-purple-300 focus-visible:outline-none ${
           isSelected
             ? 'border-brand-purple-200 bg-bg-lavender'
             : 'border-border-soft bg-bg-section hover:border-border-input'
@@ -76,7 +76,7 @@ export default function BranchTree({
               {/* Vertical connector line + node dot */}
               <div className="flex flex-col items-center" style={{ width: 24, minWidth: 24 }}>
                 <div
-                  className={`mt-3 h-3 w-3 shrink-0 rounded-full border-2 transition-colors ${
+                  className={`mt-3 h-3 w-3 shrink-0 rounded-full border-2 transition-colors duration-200 ${
                     isSelected
                       ? 'border-brand-purple-600 bg-brand-purple-600'
                       : 'border-border-input bg-bg-card'
@@ -107,7 +107,7 @@ export default function BranchTree({
                   className={`${cardCls} ${isMandatory ? 'cursor-default' : ''}`}
                 >
                   <div
-                    className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors ${
+                    className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors duration-200 ${
                       isSelected
                         ? 'border-brand-purple-600 bg-brand-purple-600 text-white'
                         : 'border-border-input'

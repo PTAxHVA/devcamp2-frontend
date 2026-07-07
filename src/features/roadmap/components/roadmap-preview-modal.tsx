@@ -63,7 +63,7 @@ export default function RoadmapPreviewModal({
         <button
           onClick={onClose}
           aria-label="Close preview"
-          className="text-text-placeholder hover:bg-bg-section hover:text-text-secondary absolute top-5 right-5 flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+          className="text-text-placeholder hover:bg-bg-section hover:text-text-secondary focus-visible:ring-brand-purple-300 absolute top-5 right-5 flex h-9 w-9 items-center justify-center rounded-full transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           <RiCloseLine size={22} />
         </button>
@@ -79,7 +79,7 @@ export default function RoadmapPreviewModal({
             <button
               onClick={() => refetch()}
               disabled={isFetching}
-              className="rounded-xl bg-red-500 px-5 py-2 text-sm font-bold text-white transition-colors hover:bg-red-600 disabled:opacity-60"
+              className="focus-visible:ring-brand-purple-300 rounded-xl bg-red-500 px-5 py-2 text-sm font-bold text-white transition-colors duration-200 hover:bg-red-600 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-60"
             >
               {isFetching ? <span className="loading loading-spinner loading-xs" /> : 'Try again'}
             </button>
@@ -130,14 +130,14 @@ export default function RoadmapPreviewModal({
             <div className="flex gap-3">
               <button
                 onClick={onClose}
-                className="border-border-soft text-text-secondary hover:bg-bg-section flex-1 rounded-xl border py-3 text-sm font-bold transition-colors"
+                className="border-border-soft text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 flex-1 rounded-xl border py-3 text-sm font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
               >
                 Close
               </button>
               {isEnrolled ? (
                 <button
                   onClick={() => navigate(`/my-learning/${roadmapSlug(title)}`)}
-                  className="bg-btn-primary-bg hover:bg-btn-primary-hover flex-1 rounded-xl py-3 text-sm font-bold text-white transition-colors"
+                  className="bg-btn-primary-bg hover:bg-btn-primary-hover focus-visible:ring-brand-purple-300 flex-1 rounded-xl py-3 text-sm font-bold text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
                 >
                   Continue learning
                 </button>
@@ -151,7 +151,7 @@ export default function RoadmapPreviewModal({
                     })
                   }
                   disabled={enroll.isPending || selectedBranches.size === 0}
-                  className="bg-btn-primary-bg hover:bg-btn-primary-hover flex-1 rounded-xl py-3 text-sm font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                  className="bg-btn-primary-bg hover:bg-btn-primary-hover focus-visible:ring-brand-purple-300 flex-1 rounded-xl py-3 text-sm font-bold text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {enroll.isPending ? (
                     <span className="loading loading-spinner loading-xs" />

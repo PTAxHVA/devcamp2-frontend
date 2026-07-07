@@ -13,13 +13,13 @@ export default function NotFoundPage() {
       <div className="flex gap-3">
         <Link
           to="/dashboard"
-          className="bg-btn-primary-bg hover:bg-btn-primary-hover rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition"
+          className="bg-btn-primary-bg hover:bg-btn-primary-hover focus-visible:ring-brand-purple-300 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           Back to Dashboard
         </Link>
         <Link
           to="/"
-          className="border-border-input text-text-primary hover:bg-bg-section rounded-xl border px-5 py-2.5 text-sm font-semibold transition"
+          className="border-border-input text-text-primary hover:bg-bg-section focus-visible:ring-brand-purple-300 rounded-xl border px-5 py-2.5 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           Back to home
         </Link>

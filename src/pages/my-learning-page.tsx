@@ -79,7 +79,7 @@ export default function MyLearningJourneyPage() {
         <p className="mt-1 text-sm">Please check your connection and try again.</p>
         <button
           onClick={() => void refetchList()}
-          className="border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section mt-5 rounded-xl border px-5 py-2 text-sm font-bold transition-colors"
+          className="border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 mt-5 rounded-xl border px-5 py-2 text-sm font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           Try again
         </button>
@@ -121,14 +121,14 @@ export default function MyLearningJourneyPage() {
             <button
               key={r._id}
               onClick={() => navigate(`/my-learning/${roadmapSlug(r.roleName)}`)}
-              className="bg-brand-purple-600 hover:bg-brand-purple-700 rounded-lg px-3 py-1.5 text-xs font-bold text-white transition-colors"
+              className="bg-brand-purple-600 hover:bg-brand-purple-700 focus-visible:ring-brand-purple-300 rounded-lg px-3 py-1.5 text-xs font-bold text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
             >
               {r.roleName ?? 'Roadmap'}
             </button>
           ))}
           <button
             onClick={() => navigate('/roadmaps/browse')}
-            className="border-border-soft text-text-secondary hover:bg-bg-section rounded-lg border px-3 py-1.5 text-xs font-bold transition-colors"
+            className="border-border-soft text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 rounded-lg border px-3 py-1.5 text-xs font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
           >
             Browse roadmaps
           </button>
@@ -183,7 +183,7 @@ export default function MyLearningJourneyPage() {
           {activeRoadmapId && (
             <button
               onClick={() => navigate(`/roadmaps/${activeRoadmapId}/edit`)}
-              className="border-border-soft text-text-secondary hover:bg-bg-section flex cursor-pointer items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-semibold transition-colors"
+              className="border-border-soft text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 flex cursor-pointer items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
             >
               <RiEditLine /> Edit roadmap
             </button>
@@ -196,7 +196,7 @@ export default function MyLearningJourneyPage() {
                 <button
                   key={r._id}
                   onClick={() => navigate(`/my-learning/${roadmapSlug(r.roleName)}`)}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-bold whitespace-nowrap transition-all ${
+                  className={`focus-visible:ring-brand-purple-300 rounded-lg px-3 py-1.5 text-xs font-bold whitespace-nowrap transition-all duration-200 focus-visible:ring-2 focus-visible:outline-none ${
                     r._id === activeRoadmapId
                       ? 'bg-brand-purple-600 text-white shadow-sm'
                       : 'text-text-muted hover:bg-bg-section hover:text-text-secondary'

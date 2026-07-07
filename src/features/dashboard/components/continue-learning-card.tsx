@@ -59,11 +59,11 @@ export function ContinueLearningCard({
               be a display fallback that round-trips to no roadmap. /roadmaps/:id
               resolves the real roleName server-side and redirects to my-learning. */}
           <h3
-            className="group text-text-primary flex w-fit cursor-pointer items-center gap-2 text-2xl font-bold"
+            className="group text-text-primary hover:text-primary flex w-fit cursor-pointer items-center gap-2 text-2xl font-bold transition-colors duration-200"
             onClick={() => navigate(`/roadmaps/${continueLearning.userRoadmapId}`)}
           >
             {continueLearning.roadmapName}
-            <FiExternalLink className="group-hover:text-primary text-text-placeholder h-5 w-5 transition-colors" />
+            <FiExternalLink className="group-hover:text-primary text-text-placeholder h-5 w-5 transition-colors duration-200" />
           </h3>
           <div className="bg-border-soft/60 my-4 h-px w-full"></div>
 
@@ -89,7 +89,7 @@ export function ContinueLearningCard({
       {/* Footer chứa Nút bấm */}
       <div className="flex flex-wrap gap-3 bg-[#EBE4FF] px-6 py-4">
         <button
-          className="btn btn-primary rounded-lg border-none px-6 shadow-sm"
+          className="btn btn-primary focus-visible:ring-brand-purple-300 rounded-lg border-none px-6 shadow-sm transition-colors duration-200 focus-visible:ring-2"
           onClick={() =>
             navigate(
               `/my-learning/topics/${continueLearning.topicId}/sections/${continueLearning.sectionId}?roadmapId=${continueLearning.userRoadmapId}`,
@@ -99,7 +99,7 @@ export function ContinueLearningCard({
           Continue Learning <FiArrowRight className="ml-1 h-4 w-4" />
         </button>
         <button
-          className="btn btn-outline border-border-soft text-text-secondary hover:border-border-input hover:bg-bg-section bg-bg-card rounded-lg px-5"
+          className="btn btn-outline border-border-soft text-text-secondary hover:border-border-input hover:bg-bg-section bg-bg-card focus-visible:ring-brand-purple-300 rounded-lg px-5 transition-colors duration-200 focus-visible:ring-2"
           onClick={() => navigate(`/roadmaps/${continueLearning.userRoadmapId}`)}
         >
           View Roadmap <FiExternalLink className="ml-1 h-4 w-4" />

@@ -20,7 +20,7 @@ export function AddAnotherRolePage() {
     <div className="animate-in fade-in slide-in-from-bottom-4 mx-auto max-w-5xl p-6 duration-500">
       <Link
         to="/dashboard"
-        className="mb-4 inline-flex items-center gap-1 font-bold text-indigo-600 hover:underline"
+        className="focus-visible:ring-brand-purple-300 mb-4 inline-flex items-center gap-1 font-bold text-indigo-600 transition-colors duration-200 hover:text-indigo-700 hover:underline focus-visible:ring-2 focus-visible:outline-none"
       >
         <FiArrowLeft /> Back to dashboard
       </Link>
@@ -45,7 +45,7 @@ export function AddAnotherRolePage() {
           <button
             onClick={() => refetch()}
             disabled={isFetching}
-            className="mt-4 rounded-xl bg-red-500 px-5 py-2 text-sm font-bold text-white hover:bg-red-600 disabled:opacity-60"
+            className="focus-visible:ring-brand-purple-300 mt-4 rounded-xl bg-red-500 px-5 py-2 text-sm font-bold text-white transition-colors duration-200 hover:bg-red-600 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-60"
           >
             {isFetching ? <span className="loading loading-spinner loading-xs" /> : 'Try again'}
           </button>
@@ -62,7 +62,7 @@ export function AddAnotherRolePage() {
           </p>
           <Link
             to="/roadmaps/browse"
-            className="border-border-soft text-text-secondary hover:bg-bg-section mt-4 inline-block rounded-xl border px-5 py-2 text-sm font-bold"
+            className="border-border-soft text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 mt-4 inline-block rounded-xl border px-5 py-2 text-sm font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
           >
             Browse all roadmaps
           </Link>

@@ -200,7 +200,7 @@ export default function SettingsPage() {
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="border-border-input focus:border-brand-purple-500 w-full rounded-lg border px-4 py-2.5 pr-10 text-sm transition outline-none"
+                    className="border-border-input focus:border-brand-purple-500 w-full rounded-lg border px-4 py-2.5 pr-10 text-sm transition-colors duration-200 outline-none"
                   />
                   <User className="text-text-muted absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
                 </div>
@@ -223,7 +223,7 @@ export default function SettingsPage() {
                 <button
                   onClick={handleSaveProfile}
                   disabled={updateProfile.isPending}
-                  className="bg-btn-primary-bg hover:bg-btn-primary-hover rounded-lg px-5 py-2 text-sm font-semibold text-white transition disabled:opacity-60"
+                  className="bg-btn-primary-bg hover:bg-btn-primary-hover focus-visible:ring-brand-purple-300 rounded-lg px-5 py-2 text-sm font-semibold text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-60"
                 >
                   {updateProfile.isPending ? 'Saving...' : 'Save changes'}
                 </button>
@@ -247,12 +247,12 @@ export default function SettingsPage() {
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="Enter current password"
-                    className="border-border-input focus:border-brand-purple-500 w-full rounded-lg border px-4 py-2.5 pr-10 text-sm transition outline-none"
+                    className="border-border-input focus:border-brand-purple-500 w-full rounded-lg border px-4 py-2.5 pr-10 text-sm transition-colors duration-200 outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => setShowCurrent((v) => !v)}
-                    className="text-text-muted absolute top-1/2 right-3 -translate-y-1/2"
+                    className="text-text-muted hover:text-text-secondary focus-visible:ring-brand-purple-300 absolute top-1/2 right-3 -translate-y-1/2 transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
                   >
                     {showCurrent ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -269,12 +269,12 @@ export default function SettingsPage() {
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="Enter new password"
-                      className="border-border-input focus:border-brand-purple-500 w-full rounded-lg border px-4 py-2.5 pr-10 text-sm transition outline-none"
+                      className="border-border-input focus:border-brand-purple-500 w-full rounded-lg border px-4 py-2.5 pr-10 text-sm transition-colors duration-200 outline-none"
                     />
                     <button
                       type="button"
                       onClick={() => setShowNew((v) => !v)}
-                      className="text-text-muted absolute top-1/2 right-3 -translate-y-1/2"
+                      className="text-text-muted hover:text-text-secondary focus-visible:ring-brand-purple-300 absolute top-1/2 right-3 -translate-y-1/2 transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
                     >
                       {showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -290,12 +290,12 @@ export default function SettingsPage() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Confirm new password"
-                      className="border-border-input focus:border-brand-purple-500 w-full rounded-lg border px-4 py-2.5 pr-10 text-sm transition outline-none"
+                      className="border-border-input focus:border-brand-purple-500 w-full rounded-lg border px-4 py-2.5 pr-10 text-sm transition-colors duration-200 outline-none"
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirm((v) => !v)}
-                      className="text-text-muted absolute top-1/2 right-3 -translate-y-1/2"
+                      className="text-text-muted hover:text-text-secondary focus-visible:ring-brand-purple-300 absolute top-1/2 right-3 -translate-y-1/2 transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
                     >
                       {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -324,7 +324,7 @@ export default function SettingsPage() {
                 <button
                   onClick={handleUpdatePassword}
                   disabled={updateAccount.isPending}
-                  className="bg-btn-primary-bg hover:bg-btn-primary-hover rounded-lg px-5 py-2 text-sm font-semibold text-white transition disabled:opacity-60"
+                  className="bg-btn-primary-bg hover:bg-btn-primary-hover focus-visible:ring-brand-purple-300 rounded-lg px-5 py-2 text-sm font-semibold text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-60"
                 >
                   {updateAccount.isPending ? 'Updating...' : 'Update password'}
                 </button>
@@ -352,7 +352,7 @@ export default function SettingsPage() {
               </div>
               <button
                 onClick={logout}
-                className="border-border-input text-text-primary hover:bg-bg-section rounded-lg border px-4 py-2 text-sm font-semibold transition"
+                className="border-border-input text-text-primary hover:bg-bg-section focus-visible:ring-brand-purple-300 rounded-lg border px-4 py-2 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
               >
                 Log out
               </button>
@@ -379,7 +379,7 @@ export default function SettingsPage() {
               </div>
               <button
                 onClick={() => setShowDeactivatePassword(true)}
-                className="border-border-input text-text-primary hover:bg-bg-section shrink-0 rounded-lg border px-4 py-2 text-sm font-semibold whitespace-nowrap transition"
+                className="border-border-input text-text-primary hover:bg-bg-section focus-visible:ring-brand-purple-300 shrink-0 rounded-lg border px-4 py-2 text-sm font-semibold whitespace-nowrap transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
               >
                 Deactivate account
               </button>
@@ -403,7 +403,7 @@ export default function SettingsPage() {
               type="button"
               onClick={closeDeactivateModal}
               aria-label="Close"
-              className="text-text-placeholder hover:bg-bg-section hover:text-text-secondary absolute top-5 right-5 flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+              className="text-text-placeholder hover:bg-bg-section hover:text-text-secondary focus-visible:ring-brand-purple-300 absolute top-5 right-5 flex h-9 w-9 items-center justify-center rounded-full transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
             >
               <X size={20} />
             </button>
@@ -426,14 +426,14 @@ export default function SettingsPage() {
                     type={showConfirmDeactivatePassword ? 'text' : 'password'}
                     value={deactivatePassword}
                     onChange={(e) => setDeactivatePassword(e.target.value)}
-                    className="border-border-input focus:border-brand-purple-500 w-full rounded-lg border px-4 py-2.5 pr-10 text-sm transition outline-none"
+                    className="border-border-input focus:border-brand-purple-500 w-full rounded-lg border px-4 py-2.5 pr-10 text-sm transition-colors duration-200 outline-none"
                     placeholder="Enter your current password"
                     autoFocus
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmDeactivatePassword(!showConfirmDeactivatePassword)}
-                    className="text-text-muted absolute top-1/2 right-3 -translate-y-1/2"
+                    className="text-text-muted hover:text-text-secondary focus-visible:ring-brand-purple-300 absolute top-1/2 right-3 -translate-y-1/2 transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
                   >
                     {showConfirmDeactivatePassword ? (
                       <EyeOff className="h-4 w-4" />
@@ -447,14 +447,14 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={closeDeactivateModal}
-                  className="border-border-input text-text-primary hover:bg-bg-section rounded-lg border px-4 py-2 text-sm font-semibold transition"
+                  className="border-border-input text-text-primary hover:bg-bg-section focus-visible:ring-brand-purple-300 rounded-lg border px-4 py-2 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={deactivateAccount.isPending}
-                  className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:bg-red-400"
+                  className="focus-visible:ring-brand-purple-300 flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-red-700 focus-visible:ring-2 focus-visible:outline-none disabled:bg-red-400"
                 >
                   {deactivateAccount.isPending ? 'Deactivating...' : 'Deactivate account'}
                 </button>

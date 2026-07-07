@@ -49,7 +49,7 @@ export default function ResetPasswordSuccessPage() {
         </p>
         <Link
           to="/login"
-          className="inline-flex w-fit items-center justify-center gap-2 rounded-lg bg-[#001a57] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[#002080]"
+          className="focus-visible:ring-brand-purple-300 inline-flex w-fit items-center justify-center gap-2 rounded-lg bg-[#001a57] px-6 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#002080] focus-visible:ring-2 focus-visible:outline-none"
         >
           → Back to login
         </Link>

@@ -23,7 +23,7 @@ export function McqQuestion({ question, selectedId, onSelect }: McqQuestionProps
           return (
             <label
               key={option.id}
-              className={`flex cursor-pointer items-center gap-4 rounded-xl border-2 p-4 transition-all duration-300 hover:shadow-md ${
+              className={`focus-within:ring-brand-purple-300 flex cursor-pointer items-center gap-4 rounded-xl border-2 p-4 transition-all duration-200 focus-within:ring-2 hover:shadow-md ${
                 isSelected
                   ? 'border-primary bg-primary/10 scale-[1.02] shadow-sm'
                   : 'border-base-300 hover:border-primary/40'

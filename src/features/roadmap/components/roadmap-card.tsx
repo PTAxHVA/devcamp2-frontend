@@ -59,7 +59,7 @@ export default function RoadmapCard({ data, isEnrolled = false }: RoadmapCardPro
       : 'text-text-placeholder'
 
   return (
-    <div className="border-border-soft bg-bg-card flex h-full flex-col justify-between rounded-3xl border p-5 shadow-sm transition-all hover:shadow-md">
+    <div className="border-border-soft bg-bg-card flex h-full flex-col justify-between rounded-3xl border p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
       <div
         className={`mb-4 flex h-36 items-center justify-center rounded-2xl border border-transparent p-4 text-center ${gradientCls}`}
       >
@@ -102,14 +102,14 @@ export default function RoadmapCard({ data, isEnrolled = false }: RoadmapCardPro
         <div className="flex gap-2">
           <button
             onClick={() => setPreviewOpen(true)}
-            className="border-brand-purple-600 text-brand-purple-600 hover:bg-bg-lavender flex-1 rounded-xl border-2 py-2 text-sm font-bold transition-colors"
+            className="border-brand-purple-600 text-brand-purple-600 hover:bg-bg-lavender focus-visible:ring-brand-purple-300 flex-1 rounded-xl border-2 py-2 text-sm font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
           >
             Preview
           </button>
           {isEnrolled ? (
             <button
               onClick={() => navigate(`/my-learning/${roadmapSlug(displayTitle)}`)}
-              className="bg-btn-primary-bg hover:bg-btn-primary-hover flex-1 rounded-xl py-2 text-sm font-bold text-white transition-colors"
+              className="bg-btn-primary-bg hover:bg-btn-primary-hover focus-visible:ring-brand-purple-300 flex-1 rounded-xl py-2 text-sm font-bold text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
             >
               Continue
             </button>
@@ -117,7 +117,7 @@ export default function RoadmapCard({ data, isEnrolled = false }: RoadmapCardPro
             <button
               onClick={handleEnroll}
               disabled={enroll.isPending || branchesLoading || branches.length === 0}
-              className="bg-btn-primary-bg hover:bg-btn-primary-hover flex-1 rounded-xl py-2 text-sm font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+              className="bg-btn-primary-bg hover:bg-btn-primary-hover focus-visible:ring-brand-purple-300 flex-1 rounded-xl py-2 text-sm font-bold text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
             >
               {enroll.isPending || branchesLoading ? (
                 <span className="loading loading-spinner loading-xs" />

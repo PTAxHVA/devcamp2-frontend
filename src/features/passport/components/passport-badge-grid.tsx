@@ -20,7 +20,7 @@ export function PassportBadgeGrid({ topics }: PassportBadgeGridProps) {
       {topics.map((topic) => (
         <div
           key={topic.name}
-          className="border-border-soft hover:border-border-purple group bg-bg-card rounded-2xl border p-4 transition"
+          className="border-border-soft hover:border-border-purple group bg-bg-card rounded-2xl border p-4 transition-colors duration-200"
         >
           <div className="flex items-start gap-3">
             <div className="bg-bg-lavender flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">

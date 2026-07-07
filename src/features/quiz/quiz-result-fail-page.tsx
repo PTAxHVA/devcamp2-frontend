@@ -34,7 +34,7 @@ export function QuizResultFailPage() {
         <p className="font-semibold text-red-600">Unable to load the result.</p>
         <button
           onClick={() => navigate('/dashboard')}
-          className="border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section mt-4 rounded-xl border px-5 py-2 text-sm font-bold"
+          className="border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 mt-4 rounded-xl border px-5 py-2 text-sm font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           Back to Dashboard
         </button>
@@ -107,7 +107,7 @@ export function QuizResultFailPage() {
 
           <div className="flex flex-col gap-3 border-t pt-6 sm:flex-row">
             <button
-              className={`btn h-14 flex-1 rounded-xl text-base font-bold transition-all ${
+              className={`btn focus-visible:ring-brand-purple-300 h-14 flex-1 rounded-xl text-base font-bold transition-all duration-200 focus-visible:ring-2 ${
                 isExpired
                   ? 'border-none bg-slate-900 text-white hover:-translate-y-0.5 hover:bg-slate-800'
                   : 'bg-border-soft text-text-placeholder cursor-not-allowed border-none'
@@ -131,7 +131,7 @@ export function QuizResultFailPage() {
                   navigate('/dashboard')
                 }
               }}
-              className="btn border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section h-14 flex-1 rounded-xl text-base font-bold"
+              className="btn border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 h-14 flex-1 rounded-xl text-base font-bold transition-colors duration-200 focus-visible:ring-2"
             >
               Back to topic
             </button>

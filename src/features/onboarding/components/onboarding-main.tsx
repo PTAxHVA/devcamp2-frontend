@@ -204,14 +204,14 @@ const OnboardingMain = () => {
             <div className="flex items-center justify-between">
               <button
                 onClick={handleBack}
-                className="btn btn-ghost border-border-soft text-text-secondary hover:bg-bg-section h-12 rounded-xl border px-8 text-base font-semibold transition-all active:scale-95"
+                className="btn btn-ghost border-border-soft text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 h-12 rounded-xl border px-8 text-base font-semibold transition-all duration-200 focus-visible:ring-2 active:scale-95"
               >
                 <RiArrowLeftLine className="mr-2 h-5 w-5" /> Back
               </button>
               {currentStep !== 6 && currentStep !== 7 && (
                 <button
                   onClick={handleNext}
-                  className="btn h-12 rounded-xl border-none bg-[#0B1528] px-10 text-base font-semibold text-white transition-all hover:bg-[#15233e] hover:shadow-lg active:scale-95"
+                  className="btn focus-visible:ring-brand-purple-300 h-12 rounded-xl border-none bg-[#0B1528] px-10 text-base font-semibold text-white transition-all duration-200 hover:bg-[#15233e] hover:shadow-lg focus-visible:ring-2 active:scale-95"
                 >
                   {currentStep === 5 && subStep === 2 ? 'Personalize Your Roadmap' : 'Continue'}
                   <RiArrowRightLine className="ml-2 h-5 w-5" />
