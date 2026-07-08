@@ -96,7 +96,7 @@ export function AppRoutes() {
           <Route
             path="/ai-assistant"
             element={
-              <div className="text-text-placeholder flex h-full items-center justify-center text-2xl font-bold">
+              <div className="text-text-placeholder flex h-full items-center justify-center p-4 text-center text-2xl font-bold">
                 🚧 AI Assistant (Coming soon)
               </div>
             }
@@ -104,7 +104,7 @@ export function AppRoutes() {
           <Route
             path="/support"
             element={
-              <div className="text-text-placeholder flex h-full items-center justify-center text-2xl font-bold">
+              <div className="text-text-placeholder flex h-full items-center justify-center p-4 text-center text-2xl font-bold">
                 🚧 Help & Support (Coming soon)
               </div>
             }

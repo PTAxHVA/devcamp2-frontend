@@ -39,7 +39,7 @@ export function CertificateCard({
         printTarget && 'print-target',
       )}
     >
-      <div className="border-border-soft flex flex-col items-center gap-5 rounded-3xl border px-6 py-10 text-center sm:px-12">
+      <div className="border-border-soft flex flex-col items-center gap-5 rounded-3xl border px-4 py-8 text-center sm:px-12 sm:py-10">
         <VoraWordmark />
         <div>
           <p className="text-brand-purple-600 text-[11px] font-bold tracking-[0.3em] uppercase">

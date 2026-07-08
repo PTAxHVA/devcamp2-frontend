@@ -34,7 +34,7 @@ export default function ProgressHeader({ topics }: ProgressHeaderProps) {
 
   return (
     <div className="border-border-soft bg-bg-card grid grid-cols-2 gap-4 rounded-2xl border p-5 shadow-sm md:grid-cols-4">
-      <div className="border-border-soft flex items-center gap-3 border-r pr-4">
+      <div className="border-border-soft flex flex-col items-center gap-2 border-r pr-2 text-center sm:flex-row sm:gap-3 sm:pr-4 sm:text-left">
         <div className="text-brand-purple-600 relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-sm font-black ring-4 ring-indigo-100">
           {overallProgress}%
         </div>
@@ -46,7 +46,7 @@ export default function ProgressHeader({ topics }: ProgressHeaderProps) {
         </div>
       </div>
 
-      <div className="border-border-soft flex items-center gap-3 border-r pr-4">
+      <div className="border-border-soft flex flex-col items-center gap-2 pr-0 text-center sm:flex-row sm:gap-3 sm:text-left md:border-r md:pr-4">
         <div className="shrink-0 rounded-xl bg-green-50 p-3 text-xl text-green-600">
           <RiCalendarCheckLine />
         </div>
@@ -56,7 +56,7 @@ export default function ProgressHeader({ topics }: ProgressHeaderProps) {
         </div>
       </div>
 
-      <div className="border-border-soft flex items-center gap-3 border-r pr-4">
+      <div className="border-border-soft flex flex-col items-center gap-2 border-r pr-2 text-center sm:flex-row sm:gap-3 sm:pr-4 sm:text-left">
         <div className="shrink-0 rounded-xl bg-amber-50 p-3 text-xl text-amber-600">
           <RiTimeLine />
         </div>
@@ -66,13 +66,13 @@ export default function ProgressHeader({ topics }: ProgressHeaderProps) {
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col items-center gap-2 text-center sm:flex-row sm:gap-3 sm:text-left">
         <div className="shrink-0 rounded-xl bg-indigo-50 p-3 text-xl text-indigo-600">
           <RiFlagLine />
         </div>
         <div className="min-w-0">
           <p className="text-text-placeholder text-xs font-bold">Up Next</p>
-          <p className="text-brand-purple-600 truncate text-sm font-black">
+          <p className="text-brand-purple-600 text-sm leading-tight font-black break-words">
             {nextTopic?.title ?? 'All done!'}
           </p>
         </div>

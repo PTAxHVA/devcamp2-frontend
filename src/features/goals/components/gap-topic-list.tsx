@@ -35,11 +35,15 @@ function GapGroup({ title, emptyNote, topics, icon: Icon, iconClass, chipClass }
           {topics.map((topic) => (
             <li
               key={topic.topicId}
-              className="bg-bg-section flex items-center justify-between gap-2 rounded-xl px-3 py-2"
+              className="bg-bg-section flex items-start justify-between gap-3 rounded-xl px-3 py-2"
             >
-              <span className="text-text-primary truncate text-sm font-medium">{topic.name}</span>
+              <span className="text-text-primary text-sm leading-tight font-medium">
+                {topic.name}
+              </span>
               {topic.estimatedHours > 0 && (
-                <span className="text-text-muted shrink-0 text-xs">~{topic.estimatedHours}h</span>
+                <span className="text-text-muted mt-0.5 shrink-0 text-xs">
+                  ~{topic.estimatedHours}h
+                </span>
               )}
             </li>
           ))}
@@ -52,7 +56,7 @@ function GapGroup({ title, emptyNote, topics, icon: Icon, iconClass, chipClass }
 /** The gap table: required topics split into verified / in progress / missing. */
 export function GapTopicList({ verified, inProgress, missing }: GapTopicListProps) {
   return (
-    <div className="grid gap-4 md:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <GapGroup
         title="Verified"
         emptyNote="Nothing verified for this role yet — pass section quizzes to earn these."
