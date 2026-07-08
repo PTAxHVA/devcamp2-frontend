@@ -179,7 +179,15 @@ export default function SectionDetailPage() {
             <span className="text-3xl font-bold">{sectionNumber}</span>
           </div>
           <div>
-            <h1 className="text-text-primary mb-2 text-3xl font-bold">{section.title}</h1>
+            <h1 className="text-text-primary mb-2 flex flex-wrap items-center gap-3 text-3xl font-bold">
+              <span>{section.title}</span>
+              {quiz?.lastAttemptPassed && (
+                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                  Passed
+                </span>
+              )}
+            </h1>
             <p className="text-text-secondary max-w-2xl text-sm leading-relaxed md:text-base">
               Understand the core specifications, methods, and practical aspects of this section.
             </p>
@@ -269,7 +277,7 @@ export default function SectionDetailPage() {
       </div>
 
       {/* Info Banner */}
-      {section.hasQuiz && (
+      {section.hasQuiz && !quiz?.lastAttemptPassed && (
         <div className="border-brand-purple-100 bg-bg-lavender/50 text-brand-purple-800 mb-10 flex items-center gap-3 rounded-xl border p-4">
           <RiInformationLine className="text-brand-purple-600 shrink-0 text-xl" />
           <p className="text-sm font-medium">
@@ -347,14 +355,24 @@ export default function SectionDetailPage() {
             )}
 
             {section.hasQuiz ? (
-              <button
-                onClick={handleStartQuiz}
-                disabled={isQuizLoading}
-                className="focus-visible:ring-brand-purple-300 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#0B1221] px-6 py-3 text-sm font-bold text-white shadow-sm transition-colors duration-200 hover:bg-slate-800 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50 sm:w-auto"
-              >
-                <RiSparklingFill className="text-brand-purple-300 animate-pulse" />{' '}
-                {quiz?.lastAttemptPassed ? 'View Results' : 'Start Quiz'}
-              </button>
+              quiz?.lastAttemptPassed ? (
+                <button
+                  onClick={handleStartQuiz}
+                  disabled={isQuizLoading}
+                  className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-6 py-3 text-sm font-bold text-emerald-700 shadow-sm transition-all duration-200 hover:border-emerald-300 hover:bg-emerald-100 focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:outline-none disabled:opacity-50 sm:w-auto"
+                >
+                  <RiCheckboxCircleLine className="text-lg text-emerald-600" />
+                  View Results
+                </button>
+              ) : (
+                <button
+                  onClick={handleStartQuiz}
+                  disabled={isQuizLoading}
+                  className="focus-visible:ring-brand-purple-300 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#0B1221] px-6 py-3 text-sm font-bold text-white shadow-sm transition-colors duration-200 hover:bg-slate-800 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50 sm:w-auto"
+                >
+                  <RiSparklingFill className="text-brand-purple-300 animate-pulse" /> Start Quiz
+                </button>
+              )
             ) : (
               <p className="text-text-muted max-w-xs text-sm sm:text-right">
                 This section has no quiz — review the materials above, then continue.
