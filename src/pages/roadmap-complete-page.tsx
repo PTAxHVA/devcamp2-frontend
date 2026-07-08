@@ -28,9 +28,9 @@ export function RoadmapCompletePage() {
 
   // Only celebrate a genuinely 100%-complete roadmap (M4) — otherwise send the
   // learner back to the roadmap instead of a false "Congratulations".
-  const allComplete =
-    isPreview ||
-    (!!data && data.topics.length > 0 && data.topics.every((t) => t.status === 'completed'))
+  const isGenuinelyComplete =
+    !!data && data.topics.length > 0 && data.topics.every((t) => t.status === 'completed')
+  const allComplete = isPreview || isGenuinelyComplete
   if (!allComplete) {
     return <Navigate to={id ? `/roadmaps/${id}` : '/dashboard'} replace />
   }
@@ -68,8 +68,8 @@ export function RoadmapCompletePage() {
         </div>
       </div>
 
-      {/* Printable certificate — rendered once the owner's username is known */}
-      {me?.username && data && (
+      {/* Printable certificate — rendered once the owner's username is known and the roadmap is genuinely completed */}
+      {me?.username && data && isGenuinelyComplete && (
         <div className="mt-6 flex flex-col gap-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-text-primary text-sm font-bold">Your certificate</h2>
