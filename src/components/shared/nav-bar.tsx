@@ -15,7 +15,14 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
   const initials = me?.username?.slice(0, 2).toUpperCase() ?? '??'
   const displayName = me?.username ?? ''
 
+  // daisyUI dropdowns are focus-driven: after clicking a menu link, focus stays
+  // inside the menu, so it would remain open on the destination page.
+  const closeDropdown = () => {
+    ;(document.activeElement as HTMLElement | null)?.blur()
+  }
+
   const handleLogout = () => {
+    closeDropdown()
     setAuth(null, null)
     // Drop the previous user's cached queries so a next login in the same tab
     // can't briefly show stale dashboard/profile data.
@@ -59,12 +66,12 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
             className="dropdown-content menu border-border-soft rounded-box bg-base-100 z-20 mt-2 w-48 border p-2 shadow-lg"
           >
             <li>
-              <Link to="/profile">
+              <Link to="/profile" onClick={closeDropdown}>
                 <RiUser3Line className="h-4 w-4" /> Profile
               </Link>
             </li>
             <li>
-              <Link to="/settings">
+              <Link to="/settings" onClick={closeDropdown}>
                 <RiSettings3Line className="h-4 w-4" /> Settings
               </Link>
             </li>
