@@ -10,6 +10,14 @@ import { useMyRoadmaps, useRoadmapDetail } from '../features/learning/hooks/use-
 import { roadmapSlug } from '../features/learning/lib/roadmap-slug'
 import type { LearningTopic } from '../features/learning/types'
 
+function getShortRoleName(name: string | null | undefined): string {
+  if (!name) return 'Roadmap'
+  const lower = name.toLowerCase()
+  if (lower.includes('frontend')) return 'Frontend'
+  if (lower.includes('backend')) return 'Backend'
+  return name
+}
+
 export default function MyLearningJourneyPage() {
   const { slug } = useParams<{ slug?: string }>()
   const navigate = useNavigate()
@@ -178,7 +186,7 @@ export default function MyLearningJourneyPage() {
           </div>
         </div>
 
-        <div className="flex flex-col items-end gap-3">
+        <div className="flex flex-wrap items-center gap-3 sm:justify-end">
           {/* Edit roadmap — the entry point that used to live on /roadmaps/:id. */}
           {activeRoadmapId && (
             <button
@@ -187,8 +195,7 @@ export default function MyLearningJourneyPage() {
             >
               <RiEditLine /> Edit roadmap
             </button>
-          )}
-
+          )}{' '}
           {/* Roadmap switcher — only shown when user has 2 active roadmaps */}
           {roadmaps.length > 1 && (
             <div className="border-border-soft bg-bg-card flex items-center gap-1 rounded-xl border p-1 shadow-sm">
@@ -202,7 +209,8 @@ export default function MyLearningJourneyPage() {
                       : 'text-text-muted hover:bg-bg-section hover:text-text-secondary'
                   }`}
                 >
-                  {r.roleName ?? `Roadmap ${idx + 1}`}
+                  <span className="hidden sm:inline">{r.roleName ?? `Roadmap ${idx + 1}`}</span>
+                  <span className="inline sm:hidden">{getShortRoleName(r.roleName)}</span>
                 </button>
               ))}
             </div>

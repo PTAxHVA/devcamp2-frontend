@@ -94,7 +94,7 @@ export default function BrowseRoadmapsPage() {
           </button>
         </div>
       ) : displayRoadmaps.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {displayRoadmaps.map((item) => (
             <RoadmapCard key={item._id} data={item} isEnrolled={enrolledIds.has(item._id)} />
           ))}

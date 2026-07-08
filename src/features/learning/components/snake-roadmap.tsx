@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { RiCheckFill, RiFlagFill, RiStarFill, RiPlayMiniFill } from 'react-icons/ri'
 import type { LearningTopic } from '../types'
 
@@ -22,10 +23,27 @@ export default function RoadmapSnakePath({
     { masterTopicId: 'finish-node', title: 'FINISH', status: 'locked', type: 'finish' },
   ]
 
-  const CHUNK_SIZE = 3
+  const [chunkSize, setChunkSize] = useState(3)
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth
+      if (width < 480) {
+        setChunkSize(1)
+      } else if (width < 640) {
+        setChunkSize(2)
+      } else {
+        setChunkSize(3)
+      }
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   const rows: AnyNode[][] = []
-  for (let i = 0; i < allNodes.length; i += CHUNK_SIZE) {
-    rows.push(allNodes.slice(i, i + CHUNK_SIZE))
+  for (let i = 0; i < allNodes.length; i += chunkSize) {
+    rows.push(allNodes.slice(i, i + chunkSize))
   }
 
   return (
@@ -58,7 +76,7 @@ export default function RoadmapSnakePath({
         }}
       >
         <div
-          className="relative mx-auto flex max-w-4xl flex-col px-8 py-14"
+          className="relative mx-auto flex max-w-4xl flex-col px-4 py-10 sm:px-8 sm:py-14"
           style={{ gap: '96px' }}
         >
           {rows.map((row, rowIndex) => {
@@ -68,10 +86,10 @@ export default function RoadmapSnakePath({
             return (
               <div
                 key={rowIndex}
-                className={`relative flex w-full items-center justify-between px-12 ${isReverse ? 'flex-row-reverse' : 'flex-row'}`}
+                className={`relative flex w-full items-center justify-between px-4 sm:px-12 ${isReverse ? 'flex-row-reverse' : 'flex-row'}`}
               >
                 {row.map((node, colIndex) => {
-                  const globalIndex = rowIndex * CHUNK_SIZE + colIndex
+                  const globalIndex = rowIndex * chunkSize + colIndex
                   const nextNode = allNodes[globalIndex + 1]
                   const typeNode = 'type' in node ? node : null
 
@@ -87,7 +105,8 @@ export default function RoadmapSnakePath({
                   // In a short last row (2 nodes), justify-between pushes them to
                   // opposite ends with an empty middle column, so the horizontal
                   // connector must span 2 columns to actually reach the far node.
-                  const horizSpan = isLastRow && row.length === 2 ? 'w-[200%]' : 'w-full'
+                  const horizSpan =
+                    chunkSize === 3 && isLastRow && row.length === 2 ? 'w-[200%]' : 'w-full'
                   const topicNum = typeNode
                     ? null
                     : topics.findIndex((t) => t.masterTopicId === node.masterTopicId) + 1
@@ -152,9 +171,15 @@ export default function RoadmapSnakePath({
                   const learningTopic = !typeNode ? (node as LearningTopic) : null
 
                   return (
-                    <div key={node.masterTopicId} className="relative flex w-1/3 justify-center">
+                    <div
+                      key={node.masterTopicId}
+                      className={`relative flex justify-center ${
+                        chunkSize === 1 ? 'w-full' : chunkSize === 2 ? 'w-1/2' : 'w-1/3'
+                      }`}
+                    >
                       {/* Horizontal connector */}
-                      {!isLastInRow &&
+                      {chunkSize > 1 &&
+                        !isLastInRow &&
                         nextNode &&
                         (isNextUnlocked ? (
                           <div
@@ -171,13 +196,26 @@ export default function RoadmapSnakePath({
                           162px apart (66px node height + 96px row gap), so the box is
                           165px tall (162 + the two 3px borders) and nudged up 1.5px so
                           each border's CENTER — not its edge — sits on a node line. */}
-                      {isLastInRow && !isLastRow && nextNode && (
+                      {chunkSize > 1 && isLastInRow && !isLastRow && nextNode && (
                         <div
-                          className={`absolute top-[calc(50%-1.5px)] z-0 h-[165px] w-[70%] ${isNextUnlocked ? 'border-solid border-emerald-300' : 'border-border-input border-dashed'} border-t-[3px] border-b-[3px] ${
+                          className={`absolute top-[calc(50%-1.5px)] z-0 h-[165px] ${
+                            chunkSize === 2 ? 'w-[50%]' : 'w-[70%]'
+                          } ${isNextUnlocked ? 'border-solid border-emerald-300' : 'border-border-input border-dashed'} border-t-[3px] border-b-[3px] ${
                             isReverse
                               ? 'right-1/2 rounded-l-[80px] border-l-[3px]'
                               : 'left-1/2 rounded-r-[80px] border-r-[3px]'
                           } `}
+                        />
+                      )}
+
+                      {/* Simple vertical connector for 1-column layout */}
+                      {chunkSize === 1 && !isLastRow && nextNode && (
+                        <div
+                          className={`absolute top-1/2 left-1/2 z-0 h-[152px] w-0 -translate-x-1/2 border-l-[3px] ${
+                            isNextUnlocked
+                              ? 'border-solid border-emerald-300'
+                              : 'border-border-input border-dashed'
+                          }`}
                         />
                       )}
 
@@ -252,7 +290,9 @@ export default function RoadmapSnakePath({
 
                         {/* Label */}
                         <span
-                          className={`absolute top-full mt-2.5 line-clamp-2 w-22.5 text-center text-[11px] leading-tight ${labelCls}`}
+                          className={`absolute top-full left-1/2 mt-2.5 line-clamp-2 -translate-x-1/2 ${
+                            chunkSize === 1 ? 'w-56' : 'w-24'
+                          } text-center text-[11px] leading-tight ${labelCls}`}
                         >
                           {typeNode ? node.title : `${topicNum}. ${node.title}`}
                         </span>

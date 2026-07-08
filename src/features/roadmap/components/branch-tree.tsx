@@ -50,9 +50,7 @@ export default function BranchTree({
                   </span>
                 )}
               </p>
-              {b.description && (
-                <p className="text-text-muted mt-0.5 line-clamp-2 text-xs">{b.description}</p>
-              )}
+              {b.description && <p className="text-text-muted mt-0.5 text-xs">{b.description}</p>}
             </div>
             <span className="text-text-placeholder shrink-0 text-xs font-semibold">
               {b.topicCount} topic{b.topicCount === 1 ? '' : 's'}

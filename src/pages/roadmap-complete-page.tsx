@@ -1,4 +1,4 @@
-import { useNavigate, useParams, Navigate } from 'react-router'
+import { useNavigate, useParams, Navigate, useSearchParams } from 'react-router'
 import { FiCheck, FiCompass, FiGrid, FiPrinter } from 'react-icons/fi'
 import { useRoadmapDetail } from '@/features/roadmap/hooks/use-roadmap-detail'
 import { useMe } from '@/features/profile/hooks/use-profile'
@@ -12,8 +12,11 @@ import { CertificateCard } from '@/features/passport/components/certificate-card
 export function RoadmapCompletePage() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
+  const [searchParams] = useSearchParams()
   const { data, isLoading } = useRoadmapDetail(id ?? '')
   const { data: me } = useMe()
+
+  const isPreview = searchParams.get('preview') === 'true'
 
   if (isLoading) {
     return (
@@ -25,15 +28,16 @@ export function RoadmapCompletePage() {
 
   // Only celebrate a genuinely 100%-complete roadmap (M4) — otherwise send the
   // learner back to the roadmap instead of a false "Congratulations".
-  const allComplete =
+  const isGenuinelyComplete =
     !!data && data.topics.length > 0 && data.topics.every((t) => t.status === 'completed')
+  const allComplete = isPreview || isGenuinelyComplete
   if (!allComplete) {
     return <Navigate to={id ? `/roadmaps/${id}` : '/dashboard'} replace />
   }
 
   return (
     <div className="animate-in fade-in zoom-in-95 mx-auto max-w-3xl p-6 duration-700">
-      <div className="bg-bg-card relative flex flex-col items-center gap-6 overflow-hidden rounded-[2rem] border p-10 text-center shadow-sm">
+      <div className="bg-bg-card relative flex flex-col items-center gap-6 overflow-hidden rounded-[2rem] border p-6 text-center shadow-sm sm:p-10">
         <div className="absolute top-0 right-0 -mt-20 -mr-20 h-96 w-96 rounded-full bg-indigo-50/50 blur-3xl"></div>
 
         <div className="bg-bg-card relative z-10 flex h-28 w-28 items-center justify-center rounded-full border-[6px] border-indigo-50 text-indigo-600 shadow-xl shadow-indigo-100">
@@ -48,7 +52,7 @@ export function RoadmapCompletePage() {
           </p>
         </div>
 
-        <div className="relative z-10 mt-2 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
+        <div className="relative z-10 mt-2 flex w-full flex-col gap-3 lg:flex-row lg:justify-center">
           <button
             onClick={() => navigate('/dashboard')}
             className="btn focus-visible:ring-brand-purple-300 h-12 rounded-xl bg-slate-900 px-8 font-bold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-800 focus-visible:ring-2"
@@ -64,14 +68,14 @@ export function RoadmapCompletePage() {
         </div>
       </div>
 
-      {/* Printable certificate — rendered once the owner's username is known */}
-      {me?.username && data && (
+      {/* Printable certificate — rendered once the owner's username is known and the roadmap is genuinely completed */}
+      {me?.username && data && isGenuinelyComplete && (
         <div className="mt-6 flex flex-col gap-3">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-text-primary text-sm font-bold">Your certificate</h2>
             <button
               onClick={() => window.print()}
-              className="btn border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 h-10 rounded-xl px-5 text-sm font-bold transition-colors duration-200 focus-visible:ring-2"
+              className="btn border-border-soft bg-bg-card text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 h-10 w-full rounded-xl px-5 text-sm font-bold transition-colors duration-200 focus-visible:ring-2 sm:w-auto"
             >
               <FiPrinter className="mr-2 h-4 w-4" /> Print / save as PDF
             </button>
