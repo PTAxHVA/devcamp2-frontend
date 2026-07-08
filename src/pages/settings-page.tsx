@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router'
 import { toast } from 'react-hot-toast'
 import axios from 'axios'
@@ -57,6 +57,8 @@ export default function SettingsPage() {
   const [deactivatePassword, setDeactivatePassword] = useState('')
   const [showConfirmDeactivatePassword, setShowConfirmDeactivatePassword] = useState(false)
 
+  const deactivateModalRef = useRef<HTMLDivElement>(null)
+
   const closeDeactivateModal = () => {
     setShowDeactivatePassword(false)
     setDeactivatePassword('')
@@ -68,6 +70,29 @@ export default function SettingsPage() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         closeDeactivateModal()
+        return
+      }
+      // Trap Tab inside the modal — without this, tabbing walks into the page
+      // behind the overlay.
+      if (e.key !== 'Tab') return
+      const modal = deactivateModalRef.current
+      if (!modal) return
+      const focusables = modal.querySelectorAll<HTMLElement>(
+        'button, input, a[href], select, textarea, [tabindex]:not([tabindex="-1"])',
+      )
+      if (focusables.length === 0) return
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      const active = document.activeElement
+      if (!modal.contains(active)) {
+        e.preventDefault()
+        first.focus()
+      } else if (e.shiftKey && active === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault()
+        first.focus()
       }
     }
     window.addEventListener('keydown', handleKeyDown)
@@ -365,7 +390,7 @@ export default function SettingsPage() {
             title="Account deactivation"
             subtitle="Turn off access to your VORA account."
           >
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <div className="bg-bg-section flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
                   <User className="text-text-muted h-4 w-4" />
@@ -396,6 +421,7 @@ export default function SettingsPage() {
           aria-modal="true"
         >
           <div
+            ref={deactivateModalRef}
             className="animate-in zoom-in-95 bg-bg-card relative w-full max-w-md overflow-hidden rounded-3xl p-6 shadow-xl duration-200 lg:p-8"
             onClick={(e) => e.stopPropagation()}
           >

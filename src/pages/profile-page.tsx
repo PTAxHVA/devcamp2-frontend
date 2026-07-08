@@ -21,7 +21,7 @@ function RoadmapCard({
   total: number
 }) {
   return (
-    <div className="border-border-soft bg-bg-card flex min-w-0 flex-1 flex-col gap-3 rounded-xl border p-4">
+    <div className="border-border-soft bg-bg-card flex min-w-0 flex-1 flex-col gap-3 rounded-xl border p-4 sm:min-w-56">
       {/* Abstract roadmap illustration — shows the real roadmap title, no fabricated topic names */}
       <div className="bg-bg-section flex h-24 w-full items-center justify-center rounded-lg">
         <div className="text-text-muted flex flex-col items-center gap-1.5 opacity-60 select-none">
@@ -98,7 +98,7 @@ export default function ProfilePage() {
     : '—'
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl items-start gap-5 px-4 py-6 md:px-8">
+    <div className="mx-auto flex w-full max-w-6xl flex-col items-stretch gap-5 px-4 py-6 md:px-8 lg:flex-row lg:items-start">
       {/* ── Left (main) ── */}
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         {/* Header */}
@@ -108,7 +108,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Profile card */}
-        <div className="border-border-soft bg-bg-card flex items-start gap-5 rounded-2xl border p-6">
+        <div className="border-border-soft bg-bg-card flex flex-wrap items-start gap-5 rounded-2xl border p-6">
           {/* Avatar */}
           <div className="bg-brand-purple-300/30 flex h-20 w-20 shrink-0 items-center justify-center rounded-full">
             <div className="bg-brand-purple-300/50 text-brand-purple-600 flex h-12 w-12 items-center justify-center rounded-full text-xl font-bold">
@@ -119,12 +119,14 @@ export default function ProfilePage() {
           {/* Info */}
           <div className="min-w-0 flex-1">
             <div className="mb-1 flex items-center gap-2">
-              <h2 className="text-text-primary text-xl font-bold">{me?.username ?? ''}</h2>
-              <span className="border-brand-purple-400 text-brand-purple-600 rounded-full border px-2.5 py-0.5 text-xs font-semibold">
+              <h2 className="text-text-primary min-w-0 truncate text-xl font-bold">
+                {me?.username ?? ''}
+              </h2>
+              <span className="border-brand-purple-400 text-brand-purple-600 shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-semibold">
                 {levelLabel[profile?.level?.toLowerCase()] ?? 'Learner'}
               </span>
             </div>
-            <p className="text-text-muted mb-3 text-sm">{me?.email ?? ''}</p>
+            <p className="text-text-muted mb-3 truncate text-sm">{me?.email ?? ''}</p>
             <div className="text-text-muted flex items-center gap-1.5 text-xs">
               <Clock className="h-3.5 w-3.5" />
               Joined {joinedDate}
@@ -154,7 +156,7 @@ export default function ProfilePage() {
               View all roadmaps <ExternalLink className="h-3 w-3" />
             </button>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             {activeRoadmaps.length > 0 ? (
               activeRoadmaps.map((r) => <RoadmapCard key={r.id} {...r} />)
             ) : (
@@ -164,7 +166,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Banner */}
-        <div className="border-border-soft bg-bg-card flex items-center justify-between gap-4 rounded-2xl border p-5">
+        <div className="border-border-soft bg-bg-card flex flex-wrap items-center justify-between gap-4 rounded-2xl border p-5">
           <div className="flex items-center gap-4">
             <Star className="h-8 w-8 shrink-0 text-yellow-400" />
             <div>
@@ -184,7 +186,7 @@ export default function ProfilePage() {
       </div>
 
       {/* ── Right (stats + activity) ── */}
-      <div className="flex w-72 shrink-0 flex-col gap-4">
+      <div className="flex w-full shrink-0 flex-col gap-4 lg:w-72">
         {/* Learning stats */}
         <div className="border-border-soft bg-bg-card flex flex-col gap-4 rounded-2xl border p-5">
           <p className="text-text-primary text-sm font-bold">Learning stats</p>
