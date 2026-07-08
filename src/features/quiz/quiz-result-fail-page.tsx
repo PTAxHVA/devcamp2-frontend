@@ -27,6 +27,8 @@ export function QuizResultFailPage() {
   // Real cooldown from the attempt; null until loaded / when BE sets no cooldown.
   const { formatted, isExpired } = useCooldownTimer(data?.quizAttempt?.cooldownUntil ?? null)
 
+  const safeResources = explain.data?.resources.filter((r) => /^https?:\/\//i.test(r.url)) ?? []
+
   const handleToggleCoach = () => {
     if (!showCoach) {
       setShowCoach(true)
@@ -127,6 +129,12 @@ export function QuizResultFailPage() {
             )}
           </div>
 
+          {showCoach && explain.data?.source === 'fallback' && (
+            <div className="bg-bg-section text-text-secondary border-border-soft animate-fade-in mt-4 rounded-xl border p-4 text-xs font-semibold">
+              AI is busy right now — showing the correct answers and curated resources instead.
+            </div>
+          )}
+
           <div className="space-y-4">
             {data.questions.map((q, i) => {
               const isMcq = q.type === 'MULTIPLE_CHOICE'
@@ -166,13 +174,15 @@ export function QuizResultFailPage() {
                     </div>
 
                     <div className="text-text-secondary text-sm font-medium">
-                      <span className="text-text-placeholder">Your Answer:</span>{' '}
+                      <span className="text-text-placeholder mb-1 block">Your Answer:</span>
                       {answerText ? (
-                        <span className="text-text-primary font-semibold">
-                          "{isMcq ? <QuestionContent text={answerText} /> : answerText}"
-                        </span>
+                        <div className="text-text-primary border-l-2 border-indigo-100 pl-3 font-semibold">
+                          {isMcq ? <QuestionContent text={answerText} /> : answerText}
+                        </div>
                       ) : (
-                        <span className="text-text-muted italic">Not answered</span>
+                        <div className="text-text-muted border-l-2 border-slate-200 pl-3 italic">
+                          Not answered
+                        </div>
                       )}
                     </div>
                   </div>
@@ -234,27 +244,25 @@ export function QuizResultFailPage() {
           </div>
 
           {/* Curated Resources Section */}
-          {showCoach && explain.data && explain.data.resources.length > 0 && (
+          {showCoach && safeResources.length > 0 && (
             <div className="bg-bg-card animate-fade-in mt-8 rounded-2xl border p-6 shadow-sm">
               <p className="text-text-placeholder mb-3 text-xs font-bold tracking-wider uppercase">
                 Curated resources for this section
               </p>
               <ul className="flex flex-wrap gap-2">
-                {explain.data.resources
-                  .filter((r) => /^https?:\/\//i.test(r.url))
-                  .map((r) => (
-                    <li key={`${r.title}|${r.url}`}>
-                      <a
-                        href={r.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="border-border-soft bg-bg-card text-text-secondary focus-visible:ring-brand-purple-300 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors duration-200 hover:border-indigo-300 hover:text-indigo-700 focus-visible:ring-2 focus-visible:outline-none"
-                      >
-                        {r.title}
-                        <FiExternalLink className="h-3.5 w-3.5" />
-                      </a>
-                    </li>
-                  ))}
+                {safeResources.map((r) => (
+                  <li key={`${r.title}|${r.url}`}>
+                    <a
+                      href={r.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="border-border-soft bg-bg-card text-text-secondary focus-visible:ring-brand-purple-300 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors duration-200 hover:border-indigo-300 hover:text-indigo-700 focus-visible:ring-2 focus-visible:outline-none"
+                    >
+                      {r.title}
+                      <FiExternalLink className="h-3.5 w-3.5" />
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
           )}
