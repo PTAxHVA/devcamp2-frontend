@@ -1,68 +1,127 @@
 import { useMemo } from 'react'
-import { useNavigate } from 'react-router'
-import { RiArrowLeftLine } from 'react-icons/ri'
+import { Link } from 'react-router'
+import { RiArrowLeftLine, RiArrowRightLine, RiBookOpenLine, RiTimeLine } from 'react-icons/ri'
 import { type Node } from '@xyflow/react'
-import { type BaseNodeData } from '@/features/roadmap/components/base-roadmap-node'
+import { type BaseNodeData, type NodeStatus } from '@/features/roadmap/components/base-roadmap-node'
 import { useDemoRoadmap } from '@/features/roadmap/hooks/use-demo-roadmap'
 import { buildFlowGraph } from '@/features/roadmap/lib/build-flow-graph'
-
-import Roadmap from '@/features/roadmap/components/roadmap'
+import { RoadmapGraph } from '@/features/roadmap/components/roadmap-graph'
 
 /**
  * Public, no-login demo roadmap page (mentor #1).
  * Fetches the curated demo from the backend and renders it as a React Flow tree.
  */
 const DemoRoadmapPage = () => {
-  const navigate = useNavigate()
   const { data, isLoading, isError } = useDemoRoadmap()
 
-  const graph = useMemo(
-    () =>
-      data
-        ? buildFlowGraph(data as unknown as Parameters<typeof buildFlowGraph>[0], {
-            synthesizeSequentialEdges: true,
-          })
-        : null,
+  const graph = useMemo(() => {
+    if (!data) return null
+    const { nodes, edges } = buildFlowGraph(
+      data as unknown as Parameters<typeof buildFlowGraph>[0],
+      {
+        synthesizeSequentialEdges: true,
+      },
+    )
+    // The public demo has no learner progress, so the normal status derivation
+    // renders everything past the root as locked — a wall of dashed, disabled
+    // nodes. Show the path as it looks on day one instead: first topic current,
+    // the rest upcoming.
+    return {
+      edges,
+      nodes: nodes.map((node, index) => ({
+        ...node,
+        data: {
+          ...node.data,
+          status: (index === 0 ? 'current' : 'upcoming') as NodeStatus,
+        },
+      })),
+    }
+  }, [data])
+
+  const totalHours = useMemo(
+    () => data?.topics.reduce((sum, topic) => sum + (topic.estimatedHours || 0), 0) ?? 0,
     [data],
   )
 
   if (isLoading) {
     return (
-      <div className="bg-base-100 flex h-screen w-full items-center justify-center">
+      <div className="bg-bg-soft flex h-dvh w-full flex-col items-center justify-center gap-3">
         <span className="loading loading-spinner loading-lg text-primary" />
+        <p className="text-text-muted text-sm font-medium">Loading demo roadmap…</p>
       </div>
     )
   }
 
   if (isError || !data || !graph) {
     return (
-      <div className="bg-base-100 flex h-screen w-full flex-col items-center justify-center gap-4">
-        <p className="text-error">Unable to load the demo roadmap. Please try again.</p>
-        <button
-          onClick={() => navigate('/')}
-          className="border-border-soft text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
-        >
-          <RiArrowLeftLine className="h-4 w-4" /> Back to home
-        </button>
+      <div className="bg-bg-soft flex h-dvh w-full items-center justify-center p-6">
+        <div className="border-border-soft bg-bg-card flex w-full max-w-md flex-col items-center gap-2 rounded-2xl border p-8 text-center shadow-sm">
+          <h1 className="text-text-primary text-lg font-bold">Unable to load the demo roadmap</h1>
+          <p className="text-text-muted text-sm">Please check your connection and try again.</p>
+          <Link
+            to="/"
+            className="btn btn-outline btn-sm border-border-input hover:bg-bg-section focus-visible:ring-brand-purple-300 mt-4 rounded-full px-5 transition-colors duration-200 focus-visible:ring-2"
+          >
+            <RiArrowLeftLine className="h-4 w-4" /> Back to home
+          </Link>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="bg-base-100 flex h-screen w-full flex-col">
-      <header className="border-border-soft shrink-0 border-b px-8 py-4">
-        <button
-          onClick={() => navigate('/')}
-          className="text-text-secondary hover:text-text-primary focus-visible:ring-brand-purple-300 mb-2 flex cursor-pointer items-center gap-2 text-sm font-medium transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
-        >
-          <RiArrowLeftLine className="h-4 w-4" /> Back to home
-        </button>
-        <h1 className="text-text-primary text-xl font-bold">{data.roadmap.roleName}</h1>
-        <p className="text-text-muted text-sm">{data.roadmap.description}</p>
+    <div className="bg-bg-soft flex h-dvh w-full flex-col">
+      <header className="border-border-soft bg-bg-card shrink-0 border-b px-4 py-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-350 flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div className="min-w-0">
+            <Link
+              to="/"
+              className="text-text-secondary hover:text-text-primary focus-visible:ring-brand-purple-300 mb-1.5 inline-flex items-center gap-1.5 text-sm font-medium transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
+            >
+              <RiArrowLeftLine className="h-4 w-4" /> Back to home
+            </Link>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+              <h1 className="text-text-primary text-xl font-extrabold tracking-tight sm:text-2xl">
+                {data.roadmap.roleName}
+              </h1>
+              <span className="badge badge-primary badge-outline badge-sm px-2 py-1 font-semibold">
+                Demo preview
+              </span>
+            </div>
+            {data.roadmap.description && (
+              <p className="text-text-muted mt-1 max-w-2xl text-sm">{data.roadmap.description}</p>
+            )}
+          </div>
+
+          <div className="flex shrink-0 flex-wrap items-center gap-x-5 gap-y-3 md:justify-end">
+            <div className="text-text-secondary flex items-center gap-4 text-sm font-semibold">
+              <span className="flex items-center gap-1.5">
+                <RiBookOpenLine className="text-brand-purple-500 h-4.5 w-4.5" />
+                {data.topics.length} topics
+              </span>
+              {totalHours > 0 && (
+                <span className="flex items-center gap-1.5">
+                  <RiTimeLine className="text-brand-purple-500 h-4.5 w-4.5" />~
+                  {Math.round(totalHours)}h total
+                </span>
+              )}
+            </div>
+            <Link to="/signup" className="btn btn-primary px-6">
+              Build my roadmap <RiArrowRightLine className="ml-1" />
+            </Link>
+          </div>
+        </div>
       </header>
-      <div className="min-h-0 flex-1">
-        <Roadmap nodes={graph.nodes as Node<BaseNodeData>[]} edges={graph.edges} />
-      </div>
+
+      <main className="mx-auto flex min-h-0 w-full max-w-350 flex-1 flex-col p-4 sm:p-6">
+        <RoadmapGraph
+          nodes={graph.nodes as Node<BaseNodeData>[]}
+          edges={graph.edges}
+          isReadOnly={true}
+          browsable={true}
+          withUI={true}
+        />
+      </main>
     </div>
   )
 }
