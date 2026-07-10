@@ -85,20 +85,20 @@ export function QuizResultPassPage() {
   const correct = countCorrect(data.questions)
 
   return (
-    <div className="animate-in fade-in zoom-in-95 mx-auto max-w-5xl p-6 duration-500">
-      <div className="mb-10 flex flex-col items-center border-b pb-10 text-center">
-        <div className="bg-bg-card relative mb-6 flex h-24 w-24 items-center justify-center rounded-full border-4 border-indigo-100 text-indigo-600 shadow-lg">
+    <div className="animate-in fade-in zoom-in-95 mx-auto w-full max-w-5xl p-4 duration-500 sm:p-6">
+      <div className="mb-8 flex flex-col items-center border-b pb-8 text-center sm:mb-10 sm:pb-10">
+        <div className="bg-bg-card relative mb-6 flex h-20 w-20 items-center justify-center rounded-full border-4 border-indigo-100 text-indigo-600 shadow-lg sm:h-24 sm:w-24">
           <div className="absolute inset-0 animate-ping rounded-full bg-indigo-50 opacity-75 duration-1000"></div>
-          <FiCheck className="relative z-10 h-12 w-12" />
+          <FiCheck className="relative z-10 h-10 w-10 sm:h-12 sm:w-12" />
         </div>
-        <h1 className="text-text-primary text-4xl font-black tracking-tight">
+        <h1 className="text-text-primary text-3xl font-black tracking-tight sm:text-4xl">
           Great job! You passed!
         </h1>
-        <p className="text-text-muted mt-3 text-lg font-medium">
+        <p className="text-text-muted mt-3 max-w-xl text-base font-medium sm:text-lg">
           You've completed this section and are one step closer to your goal.
         </p>
 
-        <div className="bg-bg-card mt-10 flex gap-16 rounded-3xl border p-6 shadow-sm">
+        <div className="bg-bg-card mt-8 flex w-full flex-col rounded-3xl border p-4 shadow-sm sm:mt-10 sm:w-auto sm:flex-row sm:gap-10 sm:p-6 md:gap-16">
           <div className="text-center">
             <p className="text-text-placeholder text-xs font-bold tracking-wider uppercase">
               Your score
@@ -108,7 +108,7 @@ export function QuizResultPassPage() {
               {correct} / {total} correct
             </p>
           </div>
-          <div className="border-r border-l px-16 text-center">
+          <div className="my-4 border-y py-4 text-center sm:my-0 sm:border-y-0 sm:border-r sm:border-l sm:px-10 sm:py-0 md:px-16">
             <p className="text-text-placeholder text-xs font-bold tracking-wider uppercase">
               Result
             </p>
@@ -127,7 +127,7 @@ export function QuizResultPassPage() {
         </div>
       </div>
 
-      <div className="bg-bg-card rounded-3xl border p-8 shadow-sm">
+      <div className="bg-bg-card rounded-3xl border p-4 shadow-sm sm:p-8">
         <h3 className="text-text-primary mb-6 text-lg font-bold">Review your answers</h3>
         <AnswerReview questions={data.questions} />
       </div>
@@ -139,7 +139,7 @@ export function QuizResultPassPage() {
         </div>
       )}
 
-      <div className="mt-10 flex justify-end">
+      <div className="mt-10 flex justify-stretch sm:justify-end">
         <button
           onClick={() => {
             if (topicId) {
@@ -150,7 +150,7 @@ export function QuizResultPassPage() {
               navigate('/dashboard')
             }
           }}
-          className="btn focus-visible:ring-brand-purple-300 h-14 rounded-xl bg-slate-900 px-10 text-lg font-bold text-white shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-800 focus-visible:ring-2"
+          className="btn focus-visible:ring-brand-purple-300 h-14 w-full rounded-xl bg-slate-900 px-10 text-lg font-bold text-white shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-800 focus-visible:ring-2 sm:w-auto"
         >
           Continue →
         </button>

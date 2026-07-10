@@ -46,7 +46,7 @@ export function MistakeCoach({ attemptId, questions }: MistakeCoachProps) {
   const safeResources = result?.resources.filter((r) => isSafeUrl(r.url)) ?? []
 
   return (
-    <div className="bg-bg-card rounded-3xl border p-8 shadow-sm">
+    <div className="bg-bg-card rounded-3xl border p-4 shadow-sm sm:p-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h3 className="text-text-primary flex items-center gap-2 text-lg font-bold">
@@ -62,7 +62,7 @@ export function MistakeCoach({ attemptId, questions }: MistakeCoachProps) {
             type="button"
             onClick={handleReview}
             disabled={explain.isPending}
-            className="btn disabled:bg-border-soft disabled:text-text-placeholder focus-visible:ring-brand-purple-300 h-12 shrink-0 rounded-xl border-none bg-indigo-600 px-6 font-bold text-white transition-colors duration-200 hover:bg-indigo-700 focus-visible:ring-2"
+            className="btn disabled:bg-border-soft disabled:text-text-placeholder focus-visible:ring-brand-purple-300 h-12 w-full shrink-0 rounded-xl border-none bg-indigo-600 px-6 font-bold text-white transition-colors duration-200 hover:bg-indigo-700 focus-visible:ring-2 sm:w-auto"
           >
             {explain.isPending ? (
               <>
