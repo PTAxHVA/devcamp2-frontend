@@ -42,22 +42,22 @@ export function StreakCalendar({
         <FiCalendar className="text-primary h-5 w-5" />
         <h3 className="font-bold">This Week</h3>
       </div>
-      <div className="flex justify-between gap-1">
+      <div className="grid grid-cols-7 gap-1">
         {dayLabels.map(({ short, date }, i) => {
           const isToday = i === todayIndex
           const isActive = activityDays[i]
           return (
-            <div key={i} className="flex flex-col items-center gap-1">
+            <div key={i} className="flex min-w-0 flex-col items-center gap-1">
               <span className="text-base-content/40 text-xs font-medium">{short}</span>
               <div
-                className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                className={`flex aspect-square w-full max-w-[40px] items-center justify-center rounded-lg ${
                   isActive
                     ? 'bg-primary text-primary-content shadow-md'
                     : 'bg-base-200 text-base-content/40'
-                } ${isToday ? 'ring-primary ring-2 ring-offset-2' : ''}`}
+                } ${isToday ? 'ring-primary ring-2 ring-offset-1' : ''}`}
               >
                 {isActive ? (
-                  <FaFire className="h-5 w-5 animate-pulse" />
+                  <FaFire className="h-4 w-4 animate-pulse" />
                 ) : (
                   <span className="text-xs font-semibold opacity-40">{date}</span>
                 )}
