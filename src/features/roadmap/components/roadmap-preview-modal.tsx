@@ -90,7 +90,7 @@ export default function RoadmapPreviewModal({
         ) : (
           <>
             <p className="text-brand-purple-600 mb-1 text-xs font-bold tracking-wider uppercase">
-              Roadmap preview
+              Customize
             </p>
             <h2 className="text-text-primary mb-2 pr-8 text-2xl font-black">{title}</h2>
             <p className="text-text-muted mb-5 text-sm">
