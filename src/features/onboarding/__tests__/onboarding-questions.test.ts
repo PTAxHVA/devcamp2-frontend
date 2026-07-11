@@ -23,4 +23,15 @@ describe('getPreferenceQuestions (H11)', () => {
     const ids = getPreferenceQuestions('backend').map((q) => q.id)
     expect(ids).not.toContain('framework')
   })
+
+  it('asks a backend learner for a database, but not a frontend learner', () => {
+    expect(getPreferenceQuestions('backend').map((q) => q.id)).toContain('database')
+    expect(getPreferenceQuestions('frontend').map((q) => q.id)).not.toContain('database')
+    expect(getPreferenceQuestions('fullstack').map((q) => q.id)).not.toContain('database')
+  })
+
+  it('offers database options that match the seeded Database fork branches', () => {
+    const database = getPreferenceQuestions('backend').find((q) => q.id === 'database')
+    expect(database?.options?.map((o) => o.value)).toEqual(['mongodb', 'postgresql', 'mysql'])
+  })
 })
