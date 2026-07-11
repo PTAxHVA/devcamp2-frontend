@@ -33,7 +33,11 @@ export default function ProgressHeader({ topics }: ProgressHeaderProps) {
     topics.find((t) => t.status === 'in_progress') ?? topics.find((t) => t.status !== 'completed')
 
   return (
-    <div className="border-border-soft bg-bg-card grid grid-cols-2 gap-4 rounded-2xl border p-5 shadow-sm md:grid-cols-4">
+    // Stay 2-up through the tablet range and only go 4-up at xl (≥1280). Between
+    // md and xl the 256px sidebar leaves too little width for four cells, so the
+    // labels used to wrap word-by-word and overlap their icons (audit D1). Two
+    // columns reflow cleanly there; the four-column desktop look is unchanged.
+    <div className="border-border-soft bg-bg-card grid grid-cols-2 gap-4 rounded-2xl border p-5 shadow-sm xl:grid-cols-4">
       <div className="border-border-soft flex flex-col items-center gap-2 border-r pr-2 text-center sm:flex-row sm:gap-3 sm:pr-4 sm:text-left">
         <div className="text-brand-purple-600 relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-sm font-black ring-4 ring-indigo-100">
           {overallProgress}%
@@ -46,7 +50,7 @@ export default function ProgressHeader({ topics }: ProgressHeaderProps) {
         </div>
       </div>
 
-      <div className="border-border-soft flex flex-col items-center gap-2 pr-0 text-center sm:flex-row sm:gap-3 sm:text-left md:border-r md:pr-4">
+      <div className="border-border-soft flex flex-col items-center gap-2 pr-0 text-center sm:flex-row sm:gap-3 sm:text-left xl:border-r xl:pr-4">
         <div className="shrink-0 rounded-xl bg-green-50 p-3 text-xl text-green-600">
           <RiCalendarCheckLine />
         </div>
