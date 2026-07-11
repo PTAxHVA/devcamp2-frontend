@@ -165,6 +165,19 @@ export const PREFERENCE_QUESTIONS = [
     ],
   },
   {
+    id: 'database',
+    icon: <LuDatabase className="h-6 w-6" />,
+    label: 'Database preference',
+    desc: 'Which database would you like to focus on?',
+    type: 'select',
+    placeholder: 'Select database...',
+    options: [
+      { value: 'mongodb', label: 'MongoDB' },
+      { value: 'postgresql', label: 'PostgreSQL' },
+      { value: 'mysql', label: 'MySQL (with Prisma)' },
+    ],
+  },
+  {
     id: 'os',
     icon: <RiGlobalLine className="h-6 w-6" />,
     label: 'Operating system',
@@ -209,7 +222,12 @@ export const LEARNING_PATH_KEYS = ['learningFramework', 'styling', 'projectDirec
 export const isFrontendFocusedRole = (role: string | undefined | null): boolean =>
   role === 'frontend' || role === 'fullstack'
 
-// Preference questions for a given role: the frontend-only "framework" question is
-// dropped for non-frontend roles.
+// Preference questions for a given role. The framework question is frontend-only and
+// the database question is backend-only, so each learner is asked exactly the fork
+// choice that applies to their roadmap (its answer selects the enrolled branch).
 export const getPreferenceQuestions = (role: string | undefined | null) =>
-  PREFERENCE_QUESTIONS.filter((q) => q.id !== 'framework' || isFrontendFocusedRole(role))
+  PREFERENCE_QUESTIONS.filter((q) => {
+    if (q.id === 'framework') return isFrontendFocusedRole(role)
+    if (q.id === 'database') return role === 'backend'
+    return true
+  })

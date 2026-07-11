@@ -1,5 +1,5 @@
 import { Handle, Position } from '@xyflow/react'
-import { RiCheckFill, RiGitBranchLine, RiLockLine } from 'react-icons/ri'
+import { RiAddLine, RiCheckFill, RiGitBranchLine, RiLockLine } from 'react-icons/ri'
 
 export type NodeStatus = 'completed' | 'current' | 'upcoming' | 'locked'
 
@@ -12,14 +12,21 @@ export interface BaseNodeData extends Record<string, unknown> {
   variant?: NodeVariant
   /** Optional hover hint (native tooltip) — used by the ghost fork node. */
   hint?: string
+  /** Ghost only: when true the node is an add-in-parallel affordance (Customize editor). */
+  clickable?: boolean
+  /** Ghost only: the branch this ghost topic belongs to (add-in-parallel target). */
+  branchId?: string
+  branchName?: string
 }
 
 export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
   const variant = data.variant || 'standard'
   // Only the real (interactive) roadmap graph wires node clicks; the onboarding/demo
   // preview is read-only, so it must not look clickable (L9 — no pointer/hover-lift).
-  // The ghost fork node (the not-chosen path) is likewise inert.
-  const isInteractive = variant === 'standard'
+  // The learner-view ghost fork node is inert too — but an editor ghost with
+  // `clickable` IS an add-in-parallel affordance, so it looks and behaves clickable.
+  const isGhostAdd = variant === 'ghost' && data.clickable === true
+  const isInteractive = variant === 'standard' || isGhostAdd
   const getContainerStyles = () => {
     if (variant === 'onboarding') {
       switch (data.status) {
@@ -33,7 +40,10 @@ export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
     }
     if (variant === 'ghost') {
       // The alternative fork path: visible but clearly not part of the enrollment.
-      return 'border-border-input bg-bg-section text-text-placeholder border-dashed opacity-80'
+      // A clickable ghost (Customize editor) brightens on hover to invite adding it.
+      return isGhostAdd
+        ? 'border-border-input bg-bg-section text-text-secondary hover:border-brand-purple-400 hover:text-brand-purple-700 border-dashed'
+        : 'border-border-input bg-bg-section text-text-placeholder border-dashed opacity-80'
     }
     switch (data.status) {
       case 'completed':
@@ -51,7 +61,11 @@ export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
     if (variant === 'ghost') {
       return (
         <div className="flex w-6 shrink-0 justify-center">
-          <RiGitBranchLine className="text-text-placeholder h-4 w-4" />
+          {isGhostAdd ? (
+            <RiAddLine className="text-brand-purple-600 h-4 w-4" />
+          ) : (
+            <RiGitBranchLine className="text-text-placeholder h-4 w-4" />
+          )}
         </div>
       )
     }
