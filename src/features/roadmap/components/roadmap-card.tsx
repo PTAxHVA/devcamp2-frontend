@@ -20,9 +20,12 @@ interface RoadmapCardData {
 interface RoadmapCardProps {
   data: RoadmapCardData
   isEnrolled?: boolean
+  /** Present only for an enrolled roadmap — the user-roadmap id the preview's
+   *  "Edit Roadmap" button opens in the editor (/roadmaps/:id/edit). */
+  userRoadmapId?: string
 }
 
-export default function RoadmapCard({ data, isEnrolled = false }: RoadmapCardProps) {
+export default function RoadmapCard({ data, isEnrolled = false, userRoadmapId }: RoadmapCardProps) {
   const displayTitle = data.roleName ?? 'Roadmap'
   const [previewOpen, setPreviewOpen] = useState(false)
   const navigate = useNavigate()
@@ -106,7 +109,7 @@ export default function RoadmapCard({ data, isEnrolled = false }: RoadmapCardPro
             onClick={() => setPreviewOpen(true)}
             className="border-brand-purple-600 text-brand-purple-600 hover:bg-bg-lavender focus-visible:ring-brand-purple-300 flex-1 rounded-xl border-2 py-2 text-sm font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
           >
-            Preview
+            Customize
           </button>
           {isEnrolled ? (
             <button
@@ -136,6 +139,7 @@ export default function RoadmapCard({ data, isEnrolled = false }: RoadmapCardPro
           roadmapId={data._id}
           roleName={displayTitle}
           isEnrolled={isEnrolled}
+          userRoadmapId={userRoadmapId}
           onClose={() => setPreviewOpen(false)}
         />
       )}
