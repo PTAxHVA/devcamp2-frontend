@@ -1,16 +1,22 @@
 import type { RoadmapSummary } from '@/features/learning/types'
 
 /**
- * The set of MASTER roadmap ids the user is already enrolled in. Browse / Add-role
- * pages cross-reference this to show a "Continue" button instead of a re-enroll one.
+ * Map of MASTER roadmap id -> the user's own user-roadmap id, for every roadmap the
+ * user is enrolled in. Browse / Add-role pages cross-reference a browse roadmap's `_id`
+ * (a master id) to know both:
+ *  - whether the user is enrolled (`.has`) — show "Continue" instead of "Use roadmap", and
+ *  - which user-roadmap to open in the editor (`.get` -> /roadmaps/:userRoadmapId/edit).
  *
- * Match key: a browse roadmap's `_id` (a master roadmap id) === a my-roadmap's
- * `roadmapId` (the master id its user-roadmap points at). NOT `_id` — on a
- * RoadmapSummary `_id` is the user-roadmap's own id, so matching on it would never
- * hit and every enrolled roadmap would still offer "Use roadmap".
+ * Match key: a browse roadmap's `_id` (a master id) === a my-roadmap's `roadmapId`.
+ * The value is the my-roadmap's own `_id` (the user-roadmap id we navigate with). If the
+ * same master appears twice (e.g. a re-enrolled roadmap), the first entry wins.
  */
-export function enrolledMasterRoadmapIds(
-  myRoadmaps: Pick<RoadmapSummary, 'roadmapId'>[] | undefined,
-): Set<string> {
-  return new Set((myRoadmaps ?? []).map((r) => r.roadmapId))
+export function enrolledMasterToUserRoadmapId(
+  myRoadmaps: Pick<RoadmapSummary, '_id' | 'roadmapId'>[] | undefined,
+): Map<string, string> {
+  const map = new Map<string, string>()
+  for (const r of myRoadmaps ?? []) {
+    if (!map.has(r.roadmapId)) map.set(r.roadmapId, r._id)
+  }
+  return map
 }

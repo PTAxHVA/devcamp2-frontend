@@ -11,6 +11,8 @@ interface RoadmapPreviewModalProps {
   roadmapId: string
   roleName?: string
   isEnrolled?: boolean
+  /** The user-roadmap id (present when enrolled) — opened by the "Edit Roadmap" button. */
+  userRoadmapId?: string
   onClose: () => void
 }
 
@@ -18,6 +20,7 @@ export default function RoadmapPreviewModal({
   roadmapId,
   roleName,
   isEnrolled = false,
+  userRoadmapId,
   onClose,
 }: RoadmapPreviewModalProps) {
   const { data, isLoading, isError, refetch, isFetching } = useMasterRoadmap(roadmapId)
@@ -87,7 +90,7 @@ export default function RoadmapPreviewModal({
         ) : (
           <>
             <p className="text-brand-purple-600 mb-1 text-xs font-bold tracking-wider uppercase">
-              Roadmap preview
+              Customize
             </p>
             <h2 className="text-text-primary mb-2 pr-8 text-2xl font-black">{title}</h2>
             <p className="text-text-muted mb-5 text-sm">
@@ -136,10 +139,16 @@ export default function RoadmapPreviewModal({
               </button>
               {isEnrolled ? (
                 <button
-                  onClick={() => navigate(`/my-learning/${roadmapSlug(title)}`)}
+                  onClick={() =>
+                    navigate(
+                      userRoadmapId
+                        ? `/roadmaps/${userRoadmapId}/edit`
+                        : `/my-learning/${roadmapSlug(title)}`,
+                    )
+                  }
                   className="bg-btn-primary-bg hover:bg-btn-primary-hover focus-visible:ring-brand-purple-300 flex-1 rounded-xl py-3 text-sm font-bold text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
                 >
-                  Continue learning
+                  Edit Roadmap
                 </button>
               ) : (
                 <button

@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import RoadmapCard from '@/features/roadmap/components/roadmap-card'
 import { useBrowseRoadmaps } from '@/features/roadmap/hooks/use-browse-roadmaps'
 import { useMyRoadmaps } from '@/features/learning/hooks/use-my-learning'
-import { enrolledMasterRoadmapIds } from '@/features/roadmap/lib/enrolled-roadmaps'
+import { enrolledMasterToUserRoadmapId } from '@/features/roadmap/lib/enrolled-roadmaps'
 
 export default function BrowseRoadmapsPage() {
   const [search, setSearch] = useState('')
@@ -10,7 +10,7 @@ export default function BrowseRoadmapsPage() {
 
   const { data: rawRoadmaps = [], isLoading, isError, isFetching, refetch } = useBrowseRoadmaps()
   const { data: myRoadmaps } = useMyRoadmaps()
-  const enrolledIds = useMemo(() => enrolledMasterRoadmapIds(myRoadmaps), [myRoadmaps])
+  const enrolledMap = useMemo(() => enrolledMasterToUserRoadmapId(myRoadmaps), [myRoadmaps])
 
   const clearFilters = () => {
     setSearch('')
@@ -96,7 +96,12 @@ export default function BrowseRoadmapsPage() {
       ) : displayRoadmaps.length > 0 ? (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {displayRoadmaps.map((item) => (
-            <RoadmapCard key={item._id} data={item} isEnrolled={enrolledIds.has(item._id)} />
+            <RoadmapCard
+              key={item._id}
+              data={item}
+              isEnrolled={enrolledMap.has(item._id)}
+              userRoadmapId={enrolledMap.get(item._id)}
+            />
           ))}
         </div>
       ) : (
