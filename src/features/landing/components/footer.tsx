@@ -10,7 +10,7 @@ export const Footer = () => {
               <RiTeamLine className="h-8 w-8" />
             </div>
             <div className="flex flex-col">
-              <span className="text-l leading-tight font-bold">Tailored for You</span>
+              <span className="text-lg leading-tight font-bold">Tailored for You</span>
               <span className="text-text-muted text-sm">Your unique learning path</span>
             </div>
           </div>
@@ -22,7 +22,7 @@ export const Footer = () => {
               <RiShieldCheckLine className="h-8 w-8" />
             </div>
             <div className="flex flex-col">
-              <span className="text-l leading-tight font-bold">Curated Resources</span>
+              <span className="text-lg leading-tight font-bold">Curated Resources</span>
               <span className="text-text-muted text-sm">High-quality, modern tutorials</span>
             </div>
           </div>
@@ -34,7 +34,7 @@ export const Footer = () => {
               <RiRocketLine className="h-8 w-8" />
             </div>
             <div className="flex flex-col">
-              <span className="text-l leading-tight font-bold">Project-Driven</span>
+              <span className="text-lg leading-tight font-bold">Project-Driven</span>
               <span className="text-text-muted text-sm">Learn by building real apps</span>
             </div>
           </div>

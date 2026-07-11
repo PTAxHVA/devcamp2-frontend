@@ -130,14 +130,14 @@ const OnboardingMain = () => {
 
         {currentStep > 1 && currentStep < 5 && (
           <div key={`heading-${currentStep}`} className="fade-only mb-10 text-center">
-            <h1 className="text-text-primary mb-4 text-4xl font-bold">
+            <h1 className="text-text-primary mb-4 text-2xl font-bold sm:text-3xl lg:text-4xl">
               {currentStep === 2
                 ? "What's your starting point?"
                 : currentStep === 3
                   ? "What's your main goal?"
                   : 'What’s your current level?'}
             </h1>
-            <p className="text-text-muted text-lg font-medium">
+            <p className="text-text-muted text-base font-medium sm:text-lg">
               {currentStep === 2
                 ? 'Choose the role that best matches your goals.'
                 : currentStep === 3

@@ -41,14 +41,15 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
       </button>
 
       {/* Desktop greeting — fills the otherwise-empty top bar with the signed-in
-          learner's name instead of leaving dead space. */}
+          learner's name instead of leaving dead space. Truncates so a very long
+          username can't blow the header (and the whole page) past the viewport. */}
       {displayName && (
-        <p className="text-text-secondary hidden text-sm font-medium md:block">
+        <p className="text-text-secondary hidden min-w-0 truncate text-sm font-medium md:block">
           Welcome back, <span className="text-text-primary font-semibold">{displayName}</span>
         </p>
       )}
 
-      <div className="ml-auto flex items-center gap-2 sm:gap-3">
+      <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
         <div className="dropdown dropdown-end">
           <div
             tabIndex={0}
@@ -56,10 +57,12 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
             aria-label="Account menu"
             className="hover:text-brand-purple-600 focus-visible:ring-brand-purple-300 flex cursor-pointer items-center gap-3 rounded-xl transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
           >
-            <div className="bg-bg-lavender text-brand-purple-700 flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold">
+            <div className="bg-bg-lavender text-brand-purple-700 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold">
               {initials}
             </div>
-            <span className="hidden text-sm font-semibold sm:inline">{displayName}</span>
+            <span className="hidden max-w-[10rem] truncate text-sm font-semibold sm:block">
+              {displayName}
+            </span>
           </div>
           <ul
             tabIndex={0}

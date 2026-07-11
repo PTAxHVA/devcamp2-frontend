@@ -14,7 +14,7 @@ export function FillQuestion({ question, value, onChange }: FillQuestionProps) {
   const hasValue = value.trim().length > 0
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 w-full duration-500">
-      <div className="text-base-content mb-6 text-xl leading-relaxed font-bold">
+      <div className="text-base-content mb-6 text-xl leading-relaxed font-bold break-words">
         <QuestionContent text={question.content} />
       </div>
       <div className="flex flex-col gap-3">

@@ -196,7 +196,11 @@ export default function TopicDetailPage() {
   const estimatedTimeText =
     estimatedHours > 0 ? `${estimatedHours} ${estimatedHours === 1 ? 'hour' : 'hours'}` : '—'
 
-  const cols = 'grid-cols-[20px_22px_1fr_104px_24px]'
+  // Narrow phones can't fit the full 5-column table (drag + # + name + status +
+  // icon), so on mobile we drop the decorative drag handle and the status icon and
+  // let the badge size to content — the fixed columns otherwise overran 320px and
+  // pushed the status icon off-screen.
+  const cols = 'grid-cols-[24px_1fr_auto] gap-2 sm:grid-cols-[20px_22px_1fr_104px_24px] sm:gap-4'
 
   const getSectionStatus = (secId: string): Status => {
     const progress = userProgress.find((p) => p.sectionId === secId)
@@ -235,15 +239,17 @@ export default function TopicDetailPage() {
 
         <div className="mt-6 flex flex-col gap-6 lg:flex-row">
           {/* ============================ MAIN ============================ */}
-          <main className="flex-1 space-y-5">
+          <main className="min-w-0 flex-1 space-y-5">
             {/* Header */}
             <div className="flex items-start gap-4">
               <div className="bg-bg-lavender text-brand-purple-700 flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xl font-bold">
                 {orderIndex + 1}
               </div>
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-3">
-                  <h1 className="text-text-primary text-3xl font-bold">{topicName}</h1>
+                  <h1 className="text-text-primary max-w-full min-w-0 text-3xl font-bold break-words">
+                    {topicName}
+                  </h1>
                 </div>
                 {/* Progress */}
                 <div className="mt-3 flex items-center gap-4">
@@ -282,11 +288,11 @@ export default function TopicDetailPage() {
                           <div className="bg-bg-lavender text-brand-purple-600 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
                             <Icon className="h-5 w-5" />
                           </div>
-                          <div>
+                          <div className="min-w-0">
                             <p className="text-text-placeholder text-xs font-semibold uppercase">
                               {r.type}
                             </p>
-                            <p className="text-text-primary text-sm leading-snug font-semibold">
+                            <p className="text-text-primary text-sm leading-snug font-semibold break-words">
                               {r.title}
                             </p>
                           </div>
@@ -306,13 +312,13 @@ export default function TopicDetailPage() {
             <Card className="p-6">
               <h3 className="text-text-primary mb-3 font-semibold">Sections</h3>
               <div
-                className={`grid ${cols} text-text-placeholder items-center gap-4 px-2 pb-1 text-xs font-medium`}
+                className={`grid ${cols} text-text-placeholder items-center px-2 pb-1 text-xs font-medium`}
               >
-                <span />
+                <span className="hidden sm:block" />
                 <span>#</span>
                 <span>Section</span>
                 <span className="text-center">Status</span>
-                <span />
+                <span className="hidden sm:block" />
               </div>
               {sections.map((sec, idx) => {
                 const status = getSectionStatus(sec._id)
@@ -324,9 +330,9 @@ export default function TopicDetailPage() {
                         `/my-learning/topics/${id}/sections/${sec._id}${roadmapId ? `?roadmapId=${roadmapId}` : ''}`,
                       )
                     }
-                    className={`grid ${cols} border-border-soft hover:bg-bg-section/60 cursor-pointer items-center gap-4 border-t px-2 py-4 transition-colors duration-200`}
+                    className={`grid ${cols} border-border-soft hover:bg-bg-section/60 cursor-pointer items-center border-t px-2 py-4 transition-colors duration-200`}
                   >
-                    <RiDraggable className="text-text-disabled h-4 w-4" />
+                    <RiDraggable className="text-text-disabled hidden h-4 w-4 sm:block" />
                     <span className="text-text-placeholder text-sm">{idx + 1}</span>
                     <div className="min-w-0">
                       <p className="text-text-primary truncate text-sm font-semibold">{sec.name}</p>
@@ -342,7 +348,9 @@ export default function TopicDetailPage() {
                       </p>
                     </div>
                     <StatusBadge status={status} />
-                    <StatusIcon status={status} />
+                    <span className="hidden sm:block">
+                      <StatusIcon status={status} />
+                    </span>
                   </div>
                 )
               })}

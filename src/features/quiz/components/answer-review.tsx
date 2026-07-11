@@ -24,10 +24,10 @@ export function AnswerReview({ questions }: { questions: ResultQuestion[] }) {
 
         return (
           <li key={q._id} className={`rounded-xl border p-4 ${tone}`}>
-            <div className="text-text-primary font-semibold">
+            <div className="text-text-primary font-semibold break-words">
               Q{i + 1}. <QuestionContent text={q.content} />
             </div>
-            <div className={`mt-1 text-sm font-medium ${label}`}>
+            <div className={`mt-1 text-sm font-medium break-words ${label}`}>
               {correct ? 'Correct' : 'Incorrect'}
               {answerText ? (
                 <>

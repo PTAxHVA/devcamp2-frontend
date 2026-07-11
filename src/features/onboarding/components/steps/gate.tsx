@@ -24,7 +24,7 @@ export function StepGate({ onAccept, onCustomize, onChooseAnother, isSubmitting 
         <div className="bg-bg-lavender mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full">
           <span className="text-4xl">✨</span>
         </div>
-        <h1 className="text-text-primary mb-3 text-4xl leading-tight font-bold">
+        <h1 className="text-text-primary mb-3 text-3xl leading-tight font-bold sm:text-4xl">
           Your roadmap is ready!
         </h1>
         <p className="text-text-muted text-lg">

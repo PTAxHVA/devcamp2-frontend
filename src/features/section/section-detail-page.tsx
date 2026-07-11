@@ -164,7 +164,7 @@ export default function SectionDetailPage() {
         <RiArrowRightSLine className="text-text-placeholder" />
         <Link
           to={`/my-learning/topics/${topicId}${qRoadmap}`}
-          className="text-brand-purple-600 hover:text-brand-purple-700 cursor-pointer transition-colors duration-200"
+          className="text-brand-purple-600 hover:text-brand-purple-700 min-w-0 cursor-pointer break-words transition-colors duration-200"
         >
           {topic.name}
         </Link>
@@ -174,13 +174,13 @@ export default function SectionDetailPage() {
 
       {/* Header */}
       <div className="mb-8 flex flex-col items-start justify-between gap-8 lg:flex-row">
-        <div className="flex flex-1 gap-5">
+        <div className="flex w-full min-w-0 flex-1 gap-5 lg:w-auto">
           <div className="border-border-purple bg-bg-lavender text-brand-purple-700 flex h-20 w-20 shrink-0 flex-col items-center justify-center rounded-full border-2">
             <span className="text-3xl font-bold">{sectionNumber}</span>
           </div>
-          <div>
+          <div className="max-w-full min-w-0">
             <h1 className="text-text-primary mb-2 flex flex-wrap items-center gap-3 text-3xl font-bold">
-              <span>{section.title}</span>
+              <span className="max-w-full min-w-0 break-words">{section.title}</span>
               {quiz?.lastAttemptPassed && (
                 <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
@@ -198,11 +198,13 @@ export default function SectionDetailPage() {
         <div className="border-border-soft bg-bg-card w-full shrink-0 rounded-2xl border p-5 shadow-sm lg:w-80 xl:w-96">
           <div className="space-y-4">
             <div className="flex items-center justify-between text-sm">
-              <div className="text-text-secondary flex items-center gap-3">
+              <div className="text-text-secondary flex shrink-0 items-center gap-3">
                 <RiBookOpenLine className="text-brand-purple-600 text-lg" />
                 <span className="font-medium">Topic</span>
               </div>
-              <span className="text-text-primary font-semibold">{topic.name}</span>
+              <span className="text-text-primary min-w-0 text-right font-semibold break-words">
+                {topic.name}
+              </span>
             </div>
           </div>
         </div>
@@ -256,15 +258,15 @@ export default function SectionDetailPage() {
                   <div className="bg-bg-lavender text-brand-purple-600 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
                     <Icon className="text-xl" />
                   </div>
-                  <div className="flex-1">
+                  <div className="min-w-0 flex-1">
                     <p className="text-text-placeholder mb-0.5 text-xs font-bold tracking-wider uppercase">
                       {getResourceTypeLabel(mat.type)}
                     </p>
-                    <p className="text-text-primary group-hover:text-brand-purple-700 text-sm font-bold transition-colors duration-200">
+                    <p className="text-text-primary group-hover:text-brand-purple-700 text-sm font-bold break-words transition-colors duration-200">
                       {mat.title}
                     </p>
                   </div>
-                  <div className="flex items-center">
+                  <div className="flex shrink-0 items-center">
                     <span className="text-text-muted text-xs font-medium">
                       {mat.estimatedMinutes ? `${mat.estimatedMinutes} min` : 'External'}
                     </span>
@@ -295,19 +297,19 @@ export default function SectionDetailPage() {
             onClick={() =>
               navigate(`/my-learning/topics/${topicId}/sections/${prevSection._id}${qRoadmap}`)
             }
-            className="group focus-visible:ring-brand-purple-300 flex w-full cursor-pointer items-center gap-4 text-left transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none sm:w-auto"
+            className="group focus-visible:ring-brand-purple-300 flex w-full max-w-full min-w-0 cursor-pointer items-center gap-4 text-left transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none sm:w-auto"
           >
             <div className="border-border-soft text-text-secondary group-hover:border-border-input bg-bg-card flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-colors duration-200">
               <RiArrowLeftLine />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-text-muted mb-0.5 text-xs font-bold tracking-wider uppercase">
                 Previous Section
               </p>
               <p className="text-text-primary group-hover:text-brand-purple-700 text-sm font-semibold transition-colors duration-200">
                 Section {currentIdx}
                 <br />
-                <span className="text-text-secondary group-hover:text-brand-purple-600 font-medium transition-colors duration-200">
+                <span className="text-text-secondary group-hover:text-brand-purple-600 font-medium break-words transition-colors duration-200">
                   {prevSection.name}
                 </span>
               </p>
