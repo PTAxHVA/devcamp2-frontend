@@ -70,7 +70,7 @@ export default function ProgressHeader({ topics }: ProgressHeaderProps) {
         <div className="shrink-0 rounded-xl bg-indigo-50 p-3 text-xl text-indigo-600">
           <RiFlagLine />
         </div>
-        <div className="min-w-0">
+        <div className="max-w-full min-w-0">
           <p className="text-text-placeholder text-xs font-bold">Up Next</p>
           <p className="text-brand-purple-600 text-sm leading-tight font-black break-words">
             {nextTopic?.title ?? 'All done!'}

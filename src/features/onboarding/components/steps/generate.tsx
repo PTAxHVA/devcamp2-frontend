@@ -40,7 +40,7 @@ const WORKING_STEPS = [
 const WorkingState = () => (
   <div className="animate-in fade-in mt-8 flex w-full flex-col items-center gap-10 duration-700">
     <div className="max-w-xl text-center">
-      <h1 className="mb-4 text-4xl leading-tight font-bold text-[#0B1528] md:text-5xl">
+      <h1 className="mb-4 text-3xl leading-tight font-bold text-[#0B1528] sm:text-4xl md:text-5xl">
         Personalizing your roadmap
       </h1>
       <p className="text-text-muted text-lg">
@@ -108,7 +108,7 @@ export const StepGenerating = ({ onContinue, minDwellMs = MIN_DWELL_MS }: StepGe
         <div className="bg-bg-lavender mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full">
           <span className="text-4xl">✨</span>
         </div>
-        <h1 className="text-text-primary mb-3 text-4xl leading-tight font-bold">
+        <h1 className="text-text-primary mb-3 text-3xl leading-tight font-bold sm:text-4xl">
           Here's your personalized plan
         </h1>
         <p className="text-text-muted text-lg">

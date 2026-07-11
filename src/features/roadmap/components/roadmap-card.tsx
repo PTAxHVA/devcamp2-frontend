@@ -63,14 +63,16 @@ export default function RoadmapCard({ data, isEnrolled = false }: RoadmapCardPro
       <div
         className={`mb-4 flex h-36 items-center justify-center rounded-2xl border border-transparent p-4 text-center ${gradientCls}`}
       >
-        <span className={`text-xl font-black opacity-80 ${textCls}`}>{displayTitle}</span>
+        <span className={`max-w-full text-xl font-black break-words opacity-80 ${textCls}`}>
+          {displayTitle}
+        </span>
       </div>
 
       <div>
-        <h3 className="text-text-primary mb-1.5 text-[17px] leading-tight font-bold">
+        <h3 className="text-text-primary mb-1.5 text-[17px] leading-tight font-bold break-words">
           {displayTitle}
         </h3>
-        <p className="text-text-muted mb-4 line-clamp-2 text-sm">
+        <p className="text-text-muted mb-4 line-clamp-2 text-sm break-words">
           {data.description ?? 'No description available.'}
         </p>
       </div>

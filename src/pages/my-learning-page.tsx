@@ -129,7 +129,7 @@ export default function MyLearningJourneyPage() {
             <button
               key={r._id}
               onClick={() => navigate(`/my-learning/${roadmapSlug(r.roleName)}`)}
-              className="bg-brand-purple-600 hover:bg-brand-purple-700 focus-visible:ring-brand-purple-300 rounded-lg px-3 py-1.5 text-xs font-bold text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
+              className="bg-brand-purple-600 hover:bg-brand-purple-700 focus-visible:ring-brand-purple-300 max-w-full rounded-lg px-3 py-1.5 text-xs font-bold break-words text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
             >
               {r.roleName ?? 'Roadmap'}
             </button>
@@ -162,8 +162,8 @@ export default function MyLearningJourneyPage() {
     <div className="mx-auto w-full max-w-375 p-6 lg:p-8">
       {/* Header */}
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-text-primary text-2xl font-black">
+        <div className="max-w-full min-w-0">
+          <h1 className="text-text-primary max-w-full text-2xl font-black break-words">
             {roadmap.roleName ?? 'My Learning Journey'}
           </h1>
           <p className="text-text-muted mt-0.5 text-sm">

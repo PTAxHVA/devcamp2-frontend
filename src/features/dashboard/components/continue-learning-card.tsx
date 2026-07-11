@@ -59,11 +59,11 @@ export function ContinueLearningCard({
               be a display fallback that round-trips to no roadmap. /roadmaps/:id
               resolves the real roleName server-side and redirects to my-learning. */}
           <h3
-            className="group text-text-primary hover:text-primary flex w-fit cursor-pointer items-center gap-2 text-2xl font-bold transition-colors duration-200"
+            className="group text-text-primary hover:text-primary flex cursor-pointer items-center gap-2 text-2xl font-bold transition-colors duration-200"
             onClick={() => navigate(`/roadmaps/${continueLearning.userRoadmapId}`)}
           >
-            {continueLearning.roadmapName}
-            <FiExternalLink className="group-hover:text-primary text-text-placeholder h-5 w-5 transition-colors duration-200" />
+            <span className="min-w-0 break-words">{continueLearning.roadmapName}</span>
+            <FiExternalLink className="group-hover:text-primary text-text-placeholder h-5 w-5 shrink-0 transition-colors duration-200" />
           </h3>
           <div className="bg-border-soft/60 my-4 h-px w-full"></div>
 
@@ -72,11 +72,13 @@ export function ContinueLearningCard({
               Next up
             </p>
             <div className="flex items-center gap-3">
-              <div className="border-border-soft text-text-secondary bg-bg-card flex h-8 w-8 items-center justify-center rounded-md border font-bold shadow-sm">
+              <div className="border-border-soft text-text-secondary bg-bg-card flex h-8 w-8 shrink-0 items-center justify-center rounded-md border font-bold shadow-sm">
                 {completed}
               </div>
-              <div className="flex flex-col">
-                <span className="text-text-primary font-bold">{continueLearning.topicName}</span>
+              <div className="flex min-w-0 flex-col">
+                <span className="text-text-primary font-bold break-words">
+                  {continueLearning.topicName}
+                </span>
                 <span className="text-text-muted text-xs font-medium">
                   {completed} of {total} sections completed
                 </span>

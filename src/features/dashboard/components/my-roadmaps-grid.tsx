@@ -42,18 +42,18 @@ export function MyRoadmapsGrid({ roadmaps, hasAvailableRoles }: MyRoadmapsGridPr
           >
             <div className="card-body flex h-full flex-col gap-4 p-5">
               <div className="flex items-start justify-between gap-3">
-                <div className="flex items-start gap-3">
+                <div className="flex min-w-0 items-start gap-3">
                   <div className="bg-primary/10 group-hover:bg-primary flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg transition-colors duration-200">
                     <HiMiniAcademicCap className="text-primary group-hover:text-primary-content h-6 w-6" />
                   </div>
-                  <div>
-                    <h3 className="text-base-content group-hover:text-primary line-clamp-2 leading-tight font-semibold transition-colors duration-200">
+                  <div className="min-w-0">
+                    <h3 className="text-base-content group-hover:text-primary line-clamp-2 leading-tight font-semibold break-words transition-colors duration-200">
                       {roadmap.roleName}
                     </h3>
                   </div>
                 </div>
                 <div
-                  className={`badge text-[10px] font-bold tracking-wider whitespace-nowrap uppercase ${badgeInfo.class}`}
+                  className={`badge shrink-0 text-[10px] font-bold tracking-wider whitespace-nowrap uppercase ${badgeInfo.class}`}
                 >
                   {badgeInfo.text}
                 </div>

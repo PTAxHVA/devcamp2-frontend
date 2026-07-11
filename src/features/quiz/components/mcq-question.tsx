@@ -14,7 +14,7 @@ interface McqQuestionProps {
 export function McqQuestion({ question, selectedId, onSelect }: McqQuestionProps) {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 w-full duration-500">
-      <div className="text-base-content mb-6 text-xl leading-relaxed font-bold">
+      <div className="text-base-content mb-6 text-xl leading-relaxed font-bold break-words">
         <QuestionContent text={question.content} />
       </div>
       <div className="flex flex-col gap-3">
@@ -32,16 +32,16 @@ export function McqQuestion({ question, selectedId, onSelect }: McqQuestionProps
               <input
                 type="radio"
                 name={`question-${question.id}`}
-                className="radio radio-primary"
+                className="radio radio-primary shrink-0"
                 checked={isSelected}
                 onChange={() => onSelect(option.id)}
               />
-              <div className="flex-1 text-base font-medium">
+              <div className="min-w-0 flex-1 text-base font-medium break-words">
                 <QuestionContent text={option.content} />
               </div>
 
               {isSelected && (
-                <HiOutlineCheckCircle className="text-primary h-7 w-7 animate-bounce" />
+                <HiOutlineCheckCircle className="text-primary h-7 w-7 shrink-0 animate-bounce" />
               )}
             </label>
           )

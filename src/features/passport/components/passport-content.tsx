@@ -40,9 +40,10 @@ export function PassportContent({ passport, passportUrl }: PassportContentProps)
               {passport.roadmaps.map((roadmap) => (
                 <span
                   key={roadmap.name}
-                  className="bg-bg-section text-text-secondary inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold"
+                  className="bg-bg-section text-text-secondary inline-flex max-w-full items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold"
                 >
-                  <FiMap className="h-3 w-3" /> {roadmap.name}
+                  <FiMap className="h-3 w-3 shrink-0" />{' '}
+                  <span className="min-w-0 break-words">{roadmap.name}</span>
                 </span>
               ))}
             </div>
