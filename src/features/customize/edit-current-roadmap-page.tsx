@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useEffect, useRef } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import { BaseRoadmapNode, type BaseNodeData } from '@/features/roadmap/components/base-roadmap-node'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
@@ -11,7 +11,9 @@ import {
   type AvailableTopic,
 } from '@/features/roadmap/hooks/use-available-topics'
 import { useMasterRoadmap } from '@/features/roadmap/hooks/use-master-roadmap'
+import { useMasterRoadmapGraph } from '@/features/roadmap/hooks/use-master-roadmap-graph'
 import { buildFlowGraph } from '@/features/roadmap/lib/build-flow-graph'
+import { buildGhostBranches } from '@/features/roadmap/lib/build-ghost-branches'
 import SwitchPathPanel, { type PathSwap } from './components/switch-path-panel'
 import { resolveIncomingTopics } from './lib/resolve-incoming-topics'
 import {
@@ -83,6 +85,9 @@ export default function EditCurrentRoadmapPage() {
   // Master branches carry the fork metadata (selectionGroup + topicIds) that
   // powers the "Learning path" switch card for forked roadmaps.
   const { data: masterPreview } = useMasterRoadmap(data?.roadmap.masterRoadmapId)
+  // The all-branches master graph (topic names + fork edges) feeds the ghost overlay:
+  // the unchosen parallel branches shown beside the chosen path.
+  const { data: masterGraph } = useMasterRoadmapGraph(data?.roadmap.masterRoadmapId)
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<BaseNodeData>>([])
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
@@ -139,12 +144,24 @@ export default function EditCurrentRoadmapPage() {
     [availableTopics, canvasIds],
   )
 
-  const selectedMeta = selectedId ? topicMeta.get(selectedId) : undefined
+  // Ghost overlay: the unchosen fork branches (e.g. Vue/Angular while on React,
+  // Bootstrap while on Tailwind) drawn as inert dashed columns the learner can click
+  // to add in parallel. Derived from the all-branches master graph keyed on what's on
+  // the canvas, so a branch drops off the moment its topics are added. Empty for a
+  // non-forked roadmap → the canvas renders exactly as before.
+  const ghost = useMemo(
+    () =>
+      buildGhostBranches({
+        masterGraph,
+        canvasTopicIds: nodes.map((n) => n.id),
+        branches: masterPreview?.branches,
+      }),
+    [masterGraph, nodes, masterPreview],
+  )
+  const displayNodes = useMemo(() => [...nodes, ...ghost.nodes], [nodes, ghost.nodes])
+  const displayEdges = useMemo(() => [...edges, ...ghost.edges], [edges, ghost.edges])
 
-  const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
-    setSelectedId(node.id)
-    setSheetOpen(true)
-  }, [])
+  const selectedMeta = selectedId ? topicMeta.get(selectedId) : undefined
 
   // Re-number, re-stack vertically and keep the graph connected after a structural
   // change. Layout/ordering is visual only — the backend re-derives canonical order.
@@ -239,6 +256,60 @@ export default function EditCurrentRoadmapPage() {
     relayout([...nodes, newNode])
     setSelectedId(topic.masterTopicId)
     aiFeedbackMutation.mutate({ action: 'add', topicId: topic.masterTopicId })
+  }
+
+  // Add every not-yet-enrolled topic of a ghost branch to the canvas in one pass —
+  // learn it in parallel (keeps the current path, only adds). Save persists it via the
+  // normal PATCH addTopicIds. Fires AI feedback once so the branch-conflict warning
+  // (two frameworks at once) surfaces, degrading to data when Gemini is down.
+  const handleAddGhostBranch = (branchId?: string, branchName?: string) => {
+    if (!branchId || !masterGraph) return
+    const branch = masterPreview?.branches.find((b) => b._id === branchId)
+    if (!branch?.topicIds?.length) return
+    const canvas = new Set(nodes.map((n) => n.id))
+    const topicById = new Map(masterGraph.topics.map((t) => [t.masterTopicId, t]))
+    const toAdd = branch.topicIds
+      .map((id) => topicById.get(id))
+      .filter((t): t is BEGraphTopic => !!t && !canvas.has(t.masterTopicId))
+    if (toAdd.length === 0) return
+
+    setTopicMeta((prev) => {
+      const next = new Map(prev)
+      for (const t of toAdd) {
+        next.set(t.masterTopicId, {
+          name: t.name,
+          status: 'available',
+          estimatedHours: t.estimatedHours,
+          sectionTotal: t.sectionTotal,
+          sectionCompleted: 0,
+          hasProgress: false,
+        })
+      }
+      return next
+    })
+
+    const newNodes: Node<BaseNodeData>[] = toAdd.map((t, i) => ({
+      id: t.masterTopicId,
+      type: 'roadmapNode',
+      position: { x: COLUMN_X, y: (nodes.length + i) * VERTICAL_GAP },
+      data: { number: String(nodes.length + i + 1), label: t.name, status: 'upcoming' },
+    }))
+    relayout([...nodes, ...newNodes])
+    setSelectedId(toAdd[0].masterTopicId)
+    aiFeedbackMutation.mutate({ action: 'add', topicId: toAdd[0].masterTopicId })
+    toast.success(`Added the ${branchName ?? branch.name} path — press Save changes to apply.`)
+  }
+
+  const onNodeClick = (_: React.MouseEvent, node: Node) => {
+    // A ghost node = an unchosen fork branch. Clicking it adds that branch in parallel;
+    // a real topic node just opens its details.
+    if (node.id.startsWith('ghost:')) {
+      const ghostData = node.data as BaseNodeData
+      handleAddGhostBranch(ghostData.branchId, ghostData.branchName)
+      return
+    }
+    setSelectedId(node.id)
+    setSheetOpen(true)
   }
 
   // Swap the fork path on the CANVAS in one pass (single relayout — applying the
@@ -474,8 +545,8 @@ export default function EditCurrentRoadmapPage() {
 
           <div className="bg-bg-section/50 relative flex-1">
             <ReactFlow
-              nodes={nodes}
-              edges={edges}
+              nodes={displayNodes}
+              edges={displayEdges}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               onNodeClick={onNodeClick}
