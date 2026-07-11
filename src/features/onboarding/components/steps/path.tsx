@@ -3,9 +3,8 @@ import { LuCode } from 'react-icons/lu'
 import {
   RiReactjsLine,
   RiAngularjsLine,
-  RiCss3Line,
+  RiBootstrapLine,
   RiLayout4Line,
-  RiFileCodeLine,
   RiProfileLine,
   RiDashboardLine,
   RiShoppingCartLine,
@@ -54,22 +53,16 @@ export const StepLearningPath = () => {
       setState: (val: string) => setAnswer('styling', val),
       options: [
         {
-          id: 'css',
-          title: 'CSS Fundamentals',
-          desc: 'Core styling techniques for building web layouts.',
-          icon: <RiCss3Line className="h-10 w-10 text-[#264de4]" />,
-        },
-        {
           id: 'tailwind',
           title: 'Tailwind CSS',
           desc: 'A utility-first framework for rapid UI development.',
           icon: <RiLayout4Line className="h-10 w-10 text-[#38bdf8]" />,
         },
         {
-          id: 'scss',
-          title: 'SCSS/ Sass',
-          desc: 'Advanced CSS with variables and reusable styles.',
-          icon: <RiFileCodeLine className="h-10 w-10 text-[#c6538c]" />,
+          id: 'bootstrap',
+          title: 'Bootstrap',
+          desc: 'A component-rich framework for fast, responsive UIs.',
+          icon: <RiBootstrapLine className="h-10 w-10 text-[#7952B3]" />,
         },
       ],
     },
