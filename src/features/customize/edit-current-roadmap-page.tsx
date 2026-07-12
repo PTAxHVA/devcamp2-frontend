@@ -16,6 +16,11 @@ import { buildFlowGraph } from '@/features/roadmap/lib/build-flow-graph'
 import { buildEditorLayout } from './lib/build-editor-layout'
 import { resolveAiFeedbackView, type AiFeedbackData } from './lib/resolve-ai-feedback-view'
 import {
+  findDependentTopicIds,
+  insertAtIndex,
+  resolveOnCanvasPrereqNames,
+} from './lib/editor-remove-ops'
+import {
   ReactFlow,
   Background,
   Controls,
@@ -34,6 +39,7 @@ import {
   RiSparklingFill,
   RiLoader4Line,
   RiInformationLine,
+  RiLockLine,
 } from 'react-icons/ri'
 
 interface TopicMeta {
@@ -44,6 +50,9 @@ interface TopicMeta {
   sectionCompleted: number
   /** A topic the learner has started cannot be removed (backend enforces this too). */
   hasProgress: boolean
+  /** MasterTopic ids this topic depends on — shown in the details panel and used to
+   *  guard removals (you can't drop a topic another on-canvas topic requires). */
+  prerequisiteTopicIds: string[]
 }
 
 const STATUS_LABEL: Record<BEGraphTopic['status'], string> = {
@@ -146,6 +155,10 @@ export default function EditCurrentRoadmapPage() {
   // Captured once from the fetched roadmap: per-topic metadata (for removal rules
   // and the details panel) and the original topic set (to diff into removeTopicIds).
   const initializedRef = useRef(false)
+  // The id of the outstanding "Removed … / Undo" toast, if any. A single undo is live
+  // at a time: any later structural change (add/remove/add-branch) dismisses it, so
+  // undo can never restore a stale snapshot on top of newer edits.
+  const undoToastIdRef = useRef<string | null>(null)
   const [topicMeta, setTopicMeta] = useState<Map<string, TopicMeta>>(new Map())
   const [originalIds, setOriginalIds] = useState<string[]>([])
   // Seed the editor from real roadmap data the first time it arrives. Node ids are
@@ -168,6 +181,7 @@ export default function EditCurrentRoadmapPage() {
         sectionTotal: t.sectionTotal,
         sectionCompleted: t.sectionCompleted,
         hasProgress: t.sectionCompleted > 0,
+        prerequisiteTopicIds: t.prerequisiteTopicIds ?? [],
       })
     }
     setTopicMeta(meta)
@@ -214,6 +228,34 @@ export default function EditCurrentRoadmapPage() {
 
   const selectedMeta = selectedId ? topicMeta.get(selectedId) : undefined
 
+  // Prerequisite topics of the selected topic, resolved to names (only those still
+  // on the canvas can be named). Surfaces the dependency the graph edges imply.
+  const selectedPrereqNames = useMemo(
+    () =>
+      resolveOnCanvasPrereqNames(
+        selectedMeta?.prerequisiteTopicIds,
+        (id) => canvasIds.has(id),
+        (id) => topicMeta.get(id)?.name,
+      ),
+    [selectedMeta, topicMeta, canvasIds],
+  )
+
+  // Topics still on the canvas that list the selected topic as a prerequisite — used
+  // to warn that removing it would break their chain.
+  const selectedRequiredByNames = useMemo(
+    () =>
+      selectedId
+        ? findDependentTopicIds(
+            nodes.map((n) => n.id),
+            (id) => topicMeta.get(id)?.prerequisiteTopicIds,
+            selectedId,
+          )
+            .map((id) => topicMeta.get(id)?.name)
+            .filter((name): name is string => !!name)
+        : [],
+    [selectedId, nodes, topicMeta],
+  )
+
   // Update the canvas topic set + order after a structural change. Positions,
   // numbering, fork rows, ghosts and edges are all derived from `nodes` by
   // buildEditorLayout (display), so this just keeps `nodes` as the ordered
@@ -245,6 +287,15 @@ export default function EditCurrentRoadmapPage() {
     },
   })
 
+  // Dismiss the outstanding undo toast, if any. Called before every structural change
+  // so a stale undo can never fire against a canvas that has since moved on.
+  const dismissUndo = () => {
+    if (undoToastIdRef.current) {
+      toast.dismiss(undoToastIdRef.current)
+      undoToastIdRef.current = null
+    }
+  }
+
   const handleRemoveTopic = () => {
     if (!selectedId) return
     const meta = topicMeta.get(selectedId)
@@ -252,21 +303,70 @@ export default function EditCurrentRoadmapPage() {
       toast.error("You can't remove a topic you've already started.")
       return
     }
+    // Guard the prerequisite chain: refuse to remove a topic that another topic
+    // still on the canvas depends on, and name the dependents so the reason is clear.
+    const dependentIds = findDependentTopicIds(
+      nodes.map((n) => n.id),
+      (id) => topicMeta.get(id)?.prerequisiteTopicIds,
+      selectedId,
+    )
+    if (dependentIds.length > 0) {
+      const names = dependentIds.map((id) => topicMeta.get(id)?.name ?? 'another topic')
+      toast.error(`Required by ${names.join(', ')} — remove those first.`)
+      return
+    }
     if (nodes.length <= 1) {
       toast.error('A roadmap must keep at least one topic.')
       return
     }
 
+    dismissUndo()
     const removedTopicId = selectedId
+    const removedName = meta?.name ?? 'Topic'
+    // Remember the removed node and its column position so undo can splice it back
+    // exactly where it was, rather than restoring a full-canvas snapshot that would
+    // clobber any edits made in the undo window. Display + edges are re-derived.
+    const removedIndex = nodes.findIndex((n) => n.id === removedTopicId)
+    // Unreachable today (selectedId is always a real on-canvas node id), but guards a
+    // future mutation path that forgets to keep selectedId in sync: splicing an
+    // undefined node back in on undo would hard-crash the next render.
+    if (removedIndex === -1) return
+    const removedNode = nodes[removedIndex]
     const remaining = nodes.filter((n) => n.id !== removedTopicId)
     relayout(remaining)
     setSelectedId(remaining[0]?.id ?? null)
 
     // Advisory only: tell the learner what removing this topic implies.
     aiFeedbackMutation.mutate({ action: 'remove', topicId: removedTopicId })
+
+    const toastId = toast(
+      () => (
+        <span className="flex items-center gap-3">
+          <span className="text-sm">
+            Removed <span className="font-semibold">{removedName}</span>.
+          </span>
+          <button
+            onClick={() => {
+              // Splice the removed node back at its original slot. No structural change
+              // can have happened since (any would have dismissed this toast), so
+              // `remaining` is still the live canvas; the display is re-derived.
+              relayout(insertAtIndex(remaining, removedNode, removedIndex))
+              setSelectedId(removedTopicId)
+              dismissUndo()
+            }}
+            className="text-brand-purple-600 hover:text-brand-purple-700 shrink-0 text-sm font-bold"
+          >
+            Undo
+          </button>
+        </span>
+      ),
+      { icon: <RiSubtractLine className="text-error-text" />, duration: 6000 },
+    )
+    undoToastIdRef.current = toastId
   }
 
   const handleAddTopic = (topic: AvailableTopic) => {
+    dismissUndo()
     const newNode: Node<BaseNodeData> = {
       id: topic.masterTopicId,
       type: 'roadmapNode',
@@ -282,6 +382,10 @@ export default function EditCurrentRoadmapPage() {
         sectionTotal: topic.sectionTotal,
         sectionCompleted: 0,
         hasProgress: false,
+        // Symmetric prereq guard: once /available-topics returns prerequisiteTopicIds,
+        // a picker-added topic's prerequisites are protected too. Defaults to [] until
+        // the backend field lands.
+        prerequisiteTopicIds: topic.prerequisiteTopicIds ?? [],
       })
       return next
     })
@@ -312,6 +416,7 @@ export default function EditCurrentRoadmapPage() {
       .filter((t): t is BEGraphTopic => !!t && !canvas.has(t.masterTopicId))
     if (toAdd.length === 0) return
 
+    dismissUndo()
     setTopicMeta((prev) => {
       const next = new Map(prev)
       for (const t of toAdd) {
@@ -322,6 +427,7 @@ export default function EditCurrentRoadmapPage() {
           sectionTotal: t.sectionTotal,
           sectionCompleted: 0,
           hasProgress: false,
+          prerequisiteTopicIds: t.prerequisiteTopicIds ?? [],
         })
       }
       return next
@@ -660,11 +766,35 @@ export default function EditCurrentRoadmapPage() {
                 </p>
               </div>
 
+              <div>
+                <p className="text-text-secondary mb-1.5 text-sm font-bold">Prerequisites</p>
+                {selectedPrereqNames.length > 0 ? (
+                  <ul className="flex flex-wrap gap-1.5">
+                    {selectedPrereqNames.map((name) => (
+                      <li
+                        key={name}
+                        className="border-border-soft text-text-secondary inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-semibold"
+                      >
+                        <RiLockLine className="text-text-placeholder text-xs" />
+                        {name}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-text-muted text-sm">None — this topic has no prerequisites.</p>
+                )}
+              </div>
+
               <div className="border-border-soft mt-auto border-t pt-4">
                 {selectedMeta.hasProgress ? (
                   <p className="text-text-muted flex items-start gap-2 text-xs">
                     <RiInformationLine className="mt-0.5 shrink-0 text-sm" />
                     You have already started this topic, so it can&apos;t be removed.
+                  </p>
+                ) : selectedRequiredByNames.length > 0 ? (
+                  <p className="text-text-muted flex items-start gap-2 text-xs">
+                    <RiInformationLine className="mt-0.5 shrink-0 text-sm" />
+                    Required by {selectedRequiredByNames.join(', ')} — remove those first.
                   </p>
                 ) : (
                   <p className="text-text-muted flex items-start gap-2 text-xs">
