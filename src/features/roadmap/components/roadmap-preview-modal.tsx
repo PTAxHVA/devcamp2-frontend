@@ -108,11 +108,15 @@ export default function RoadmapPreviewModal({
             </div>
 
             <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-text-primary text-sm font-bold">Choose your learning path</h3>
+              <h3 className="text-text-primary text-sm font-bold">
+                {isEnrolled ? 'Learning paths' : 'Choose your learning path'}
+              </h3>
               <span className="text-text-muted text-xs">
-                {branches.some((b) => b.selectionGroup && b.isMutuallyExclusive)
-                  ? 'Pick one path where the roadmap splits'
-                  : 'Click to select / deselect'}
+                {isEnrolled
+                  ? 'Switch your path or add topics in the editor'
+                  : branches.some((b) => b.selectionGroup && b.isMutuallyExclusive)
+                    ? 'Pick one path where the roadmap splits'
+                    : 'Click to select / deselect'}
               </span>
             </div>
 
@@ -122,6 +126,7 @@ export default function RoadmapPreviewModal({
                   branches={branches}
                   selected={selectedBranches}
                   onToggle={toggleBranch}
+                  readOnly={isEnrolled}
                 />
               </div>
             ) : (

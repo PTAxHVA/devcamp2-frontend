@@ -80,4 +80,34 @@ describe('BranchTree', () => {
     fireEvent.click(row)
     expect(onToggle).toHaveBeenCalledWith('b1')
   })
+
+  it('readOnly disables radio branches (no false affordance when enrolled)', () => {
+    render(
+      <BranchTree
+        branches={[core, mongo, pg]}
+        selected={new Set(['core', 'mongo'])}
+        onToggle={vi.fn()}
+        readOnly
+      />,
+    )
+
+    const radios = screen.getAllByRole('radio') as HTMLInputElement[]
+    expect(radios).toHaveLength(2)
+    // Disabled inputs are inert in a real browser — the guarantee against a
+    // misleading pick the modal's Edit-Roadmap button can't apply.
+    radios.forEach((r) => expect(r).toBeDisabled())
+  })
+
+  it('readOnly disables ungrouped checkbox rows too', () => {
+    const onToggle = vi.fn()
+    const plain: MasterBranch[] = [
+      { _id: 'b1', name: 'React + Tailwind', orderIndex: 0, topicCount: 10 },
+    ]
+    render(<BranchTree branches={plain} selected={new Set(['b1'])} onToggle={onToggle} readOnly />)
+
+    const row = screen.getByRole('button', { name: /react \+ tailwind/i })
+    expect(row).toBeDisabled()
+    fireEvent.click(row)
+    expect(onToggle).not.toHaveBeenCalled()
+  })
 })
