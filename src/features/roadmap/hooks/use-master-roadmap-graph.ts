@@ -17,10 +17,10 @@ interface ApiEnvelope<T> {
  * All-branches graph of a master roadmap (GET /master-roadmaps/:id/graph) — every
  * parallel branch's topics + fork edges, with NO user progress. Public (no JWT).
  *
- * Powers the Customize editor's ghost overlay: topics the learner hasn't enrolled
- * (the unchosen fork branches) are drawn as inert "ghost" columns beside the chosen
- * path so the learner can see — and add — the parallel options. Same
- * `{ roadmap, topics, edges }` shape as the roadmap-detail graph.
+ * In the Customize editor this resolves a ghost branch's topic details when the
+ * learner clicks "+ Add" to learn it in parallel (handleAddGhostBranch). The ghost
+ * NODES themselves are derived from the roadmap's branch metadata by
+ * buildEditorLayout. Same `{ roadmap, topics, edges }` shape as the roadmap-detail graph.
  */
 export function useMasterRoadmapGraph(id: string | null | undefined, enabled = true) {
   return useQuery<MasterRoadmapGraph>({

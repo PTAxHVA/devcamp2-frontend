@@ -84,3 +84,30 @@ describe('buildFlowGraph fork indicator', () => {
     }
   })
 })
+
+describe('buildFlowGraph neverLocked (editor de-lock)', () => {
+  it('keeps derived locked statuses by default', () => {
+    const { nodes } = buildFlowGraph(detail())
+    // 0-progress + no prereqs → sequential unlock: only the root is available.
+    expect(nodes.map((n) => n.data.status)).toEqual(['upcoming', 'locked', 'locked', 'locked'])
+  })
+
+  it('maps locked -> upcoming when neverLocked is set', () => {
+    const { nodes } = buildFlowGraph(detail(), { neverLocked: true })
+    expect(nodes.some((n) => n.data.status === 'locked')).toBe(false)
+    expect(nodes.map((n) => n.data.status)).toEqual([
+      'upcoming',
+      'upcoming',
+      'upcoming',
+      'upcoming',
+    ])
+  })
+
+  it('leaves completed/current statuses untouched under neverLocked', () => {
+    const d = detail()
+    d.topics[0] = { ...d.topics[0]!, sectionCompleted: 3 } // root fully completed (3/3)
+    const noLock = buildFlowGraph(d, { neverLocked: true })
+    expect(noLock.nodes[0]!.data.status).toBe('completed') // not rewritten to upcoming
+    expect(noLock.nodes.some((n) => n.data.status === 'locked')).toBe(false)
+  })
+})

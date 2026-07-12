@@ -16,9 +16,10 @@ interface ForkPathBannerProps {
 /**
  * Lightweight fork indicator for the learner's roadmap view. When the roadmap
  * follows one side of a mutually-exclusive branch group (e.g. MongoDB vs
- * PostgreSQL), it names the chosen path and points to Edit to switch. The full
- * ghost-node + one-click switch lives in the editor (SwitchPathPanel); this is
- * just the read-only heads-up that used to appear on /roadmaps/:id.
+ * PostgreSQL), it names the chosen path and points to Edit to change it. The
+ * full ghost-node fork — add a parallel branch via "+ Add", or remove one —
+ * lives in the editor; this is just the read-only heads-up that used to appear
+ * on /roadmaps/:id.
  */
 export default function ForkPathBanner({
   masterRoadmapId,

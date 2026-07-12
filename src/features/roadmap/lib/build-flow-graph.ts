@@ -89,24 +89,34 @@ export interface FlowGraph {
  * "ghost" node for the NOT-chosen branch of the exclusive group, hanging off the
  * fork predecessor beside the chosen topic. Consumers that don't pass it (editor,
  * demo) render exactly as before.
+ *
+ * `neverLocked` (Customize editor) maps a derived `locked` status to `upcoming`.
+ * A 0-progress roadmap would otherwise render every topic after the first as a
+ * dashed, disabled "lock" — meaningless in an editor where every topic is
+ * editable. `completed`/`current`/`upcoming` are untouched, so progress still
+ * shows. OFF by default → the learner/demo views keep their real lock states.
  */
 export function buildFlowGraph(
   data: BERoadmapDetail,
-  opts: { synthesizeSequentialEdges?: boolean; forkContext?: ForkContext | null } = {},
+  opts: {
+    synthesizeSequentialEdges?: boolean
+    forkContext?: ForkContext | null
+    neverLocked?: boolean
+  } = {},
 ): FlowGraph {
   const ordered = [...data.topics].sort((a, b) => a.orderIndex - b.orderIndex)
   const statusById = deriveTopicStatuses(data.topics)
 
-  const nodes: Node<BaseNodeData>[] = ordered.map((topic, index) => ({
-    id: topic.masterTopicId,
-    type: 'roadmapNode',
-    position: { x: COLUMN_X, y: index * VERTICAL_GAP },
-    data: {
-      number: String(index + 1),
-      label: topic.name,
-      status: STATUS_MAP[statusById.get(topic.masterTopicId) ?? topic.status],
-    },
-  }))
+  const nodes: Node<BaseNodeData>[] = ordered.map((topic, index) => {
+    const derived = STATUS_MAP[statusById.get(topic.masterTopicId) ?? topic.status]
+    const status = opts.neverLocked && derived === 'locked' ? 'upcoming' : derived
+    return {
+      id: topic.masterTopicId,
+      type: 'roadmapNode',
+      position: { x: COLUMN_X, y: index * VERTICAL_GAP },
+      data: { number: String(index + 1), label: topic.name, status },
+    }
+  })
 
   const edges: Edge[] =
     data.edges.length > 0 || !opts.synthesizeSequentialEdges

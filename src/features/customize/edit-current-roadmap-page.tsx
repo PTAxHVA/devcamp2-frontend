@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from 'react'
+import { useMemo, useState, useEffect, useRef, type RefObject } from 'react'
 import { BaseRoadmapNode, type BaseNodeData } from '@/features/roadmap/components/base-roadmap-node'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
@@ -13,18 +13,15 @@ import {
 import { useMasterRoadmap } from '@/features/roadmap/hooks/use-master-roadmap'
 import { useMasterRoadmapGraph } from '@/features/roadmap/hooks/use-master-roadmap-graph'
 import { buildFlowGraph } from '@/features/roadmap/lib/build-flow-graph'
-import { buildGhostBranches } from '@/features/roadmap/lib/build-ghost-branches'
-import SwitchPathPanel, { type PathSwap } from './components/switch-path-panel'
-import { resolveIncomingTopics } from './lib/resolve-incoming-topics'
-import { reorderAfterSwap } from './lib/reorder-after-swap'
+import { buildEditorLayout } from './lib/build-editor-layout'
+import { resolveAiFeedbackView, type AiFeedbackData } from './lib/resolve-ai-feedback-view'
 import {
   ReactFlow,
   Background,
   Controls,
   useNodesState,
-  useEdgesState,
+  useReactFlow,
   type Node,
-  type Edge,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import {
@@ -38,15 +35,6 @@ import {
   RiLoader4Line,
   RiInformationLine,
 } from 'react-icons/ri'
-
-const VERTICAL_GAP = 140
-const COLUMN_X = 0
-const EDGE_STYLE = { stroke: '#CBD5E1', strokeWidth: 2 }
-
-interface AiFeedback {
-  feedback: string
-  severity: 'info' | 'warning'
-}
 
 interface TopicMeta {
   name: string
@@ -69,15 +57,74 @@ const STATUS_LABEL: Record<BEGraphTopic['status'], string> = {
 const errorCode = (error: unknown): string | undefined =>
   (error as { response?: { data?: { error?: { code?: string } } } })?.response?.data?.error?.code
 
+// Keep the whole fork (chosen column + inline ghost branches) framed in the canvas
+// at every viewport. The top padding reserves screen space so the first node never
+// hides under the fit-view Controls overlay (top-left of the canvas); the percent
+// sides give breathing room; maxZoom 1 stops a small (non-forked) roadmap from
+// blowing up past 100%.
+const FIT_VIEW_OPTIONS = {
+  padding: { top: '64px', right: '8%', bottom: '8%', left: '8%' },
+  maxZoom: 1,
+} as const
+
+/**
+ * Re-fits the React Flow viewport so the fork is never clipped. The fork can be
+ * ~3 node-columns wide, so a narrow canvas needs a small zoom to show it whole;
+ * the plain `fitView` prop only runs once on mount (before the async nodes land),
+ * so we re-fit here whenever the node set OR the canvas size changes.
+ * Rendered inside <ReactFlow> so it can read the flow instance via useReactFlow.
+ */
+function FitViewController({
+  wrapperRef,
+  signature,
+}: {
+  wrapperRef: RefObject<HTMLDivElement | null>
+  signature: string
+}) {
+  const { fitView } = useReactFlow()
+
+  // Node set changed: initial async load, add topic, remove topic, add-in-parallel
+  // ghost. rAF lets React Flow measure the new nodes before we frame them.
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => {
+      void fitView(FIT_VIEW_OPTIONS)
+    })
+    return () => cancelAnimationFrame(raf)
+  }, [signature, fitView])
+
+  // Canvas resized: viewport/orientation change, the mobile↔desktop and lg↔xl
+  // breakpoint reflows, or the alert card being dismissed. Debounced via rAF.
+  useEffect(() => {
+    const el = wrapperRef.current
+    if (!el) return
+    let raf = 0
+    const observer = new ResizeObserver(() => {
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(() => {
+        void fitView(FIT_VIEW_OPTIONS)
+      })
+    })
+    observer.observe(el)
+    return () => {
+      cancelAnimationFrame(raf)
+      observer.disconnect()
+    }
+  }, [wrapperRef, fitView])
+
+  return null
+}
+
 export default function EditCurrentRoadmapPage() {
   const { id: roadmapId } = useParams()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const nodeTypes = useMemo(() => ({ roadmapNode: BaseRoadmapNode }), [])
+  // The canvas wrapper — observed so the graph re-fits when its size changes.
+  const flowWrapperRef = useRef<HTMLDivElement>(null)
   const [showAlert, setShowAlert] = useState(true)
-  // On mobile the topic-details panel is a bottom sheet that opens when a node is
-  // tapped; on lg+ it is a static sidebar and this flag is ignored.
+  // Below xl the topic-details panel is a bottom sheet that opens when a node is
+  // tapped; on xl+ it is a static sidebar and this flag is ignored.
   const [sheetOpen, setSheetOpen] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
 
@@ -86,14 +133,15 @@ export default function EditCurrentRoadmapPage() {
   // Master branches carry the fork metadata (selectionGroup + topicIds) that
   // powers the "Learning path" switch card for forked roadmaps.
   const { data: masterPreview } = useMasterRoadmap(data?.roadmap.masterRoadmapId)
-  // The all-branches master graph (topic names + fork edges) feeds the ghost overlay:
-  // the unchosen parallel branches shown beside the chosen path.
+  // The all-branches master graph resolves a ghost branch's topics when the learner
+  // clicks "+ Add" to learn it in parallel (see handleAddGhostBranch). The ghost
+  // NODES themselves are derived from the branch metadata by buildEditorLayout.
   const { data: masterGraph } = useMasterRoadmapGraph(data?.roadmap.masterRoadmapId)
 
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node<BaseNodeData>>([])
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
+  const [nodes, setNodes] = useNodesState<Node<BaseNodeData>>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [aiFeedback, setAiFeedback] = useState<AiFeedback | null>(null)
+  const [aiFeedback, setAiFeedback] = useState<AiFeedbackData | null>(null)
+  const [aiError, setAiError] = useState(false)
 
   // Captured once from the fetched roadmap: per-topic metadata (for removal rules
   // and the details panel) and the original topic set (to diff into removeTopicIds).
@@ -106,9 +154,10 @@ export default function EditCurrentRoadmapPage() {
     if (!data || initializedRef.current) return
     initializedRef.current = true
 
-    const graph = buildFlowGraph(data)
+    // neverLocked: the editor shows every topic as editable, never a dashed "lock".
+    // Positions, fork rows, ghosts and edges are derived below by buildEditorLayout.
+    const graph = buildFlowGraph(data, { neverLocked: true })
     setNodes(graph.nodes)
-    setEdges(graph.edges)
 
     const meta = new Map<string, TopicMeta>()
     for (const t of data.topics) {
@@ -124,7 +173,7 @@ export default function EditCurrentRoadmapPage() {
     setTopicMeta(meta)
     setOriginalIds(data.topics.map((t) => t.masterTopicId))
     setSelectedId(graph.nodes[0]?.id ?? null)
-  }, [data, setNodes, setEdges])
+  }, [data, setNodes])
 
   // Topics present at load but no longer on the canvas — the PATCH removal diff.
   const removedIds = useMemo(() => {
@@ -145,72 +194,54 @@ export default function EditCurrentRoadmapPage() {
     [availableTopics, canvasIds],
   )
 
-  // Ghost overlay: the unchosen fork branches (e.g. Vue/Angular while on React,
-  // Bootstrap while on Tailwind) drawn as inert dashed columns the learner can click
-  // to add in parallel. Derived from the all-branches master graph keyed on what's on
-  // the canvas, so a branch drops off the moment its topics are added. Empty for a
-  // non-forked roadmap → the canvas renders exactly as before.
-  const ghost = useMemo(
+  // Fork-aware display layout: enrolled topics as a vertical column, with the chosen
+  // fork branch badged in-column and the unchosen branches inline to its right as
+  // add-in-parallel "ghost" cards under a "Choose one" pill. Derived purely from the
+  // canvas topics + the roadmap's branches, so a non-forked roadmap renders as a
+  // plain column exactly as before.
+  const { nodes: displayNodes, edges: displayEdges } = useMemo(
     () =>
-      buildGhostBranches({
-        masterGraph,
-        canvasTopicIds: nodes.map((n) => n.id),
+      buildEditorLayout({
+        canvasTopics: nodes.map((n) => ({ id: n.id, label: n.data.label, status: n.data.status })),
         branches: masterPreview?.branches,
       }),
-    [masterGraph, nodes, masterPreview],
+    [nodes, masterPreview],
   )
-  const displayNodes = useMemo(() => [...nodes, ...ghost.nodes], [nodes, ghost.nodes])
-  const displayEdges = useMemo(() => [...edges, ...ghost.edges], [edges, ghost.edges])
+
+  // A stable signature of the displayed node set — changes on load, add, remove,
+  // or add-in-parallel — so FitViewController can re-frame the canvas.
+  const nodeSignature = useMemo(() => displayNodes.map((n) => n.id).join('|'), [displayNodes])
 
   const selectedMeta = selectedId ? topicMeta.get(selectedId) : undefined
 
-  // Re-number, re-stack vertically and keep the graph connected after a structural
-  // change. Layout/ordering is visual only — the backend re-derives canonical order.
-  const relayout = (nextNodes: Node<BaseNodeData>[]) => {
-    const updated = nextNodes.map((n, i) => ({
-      ...n,
-      position: { x: COLUMN_X, y: i * VERTICAL_GAP },
-      data: { ...n.data, number: String(i + 1) },
-    }))
-
-    const ids = new Set(updated.map((n) => n.id))
-    const kept = edges.filter((e) => ids.has(e.source) && ids.has(e.target))
-
-    updated.forEach((node, idx) => {
-      if (idx === 0) return
-      const hasParent = kept.some((e) => e.target === node.id)
-      if (!hasParent) {
-        const prev = updated[idx - 1]
-        kept.push({
-          id: `e-${prev.id}-${node.id}`,
-          source: prev.id,
-          target: node.id,
-          type: 'smoothstep',
-          style: EDGE_STYLE,
-        })
-      }
-    })
-
-    setNodes(updated)
-    setEdges(kept)
-  }
+  // Update the canvas topic set + order after a structural change. Positions,
+  // numbering, fork rows, ghosts and edges are all derived from `nodes` by
+  // buildEditorLayout (display), so this just keeps `nodes` as the ordered
+  // membership list that the save diff (added/removed ids) reads.
+  const relayout = (nextNodes: Node<BaseNodeData>[]) => setNodes(nextNodes)
 
   const aiFeedbackMutation = useMutation({
     mutationFn: async (vars: { action: 'add' | 'remove'; topicId: string }) => {
-      const res = await apiClient.post<{ data: AiFeedback }>('/ai/roadmap-feedback', {
+      const res = await apiClient.post<{ data: AiFeedbackData }>('/ai/roadmap-feedback', {
         userRoadmapId: roadmapId,
         action: vars.action,
         topicId: vars.topicId,
       })
       return res.data.data
     },
-    onSuccess: (fb) => setAiFeedback(fb),
+    onMutate: () => setAiError(false),
+    onSuccess: (fb) => {
+      setAiFeedback(fb)
+      setAiError(false)
+    },
     onError: (error) => {
+      // Surface the failure in the card (see resolveAiFeedbackView) instead of
+      // silently blanking it, which read as "the AI did nothing".
       logger.error(
         'Failed to fetch AI feedback:',
         error instanceof Error ? error.message : String(error),
       )
-      setAiFeedback(null)
+      setAiError(true)
     },
   })
 
@@ -239,8 +270,8 @@ export default function EditCurrentRoadmapPage() {
     const newNode: Node<BaseNodeData> = {
       id: topic.masterTopicId,
       type: 'roadmapNode',
-      position: { x: COLUMN_X, y: nodes.length * VERTICAL_GAP },
-      data: { number: String(nodes.length + 1), label: topic.name, status: 'upcoming' },
+      position: { x: 0, y: 0 }, // display position is derived by buildEditorLayout
+      data: { label: topic.name, status: 'upcoming' },
     }
     setTopicMeta((prev) => {
       const next = new Map(prev)
@@ -264,7 +295,14 @@ export default function EditCurrentRoadmapPage() {
   // normal PATCH addTopicIds. Fires AI feedback once so the branch-conflict warning
   // (two frameworks at once) surfaces, degrading to data when Gemini is down.
   const handleAddGhostBranch = (branchId?: string, branchName?: string) => {
-    if (!branchId || !masterGraph) return
+    if (!branchId) return
+    // The ghost card renders from the branch list, but adding its topics needs the
+    // heavier all-branches graph. If that hasn't loaded yet (or the endpoint is cold),
+    // tell the learner instead of dead-clicking — mirrors the switch-path panel.
+    if (!masterGraph) {
+      toast.error('Still loading the other paths — try again in a moment.')
+      return
+    }
     const branch = masterPreview?.branches.find((b) => b._id === branchId)
     if (!branch?.topicIds?.length) return
     const canvas = new Set(nodes.map((n) => n.id))
@@ -289,11 +327,11 @@ export default function EditCurrentRoadmapPage() {
       return next
     })
 
-    const newNodes: Node<BaseNodeData>[] = toAdd.map((t, i) => ({
+    const newNodes: Node<BaseNodeData>[] = toAdd.map((t) => ({
       id: t.masterTopicId,
       type: 'roadmapNode',
-      position: { x: COLUMN_X, y: (nodes.length + i) * VERTICAL_GAP },
-      data: { number: String(nodes.length + i + 1), label: t.name, status: 'upcoming' },
+      position: { x: 0, y: 0 }, // display position is derived by buildEditorLayout
+      data: { label: t.name, status: 'upcoming' },
     }))
     relayout([...nodes, ...newNodes])
     setSelectedId(toAdd[0].masterTopicId)
@@ -302,6 +340,8 @@ export default function EditCurrentRoadmapPage() {
   }
 
   const onNodeClick = (_: React.MouseEvent, node: Node) => {
+    // The "choose one" pill is an inert label, not a topic — ignore clicks on it.
+    if (node.id.startsWith('fork-label:')) return
     // A ghost node = an unchosen fork branch. Clicking it adds that branch in parallel;
     // a real topic node just opens its details.
     if (node.id.startsWith('ghost:')) {
@@ -311,59 +351,6 @@ export default function EditCurrentRoadmapPage() {
     }
     setSelectedId(node.id)
     setSheetOpen(true)
-  }
-
-  // Swap the fork path on the CANVAS in one pass (single relayout — applying the
-  // remove and the add through the individual handlers would read stale state).
-  // Persisting still goes through the normal Save → PATCH, so the remove-gate,
-  // canonical reorder and edit-log behave exactly as for manual edits.
-  const handleSwitchPath = (swap: PathSwap) => {
-    // topicMeta first, server list second: available-topics reflects the SAVED
-    // enrollment, so right after an unsaved switch it contains neither side's
-    // original topic — topicMeta still does, which makes switching back work.
-    const incoming = resolveIncomingTopics(swap.addTopicIds, topicMeta, availableTopics)
-    if (!incoming) {
-      toast.error('The other path is still loading — try again in a moment.')
-      return
-    }
-    const removeSet = new Set(swap.removeTopicIds)
-
-    setTopicMeta((prev) => {
-      const next = new Map(prev)
-      for (const topic of incoming) {
-        // Keep the original entry for topics the editor already knew — it holds
-        // the REAL hasProgress/section counts (a restored started topic must
-        // keep its remove-gate).
-        if (topic.alreadyKnown) continue
-        next.set(topic.masterTopicId, {
-          name: topic.name,
-          status: 'available',
-          estimatedHours: topic.estimatedHours,
-          sectionTotal: topic.sectionTotal,
-          sectionCompleted: 0,
-          hasProgress: false,
-        })
-      }
-      return next
-    })
-
-    const remaining = nodes.filter((n) => !removeSet.has(n.id))
-    const newNodes: Node<BaseNodeData>[] = incoming.map((topic, i) => ({
-      id: topic.masterTopicId,
-      type: 'roadmapNode',
-      position: { x: COLUMN_X, y: (remaining.length + i) * VERTICAL_GAP },
-      data: { number: String(remaining.length + i + 1), label: topic.name, status: 'upcoming' },
-    }))
-    // Splice the switched-in path into the slot the old one vacated (not the
-    // bottom of the canvas); relayout then re-numbers and re-stacks it.
-    relayout(reorderAfterSwap(nodes, removeSet, newNodes))
-    setSelectedId(incoming[0]?.masterTopicId ?? remaining[0]?.id ?? null)
-
-    // Advisory only (same as manual add/remove) — last response wins the banner.
-    for (const topicId of swap.removeTopicIds)
-      aiFeedbackMutation.mutate({ action: 'remove', topicId })
-    for (const topicId of swap.addTopicIds) aiFeedbackMutation.mutate({ action: 'add', topicId })
-    toast.success(`Switched to the ${swap.toName} path — press Save changes to apply.`)
   }
 
   const saveMutation = useMutation({
@@ -424,6 +411,11 @@ export default function EditCurrentRoadmapPage() {
   }
 
   const hasChanges = removedIds.length > 0 || addedIds.length > 0
+  const aiView = resolveAiFeedbackView({
+    pending: aiFeedbackMutation.isPending,
+    error: aiError,
+    feedback: aiFeedback,
+  })
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 bg-bg-card flex h-full w-full flex-col p-6 duration-500 ease-out lg:p-8">
@@ -462,17 +454,48 @@ export default function EditCurrentRoadmapPage() {
         </div>
       )}
 
-      {/* Learning-path switch (only for roadmaps with a fork group) */}
-      <SwitchPathPanel
-        branches={masterPreview?.branches}
-        canvasTopicIds={nodes.map((n) => n.id)}
-        hasProgressOn={(topicId) => topicMeta.get(topicId)?.hasProgress ?? false}
-        isBusy={saveMutation.isPending || isLoadingTopics}
-        onSwitch={handleSwitchPath}
-      />
+      {/* AI feedback (F19) — surfaced above the canvas so it's visible right after an
+          edit, with an explicit busy/error state instead of silently blanking out. */}
+      <div
+        className={`mb-6 flex items-start gap-4 rounded-xl border p-4 ${
+          aiView.tone === 'warning'
+            ? 'border-orange-200 bg-orange-50'
+            : 'border-border-purple bg-bg-lavender/50'
+        }`}
+      >
+        <div
+          className={`bg-bg-card flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-sm ${
+            aiView.tone === 'warning' ? 'text-orange-500' : 'text-brand-purple-600'
+          }`}
+        >
+          {aiFeedbackMutation.isPending ? (
+            <RiLoader4Line className="animate-spin text-xl" />
+          ) : (
+            <RiSparklingFill className="text-xl" />
+          )}
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <h4 className="text-text-primary font-bold">AI feedback</h4>
+            <span className="bg-bg-lavender text-brand-purple-700 rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">
+              Beta
+            </span>
+          </div>
+          <p className="text-text-secondary text-sm text-wrap break-words">{aiView.message}</p>
+          {aiView.note && (
+            <p className="text-text-muted mt-1 flex items-start gap-1.5 text-xs">
+              <RiInformationLine className="mt-0.5 shrink-0" />
+              {aiView.note}
+            </p>
+          )}
+        </div>
+      </div>
 
-      {/* Main Container */}
-      <div className="flex min-h-150 flex-1 flex-col gap-6 lg:flex-row">
+      {/* Main Container — canvas keeps full width until xl (1280px); below that the
+          topic details open as a tap-to-reveal bottom sheet so the fork stays
+          readable on tablets/small laptops (~1024px) instead of being squeezed by
+          a side panel. Two-column layout only where there's room for both. */}
+      <div className="flex min-h-150 flex-1 flex-col gap-6 xl:flex-row">
         {/* === CANVAS === */}
         <div className="border-border-soft bg-bg-card flex flex-1 flex-col rounded-2xl border">
           <div className="border-border-soft flex flex-wrap items-center justify-between border-b p-4">
@@ -546,20 +569,32 @@ export default function EditCurrentRoadmapPage() {
             </div>
           </div>
 
-          <div className="bg-bg-section/50 relative flex-1">
+          {/* isolate = a stacking context scoped to THIS canvas so React Flow's high
+              internal z-indexes stay contained and can't paint over the app sidebar.
+              Scoped here (not on the global layout wrapper) so page modals are unaffected. */}
+          <div ref={flowWrapperRef} className="bg-bg-section/50 relative isolate flex-1">
             <ReactFlow
               nodes={displayNodes}
               edges={displayEdges}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
               onNodeClick={onNodeClick}
               nodeTypes={nodeTypes}
+              nodesDraggable={false}
               fitView
+              fitViewOptions={FIT_VIEW_OPTIONS}
+              // A ~3-column-wide fork can't fit a narrow canvas at the default
+              // minZoom (0.5) — it clips the column left and the last ghost right.
+              // Allow a smaller zoom so fitView always frames the whole fork.
+              minZoom={0.2}
+              maxZoom={1.5}
               proOptions={{ hideAttribution: true }}
             >
+              <FitViewController wrapperRef={flowWrapperRef} signature={nodeSignature} />
               <Background color="#cbd5e1" gap={20} size={1} />
+              {/* Same fit options as the auto-fit so the manual fit-view button frames
+                  the whole fork and clears the Controls too. */}
               <Controls
                 position="top-right"
+                fitViewOptions={FIT_VIEW_OPTIONS}
                 className="flex! flex-row! gap-1! border-none! shadow-sm!"
               />
             </ReactFlow>
@@ -569,21 +604,22 @@ export default function EditCurrentRoadmapPage() {
         {/* Backdrop for the mobile bottom sheet */}
         {sheetOpen && (
           <div
-            className="fixed inset-0 z-30 bg-black/30 lg:hidden"
+            className="fixed inset-0 z-30 bg-black/30 xl:hidden"
             onClick={() => setSheetOpen(false)}
             aria-hidden
           />
         )}
 
         {/* === TOPIC DETAILS (read-only) ===
-            Mobile: bottom sheet that slides up. Desktop (lg+): static sidebar. */}
+            Below xl: bottom sheet that slides up. xl+: static sidebar. */}
         <div
-          className={`border-border-soft bg-bg-card flex flex-col border shadow-sm transition-transform duration-300 ease-out lg:static! lg:z-auto lg:max-h-none lg:w-100 lg:translate-y-0 lg:overflow-visible lg:rounded-2xl ${
+          className={`border-border-soft bg-bg-card flex flex-col border shadow-sm transition-transform duration-300 ease-out xl:static! xl:z-auto xl:max-h-none xl:w-100 xl:translate-y-0 xl:overflow-visible xl:rounded-2xl ${
             sheetOpen ? 'translate-y-0' : 'translate-y-full'
           } fixed inset-x-0 bottom-0 z-40 max-h-[75vh] overflow-y-auto rounded-t-2xl p-6`}
         >
-          {/* Mobile sheet header: drag handle + close */}
-          <div className="relative mb-4 lg:hidden">
+          {/* Mobile/tablet sheet header: drag handle + close (hidden once the panel
+              becomes a static sidebar at xl). */}
+          <div className="relative mb-4 xl:hidden">
             <div className="mx-auto h-1.5 w-12 rounded-full bg-slate-300" />
             <button
               onClick={() => setSheetOpen(false)}
@@ -646,44 +682,9 @@ export default function EditCurrentRoadmapPage() {
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="mt-6 flex flex-col items-end gap-6 lg:flex-row lg:items-center lg:justify-between">
-        <div
-          className={`flex w-full flex-1 items-center gap-4 rounded-xl border p-4 lg:w-auto ${
-            aiFeedback?.severity === 'warning'
-              ? 'border-orange-200 bg-orange-50'
-              : 'border-border-purple bg-bg-lavender/50'
-          }`}
-        >
-          <div
-            className={`bg-bg-card flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-sm ${
-              aiFeedback?.severity === 'warning' ? 'text-orange-500' : 'text-brand-purple-600'
-            }`}
-          >
-            {aiFeedbackMutation.isPending ? (
-              <RiLoader4Line className="animate-spin text-xl" />
-            ) : (
-              <RiSparklingFill className="text-xl" />
-            )}
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <h4 className="text-text-primary font-bold">AI feedback</h4>
-              <span className="bg-bg-lavender text-brand-purple-700 rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">
-                Beta
-              </span>
-            </div>
-            <p className="text-text-secondary text-xs text-wrap break-words">
-              {aiFeedbackMutation.isPending
-                ? 'Reviewing your change...'
-                : aiFeedback
-                  ? aiFeedback.feedback
-                  : 'Add or remove a topic and the AI will tell you how it affects your path.'}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex w-full shrink-0 gap-3 lg:w-100">
+      {/* Footer — the AI feedback card now lives above the canvas. */}
+      <div className="mt-6 flex justify-end">
+        <div className="flex w-full gap-3 sm:w-100">
           <button
             onClick={() => navigate(-1)}
             className="border-border-soft text-text-secondary hover:bg-bg-section bg-bg-card focus-visible:ring-brand-purple-300 flex flex-1 items-center justify-center rounded-xl border py-2.5 font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
