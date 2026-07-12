@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from 'react'
+import { useMemo, useState, useEffect, useRef, type RefObject } from 'react'
 import { BaseRoadmapNode, type BaseNodeData } from '@/features/roadmap/components/base-roadmap-node'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
@@ -15,7 +15,14 @@ import { useMasterRoadmapGraph } from '@/features/roadmap/hooks/use-master-roadm
 import { buildFlowGraph } from '@/features/roadmap/lib/build-flow-graph'
 import { buildEditorLayout } from './lib/build-editor-layout'
 import { resolveAiFeedbackView, type AiFeedbackData } from './lib/resolve-ai-feedback-view'
-import { ReactFlow, Background, Controls, useNodesState, type Node } from '@xyflow/react'
+import {
+  ReactFlow,
+  Background,
+  Controls,
+  useNodesState,
+  useReactFlow,
+  type Node,
+} from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import {
   RiArrowLeftLine,
@@ -50,15 +57,74 @@ const STATUS_LABEL: Record<BEGraphTopic['status'], string> = {
 const errorCode = (error: unknown): string | undefined =>
   (error as { response?: { data?: { error?: { code?: string } } } })?.response?.data?.error?.code
 
+// Keep the whole fork (chosen column + inline ghost branches) framed in the canvas
+// at every viewport. The top padding reserves screen space so the first node never
+// hides under the fit-view Controls overlay (top-left of the canvas); the percent
+// sides give breathing room; maxZoom 1 stops a small (non-forked) roadmap from
+// blowing up past 100%.
+const FIT_VIEW_OPTIONS = {
+  padding: { top: '64px', right: '8%', bottom: '8%', left: '8%' },
+  maxZoom: 1,
+} as const
+
+/**
+ * Re-fits the React Flow viewport so the fork is never clipped. The fork can be
+ * ~3 node-columns wide, so a narrow canvas needs a small zoom to show it whole;
+ * the plain `fitView` prop only runs once on mount (before the async nodes land),
+ * so we re-fit here whenever the node set OR the canvas size changes.
+ * Rendered inside <ReactFlow> so it can read the flow instance via useReactFlow.
+ */
+function FitViewController({
+  wrapperRef,
+  signature,
+}: {
+  wrapperRef: RefObject<HTMLDivElement | null>
+  signature: string
+}) {
+  const { fitView } = useReactFlow()
+
+  // Node set changed: initial async load, add topic, remove topic, add-in-parallel
+  // ghost. rAF lets React Flow measure the new nodes before we frame them.
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => {
+      void fitView(FIT_VIEW_OPTIONS)
+    })
+    return () => cancelAnimationFrame(raf)
+  }, [signature, fitView])
+
+  // Canvas resized: viewport/orientation change, the mobile↔desktop and lg↔xl
+  // breakpoint reflows, or the alert card being dismissed. Debounced via rAF.
+  useEffect(() => {
+    const el = wrapperRef.current
+    if (!el) return
+    let raf = 0
+    const observer = new ResizeObserver(() => {
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(() => {
+        void fitView(FIT_VIEW_OPTIONS)
+      })
+    })
+    observer.observe(el)
+    return () => {
+      cancelAnimationFrame(raf)
+      observer.disconnect()
+    }
+  }, [wrapperRef, fitView])
+
+  return null
+}
+
 export default function EditCurrentRoadmapPage() {
   const { id: roadmapId } = useParams()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const nodeTypes = useMemo(() => ({ roadmapNode: BaseRoadmapNode }), [])
+  // The canvas wrapper — observed so the graph re-fits when its size changes.
+  const flowWrapperRef = useRef<HTMLDivElement>(null)
   const [showAlert, setShowAlert] = useState(true)
-  // On mobile the topic-details panel is a bottom sheet that opens when a node is
-  // tapped; on lg+ it is a static sidebar and this flag is ignored.
+  // Below xl the topic-details panel is a bottom sheet that opens when a node is
+  // tapped; on xl+ it is a static sidebar and this flag is ignored.
   const [sheetOpen, setSheetOpen] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
 
@@ -141,6 +207,10 @@ export default function EditCurrentRoadmapPage() {
       }),
     [nodes, masterPreview],
   )
+
+  // A stable signature of the displayed node set — changes on load, add, remove,
+  // or add-in-parallel — so FitViewController can re-frame the canvas.
+  const nodeSignature = useMemo(() => displayNodes.map((n) => n.id).join('|'), [displayNodes])
 
   const selectedMeta = selectedId ? topicMeta.get(selectedId) : undefined
 
@@ -421,8 +491,11 @@ export default function EditCurrentRoadmapPage() {
         </div>
       </div>
 
-      {/* Main Container */}
-      <div className="flex min-h-150 flex-1 flex-col gap-6 lg:flex-row">
+      {/* Main Container — canvas keeps full width until xl (1280px); below that the
+          topic details open as a tap-to-reveal bottom sheet so the fork stays
+          readable on tablets/small laptops (~1024px) instead of being squeezed by
+          a side panel. Two-column layout only where there's room for both. */}
+      <div className="flex min-h-150 flex-1 flex-col gap-6 xl:flex-row">
         {/* === CANVAS === */}
         <div className="border-border-soft bg-bg-card flex flex-1 flex-col rounded-2xl border">
           <div className="border-border-soft flex flex-wrap items-center justify-between border-b p-4">
@@ -496,7 +569,7 @@ export default function EditCurrentRoadmapPage() {
             </div>
           </div>
 
-          <div className="bg-bg-section/50 relative flex-1">
+          <div ref={flowWrapperRef} className="bg-bg-section/50 relative flex-1">
             <ReactFlow
               nodes={displayNodes}
               edges={displayEdges}
@@ -504,10 +577,22 @@ export default function EditCurrentRoadmapPage() {
               nodeTypes={nodeTypes}
               nodesDraggable={false}
               fitView
+              fitViewOptions={FIT_VIEW_OPTIONS}
+              // A ~3-column-wide fork can't fit a narrow canvas at the default
+              // minZoom (0.5) — it clips the column left and the last ghost right.
+              // Allow a smaller zoom so fitView always frames the whole fork.
+              minZoom={0.2}
+              maxZoom={1.5}
               proOptions={{ hideAttribution: true }}
             >
+              <FitViewController wrapperRef={flowWrapperRef} signature={nodeSignature} />
               <Background color="#cbd5e1" gap={20} size={1} />
-              <Controls className="top-4! right-4! bottom-auto! flex! flex-row! gap-1! border-none! shadow-sm!" />
+              {/* Same fit options as the auto-fit so the manual fit-view button frames
+                  the whole fork and clears the Controls too. */}
+              <Controls
+                fitViewOptions={FIT_VIEW_OPTIONS}
+                className="top-4! right-4! bottom-auto! flex! flex-row! gap-1! border-none! shadow-sm!"
+              />
             </ReactFlow>
           </div>
         </div>
@@ -515,21 +600,22 @@ export default function EditCurrentRoadmapPage() {
         {/* Backdrop for the mobile bottom sheet */}
         {sheetOpen && (
           <div
-            className="fixed inset-0 z-30 bg-black/30 lg:hidden"
+            className="fixed inset-0 z-30 bg-black/30 xl:hidden"
             onClick={() => setSheetOpen(false)}
             aria-hidden
           />
         )}
 
         {/* === TOPIC DETAILS (read-only) ===
-            Mobile: bottom sheet that slides up. Desktop (lg+): static sidebar. */}
+            Below xl: bottom sheet that slides up. xl+: static sidebar. */}
         <div
-          className={`border-border-soft bg-bg-card flex flex-col border shadow-sm transition-transform duration-300 ease-out lg:static! lg:z-auto lg:max-h-none lg:w-100 lg:translate-y-0 lg:overflow-visible lg:rounded-2xl ${
+          className={`border-border-soft bg-bg-card flex flex-col border shadow-sm transition-transform duration-300 ease-out xl:static! xl:z-auto xl:max-h-none xl:w-100 xl:translate-y-0 xl:overflow-visible xl:rounded-2xl ${
             sheetOpen ? 'translate-y-0' : 'translate-y-full'
           } fixed inset-x-0 bottom-0 z-40 max-h-[75vh] overflow-y-auto rounded-t-2xl p-6`}
         >
-          {/* Mobile sheet header: drag handle + close */}
-          <div className="relative mb-4 lg:hidden">
+          {/* Mobile/tablet sheet header: drag handle + close (hidden once the panel
+              becomes a static sidebar at xl). */}
+          <div className="relative mb-4 xl:hidden">
             <div className="mx-auto h-1.5 w-12 rounded-full bg-slate-300" />
             <button
               onClick={() => setSheetOpen(false)}
