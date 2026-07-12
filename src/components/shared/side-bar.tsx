@@ -65,7 +65,7 @@ export const Sidebar = ({ mobileOpen = false, onClose }: SidebarProps) => {
 
   return (
     <aside
-      className={`border-border-soft fixed inset-y-0 left-0 z-40 flex h-full w-65 shrink-0 flex-col justify-between border-r bg-white transition-transform duration-300 ease-in-out md:relative md:inset-auto md:z-auto md:translate-x-0 md:transition-none ${
+      className={`border-border-soft fixed inset-y-0 left-0 z-40 flex h-full w-65 shrink-0 flex-col justify-between border-r bg-white transition-transform duration-300 ease-in-out md:relative md:inset-auto md:translate-x-0 md:transition-none ${
         mobileOpen ? 'translate-x-0' : '-translate-x-full'
       } ${effectiveCollapsed ? 'md:w-22' : 'md:w-65'}`}
     >
