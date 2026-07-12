@@ -16,6 +16,7 @@ import { buildFlowGraph } from '@/features/roadmap/lib/build-flow-graph'
 import { buildGhostBranches } from '@/features/roadmap/lib/build-ghost-branches'
 import SwitchPathPanel, { type PathSwap } from './components/switch-path-panel'
 import { resolveIncomingTopics } from './lib/resolve-incoming-topics'
+import { reorderAfterSwap } from './lib/reorder-after-swap'
 import {
   ReactFlow,
   Background,
@@ -353,7 +354,9 @@ export default function EditCurrentRoadmapPage() {
       position: { x: COLUMN_X, y: (remaining.length + i) * VERTICAL_GAP },
       data: { number: String(remaining.length + i + 1), label: topic.name, status: 'upcoming' },
     }))
-    relayout([...remaining, ...newNodes])
+    // Splice the switched-in path into the slot the old one vacated (not the
+    // bottom of the canvas); relayout then re-numbers and re-stacks it.
+    relayout(reorderAfterSwap(nodes, removeSet, newNodes))
     setSelectedId(incoming[0]?.masterTopicId ?? remaining[0]?.id ?? null)
 
     // Advisory only (same as manual add/remove) — last response wins the banner.
