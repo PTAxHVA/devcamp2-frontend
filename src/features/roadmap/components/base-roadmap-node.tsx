@@ -1,9 +1,15 @@
 import { Handle, Position } from '@xyflow/react'
-import { RiAddLine, RiCheckFill, RiGitBranchLine, RiLockLine } from 'react-icons/ri'
+import {
+  RiAddLine,
+  RiArrowUpDownLine,
+  RiCheckFill,
+  RiGitBranchLine,
+  RiLockLine,
+} from 'react-icons/ri'
 
 export type NodeStatus = 'completed' | 'current' | 'upcoming' | 'locked'
 
-export type NodeVariant = 'standard' | 'onboarding' | 'ghost'
+export type NodeVariant = 'standard' | 'onboarding' | 'ghost' | 'fork-label'
 
 export interface BaseNodeData extends Record<string, unknown> {
   label: string
@@ -17,6 +23,8 @@ export interface BaseNodeData extends Record<string, unknown> {
   /** Ghost only: the branch this ghost topic belongs to (add-in-parallel target). */
   branchId?: string
   branchName?: string
+  /** Standard only: a small pill on the node, e.g. "Selected" for the chosen fork branch. */
+  badge?: string
 }
 
 export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
@@ -27,6 +35,20 @@ export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
   // `clickable` IS an add-in-parallel affordance, so it looks and behaves clickable.
   const isGhostAdd = variant === 'ghost' && data.clickable === true
   const isInteractive = variant === 'standard' || isGhostAdd
+
+  // Fork-group label pill (Customize editor): the "choose one" heading that sits
+  // above a fork row. Not a real topic — inert, no handles, no status styling.
+  if (variant === 'fork-label') {
+    return (
+      <div className="flex w-64 justify-center">
+        <span className="border-border-purple bg-bg-lavender text-brand-purple-700 inline-flex items-center gap-1 rounded-full border px-3 py-1 text-[11px] font-bold tracking-wide uppercase">
+          <RiArrowUpDownLine className="h-3 w-3" />
+          {data.label}
+        </span>
+      </div>
+    )
+  }
+
   const getContainerStyles = () => {
     if (variant === 'onboarding') {
       switch (data.status) {
@@ -59,13 +81,13 @@ export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
   }
   const renderIndicator = () => {
     if (variant === 'ghost') {
+      // A branch icon reads as "an alternative path"; the "+ Add" affordance on the
+      // right (below) carries the click intent for a clickable ghost.
       return (
         <div className="flex w-6 shrink-0 justify-center">
-          {isGhostAdd ? (
-            <RiAddLine className="text-brand-purple-600 h-4 w-4" />
-          ) : (
-            <RiGitBranchLine className="text-text-placeholder h-4 w-4" />
-          )}
+          <RiGitBranchLine
+            className={`h-4 w-4 ${isGhostAdd ? 'text-brand-purple-500' : 'text-text-placeholder'}`}
+          />
         </div>
       )
     }
@@ -127,10 +149,22 @@ export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
       {renderIndicator()}
 
       <div
-        className={`ml-2.5 flex-1 truncate px-1 text-sm font-semibold ${variant === 'standard' ? 'text-left' : 'text-center'}`}
+        className={`ml-2.5 flex-1 truncate px-1 text-sm font-semibold ${variant === 'standard' || isGhostAdd ? 'text-left' : 'text-center'}`}
       >
         {data.label}
       </div>
+
+      {data.badge && (
+        <span className="bg-brand-purple-600 ml-1 shrink-0 rounded-full px-2 py-0.5 text-[9px] font-bold tracking-wide text-white uppercase">
+          {data.badge}
+        </span>
+      )}
+
+      {isGhostAdd && (
+        <span className="text-brand-purple-600 ml-1 flex shrink-0 items-center gap-0.5 text-xs font-bold">
+          <RiAddLine className="h-3.5 w-3.5" /> Add
+        </span>
+      )}
 
       <Handle type="source" position={Position.Bottom} className="h-2 w-2 opacity-0" />
     </div>

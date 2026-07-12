@@ -13,19 +13,11 @@ import {
 import { useMasterRoadmap } from '@/features/roadmap/hooks/use-master-roadmap'
 import { useMasterRoadmapGraph } from '@/features/roadmap/hooks/use-master-roadmap-graph'
 import { buildFlowGraph } from '@/features/roadmap/lib/build-flow-graph'
-import { buildGhostBranches } from '@/features/roadmap/lib/build-ghost-branches'
+import { buildEditorLayout } from './lib/build-editor-layout'
 import SwitchPathPanel, { type PathSwap } from './components/switch-path-panel'
 import { resolveIncomingTopics } from './lib/resolve-incoming-topics'
 import { reorderAfterSwap } from './lib/reorder-after-swap'
-import {
-  ReactFlow,
-  Background,
-  Controls,
-  useNodesState,
-  useEdgesState,
-  type Node,
-  type Edge,
-} from '@xyflow/react'
+import { ReactFlow, Background, Controls, useNodesState, type Node } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import {
   RiArrowLeftLine,
@@ -41,7 +33,6 @@ import {
 
 const VERTICAL_GAP = 140
 const COLUMN_X = 0
-const EDGE_STYLE = { stroke: '#CBD5E1', strokeWidth: 2 }
 
 interface AiFeedback {
   feedback: string
@@ -86,12 +77,12 @@ export default function EditCurrentRoadmapPage() {
   // Master branches carry the fork metadata (selectionGroup + topicIds) that
   // powers the "Learning path" switch card for forked roadmaps.
   const { data: masterPreview } = useMasterRoadmap(data?.roadmap.masterRoadmapId)
-  // The all-branches master graph (topic names + fork edges) feeds the ghost overlay:
-  // the unchosen parallel branches shown beside the chosen path.
+  // The all-branches master graph resolves a ghost branch's topics when the learner
+  // clicks "+ Add" to learn it in parallel (see handleAddGhostBranch). The ghost
+  // NODES themselves are derived from the branch metadata by buildEditorLayout.
   const { data: masterGraph } = useMasterRoadmapGraph(data?.roadmap.masterRoadmapId)
 
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node<BaseNodeData>>([])
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
+  const [nodes, setNodes] = useNodesState<Node<BaseNodeData>>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [aiFeedback, setAiFeedback] = useState<AiFeedback | null>(null)
 
@@ -107,9 +98,9 @@ export default function EditCurrentRoadmapPage() {
     initializedRef.current = true
 
     // neverLocked: the editor shows every topic as editable, never a dashed "lock".
+    // Positions, fork rows, ghosts and edges are derived below by buildEditorLayout.
     const graph = buildFlowGraph(data, { neverLocked: true })
     setNodes(graph.nodes)
-    setEdges(graph.edges)
 
     const meta = new Map<string, TopicMeta>()
     for (const t of data.topics) {
@@ -125,7 +116,7 @@ export default function EditCurrentRoadmapPage() {
     setTopicMeta(meta)
     setOriginalIds(data.topics.map((t) => t.masterTopicId))
     setSelectedId(graph.nodes[0]?.id ?? null)
-  }, [data, setNodes, setEdges])
+  }, [data, setNodes])
 
   // Topics present at load but no longer on the canvas — the PATCH removal diff.
   const removedIds = useMemo(() => {
@@ -146,54 +137,29 @@ export default function EditCurrentRoadmapPage() {
     [availableTopics, canvasIds],
   )
 
-  // Ghost overlay: the unchosen fork branches (e.g. Vue/Angular while on React,
-  // Bootstrap while on Tailwind) drawn as inert dashed columns the learner can click
-  // to add in parallel. Derived from the all-branches master graph keyed on what's on
-  // the canvas, so a branch drops off the moment its topics are added. Empty for a
-  // non-forked roadmap → the canvas renders exactly as before.
-  const ghost = useMemo(
+  // Fork-aware display layout: enrolled topics as a vertical column, with the chosen
+  // fork branch badged in-column and the unchosen branches inline to its right as
+  // add-in-parallel "ghost" cards under a "Choose one" pill. Derived purely from the
+  // canvas topics + the roadmap's branches, so a non-forked roadmap renders as a
+  // plain column exactly as before.
+  const { nodes: displayNodes, edges: displayEdges } = useMemo(
     () =>
-      buildGhostBranches({
-        masterGraph,
-        canvasTopicIds: nodes.map((n) => n.id),
+      buildEditorLayout({
+        canvasTopics: nodes.map((n) => ({ id: n.id, label: n.data.label, status: n.data.status })),
         branches: masterPreview?.branches,
       }),
-    [masterGraph, nodes, masterPreview],
+    [nodes, masterPreview],
   )
-  const displayNodes = useMemo(() => [...nodes, ...ghost.nodes], [nodes, ghost.nodes])
-  const displayEdges = useMemo(() => [...edges, ...ghost.edges], [edges, ghost.edges])
 
   const selectedMeta = selectedId ? topicMeta.get(selectedId) : undefined
 
-  // Re-number, re-stack vertically and keep the graph connected after a structural
-  // change. Layout/ordering is visual only — the backend re-derives canonical order.
+  // Update the canvas topic set + order after a structural change. Positions,
+  // numbering, fork rows, ghosts and edges are all derived from `nodes` by
+  // buildEditorLayout (display), so this only keeps `nodes` as the ordered
+  // membership list that the save diff (added/removed ids) reads. Ordering is
+  // visual only — the backend re-derives the canonical order on save.
   const relayout = (nextNodes: Node<BaseNodeData>[]) => {
-    const updated = nextNodes.map((n, i) => ({
-      ...n,
-      position: { x: COLUMN_X, y: i * VERTICAL_GAP },
-      data: { ...n.data, number: String(i + 1) },
-    }))
-
-    const ids = new Set(updated.map((n) => n.id))
-    const kept = edges.filter((e) => ids.has(e.source) && ids.has(e.target))
-
-    updated.forEach((node, idx) => {
-      if (idx === 0) return
-      const hasParent = kept.some((e) => e.target === node.id)
-      if (!hasParent) {
-        const prev = updated[idx - 1]
-        kept.push({
-          id: `e-${prev.id}-${node.id}`,
-          source: prev.id,
-          target: node.id,
-          type: 'smoothstep',
-          style: EDGE_STYLE,
-        })
-      }
-    })
-
-    setNodes(updated)
-    setEdges(kept)
+    setNodes(nextNodes.map((n, i) => ({ ...n, data: { ...n.data, number: String(i + 1) } })))
   }
 
   const aiFeedbackMutation = useMutation({
@@ -303,6 +269,8 @@ export default function EditCurrentRoadmapPage() {
   }
 
   const onNodeClick = (_: React.MouseEvent, node: Node) => {
+    // The "choose one" pill is an inert label, not a topic — ignore clicks on it.
+    if (node.id.startsWith('fork-label:')) return
     // A ghost node = an unchosen fork branch. Clicking it adds that branch in parallel;
     // a real topic node just opens its details.
     if (node.id.startsWith('ghost:')) {
@@ -551,10 +519,9 @@ export default function EditCurrentRoadmapPage() {
             <ReactFlow
               nodes={displayNodes}
               edges={displayEdges}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
               onNodeClick={onNodeClick}
               nodeTypes={nodeTypes}
+              nodesDraggable={false}
               fitView
               proOptions={{ hideAttribution: true }}
             >
