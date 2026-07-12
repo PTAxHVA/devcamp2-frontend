@@ -18,15 +18,33 @@ vi.mock('../../hooks/use-master-roadmap', () => ({
       roleName: 'Backend Developer',
       description: 'Curated path.',
       branches: [
-        { _id: 'core', name: 'Core', isMandatory: true, orderIndex: 0, topicCount: 3 },
-        { _id: 'mongo', name: 'MongoDB', selectionGroup: 'Database', isMutuallyExclusive: true, orderIndex: 1, topicCount: 1 }, // prettier-ignore
-        { _id: 'pg', name: 'PostgreSQL', selectionGroup: 'Database', isMutuallyExclusive: true, orderIndex: 2, topicCount: 1 }, // prettier-ignore
+        { _id: 'core', name: 'Core', isMandatory: true, orderIndex: 0, topicCount: 2, topicIds: ['t-node', 't-express'] }, // prettier-ignore
+        { _id: 'mongo', name: 'MongoDB', selectionGroup: 'Database', isMutuallyExclusive: true, orderIndex: 1, topicCount: 1, topicIds: ['t-mongo'] }, // prettier-ignore
+        { _id: 'pg', name: 'PostgreSQL', selectionGroup: 'Database', isMutuallyExclusive: true, orderIndex: 2, topicCount: 1, topicIds: ['t-pg'] }, // prettier-ignore
       ],
     },
     isLoading: false,
     isError: false,
     isFetching: false,
     refetch: vi.fn(),
+  }),
+}))
+
+// The enrolled user is on the PostgreSQL path (NOT the MongoDB default). The hook
+// is disabled (no id) when not enrolled, so it returns no data then.
+vi.mock('../../hooks/use-roadmap-detail', () => ({
+  useRoadmapDetail: (id: string) => ({
+    data: id
+      ? {
+          roadmap: {},
+          topics: [
+            { masterTopicId: 't-node' },
+            { masterTopicId: 't-express' },
+            { masterTopicId: 't-pg' },
+          ],
+          edges: [],
+        }
+      : undefined,
   }),
 }))
 
@@ -75,19 +93,26 @@ describe('RoadmapPreviewModal branch picker', () => {
     enrollMutate.mockReset()
   })
 
-  it('enrolled: the picker is read-only (radios disabled) and reframed for the editor', () => {
+  it('enrolled: read-only picker reflects the REAL branch (PostgreSQL), not the default', () => {
     renderModal({ isEnrolled: true, userRoadmapId: 'ur-1' })
 
     expect(screen.getByText('Learning paths')).toBeInTheDocument()
-    const radios = screen.getAllByRole('radio') as HTMLInputElement[]
-    expect(radios.length).toBeGreaterThan(0)
-    radios.forEach((r) => expect(r).toBeDisabled())
+    // "choose one" implies a live choice — gone in the read-only preview.
+    expect(screen.queryByText('choose one')).not.toBeInTheDocument()
+
+    const [mongoRadio, pgRadio] = screen.getAllByRole('radio') as HTMLInputElement[]
+    expect(mongoRadio).toBeDisabled()
+    expect(pgRadio).toBeDisabled()
+    // The learner switched to PostgreSQL — highlight the real path, not the MongoDB default.
+    expect(pgRadio.checked).toBe(true)
+    expect(mongoRadio.checked).toBe(false)
   })
 
-  it('not enrolled: the picker stays interactive (radio toggles the path)', () => {
+  it('not enrolled: interactive picker defaults to the group default and toggles', () => {
     renderModal({ isEnrolled: false })
 
     expect(screen.getByText('Choose your learning path')).toBeInTheDocument()
+    expect(screen.getByText('choose one')).toBeInTheDocument()
     const [mongoRadio, pgRadio] = screen.getAllByRole('radio') as HTMLInputElement[]
     // Default selection is the first branch of the exclusive group (MongoDB).
     expect(mongoRadio.checked).toBe(true)

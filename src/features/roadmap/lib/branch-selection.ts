@@ -69,6 +69,22 @@ export function resolveDefaultBranchSelection(branches: ForkableBranch[]): strin
 }
 
 /**
+ * Branches the learner is ACTUALLY enrolled in, derived from their enrolled
+ * topic ids: a branch counts as selected when at least one of its topics is
+ * enrolled. Unlike resolveDefaultBranchSelection (which assumes each group's
+ * default), this reflects the real path — e.g. PostgreSQL after the learner
+ * switched off the MongoDB default. Used by the read-only enrolled preview so
+ * it highlights the true branch instead of a possibly-wrong default.
+ */
+export function resolveEnrolledBranchSelection(
+  branches: ForkableBranch[],
+  enrolledTopicIds: readonly string[],
+): string[] {
+  const enrolled = new Set(enrolledTopicIds)
+  return branches.filter((b) => (b.topicIds ?? []).some((id) => enrolled.has(id))).map((b) => b._id)
+}
+
+/**
  * Apply a click on a branch row. Immutable — returns a new Set.
  * - Exclusive-group branch: radio semantics — selecting swaps out its group
  *   siblings; clicking the selected one keeps it (a radio can't deselect).

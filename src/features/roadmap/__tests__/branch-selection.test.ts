@@ -5,6 +5,7 @@ import {
   deriveForkContext,
   groupBranches,
   resolveDefaultBranchSelection,
+  resolveEnrolledBranchSelection,
   type ForkableBranch,
 } from '../lib/branch-selection'
 
@@ -66,6 +67,32 @@ describe('resolveDefaultBranchSelection', () => {
 
   it('returns empty for no branches', () => {
     expect(resolveDefaultBranchSelection([])).toEqual([])
+  })
+})
+
+describe('resolveEnrolledBranchSelection', () => {
+  it('selects the branches whose topics are enrolled (real path, not the default)', () => {
+    // Learner switched off the MongoDB default onto PostgreSQL.
+    expect(resolveEnrolledBranchSelection(forked, ['a', 'b', 'tail', 'p'])).toEqual(['core', 'pg'])
+  })
+
+  it('selects the default branch when that is the one enrolled', () => {
+    expect(resolveEnrolledBranchSelection(forked, ['a', 'b', 'tail', 'm'])).toEqual([
+      'core',
+      'mongo',
+    ])
+  })
+
+  it('returns both fork siblings for a pre-fork enrollee holding both', () => {
+    expect(resolveEnrolledBranchSelection(forked, ['a', 'b', 'tail', 'm', 'p'])).toEqual([
+      'core',
+      'mongo',
+      'pg',
+    ])
+  })
+
+  it('returns empty when no topics are enrolled yet', () => {
+    expect(resolveEnrolledBranchSelection(forked, [])).toEqual([])
   })
 })
 
