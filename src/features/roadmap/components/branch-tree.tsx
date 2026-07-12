@@ -71,9 +71,12 @@ export default function BranchTree({
                 <span className="text-text-primary text-xs font-bold tracking-wider uppercase">
                   {group}
                 </span>
-                <span className="bg-bg-lavender text-brand-purple-600 rounded-full px-2 py-0.5 text-[10px] font-bold">
-                  choose one
-                </span>
+                {/* "choose one" implies interactivity — omit it when read-only. */}
+                {!readOnly && (
+                  <span className="bg-bg-lavender text-brand-purple-600 rounded-full px-2 py-0.5 text-[10px] font-bold">
+                    choose one
+                  </span>
+                )}
               </div>
             )}
             <div className="flex items-start gap-3">

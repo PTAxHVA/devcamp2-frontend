@@ -96,6 +96,9 @@ describe('BranchTree', () => {
     // Disabled inputs are inert in a real browser — the guarantee against a
     // misleading pick the modal's Edit-Roadmap button can't apply.
     radios.forEach((r) => expect(r).toBeDisabled())
+    // Group label stays for context, but "choose one" (implies a live choice) is gone.
+    expect(screen.getByText('Database')).toBeInTheDocument()
+    expect(screen.queryByText('choose one')).not.toBeInTheDocument()
   })
 
   it('readOnly disables ungrouped checkbox rows too', () => {
