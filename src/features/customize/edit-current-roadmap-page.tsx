@@ -106,7 +106,8 @@ export default function EditCurrentRoadmapPage() {
     if (!data || initializedRef.current) return
     initializedRef.current = true
 
-    const graph = buildFlowGraph(data)
+    // neverLocked: the editor shows every topic as editable, never a dashed "lock".
+    const graph = buildFlowGraph(data, { neverLocked: true })
     setNodes(graph.nodes)
     setEdges(graph.edges)
 
