@@ -7,15 +7,21 @@ import { groupBranches } from '../lib/branch-selection'
  * nodes in a vertical column. Ungrouped branches keep checkbox semantics
  * (mandatory ones are locked in); branches sharing a mutually-exclusive
  * selectionGroup render as a labeled radio set — pick exactly one path.
+ *
+ * `readOnly` disables every input — used by the enrolled preview, where the
+ * modal only opens the editor and cannot apply a picker change, so an
+ * interactive radio here would be a false affordance.
  */
 export default function BranchTree({
   branches,
   selected,
   onToggle,
+  readOnly = false,
 }: {
   branches: MasterBranch[]
   selected: Set<string>
   onToggle: (id: string) => void
+  readOnly?: boolean
 }) {
   const { ungrouped, groups } = groupBranches(branches)
   const rows: { branch: MasterBranch; group: string | null }[] = [
@@ -65,9 +71,12 @@ export default function BranchTree({
                 <span className="text-text-primary text-xs font-bold tracking-wider uppercase">
                   {group}
                 </span>
-                <span className="bg-bg-lavender text-brand-purple-600 rounded-full px-2 py-0.5 text-[10px] font-bold">
-                  choose one
-                </span>
+                {/* "choose one" implies interactivity — omit it when read-only. */}
+                {!readOnly && (
+                  <span className="bg-bg-lavender text-brand-purple-600 rounded-full px-2 py-0.5 text-[10px] font-bold">
+                    choose one
+                  </span>
+                )}
               </div>
             )}
             <div className="flex items-start gap-3">
@@ -87,12 +96,13 @@ export default function BranchTree({
 
               {group !== null ? (
                 /* Radio row — exactly one branch per exclusive group */
-                <label className={`${cardCls} cursor-pointer`}>
+                <label className={`${cardCls} ${readOnly ? 'cursor-default' : 'cursor-pointer'}`}>
                   <input
                     type="radio"
                     name={`branch-group-${group}`}
                     className="radio radio-primary radio-sm mt-0.5 shrink-0"
                     checked={isSelected}
+                    disabled={readOnly}
                     onChange={() => onToggle(b._id)}
                   />
                   {body}
@@ -101,8 +111,8 @@ export default function BranchTree({
                 /* Checkbox row — mandatory branches are locked in */
                 <button
                   onClick={() => onToggle(b._id)}
-                  disabled={isMandatory}
-                  className={`${cardCls} ${isMandatory ? 'cursor-default' : ''}`}
+                  disabled={isMandatory || readOnly}
+                  className={`${cardCls} ${isMandatory || readOnly ? 'cursor-default' : ''}`}
                 >
                   <div
                     className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors duration-200 ${

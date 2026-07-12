@@ -2,9 +2,14 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { RiCloseLine, RiListUnordered, RiGitBranchLine, RiCircleLine } from 'react-icons/ri'
 import { useMasterRoadmap } from '../hooks/use-master-roadmap'
+import { useRoadmapDetail } from '../hooks/use-roadmap-detail'
 import { useEnrollRoadmap } from '../hooks/use-enroll-roadmap'
 import { roadmapSlug } from '@/features/learning/lib/roadmap-slug'
-import { applyBranchToggle, resolveDefaultBranchSelection } from '../lib/branch-selection'
+import {
+  applyBranchToggle,
+  resolveDefaultBranchSelection,
+  resolveEnrolledBranchSelection,
+} from '../lib/branch-selection'
 import BranchTree from './branch-tree'
 
 interface RoadmapPreviewModalProps {
@@ -26,14 +31,30 @@ export default function RoadmapPreviewModal({
   const { data, isLoading, isError, refetch, isFetching } = useMasterRoadmap(roadmapId)
   const navigate = useNavigate()
   const enroll = useEnrollRoadmap()
+  // When enrolled, load the user's roadmap so the read-only picker can highlight
+  // their REAL branch (their enrolled topics) instead of the master default —
+  // otherwise anyone who switched off the default path would see the wrong one.
+  const enrolledDetail = useRoadmapDetail(isEnrolled && userRoadmapId ? userRoadmapId : '')
   // null = user hasn't touched the picker yet → derive the default selection
   // (all ungrouped branches + the default path per exclusive fork group).
   const [selected, setSelected] = useState<Set<string> | null>(null)
 
-  const selectedBranches = useMemo(
-    () => selected ?? new Set(resolveDefaultBranchSelection(data?.branches ?? [])),
-    [selected, data?.branches],
-  )
+  const selectedBranches = useMemo(() => {
+    if (selected) return selected
+    if (isEnrolled) {
+      // Reflect the real enrolled branch; until it loads, highlight nothing
+      // rather than flashing a possibly-wrong default.
+      return new Set(
+        enrolledDetail.data
+          ? resolveEnrolledBranchSelection(
+              data?.branches ?? [],
+              enrolledDetail.data.topics.map((t) => t.masterTopicId),
+            )
+          : [],
+      )
+    }
+    return new Set(resolveDefaultBranchSelection(data?.branches ?? []))
+  }, [selected, isEnrolled, enrolledDetail.data, data?.branches])
 
   // Close on Escape for keyboard users.
   useEffect(() => {
@@ -108,11 +129,15 @@ export default function RoadmapPreviewModal({
             </div>
 
             <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-text-primary text-sm font-bold">Choose your learning path</h3>
+              <h3 className="text-text-primary text-sm font-bold">
+                {isEnrolled ? 'Learning paths' : 'Choose your learning path'}
+              </h3>
               <span className="text-text-muted text-xs">
-                {branches.some((b) => b.selectionGroup && b.isMutuallyExclusive)
-                  ? 'Pick one path where the roadmap splits'
-                  : 'Click to select / deselect'}
+                {isEnrolled
+                  ? 'Switch your path or add topics in the editor'
+                  : branches.some((b) => b.selectionGroup && b.isMutuallyExclusive)
+                    ? 'Pick one path where the roadmap splits'
+                    : 'Click to select / deselect'}
               </span>
             </div>
 
@@ -122,6 +147,7 @@ export default function RoadmapPreviewModal({
                   branches={branches}
                   selected={selectedBranches}
                   onToggle={toggleBranch}
+                  readOnly={isEnrolled}
                 />
               </div>
             ) : (
