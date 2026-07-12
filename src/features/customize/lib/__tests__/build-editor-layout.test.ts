@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { buildEditorLayout, type EditorCanvasTopic } from '../build-editor-layout'
+import {
+  buildEditorLayout,
+  type EditorCanvasTopic,
+  type EditorLayout,
+} from '../build-editor-layout'
 import type { ForkableBranch } from '@/features/roadmap/lib/branch-selection'
 import type { BaseNodeData } from '@/features/roadmap/components/base-roadmap-node'
 
@@ -24,9 +28,8 @@ const canvas: EditorCanvasTopic[] = [
   { id: 'tailwind', label: 'Tailwind CSS', status: 'upcoming' },
 ]
 
-const ids = (nodes: { id: string }[]) => nodes.map((n) => n.id)
-const node = (layout: { nodes: { id: string }[] }, id: string) =>
-  layout.nodes.find((n) => n.id === id)!
+const ids = (nodes: EditorLayout['nodes']) => nodes.map((n) => n.id)
+const node = (layout: EditorLayout, id: string) => layout.nodes.find((n) => n.id === id)!
 
 describe('buildEditorLayout — non-forked roadmap', () => {
   it('renders a plain vertical column with no fork labels, ghosts or badges', () => {

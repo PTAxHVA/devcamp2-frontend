@@ -17,6 +17,7 @@ import { buildEditorLayout } from './lib/build-editor-layout'
 import SwitchPathPanel, { type PathSwap } from './components/switch-path-panel'
 import { resolveIncomingTopics } from './lib/resolve-incoming-topics'
 import { reorderAfterSwap } from './lib/reorder-after-swap'
+import { resolveAiFeedbackView, type AiFeedbackData } from './lib/resolve-ai-feedback-view'
 import { ReactFlow, Background, Controls, useNodesState, type Node } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import {
@@ -33,11 +34,6 @@ import {
 
 const VERTICAL_GAP = 140
 const COLUMN_X = 0
-
-interface AiFeedback {
-  feedback: string
-  severity: 'info' | 'warning'
-}
 
 interface TopicMeta {
   name: string
@@ -84,7 +80,8 @@ export default function EditCurrentRoadmapPage() {
 
   const [nodes, setNodes] = useNodesState<Node<BaseNodeData>>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [aiFeedback, setAiFeedback] = useState<AiFeedback | null>(null)
+  const [aiFeedback, setAiFeedback] = useState<AiFeedbackData | null>(null)
+  const [aiError, setAiError] = useState(false)
 
   // Captured once from the fetched roadmap: per-topic metadata (for removal rules
   // and the details panel) and the original topic set (to diff into removeTopicIds).
@@ -164,20 +161,26 @@ export default function EditCurrentRoadmapPage() {
 
   const aiFeedbackMutation = useMutation({
     mutationFn: async (vars: { action: 'add' | 'remove'; topicId: string }) => {
-      const res = await apiClient.post<{ data: AiFeedback }>('/ai/roadmap-feedback', {
+      const res = await apiClient.post<{ data: AiFeedbackData }>('/ai/roadmap-feedback', {
         userRoadmapId: roadmapId,
         action: vars.action,
         topicId: vars.topicId,
       })
       return res.data.data
     },
-    onSuccess: (fb) => setAiFeedback(fb),
+    onMutate: () => setAiError(false),
+    onSuccess: (fb) => {
+      setAiFeedback(fb)
+      setAiError(false)
+    },
     onError: (error) => {
+      // Surface the failure in the card (see resolveAiFeedbackView) instead of
+      // silently blanking it, which read as "the AI did nothing".
       logger.error(
         'Failed to fetch AI feedback:',
         error instanceof Error ? error.message : String(error),
       )
-      setAiFeedback(null)
+      setAiError(true)
     },
   })
 
@@ -393,6 +396,11 @@ export default function EditCurrentRoadmapPage() {
   }
 
   const hasChanges = removedIds.length > 0 || addedIds.length > 0
+  const aiView = resolveAiFeedbackView({
+    pending: aiFeedbackMutation.isPending,
+    error: aiError,
+    feedback: aiFeedback,
+  })
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 bg-bg-card flex h-full w-full flex-col p-6 duration-500 ease-out lg:p-8">
@@ -439,6 +447,43 @@ export default function EditCurrentRoadmapPage() {
         isBusy={saveMutation.isPending || isLoadingTopics}
         onSwitch={handleSwitchPath}
       />
+
+      {/* AI feedback (F19) — surfaced above the canvas so it's visible right after an
+          edit, with an explicit busy/error state instead of silently blanking out. */}
+      <div
+        className={`mb-6 flex items-start gap-4 rounded-xl border p-4 ${
+          aiView.tone === 'warning'
+            ? 'border-orange-200 bg-orange-50'
+            : 'border-border-purple bg-bg-lavender/50'
+        }`}
+      >
+        <div
+          className={`bg-bg-card flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-sm ${
+            aiView.tone === 'warning' ? 'text-orange-500' : 'text-brand-purple-600'
+          }`}
+        >
+          {aiFeedbackMutation.isPending ? (
+            <RiLoader4Line className="animate-spin text-xl" />
+          ) : (
+            <RiSparklingFill className="text-xl" />
+          )}
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <h4 className="text-text-primary font-bold">AI feedback</h4>
+            <span className="bg-bg-lavender text-brand-purple-700 rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">
+              Beta
+            </span>
+          </div>
+          <p className="text-text-secondary text-sm text-wrap break-words">{aiView.message}</p>
+          {aiView.note && (
+            <p className="text-text-muted mt-1 flex items-start gap-1.5 text-xs">
+              <RiInformationLine className="mt-0.5 shrink-0" />
+              {aiView.note}
+            </p>
+          )}
+        </div>
+      </div>
 
       {/* Main Container */}
       <div className="flex min-h-150 flex-1 flex-col gap-6 lg:flex-row">
@@ -611,44 +656,9 @@ export default function EditCurrentRoadmapPage() {
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="mt-6 flex flex-col items-end gap-6 lg:flex-row lg:items-center lg:justify-between">
-        <div
-          className={`flex w-full flex-1 items-center gap-4 rounded-xl border p-4 lg:w-auto ${
-            aiFeedback?.severity === 'warning'
-              ? 'border-orange-200 bg-orange-50'
-              : 'border-border-purple bg-bg-lavender/50'
-          }`}
-        >
-          <div
-            className={`bg-bg-card flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-sm ${
-              aiFeedback?.severity === 'warning' ? 'text-orange-500' : 'text-brand-purple-600'
-            }`}
-          >
-            {aiFeedbackMutation.isPending ? (
-              <RiLoader4Line className="animate-spin text-xl" />
-            ) : (
-              <RiSparklingFill className="text-xl" />
-            )}
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <h4 className="text-text-primary font-bold">AI feedback</h4>
-              <span className="bg-bg-lavender text-brand-purple-700 rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wider uppercase">
-                Beta
-              </span>
-            </div>
-            <p className="text-text-secondary text-xs text-wrap break-words">
-              {aiFeedbackMutation.isPending
-                ? 'Reviewing your change...'
-                : aiFeedback
-                  ? aiFeedback.feedback
-                  : 'Add or remove a topic and the AI will tell you how it affects your path.'}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex w-full shrink-0 gap-3 lg:w-100">
+      {/* Footer — the AI feedback card now lives above the canvas. */}
+      <div className="mt-6 flex justify-end">
+        <div className="flex w-full gap-3 sm:w-100">
           <button
             onClick={() => navigate(-1)}
             className="border-border-soft text-text-secondary hover:bg-bg-section bg-bg-card focus-visible:ring-brand-purple-300 flex flex-1 items-center justify-center rounded-xl border py-2.5 font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
