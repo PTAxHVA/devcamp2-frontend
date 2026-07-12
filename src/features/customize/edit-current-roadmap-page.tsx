@@ -667,7 +667,7 @@ export default function EditCurrentRoadmapPage() {
                 Beta
               </span>
             </div>
-            <p className="text-text-secondary text-xs">
+            <p className="text-text-secondary text-xs text-wrap break-words">
               {aiFeedbackMutation.isPending
                 ? 'Reviewing your change...'
                 : aiFeedback
@@ -677,17 +677,17 @@ export default function EditCurrentRoadmapPage() {
           </div>
         </div>
 
-        <div className="flex shrink-0 gap-3">
+        <div className="flex w-full shrink-0 gap-3 lg:w-100">
           <button
             onClick={() => navigate(-1)}
-            className="border-border-soft text-text-secondary hover:bg-bg-section bg-bg-card focus-visible:ring-brand-purple-300 rounded-xl border px-6 py-2.5 font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
+            className="border-border-soft text-text-secondary hover:bg-bg-section bg-bg-card focus-visible:ring-brand-purple-300 flex flex-1 items-center justify-center rounded-xl border py-2.5 font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
           >
             Cancel
           </button>
           <button
             onClick={() => saveMutation.mutate()}
             disabled={saveMutation.isPending || !hasChanges}
-            className="focus-visible:ring-brand-purple-300 flex items-center gap-2 rounded-xl bg-[#0B1528] px-6 py-2.5 font-bold text-white transition-colors duration-200 hover:bg-slate-800 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
+            className="focus-visible:ring-brand-purple-300 flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#0B1528] py-2.5 font-bold text-white transition-colors duration-200 hover:bg-slate-800 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
           >
             {saveMutation.isPending && <RiLoader4Line className="animate-spin" />}
             Save changes
