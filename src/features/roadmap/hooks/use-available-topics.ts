@@ -6,6 +6,9 @@ export interface AvailableTopic {
   name: string
   estimatedHours: number
   sectionTotal: number
+  /** MasterTopic ids this topic depends on. Optional until the backend adds it to the
+   *  /available-topics payload; the editor's prerequisite remove-guard reads it. */
+  prerequisiteTopicIds?: string[]
 }
 
 export function useAvailableTopics(roadmapId: string) {
