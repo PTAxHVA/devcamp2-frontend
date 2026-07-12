@@ -14,9 +14,6 @@ import { useMasterRoadmap } from '@/features/roadmap/hooks/use-master-roadmap'
 import { useMasterRoadmapGraph } from '@/features/roadmap/hooks/use-master-roadmap-graph'
 import { buildFlowGraph } from '@/features/roadmap/lib/build-flow-graph'
 import { buildEditorLayout } from './lib/build-editor-layout'
-import SwitchPathPanel, { type PathSwap } from './components/switch-path-panel'
-import { resolveIncomingTopics } from './lib/resolve-incoming-topics'
-import { reorderAfterSwap } from './lib/reorder-after-swap'
 import { resolveAiFeedbackView, type AiFeedbackData } from './lib/resolve-ai-feedback-view'
 import { ReactFlow, Background, Controls, useNodesState, type Node } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
@@ -31,9 +28,6 @@ import {
   RiLoader4Line,
   RiInformationLine,
 } from 'react-icons/ri'
-
-const VERTICAL_GAP = 140
-const COLUMN_X = 0
 
 interface TopicMeta {
   name: string
@@ -152,12 +146,9 @@ export default function EditCurrentRoadmapPage() {
 
   // Update the canvas topic set + order after a structural change. Positions,
   // numbering, fork rows, ghosts and edges are all derived from `nodes` by
-  // buildEditorLayout (display), so this only keeps `nodes` as the ordered
-  // membership list that the save diff (added/removed ids) reads. Ordering is
-  // visual only — the backend re-derives the canonical order on save.
-  const relayout = (nextNodes: Node<BaseNodeData>[]) => {
-    setNodes(nextNodes.map((n, i) => ({ ...n, data: { ...n.data, number: String(i + 1) } })))
-  }
+  // buildEditorLayout (display), so this just keeps `nodes` as the ordered
+  // membership list that the save diff (added/removed ids) reads.
+  const relayout = (nextNodes: Node<BaseNodeData>[]) => setNodes(nextNodes)
 
   const aiFeedbackMutation = useMutation({
     mutationFn: async (vars: { action: 'add' | 'remove'; topicId: string }) => {
@@ -209,8 +200,8 @@ export default function EditCurrentRoadmapPage() {
     const newNode: Node<BaseNodeData> = {
       id: topic.masterTopicId,
       type: 'roadmapNode',
-      position: { x: COLUMN_X, y: nodes.length * VERTICAL_GAP },
-      data: { number: String(nodes.length + 1), label: topic.name, status: 'upcoming' },
+      position: { x: 0, y: 0 }, // display position is derived by buildEditorLayout
+      data: { label: topic.name, status: 'upcoming' },
     }
     setTopicMeta((prev) => {
       const next = new Map(prev)
@@ -266,11 +257,11 @@ export default function EditCurrentRoadmapPage() {
       return next
     })
 
-    const newNodes: Node<BaseNodeData>[] = toAdd.map((t, i) => ({
+    const newNodes: Node<BaseNodeData>[] = toAdd.map((t) => ({
       id: t.masterTopicId,
       type: 'roadmapNode',
-      position: { x: COLUMN_X, y: (nodes.length + i) * VERTICAL_GAP },
-      data: { number: String(nodes.length + i + 1), label: t.name, status: 'upcoming' },
+      position: { x: 0, y: 0 }, // display position is derived by buildEditorLayout
+      data: { label: t.name, status: 'upcoming' },
     }))
     relayout([...nodes, ...newNodes])
     setSelectedId(toAdd[0].masterTopicId)
@@ -290,59 +281,6 @@ export default function EditCurrentRoadmapPage() {
     }
     setSelectedId(node.id)
     setSheetOpen(true)
-  }
-
-  // Swap the fork path on the CANVAS in one pass (single relayout — applying the
-  // remove and the add through the individual handlers would read stale state).
-  // Persisting still goes through the normal Save → PATCH, so the remove-gate,
-  // canonical reorder and edit-log behave exactly as for manual edits.
-  const handleSwitchPath = (swap: PathSwap) => {
-    // topicMeta first, server list second: available-topics reflects the SAVED
-    // enrollment, so right after an unsaved switch it contains neither side's
-    // original topic — topicMeta still does, which makes switching back work.
-    const incoming = resolveIncomingTopics(swap.addTopicIds, topicMeta, availableTopics)
-    if (!incoming) {
-      toast.error('The other path is still loading — try again in a moment.')
-      return
-    }
-    const removeSet = new Set(swap.removeTopicIds)
-
-    setTopicMeta((prev) => {
-      const next = new Map(prev)
-      for (const topic of incoming) {
-        // Keep the original entry for topics the editor already knew — it holds
-        // the REAL hasProgress/section counts (a restored started topic must
-        // keep its remove-gate).
-        if (topic.alreadyKnown) continue
-        next.set(topic.masterTopicId, {
-          name: topic.name,
-          status: 'available',
-          estimatedHours: topic.estimatedHours,
-          sectionTotal: topic.sectionTotal,
-          sectionCompleted: 0,
-          hasProgress: false,
-        })
-      }
-      return next
-    })
-
-    const remaining = nodes.filter((n) => !removeSet.has(n.id))
-    const newNodes: Node<BaseNodeData>[] = incoming.map((topic, i) => ({
-      id: topic.masterTopicId,
-      type: 'roadmapNode',
-      position: { x: COLUMN_X, y: (remaining.length + i) * VERTICAL_GAP },
-      data: { number: String(remaining.length + i + 1), label: topic.name, status: 'upcoming' },
-    }))
-    // Splice the switched-in path into the slot the old one vacated (not the
-    // bottom of the canvas); relayout then re-numbers and re-stacks it.
-    relayout(reorderAfterSwap(nodes, removeSet, newNodes))
-    setSelectedId(incoming[0]?.masterTopicId ?? remaining[0]?.id ?? null)
-
-    // Advisory only (same as manual add/remove) — last response wins the banner.
-    for (const topicId of swap.removeTopicIds)
-      aiFeedbackMutation.mutate({ action: 'remove', topicId })
-    for (const topicId of swap.addTopicIds) aiFeedbackMutation.mutate({ action: 'add', topicId })
-    toast.success(`Switched to the ${swap.toName} path — press Save changes to apply.`)
   }
 
   const saveMutation = useMutation({
@@ -445,15 +383,6 @@ export default function EditCurrentRoadmapPage() {
           </button>
         </div>
       )}
-
-      {/* Learning-path switch (only for roadmaps with a fork group) */}
-      <SwitchPathPanel
-        branches={masterPreview?.branches}
-        canvasTopicIds={nodes.map((n) => n.id)}
-        hasProgressOn={(topicId) => topicMeta.get(topicId)?.hasProgress ?? false}
-        isBusy={saveMutation.isPending || isLoadingTopics}
-        onSwitch={handleSwitchPath}
-      />
 
       {/* AI feedback (F19) — surfaced above the canvas so it's visible right after an
           edit, with an explicit busy/error state instead of silently blanking out. */}
