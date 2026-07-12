@@ -6,7 +6,6 @@ import {
   RiMapPinLine,
   RiBookOpenLine,
   RiPassportLine,
-  RiRobot2Line,
   RiSettings4Line,
   RiQuestionLine,
   RiArrowLeftSLine,
@@ -117,11 +116,6 @@ export const Sidebar = ({ mobileOpen = false, onClose }: SidebarProps) => {
           <NavLink to="/passport" className={getNavClass('/passport')}>
             <RiPassportLine className="h-5 w-5 shrink-0" />
             {!effectiveCollapsed && <span>Passport</span>}
-          </NavLink>
-
-          <NavLink to="/ai-assistant" className={getNavClass('/ai')}>
-            <RiRobot2Line className="h-5 w-5 shrink-0" />
-            {!effectiveCollapsed && <span>AI Assistant</span>}
           </NavLink>
 
           <NavLink to="/settings" className={getNavClass('/setting')}>
