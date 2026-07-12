@@ -558,7 +558,10 @@ export default function EditCurrentRoadmapPage() {
               proOptions={{ hideAttribution: true }}
             >
               <Background color="#cbd5e1" gap={20} size={1} />
-              <Controls className="top-4! right-4! bottom-auto! flex! flex-row! gap-1! border-none! shadow-sm!" />
+              <Controls
+                position="top-right"
+                className="flex! flex-row! gap-1! border-none! shadow-sm!"
+              />
             </ReactFlow>
           </div>
         </div>
