@@ -569,7 +569,10 @@ export default function EditCurrentRoadmapPage() {
             </div>
           </div>
 
-          <div ref={flowWrapperRef} className="bg-bg-section/50 relative flex-1">
+          {/* isolate = a stacking context scoped to THIS canvas so React Flow's high
+              internal z-indexes stay contained and can't paint over the app sidebar.
+              Scoped here (not on the global layout wrapper) so page modals are unaffected. */}
+          <div ref={flowWrapperRef} className="bg-bg-section/50 relative isolate flex-1">
             <ReactFlow
               nodes={displayNodes}
               edges={displayEdges}
@@ -590,8 +593,9 @@ export default function EditCurrentRoadmapPage() {
               {/* Same fit options as the auto-fit so the manual fit-view button frames
                   the whole fork and clears the Controls too. */}
               <Controls
+                position="top-right"
                 fitViewOptions={FIT_VIEW_OPTIONS}
-                className="top-4! right-4! bottom-auto! flex! flex-row! gap-1! border-none! shadow-sm!"
+                className="flex! flex-row! gap-1! border-none! shadow-sm!"
               />
             </ReactFlow>
           </div>
