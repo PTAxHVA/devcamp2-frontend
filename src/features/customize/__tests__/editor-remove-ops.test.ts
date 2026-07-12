@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { findDependentTopicIds, insertAtIndex } from '../lib/editor-remove-ops'
+import {
+  findDependentTopicIds,
+  insertAtIndex,
+  resolveOnCanvasPrereqNames,
+} from '../lib/editor-remove-ops'
 
 describe('findDependentTopicIds', () => {
   // b requires a; c requires b.
@@ -49,5 +53,31 @@ describe('insertAtIndex', () => {
     const input = ['a', 'c']
     insertAtIndex(input, 'b', 1)
     expect(input).toEqual(['a', 'c'])
+  })
+})
+
+describe('resolveOnCanvasPrereqNames', () => {
+  const names: Record<string, string> = { a: 'HTML', b: 'CSS', c: 'JavaScript' }
+  const nameOf = (id: string) => names[id]
+
+  it('names prerequisites that are on the canvas', () => {
+    const onCanvas = (id: string) => ['a', 'b', 'c'].includes(id)
+    expect(resolveOnCanvasPrereqNames(['a', 'b'], onCanvas, nameOf)).toEqual(['HTML', 'CSS'])
+  })
+
+  it('drops a prerequisite that is no longer on the canvas (removed leaf, then dependent added)', () => {
+    // 'a' was removed as a leaf; a later-added topic still lists it as a prerequisite.
+    const onCanvas = (id: string) => id !== 'a'
+    expect(resolveOnCanvasPrereqNames(['a', 'b'], onCanvas, nameOf)).toEqual(['CSS'])
+  })
+
+  it('drops an unknown id (no name resolvable)', () => {
+    const onCanvas = () => true
+    expect(resolveOnCanvasPrereqNames(['a', 'zzz'], onCanvas, nameOf)).toEqual(['HTML'])
+  })
+
+  it('returns empty for undefined or empty prerequisite lists', () => {
+    expect(resolveOnCanvasPrereqNames(undefined, () => true, nameOf)).toEqual([])
+    expect(resolveOnCanvasPrereqNames([], () => true, nameOf)).toEqual([])
   })
 })

@@ -15,7 +15,11 @@ import { useMasterRoadmapGraph } from '@/features/roadmap/hooks/use-master-roadm
 import { buildFlowGraph } from '@/features/roadmap/lib/build-flow-graph'
 import { buildEditorLayout } from './lib/build-editor-layout'
 import { resolveAiFeedbackView, type AiFeedbackData } from './lib/resolve-ai-feedback-view'
-import { findDependentTopicIds, insertAtIndex } from './lib/editor-remove-ops'
+import {
+  findDependentTopicIds,
+  insertAtIndex,
+  resolveOnCanvasPrereqNames,
+} from './lib/editor-remove-ops'
 import {
   ReactFlow,
   Background,
@@ -228,10 +232,12 @@ export default function EditCurrentRoadmapPage() {
   // on the canvas can be named). Surfaces the dependency the graph edges imply.
   const selectedPrereqNames = useMemo(
     () =>
-      (selectedMeta?.prerequisiteTopicIds ?? [])
-        .map((id) => topicMeta.get(id)?.name)
-        .filter((name): name is string => !!name),
-    [selectedMeta, topicMeta],
+      resolveOnCanvasPrereqNames(
+        selectedMeta?.prerequisiteTopicIds,
+        (id) => canvasIds.has(id),
+        (id) => topicMeta.get(id)?.name,
+      ),
+    [selectedMeta, topicMeta, canvasIds],
   )
 
   // Topics still on the canvas that list the selected topic as a prerequisite — used
@@ -321,6 +327,10 @@ export default function EditCurrentRoadmapPage() {
     // exactly where it was, rather than restoring a full-canvas snapshot that would
     // clobber any edits made in the undo window. Display + edges are re-derived.
     const removedIndex = nodes.findIndex((n) => n.id === removedTopicId)
+    // Unreachable today (selectedId is always a real on-canvas node id), but guards a
+    // future mutation path that forgets to keep selectedId in sync: splicing an
+    // undefined node back in on undo would hard-crash the next render.
+    if (removedIndex === -1) return
     const removedNode = nodes[removedIndex]
     const remaining = nodes.filter((n) => n.id !== removedTopicId)
     relayout(remaining)
@@ -330,7 +340,7 @@ export default function EditCurrentRoadmapPage() {
     aiFeedbackMutation.mutate({ action: 'remove', topicId: removedTopicId })
 
     const toastId = toast(
-      (t) => (
+      () => (
         <span className="flex items-center gap-3">
           <span className="text-sm">
             Removed <span className="font-semibold">{removedName}</span>.
@@ -342,8 +352,7 @@ export default function EditCurrentRoadmapPage() {
               // `remaining` is still the live canvas; the display is re-derived.
               relayout(insertAtIndex(remaining, removedNode, removedIndex))
               setSelectedId(removedTopicId)
-              undoToastIdRef.current = null
-              toast.dismiss(t.id)
+              dismissUndo()
             }}
             className="text-brand-purple-600 hover:text-brand-purple-700 shrink-0 text-sm font-bold"
           >

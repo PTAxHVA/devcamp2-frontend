@@ -33,3 +33,25 @@ export function insertAtIndex<T>(items: readonly T[], item: T, index: number): T
   next.splice(Math.min(Math.max(index, 0), next.length), 0, item)
   return next
 }
+
+/**
+ * Names of a topic's prerequisites that are STILL on the canvas. A prereq that isn't
+ * currently on the canvas is dropped, so the details panel never shows a stale/removed
+ * topic as a present "locked" prerequisite. (A topic can gain a prereq that is no longer
+ * on the canvas — e.g. it was removed as a leaf, then a branch topic that depends on it
+ * is added in parallel; that off-canvas prereq must not be shown as satisfied.)
+ *
+ * @param prerequisiteIds the selected topic's prerequisite ids (undefined ⇒ none)
+ * @param isOnCanvas whether a topic id is currently on the canvas
+ * @param nameOf resolves a topic id to its display name (undefined ⇒ unknown, dropped)
+ */
+export function resolveOnCanvasPrereqNames(
+  prerequisiteIds: readonly string[] | undefined,
+  isOnCanvas: (id: string) => boolean,
+  nameOf: (id: string) => string | undefined,
+): string[] {
+  return (prerequisiteIds ?? [])
+    .filter((id) => isOnCanvas(id))
+    .map((id) => nameOf(id))
+    .filter((name): name is string => !!name)
+}
