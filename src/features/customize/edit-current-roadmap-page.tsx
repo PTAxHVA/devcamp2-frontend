@@ -37,6 +37,7 @@ import {
   RiSparklingFill,
   RiLoader4Line,
   RiInformationLine,
+  RiLockLine,
 } from 'react-icons/ri'
 
 const VERTICAL_GAP = 140
@@ -56,6 +57,9 @@ interface TopicMeta {
   sectionCompleted: number
   /** A topic the learner has started cannot be removed (backend enforces this too). */
   hasProgress: boolean
+  /** MasterTopic ids this topic depends on — shown in the details panel and used to
+   *  guard removals (you can't drop a topic another on-canvas topic requires). */
+  prerequisiteTopicIds: string[]
 }
 
 const STATUS_LABEL: Record<BEGraphTopic['status'], string> = {
@@ -119,6 +123,7 @@ export default function EditCurrentRoadmapPage() {
         sectionTotal: t.sectionTotal,
         sectionCompleted: t.sectionCompleted,
         hasProgress: t.sectionCompleted > 0,
+        prerequisiteTopicIds: t.prerequisiteTopicIds ?? [],
       })
     }
     setTopicMeta(meta)
@@ -163,6 +168,33 @@ export default function EditCurrentRoadmapPage() {
   const displayEdges = useMemo(() => [...edges, ...ghost.edges], [edges, ghost.edges])
 
   const selectedMeta = selectedId ? topicMeta.get(selectedId) : undefined
+
+  // Prerequisite topics of the selected topic, resolved to names (only those still
+  // on the canvas can be named). Surfaces the dependency the graph edges imply.
+  const selectedPrereqNames = useMemo(
+    () =>
+      (selectedMeta?.prerequisiteTopicIds ?? [])
+        .map((id) => topicMeta.get(id)?.name)
+        .filter((name): name is string => !!name),
+    [selectedMeta, topicMeta],
+  )
+
+  // Topics still on the canvas that list the selected topic as a prerequisite — used
+  // to warn that removing it would break their chain.
+  const selectedRequiredByNames = useMemo(
+    () =>
+      selectedId
+        ? nodes
+            .filter(
+              (n) =>
+                n.id !== selectedId &&
+                topicMeta.get(n.id)?.prerequisiteTopicIds.includes(selectedId),
+            )
+            .map((n) => topicMeta.get(n.id)?.name)
+            .filter((name): name is string => !!name)
+        : [],
+    [selectedId, nodes, topicMeta],
+  )
 
   // Re-number, re-stack vertically and keep the graph connected after a structural
   // change. Layout/ordering is visual only — the backend re-derives canonical order.
@@ -221,18 +253,62 @@ export default function EditCurrentRoadmapPage() {
       toast.error("You can't remove a topic you've already started.")
       return
     }
+    // A locked topic is gated behind prerequisites — treat it as protected so it
+    // can't be dropped out from under the topics that unlock it.
+    if (meta?.status === 'locked') {
+      toast.error("This topic is locked and can't be removed.")
+      return
+    }
+    // Guard the prerequisite chain: refuse to remove a topic that another topic
+    // still on the canvas depends on, and name the dependents so the reason is clear.
+    const dependents = nodes.filter(
+      (n) => n.id !== selectedId && topicMeta.get(n.id)?.prerequisiteTopicIds.includes(selectedId),
+    )
+    if (dependents.length > 0) {
+      const names = dependents.map((n) => topicMeta.get(n.id)?.name ?? 'another topic')
+      toast.error(`Required by ${names.join(', ')} — remove those first.`)
+      return
+    }
     if (nodes.length <= 1) {
       toast.error('A roadmap must keep at least one topic.')
       return
     }
 
     const removedTopicId = selectedId
+    const removedName = meta?.name ?? 'Topic'
+    // Snapshot the canvas so the removal can be undone (nothing is persisted until
+    // Save, but an inline undo avoids re-adding by hand after a misclick).
+    const snapshotNodes = nodes
+    const snapshotEdges = edges
     const remaining = nodes.filter((n) => n.id !== removedTopicId)
     relayout(remaining)
     setSelectedId(remaining[0]?.id ?? null)
 
     // Advisory only: tell the learner what removing this topic implies.
     aiFeedbackMutation.mutate({ action: 'remove', topicId: removedTopicId })
+
+    toast(
+      (t) => (
+        <span className="flex items-center gap-3">
+          <span className="text-sm">
+            Removed <span className="font-semibold">{removedName}</span>.
+          </span>
+          <button
+            onClick={() => {
+              setNodes(snapshotNodes)
+              setEdges(snapshotEdges)
+              setSelectedId(removedTopicId)
+              setAiFeedback(null)
+              toast.dismiss(t.id)
+            }}
+            className="text-brand-purple-600 hover:text-brand-purple-700 shrink-0 text-sm font-bold"
+          >
+            Undo
+          </button>
+        </span>
+      ),
+      { icon: <RiSubtractLine className="text-error-text" />, duration: 6000 },
+    )
   }
 
   const handleAddTopic = (topic: AvailableTopic) => {
@@ -251,6 +327,7 @@ export default function EditCurrentRoadmapPage() {
         sectionTotal: topic.sectionTotal,
         sectionCompleted: 0,
         hasProgress: false,
+        prerequisiteTopicIds: [],
       })
       return next
     })
@@ -284,6 +361,7 @@ export default function EditCurrentRoadmapPage() {
           sectionTotal: t.sectionTotal,
           sectionCompleted: 0,
           hasProgress: false,
+          prerequisiteTopicIds: t.prerequisiteTopicIds ?? [],
         })
       }
       return next
@@ -342,6 +420,7 @@ export default function EditCurrentRoadmapPage() {
           sectionTotal: topic.sectionTotal,
           sectionCompleted: 0,
           hasProgress: false,
+          prerequisiteTopicIds: [],
         })
       }
       return next
@@ -479,7 +558,9 @@ export default function EditCurrentRoadmapPage() {
             <div className="relative flex items-center gap-2">
               <button
                 onClick={handleRemoveTopic}
-                disabled={!selectedId || selectedMeta?.hasProgress}
+                disabled={
+                  !selectedId || selectedMeta?.hasProgress || selectedMeta?.status === 'locked'
+                }
                 className="border-border-soft text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-40"
               >
                 <RiSubtractLine className="text-error-text" /> Remove topic
@@ -624,11 +705,41 @@ export default function EditCurrentRoadmapPage() {
                 </p>
               </div>
 
+              <div>
+                <p className="text-text-secondary mb-1.5 text-sm font-bold">Prerequisites</p>
+                {selectedPrereqNames.length > 0 ? (
+                  <ul className="flex flex-wrap gap-1.5">
+                    {selectedPrereqNames.map((name) => (
+                      <li
+                        key={name}
+                        className="border-border-soft text-text-secondary inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-semibold"
+                      >
+                        <RiLockLine className="text-text-placeholder text-xs" />
+                        {name}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-text-muted text-sm">None — this topic has no prerequisites.</p>
+                )}
+              </div>
+
               <div className="border-border-soft mt-auto border-t pt-4">
                 {selectedMeta.hasProgress ? (
                   <p className="text-text-muted flex items-start gap-2 text-xs">
                     <RiInformationLine className="mt-0.5 shrink-0 text-sm" />
                     You have already started this topic, so it can&apos;t be removed.
+                  </p>
+                ) : selectedMeta.status === 'locked' ? (
+                  <p className="text-text-muted flex items-start gap-2 text-xs">
+                    <RiLockLine className="mt-0.5 shrink-0 text-sm" />
+                    This topic is locked until its prerequisites are done, so it can&apos;t be
+                    removed.
+                  </p>
+                ) : selectedRequiredByNames.length > 0 ? (
+                  <p className="text-text-muted flex items-start gap-2 text-xs">
+                    <RiInformationLine className="mt-0.5 shrink-0 text-sm" />
+                    Required by {selectedRequiredByNames.join(', ')} — remove those first.
                   </p>
                 ) : (
                   <p className="text-text-muted flex items-start gap-2 text-xs">

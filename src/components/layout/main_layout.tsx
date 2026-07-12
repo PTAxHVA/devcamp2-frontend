@@ -16,7 +16,11 @@ export const MainLayout = () => {
           aria-hidden="true"
         />
       )}
-      <div className="relative flex flex-1 flex-col overflow-hidden">
+      {/* isolate creates a stacking context so descendant z-indexes (e.g. React
+          Flow's internal z-index:1001 connection line on the edit-roadmap canvas)
+          stay contained here and can't paint over the z-40 sidebar / its collapse
+          toggle. Still sits below the z-50 modal/toast layer portalled to body. */}
+      <div className="relative isolate flex flex-1 flex-col overflow-hidden">
         <Navbar onMenuClick={() => setMobileOpen(true)} />
         <main className="flex-1 overflow-x-hidden overflow-y-auto">
           <Outlet />
