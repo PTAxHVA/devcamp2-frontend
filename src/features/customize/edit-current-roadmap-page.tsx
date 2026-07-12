@@ -234,7 +234,14 @@ export default function EditCurrentRoadmapPage() {
   // normal PATCH addTopicIds. Fires AI feedback once so the branch-conflict warning
   // (two frameworks at once) surfaces, degrading to data when Gemini is down.
   const handleAddGhostBranch = (branchId?: string, branchName?: string) => {
-    if (!branchId || !masterGraph) return
+    if (!branchId) return
+    // The ghost card renders from the branch list, but adding its topics needs the
+    // heavier all-branches graph. If that hasn't loaded yet (or the endpoint is cold),
+    // tell the learner instead of dead-clicking — mirrors the switch-path panel.
+    if (!masterGraph) {
+      toast.error('Still loading the other paths — try again in a moment.')
+      return
+    }
     const branch = masterPreview?.branches.find((b) => b._id === branchId)
     if (!branch?.topicIds?.length) return
     const canvas = new Set(nodes.map((n) => n.id))
