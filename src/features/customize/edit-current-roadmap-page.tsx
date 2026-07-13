@@ -11,7 +11,7 @@ import { useMasterRoadmapGraph } from '@/features/roadmap/hooks/use-master-roadm
 import { buildEditorLayout, type EditorTopic } from './lib/build-editor-layout'
 import { resolveAiFeedbackView, type AiFeedbackData } from './lib/resolve-ai-feedback-view'
 import { resolveOnCanvasPrereqNames } from './lib/editor-remove-ops'
-import { computeMembershipDiff, canRemoveTopic } from './lib/membership-ops'
+import { computeMembershipDiff, canRemoveTopic, resolveAddBlocker } from './lib/membership-ops'
 import { ReactFlow, Background, Controls, useReactFlow, type Node } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import {
@@ -233,6 +233,17 @@ export default function EditCurrentRoadmapPage() {
     [selectedId, selectedEnrolled, membership, topicMeta],
   )
 
+  // A greyed continuation topic (e.g. Next.js) can't be added until its in-branch
+  // predecessor (React) is enrolled — otherwise it would save as a permanently
+  // locked orphan. undefined = freely addable. Only relevant when not enrolled.
+  const addBlockerId = useMemo(
+    () =>
+      selectedId && !selectedEnrolled
+        ? resolveAddBlocker(selectedId, masterPreview?.branches, membership)
+        : undefined,
+    [selectedId, selectedEnrolled, masterPreview, membership],
+  )
+
   const aiFeedbackMutation = useMutation({
     mutationFn: async (vars: { action: 'add' | 'remove'; topicId: string }) => {
       const res = await apiClient.post<{ data: AiFeedbackData }>('/ai/roadmap-feedback', {
@@ -261,6 +272,12 @@ export default function EditCurrentRoadmapPage() {
 
   const handleAddTopic = (topicId: string) => {
     if (membership.has(topicId)) return
+    // Guard the branch chain: don't add a continuation topic before its head.
+    const blocker = resolveAddBlocker(topicId, masterPreview?.branches, membership)
+    if (blocker) {
+      toast.error(`Add ${topicMeta.get(blocker)?.name ?? 'its prerequisite'} first to add this topic.`)
+      return
+    }
     pushHistory()
     const next = new Set(membership)
     next.add(topicId)
@@ -580,7 +597,7 @@ export default function EditCurrentRoadmapPage() {
                 <div className="flex gap-3">
                   <button
                     onClick={() => selectedId && handleAddTopic(selectedId)}
-                    disabled={selectedEnrolled}
+                    disabled={selectedEnrolled || !!addBlockerId}
                     className="border-brand-purple-600 text-brand-purple-600 hover:bg-bg-lavender focus-visible:ring-brand-purple-300 flex flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <RiAddLine /> Add topic
@@ -596,8 +613,9 @@ export default function EditCurrentRoadmapPage() {
                 {!selectedEnrolled ? (
                   <p className="text-text-muted flex items-start gap-2 text-xs">
                     <RiInformationLine className="mt-0.5 shrink-0 text-sm" />
-                    Not in your roadmap yet — add it to learn it (parallel branches stay side by
-                    side).
+                    {addBlockerId
+                      ? `Add ${topicMeta.get(addBlockerId)?.name ?? 'its earlier topic'} first — this topic continues that branch.`
+                      : 'Not in your roadmap yet — add it to learn it (parallel branches stay side by side).'}
                   </p>
                 ) : selectedRemoveCheck && !selectedRemoveCheck.ok ? (
                   <p className="text-text-muted flex items-start gap-2 text-xs">

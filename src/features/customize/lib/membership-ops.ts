@@ -6,6 +6,7 @@
  * side-effect-free so they are unit-tested without rendering React Flow.
  */
 import { findDependentTopicIds } from './editor-remove-ops'
+import { groupBranches, type ForkableBranch } from '@/features/roadmap/lib/branch-selection'
 
 export interface MembershipDiff {
   addTopicIds: string[]
@@ -48,4 +49,32 @@ export function canRemoveTopic(params: {
   if (dependentIds.length > 0) return { ok: false, reason: 'required-by', dependentIds }
   if (membership.size <= 1) return { ok: false, reason: 'last-topic' }
   return { ok: true }
+}
+
+/**
+ * The in-branch predecessor a topic needs enrolled BEFORE it can be added, or
+ * undefined if it's freely addable. Only a mutually-exclusive branch's
+ * CONTINUATION topics (position > 0, e.g. Next.js after React) have one — adding
+ * a continuation without its branch head would leave an enrolled topic that stays
+ * permanently locked for the learner. Fork heads (position 0, incl. a parallel
+ * sibling like Vue) and core topics are always freely addable, so the intended
+ * parallel-branch flow is untouched. Only the IMMEDIATE predecessor is returned;
+ * the chain is enforced transitively as the learner adds each one.
+ */
+export function resolveAddBlocker(
+  topicId: string,
+  branches: ForkableBranch[] | undefined,
+  membership: ReadonlySet<string>,
+): string | undefined {
+  if (!branches) return undefined
+  for (const group of groupBranches(branches).groups) {
+    for (const branch of group.branches) {
+      const ids = branch.topicIds ?? []
+      const pos = ids.indexOf(topicId)
+      if (pos <= 0) continue // not in this branch, or a freely-addable fork head
+      const predecessor = ids[pos - 1]
+      return membership.has(predecessor) ? undefined : predecessor
+    }
+  }
+  return undefined
 }

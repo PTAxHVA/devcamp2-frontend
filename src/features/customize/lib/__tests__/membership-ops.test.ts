@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { computeMembershipDiff, canRemoveTopic } from '../membership-ops'
+import { computeMembershipDiff, canRemoveTopic, resolveAddBlocker } from '../membership-ops'
+import type { ForkableBranch } from '@/features/roadmap/lib/branch-selection'
 
 describe('computeMembershipDiff', () => {
   it('reports added ids (present now, absent originally)', () => {
@@ -91,5 +92,36 @@ describe('canRemoveTopic', () => {
         prerequisitesOf,
       }),
     ).toEqual({ ok: false, reason: 'last-topic' })
+  })
+})
+
+describe('resolveAddBlocker', () => {
+  // Core (dev, ts) + UI Framework {React[react, nextjs] | Vue[vue]}.
+  const branches: ForkableBranch[] = [
+    { _id: 'b-core', name: 'Core', isMandatory: true, topicIds: ['dev', 'ts'] },
+    { _id: 'b-react', name: 'React', selectionGroup: 'UI Framework', isMutuallyExclusive: true, orderIndex: 0, topicIds: ['react', 'nextjs'] }, // prettier-ignore
+    { _id: 'b-vue', name: 'Vue', selectionGroup: 'UI Framework', isMutuallyExclusive: true, orderIndex: 1, topicIds: ['vue'] }, // prettier-ignore
+  ]
+
+  it('blocks a continuation topic on its in-branch predecessor when not enrolled', () => {
+    expect(resolveAddBlocker('nextjs', branches, new Set(['dev', 'ts']))).toBe('react')
+  })
+
+  it('allows a continuation once its predecessor is enrolled', () => {
+    expect(resolveAddBlocker('nextjs', branches, new Set(['dev', 'ts', 'react']))).toBeUndefined()
+  })
+
+  it('never blocks a fork head — incl. a parallel sibling (Vue while on React)', () => {
+    expect(resolveAddBlocker('react', branches, new Set(['dev', 'ts']))).toBeUndefined()
+    expect(resolveAddBlocker('vue', branches, new Set(['dev', 'ts', 'react']))).toBeUndefined()
+  })
+
+  it('never blocks a core topic or an unknown topic', () => {
+    expect(resolveAddBlocker('ts', branches, new Set(['dev']))).toBeUndefined()
+    expect(resolveAddBlocker('mystery', branches, new Set(['dev']))).toBeUndefined()
+  })
+
+  it('returns undefined when there are no branches', () => {
+    expect(resolveAddBlocker('nextjs', undefined, new Set())).toBeUndefined()
   })
 })

@@ -97,7 +97,7 @@ vi.mock('@/features/roadmap/hooks/use-master-roadmap', () => ({
       branches: [
         { _id: 'b-core', name: 'Core', isMandatory: true, orderIndex: 0, topicCount: 2, topicIds: ['dev', 'ts'] }, // prettier-ignore
         { _id: 'b-react', name: 'React', selectionGroup: 'UI Framework', isMutuallyExclusive: true, orderIndex: 0, topicCount: 2, topicIds: ['react', 'nextjs'] }, // prettier-ignore
-        { _id: 'b-vue', name: 'Vue', selectionGroup: 'UI Framework', isMutuallyExclusive: true, orderIndex: 1, topicCount: 1, topicIds: ['vue'] }, // prettier-ignore
+        { _id: 'b-vue', name: 'Vue', selectionGroup: 'UI Framework', isMutuallyExclusive: true, orderIndex: 1, topicCount: 2, topicIds: ['vue', 'vuex'] }, // prettier-ignore
         { _id: 'b-tailwind', name: 'Tailwind CSS', selectionGroup: 'Styling', isMutuallyExclusive: true, orderIndex: 0, topicCount: 1, topicIds: ['tailwind'] }, // prettier-ignore
         { _id: 'b-bootstrap', name: 'Bootstrap', selectionGroup: 'Styling', isMutuallyExclusive: true, orderIndex: 1, topicCount: 1, topicIds: ['bootstrap'] }, // prettier-ignore
       ],
@@ -115,6 +115,7 @@ vi.mock('@/features/roadmap/hooks/use-master-roadmap-graph', () => ({
         enrolledTopic('react', 'React', 2, 'locked', 0, ['ts']),
         enrolledTopic('nextjs', 'Next.js', 3, 'locked', 0, ['react']),
         enrolledTopic('vue', 'Vue', 4, 'locked', 0, ['ts']),
+        enrolledTopic('vuex', 'Vuex', 5, 'locked', 0, ['vue']),
         enrolledTopic('tailwind', 'Tailwind CSS', 6, 'locked', 0, ['react']),
         enrolledTopic('bootstrap', 'Bootstrap', 7, 'locked', 0, ['react']),
       ],
@@ -228,5 +229,16 @@ describe('EditCurrentRoadmapPage — full graph + membership', () => {
         removeTopicIds: ['nextjs'],
       }),
     )
+  })
+
+  it('blocks adding a continuation topic until its branch head is enrolled', () => {
+    renderPage()
+    // Vuex continues the Vue branch, but Vue is not enrolled (learner is on React).
+    fireEvent.click(node('vuex'))
+    expect(btn(/add topic/i)).toBeDisabled()
+    expect(screen.getByText(/Add Vue first/i)).toBeInTheDocument()
+    // The Vue fork head itself is freely addable (a parallel branch).
+    fireEvent.click(node('vue'))
+    expect(btn(/add topic/i)).toBeEnabled()
   })
 })

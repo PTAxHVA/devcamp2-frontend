@@ -121,3 +121,14 @@ describe('buildEditorLayout — add stays in place (does not move to the bottom)
     }
   })
 })
+
+describe('buildEditorLayout — rejoin after a branch tail is removed', () => {
+  it('rejoins the next band from the last ENROLLED topic, not a greyed tail', () => {
+    // React enrolled but Next.js removed (greyed); Tailwind still enrolled.
+    const membership = new Set(['dev', 'ts', 'react', 'tailwind'])
+    const layout = buildEditorLayout({ topics: allTopics, branches, membership, statusOf })
+    const tailwindEdge = layout.edges.find((e) => e.target === 'tailwind')!
+    expect(tailwindEdge.source).toBe('react') // the enrolled tail, not greyed Next.js
+    expect((tailwindEdge.style as { strokeDasharray?: string }).strokeDasharray).toBeUndefined()
+  })
+})

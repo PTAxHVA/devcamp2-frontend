@@ -149,7 +149,8 @@ export function buildEditorLayout(params: {
     })
     const bandTop = y + PILL_GAP
     let maxLen = 0
-    const branchTails: SpineSource[] = []
+    const enrolledTails: SpineSource[] = [] // last ENROLLED topic of each enrolled branch
+    const allTails: SpineSource[] = [] // last topic of each branch (rejoin fallback)
 
     group.branches.forEach((br, bi) => {
       const x = COLUMN_X + bi * BRANCH_COLUMN_WIDTH
@@ -158,6 +159,7 @@ export function buildEditorLayout(params: {
         .filter((t): t is EditorTopic => !!t)
       let by = bandTop
       let prev: SpineSource | undefined
+      let lastEnrolled: SpineSource | undefined
       brTopics.forEach((t, ti) => {
         const enrolled = membership.has(t.id)
         const status: NodeStatus = enrolled ? statusOf(t.id) : 'upcoming'
@@ -175,15 +177,18 @@ export function buildEditorLayout(params: {
           })
         }
         prev = { id: t.id, status, enrolled }
+        if (enrolled) lastEnrolled = prev
         by += ROW_GAP
       })
       maxLen = Math.max(maxLen, brTopics.length)
-      if (prev) branchTails.push(prev)
+      if (lastEnrolled) enrolledTails.push(lastEnrolled)
+      if (prev) allTails.push(prev)
     })
 
-    // Spine rejoins from the enrolled branch tails (fallback: all tails).
-    const enrolledTails = branchTails.filter((s) => s.enrolled)
-    spineSources = enrolledTails.length > 0 ? enrolledTails : branchTails
+    // Spine rejoins from each enrolled branch's LAST ENROLLED topic — so a branch
+    // whose tail was removed (greyed) rejoins from its real enrolled end, not a
+    // greyed node. Falls back to all tails only when nothing in the band is enrolled.
+    spineSources = enrolledTails.length > 0 ? enrolledTails : allTails
     y = bandTop + Math.max(maxLen, 1) * ROW_GAP
   }
 
