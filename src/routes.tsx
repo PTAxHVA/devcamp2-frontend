@@ -31,6 +31,7 @@ import { TermsPage, PrivacyPage } from '@/pages/legal-pages'
 import { PublicPassportPage } from '@/features/passport/public-passport-page'
 import { MyPassportPage } from '@/features/passport/my-passport-page'
 import { GapAnalyzerPage } from '@/features/goals/gap-analyzer-page'
+import SupportPage from '@/features/support/support-page'
 
 export function AppRoutes() {
   return (
@@ -93,14 +94,7 @@ export function AppRoutes() {
           <Route path="/settings" element={<SettingsPage />} />
 
           <Route path="/goals" element={<GapAnalyzerPage />} />
-          <Route
-            path="/support"
-            element={
-              <div className="text-text-placeholder flex h-full items-center justify-center p-4 text-center text-2xl font-bold">
-                🚧 Help & Support (Coming soon)
-              </div>
-            }
-          />
+          <Route path="/support" element={<SupportPage />} />
           <Route path="/dashboard/add-role" element={<AddAnotherRolePage />} />
         </Route>
       </Route>
