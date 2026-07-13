@@ -1,11 +1,5 @@
 import type { IconType } from 'react-icons'
-import {
-  RiArrowUpLine,
-  RiGithubFill,
-  RiRocketLine,
-  RiShieldCheckLine,
-  RiTeamLine,
-} from 'react-icons/ri'
+import { RiArrowUpLine, RiRocketLine, RiShieldCheckLine, RiTeamLine } from 'react-icons/ri'
 import { Link } from 'react-router'
 import { VoraWordmark } from '@/components/ui/vora-logo'
 import { WRAP } from '../lib/landing-styles'
@@ -82,11 +76,13 @@ const FooterNavLink = ({ label, to, external }: FooterLink) => {
   )
 }
 
+const prefersReducedMotion = (): boolean =>
+  typeof window !== 'undefined' &&
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
 const scrollToTop = () =>
-  window.scrollTo({
-    top: 0,
-    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-  })
+  window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' })
 
 export const Footer = () => (
   <footer className="border-border-soft relative mt-2 border-t bg-white pt-11 pb-7">
@@ -127,15 +123,6 @@ export const Footer = () => (
             Verified Online Roadmap Advisor — a curated, quiz-verified path from beginner to
             job-ready web developer.
           </p>
-          <a
-            href="https://github.com/PTAxHVA"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="VORA on GitHub"
-            className="border-border-soft text-text-secondary hover:border-brand-purple-300/70 hover:bg-bg-lavender hover:text-brand-purple-700 mt-4 inline-flex h-10 w-10 items-center justify-center rounded-xl border bg-white transition-colors"
-          >
-            <RiGithubFill aria-hidden className="h-5 w-5" />
-          </a>
         </div>
 
         {COLUMNS.map((column) => (

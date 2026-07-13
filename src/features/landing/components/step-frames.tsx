@@ -265,7 +265,7 @@ const QuizDonut = () => {
       className={cn(
         'relative h-24 w-24 shrink-0',
         !reduced && 'transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
-        active ? 'scale-100' : 'scale-90',
+        active || reduced ? 'scale-100' : 'scale-90',
       )}
     >
       <svg viewBox="0 0 36 36" className="h-24 w-24" aria-hidden>

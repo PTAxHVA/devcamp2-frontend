@@ -45,12 +45,15 @@ export const Typewriter = ({ text, className, speed = 55, startDelay = 300 }: Ty
   const done = count >= text.length
 
   return (
-    <span className={className} aria-label={text}>
+    <span className={className}>
+      {/* Full text for assistive tech; the typed glyphs + caret below are decorative
+          (aria-label on a role-less span isn't reliably announced). */}
+      <span className="sr-only">{text}</span>
       <span aria-hidden>{text.slice(0, count)}</span>
       <span
         aria-hidden
         className={cn(
-          // Thêm -translate-y để kéo con trỏ xuống một chút cho cân đối
+          // Nudge the caret down slightly so it sits centered on the text baseline.
           'ml-0.5 inline-block h-[1.3em] w-0.5 translate-y-[0.15em] bg-current align-baseline',
           done && !reduced && 'animate-caret',
         )}

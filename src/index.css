@@ -160,3 +160,18 @@
 .animate-caret {
   animation: caret-blink 1s step-end infinite;
 }
+
+/* Global reduced-motion safety net: neutralize all animations/transitions (incl.
+   hover lifts and scroll-behavior) for users who ask for reduced motion. The
+   landing already JS-gates its major motion; this catches any CSS-only transitions
+   that aren't individually gated. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

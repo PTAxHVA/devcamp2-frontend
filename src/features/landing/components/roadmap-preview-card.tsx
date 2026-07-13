@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { RiArrowRightSLine, RiCheckLine } from 'react-icons/ri'
+import { RiCheckLine } from 'react-icons/ri'
 import { cn } from '@/lib/utils'
 import { SHADOW_CARD } from '../lib/landing-styles'
 import { usePrefersReducedMotion } from '../lib/use-prefers-reduced-motion'
@@ -68,10 +68,10 @@ const LEGEND = [
 ]
 
 /**
- * Hero roadmap preview — a personalized-path snapshot the visitor can play with.
- * Nodes are selectable (click / keyboard), the active checkpoint pulses, and the
- * completion meter fills on mount. All motion is gated on the LIVE reduced-motion
- * preference so it degrades to a fully static card.
+ * Hero roadmap preview — a static personalized-path snapshot. The active checkpoint
+ * pulses and the completion meter fills once on mount; both are gated on the LIVE
+ * reduced-motion preference so the card degrades to fully static. Presentational
+ * only (no controls) — the interactive roadmap lives at /demo-roadmap.
  */
 export const RoadmapPreviewCard = () => {
   const reduced = usePrefersReducedMotion()
@@ -83,17 +83,14 @@ export const RoadmapPreviewCard = () => {
     return { doneCount: done, total: NODES.length, pct: Math.round((done / NODES.length) * 100) }
   }, [])
 
-  // Selection defaults to the in-progress node so the card opens on "where you are".
-  const currentIndex = useMemo(() => NODES.findIndex((n) => n.status === 'current'), [])
-  const [selected, setSelected] = useState(currentIndex)
-
-  // Animate the meter from 0 → pct once mounted. Under reduced-motion `fill` starts
-  // at the target (and the width transition is disabled below) so nothing animates.
+  // Fill the meter from 0 → pct once mounted. Under reduced-motion it starts at the
+  // target and the effect no-ops, so nothing animates.
   const [fill, setFill] = useState(reduced ? pct : 0)
   useEffect(() => {
+    if (reduced) return
     const raf = requestAnimationFrame(() => setFill(pct))
     return () => cancelAnimationFrame(raf)
-  }, [pct])
+  }, [pct, reduced])
 
   return (
     <div
@@ -155,54 +152,39 @@ export const RoadmapPreviewCard = () => {
           aria-hidden
           className="border-border-input absolute top-3.5 bottom-3.5 left-[29px] w-0 border-l border-dashed"
         />
-        {NODES.map((node, index) => {
-          const isSelected = selected === index
-          return (
-            <button
-              key={node.title}
-              type="button"
-              onClick={() => setSelected(index)}
-              aria-pressed={isSelected}
-              className={cn(
-                'group focus-visible:ring-brand-purple-400/60 relative z-[1] flex w-full items-center gap-3 rounded-[14px] border px-3 py-[9px] text-left transition-[transform,box-shadow,border-color] duration-200 outline-none hover:-translate-y-px hover:shadow-[0_12px_26px_-18px_rgba(6,26,53,0.4)] focus-visible:ring-2',
-                node.status === 'current'
-                  ? 'border-brand-purple-300/50 bg-bg-lavender'
-                  : 'border-border-soft hover:border-brand-purple-300/60 bg-white',
-                isSelected && 'border-brand-purple-400/70 ring-brand-purple-400/35 ring-2',
-              )}
-            >
-              <NodeToken status={node.status} animate={!reduced} />
-              <div className="min-w-0">
-                <b className="text-text-primary block text-[0.92rem] leading-tight font-bold">
-                  {node.title}
-                </b>
-                {/* On the current node the subtitle sits on lavender, where text-muted
-                    dips below AA (4.38:1) — use the darker secondary there. */}
-                <small
-                  className={cn(
-                    'text-[0.75rem]',
-                    node.status === 'current' ? 'text-text-secondary' : 'text-text-muted',
-                  )}
-                >
-                  {node.sub}
-                </small>
-              </div>
-              {node.status === 'current' ? (
-                <span className="font-secondary bg-brand-purple-600 ml-auto rounded-md px-2 py-0.5 text-[0.6rem] font-bold tracking-[0.1em] text-white uppercase">
-                  Now
-                </span>
-              ) : (
-                <RiArrowRightSLine
-                  aria-hidden
-                  className={cn(
-                    'text-brand-purple-500 ml-auto h-5 w-5 shrink-0 transition-opacity duration-200',
-                    isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-60',
-                  )}
-                />
-              )}
-            </button>
-          )
-        })}
+        {NODES.map((node) => (
+          <div
+            key={node.title}
+            className={cn(
+              'relative z-[1] flex items-center gap-3 rounded-[14px] border px-3 py-[9px]',
+              node.status === 'current'
+                ? 'border-brand-purple-300/50 bg-bg-lavender'
+                : 'border-border-soft bg-white',
+            )}
+          >
+            <NodeToken status={node.status} animate={!reduced} />
+            <div className="min-w-0">
+              <b className="text-text-primary block text-[0.92rem] leading-tight font-bold">
+                {node.title}
+              </b>
+              {/* On the current node the subtitle sits on lavender, where text-muted
+                  dips below AA (4.38:1) — use the darker secondary there. */}
+              <small
+                className={cn(
+                  'text-[0.75rem]',
+                  node.status === 'current' ? 'text-text-secondary' : 'text-text-muted',
+                )}
+              >
+                {node.sub}
+              </small>
+            </div>
+            {node.status === 'current' && (
+              <span className="font-secondary bg-brand-purple-600 ml-auto rounded-md px-2 py-0.5 text-[0.6rem] font-bold tracking-[0.1em] text-white uppercase">
+                Now
+              </span>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   )
