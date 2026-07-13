@@ -6,11 +6,13 @@ import MyLearningJourneyPage from '../my-learning-page'
 const mocks = vi.hoisted(() => ({
   useMyRoadmaps: vi.fn(),
   useRoadmapDetail: vi.fn(),
+  useUnregisterRoadmap: vi.fn(),
 }))
 
 vi.mock('@/features/learning/hooks/use-my-learning', () => ({
   useMyRoadmaps: mocks.useMyRoadmaps,
   useRoadmapDetail: mocks.useRoadmapDetail,
+  useUnregisterRoadmap: mocks.useUnregisterRoadmap,
 }))
 
 const renderPage = () =>
@@ -24,6 +26,7 @@ describe('MyLearningJourneyPage list states (NEW-2)', () => {
   beforeEach(() => {
     mocks.useMyRoadmaps.mockReset()
     mocks.useRoadmapDetail.mockReturnValue({ data: undefined, isLoading: false, isError: false })
+    mocks.useUnregisterRoadmap.mockReturnValue({ mutate: vi.fn(), isPending: false })
   })
 
   it('shows a distinct error state (not the empty state) when the list request fails', () => {

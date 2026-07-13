@@ -404,7 +404,7 @@ export default function SettingsPage() {
               </div>
               <button
                 onClick={() => setShowDeactivatePassword(true)}
-                className="border-border-input text-text-primary hover:bg-bg-section focus-visible:ring-brand-purple-300 shrink-0 rounded-lg border px-4 py-2 text-sm font-semibold whitespace-nowrap transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
+                className="shrink-0 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold whitespace-nowrap text-white transition-colors duration-200 hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-red-300 focus-visible:outline-none"
               >
                 Deactivate account
               </button>

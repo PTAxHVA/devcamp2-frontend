@@ -1,12 +1,25 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router'
-import { RiBookOpenLine, RiEditLine, RiTimeLine, RiListUnordered, RiStarLine } from 'react-icons/ri'
+import { toast } from 'react-hot-toast'
+import {
+  RiBookOpenLine,
+  RiEditLine,
+  RiTimeLine,
+  RiListUnordered,
+  RiStarLine,
+  RiCloseCircleLine,
+} from 'react-icons/ri'
 import { formatRoadmapSource } from '../features/roadmap/lib/roadmap-source-label'
 import ProgressHeader from '../features/learning/progress-header'
 import RoadmapSnakePath from '../features/learning/components/snake-roadmap'
 import ForkPathBanner from '../features/learning/components/fork-path-banner'
 import TopicDetailSidebar from '../features/learning/components/topic-side-bar'
-import { useMyRoadmaps, useRoadmapDetail } from '../features/learning/hooks/use-my-learning'
+import { UnregisterModal } from '../features/learning/components/unregister-modal'
+import {
+  useMyRoadmaps,
+  useRoadmapDetail,
+  useUnregisterRoadmap,
+} from '../features/learning/hooks/use-my-learning'
 import { roadmapSlug } from '../features/learning/lib/roadmap-slug'
 import type { LearningTopic } from '../features/learning/types'
 
@@ -23,6 +36,8 @@ export default function MyLearningJourneyPage() {
   const navigate = useNavigate()
   // Selection is scoped to its roadmap so it's ignored once the user switches roadmaps.
   const [selected, setSelected] = useState<{ roadmapId: string; topicId: string } | null>(null)
+  const [showUnregister, setShowUnregister] = useState(false)
+  const unregister = useUnregisterRoadmap()
 
   const {
     data: roadmaps,
@@ -158,6 +173,21 @@ export default function MyLearningJourneyPage() {
   // Sum real estimates only — don't fabricate hours for topics missing one.
   const durationTotal = topics.reduce((sum, t) => sum + (t.estimatedHours || 0), 0)
 
+  const handleUnregister = () => {
+    if (!activeRoadmapId) return
+    // Capture the other roadmap BEFORE the list refetches so we can navigate to it.
+    const others = (roadmaps ?? []).filter((r) => r._id !== activeRoadmapId)
+    unregister.mutate(activeRoadmapId, {
+      onSuccess: () => {
+        toast.success(`Unregistered from ${roadmap.roleName ?? 'this roadmap'}`)
+        setShowUnregister(false)
+        if (others[0]) navigate(`/my-learning/${roadmapSlug(others[0].roleName)}`)
+        else navigate('/dashboard')
+      },
+      onError: () => toast.error('Could not unregister. Please try again.'),
+    })
+  }
+
   return (
     <div className="mx-auto w-full max-w-375 p-6 lg:p-8">
       {/* Header */}
@@ -194,6 +224,15 @@ export default function MyLearningJourneyPage() {
               className="border-border-soft text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 flex cursor-pointer items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
             >
               <RiEditLine /> Edit roadmap
+            </button>
+          )}{' '}
+          {/* Unregister — stops following this roadmap (progress is kept server-side). */}
+          {activeRoadmapId && (
+            <button
+              onClick={() => setShowUnregister(true)}
+              className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 transition-colors duration-200 hover:bg-red-50 focus-visible:ring-2 focus-visible:ring-red-300 focus-visible:outline-none"
+            >
+              <RiCloseCircleLine /> Unregister
             </button>
           )}{' '}
           {/* Roadmap switcher — only shown when user has 2 active roadmaps */}
@@ -241,6 +280,15 @@ export default function MyLearningJourneyPage() {
           <TopicDetailSidebar topic={activeTopic} topics={topics} roadmapId={activeRoadmapId} />
         </div>
       </div>
+
+      {showUnregister && (
+        <UnregisterModal
+          roadmapName={roadmap.roleName ?? 'this roadmap'}
+          isPending={unregister.isPending}
+          onConfirm={handleUnregister}
+          onClose={() => setShowUnregister(false)}
+        />
+      )}
     </div>
   )
 }

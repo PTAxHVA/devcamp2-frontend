@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { useDashboard } from '@/features/dashboard/hooks/use-dashboard'
+import { ActivityModal } from '@/features/activity/components/activity-modal'
 import { StatsGrid } from '@/features/dashboard/components/stats-grid'
 import { MyRoadmapsGrid } from '@/features/dashboard/components/my-roadmaps-grid'
 import { ContinueLearningCard } from '@/features/dashboard/components/continue-learning-card'
@@ -11,6 +13,7 @@ import { FiExternalLink } from 'react-icons/fi'
 
 const DashboardPage = () => {
   const { data, isLoading, isError } = useDashboard()
+  const [activityOpen, setActivityOpen] = useState(false)
 
   if (isLoading) {
     return <DashboardSkeleton />
@@ -88,14 +91,14 @@ const DashboardPage = () => {
               quizAvg={data.stats.quizAvg}
             />
 
-            {data.weeklyProgressCounts?.some((count) => count > 0) && (
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-text-primary text-xl font-bold">Weekly Progress</h2>
-                </div>
-                <WeeklyProgressChart counts={data.weeklyProgressCounts} />
-              </div>
-            )}
+            {/* Always shown now (was hidden on an empty/streak-lost week). An empty
+                week draws the axis + a hint; "View full" opens the 30-day chart. */}
+            <div className="flex flex-col gap-3">
+              <WeeklyProgressChart
+                counts={data.weeklyProgressCounts ?? [0, 0, 0, 0, 0, 0, 0]}
+                onViewFull={() => setActivityOpen(true)}
+              />
+            </div>
 
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
@@ -109,6 +112,8 @@ const DashboardPage = () => {
           </div>
         </div>
       )}
+
+      {activityOpen && <ActivityModal onClose={() => setActivityOpen(false)} />}
     </div>
   )
 }
