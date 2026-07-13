@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter } from 'react-router'
 import EditCurrentRoadmapPage from '../edit-current-roadmap-page'
+import { useMasterRoadmap } from '@/features/roadmap/hooks/use-master-roadmap'
 
 // jsdom lacks ResizeObserver, which FitViewController (rendered inside <ReactFlow>) uses.
 class ResizeObserverStub {
@@ -91,19 +92,17 @@ vi.mock('@/features/roadmap/hooks/use-roadmap-detail', () => ({
   }),
 }))
 
-vi.mock('@/features/roadmap/hooks/use-master-roadmap', () => ({
-  useMasterRoadmap: () => ({
-    data: {
-      branches: [
-        { _id: 'b-core', name: 'Core', isMandatory: true, orderIndex: 0, topicCount: 2, topicIds: ['dev', 'ts'] }, // prettier-ignore
-        { _id: 'b-react', name: 'React', selectionGroup: 'UI Framework', isMutuallyExclusive: true, orderIndex: 0, topicCount: 2, topicIds: ['react', 'nextjs'] }, // prettier-ignore
-        { _id: 'b-vue', name: 'Vue', selectionGroup: 'UI Framework', isMutuallyExclusive: true, orderIndex: 1, topicCount: 2, topicIds: ['vue', 'vuex'] }, // prettier-ignore
-        { _id: 'b-tailwind', name: 'Tailwind CSS', selectionGroup: 'Styling', isMutuallyExclusive: true, orderIndex: 0, topicCount: 1, topicIds: ['tailwind'] }, // prettier-ignore
-        { _id: 'b-bootstrap', name: 'Bootstrap', selectionGroup: 'Styling', isMutuallyExclusive: true, orderIndex: 1, topicCount: 1, topicIds: ['bootstrap'] }, // prettier-ignore
-      ],
-    },
-  }),
-}))
+vi.mock('@/features/roadmap/hooks/use-master-roadmap', () => ({ useMasterRoadmap: vi.fn() }))
+
+// Branch metadata (the /master-roadmaps/:id query). Set per-test so the "still
+// loading" path can be exercised by returning `{ data: undefined }`.
+const BRANCHES = [
+  { _id: 'b-core', name: 'Core', isMandatory: true, orderIndex: 0, topicCount: 2, topicIds: ['dev', 'ts'] }, // prettier-ignore
+  { _id: 'b-react', name: 'React', selectionGroup: 'UI Framework', isMutuallyExclusive: true, orderIndex: 0, topicCount: 2, topicIds: ['react', 'nextjs'] }, // prettier-ignore
+  { _id: 'b-vue', name: 'Vue', selectionGroup: 'UI Framework', isMutuallyExclusive: true, orderIndex: 1, topicCount: 2, topicIds: ['vue', 'vuex'] }, // prettier-ignore
+  { _id: 'b-tailwind', name: 'Tailwind CSS', selectionGroup: 'Styling', isMutuallyExclusive: true, orderIndex: 0, topicCount: 1, topicIds: ['tailwind'] }, // prettier-ignore
+  { _id: 'b-bootstrap', name: 'Bootstrap', selectionGroup: 'Styling', isMutuallyExclusive: true, orderIndex: 1, topicCount: 1, topicIds: ['bootstrap'] }, // prettier-ignore
+]
 
 // All-branches graph adds Vue + Bootstrap (not enrolled → greyed).
 vi.mock('@/features/roadmap/hooks/use-master-roadmap-graph', () => ({
@@ -150,6 +149,7 @@ const btn = (name: RegExp) => screen.getByRole('button', { name })
 
 beforeEach(() => {
   patchMock.mockClear()
+  ;(useMasterRoadmap as unknown as Mock).mockReturnValue({ data: { branches: BRANCHES } })
 })
 
 describe('EditCurrentRoadmapPage — full graph + membership', () => {
@@ -240,5 +240,15 @@ describe('EditCurrentRoadmapPage — full graph + membership', () => {
     // The Vue fork head itself is freely addable (a parallel branch).
     fireEvent.click(node('vue'))
     expect(btn(/add topic/i)).toBeEnabled()
+  })
+
+  it('holds Add until branch metadata loads (no head-less continuation add)', () => {
+    // The graph resolved (greyed topics render) but the branch metadata has not, so
+    // add-eligibility can't be evaluated yet — Add is held rather than left open.
+    ;(useMasterRoadmap as unknown as Mock).mockReturnValue({ data: undefined })
+    renderPage()
+    fireEvent.click(node('vue'))
+    expect(btn(/add topic/i)).toBeDisabled()
+    expect(screen.getByText(/loading the roadmap paths/i)).toBeInTheDocument()
   })
 })

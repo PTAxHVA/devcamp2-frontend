@@ -236,13 +236,21 @@ export default function EditCurrentRoadmapPage() {
   // A greyed continuation topic (e.g. Next.js) can't be added until its in-branch
   // predecessor (React) is enrolled — otherwise it would save as a permanently
   // locked orphan. undefined = freely addable. Only relevant when not enrolled.
+  // The greyed topics render from the /graph query, but resolveAddBlocker needs the
+  // branch metadata from the separate /master-roadmaps/:id query. Guard on that being
+  // loaded: in the window where /graph resolves first, the blocker would read
+  // undefined and a continuation could be added head-less (see addPending below).
+  const branchesReady = !!masterPreview?.branches
   const addBlockerId = useMemo(
     () =>
-      selectedId && !selectedEnrolled
+      selectedId && !selectedEnrolled && branchesReady
         ? resolveAddBlocker(selectedId, masterPreview?.branches, membership)
         : undefined,
-    [selectedId, selectedEnrolled, masterPreview, membership],
+    [selectedId, selectedEnrolled, branchesReady, masterPreview, membership],
   )
+  // Not-enrolled topic while branch metadata is still loading: add-eligibility can't
+  // be evaluated yet, so hold Add rather than risk a head-less continuation add.
+  const addPending = !!selectedId && !selectedEnrolled && !branchesReady
 
   const aiFeedbackMutation = useMutation({
     mutationFn: async (vars: { action: 'add' | 'remove'; topicId: string }) => {
@@ -272,10 +280,18 @@ export default function EditCurrentRoadmapPage() {
 
   const handleAddTopic = (topicId: string) => {
     if (membership.has(topicId)) return
+    // Can't evaluate the branch chain until branch metadata loads — hold rather than
+    // risk adding a continuation topic without its head (a permanently-locked orphan).
+    if (!masterPreview?.branches) {
+      toast.error('Still loading the roadmap paths — try again in a moment.')
+      return
+    }
     // Guard the branch chain: don't add a continuation topic before its head.
-    const blocker = resolveAddBlocker(topicId, masterPreview?.branches, membership)
+    const blocker = resolveAddBlocker(topicId, masterPreview.branches, membership)
     if (blocker) {
-      toast.error(`Add ${topicMeta.get(blocker)?.name ?? 'its prerequisite'} first to add this topic.`)
+      toast.error(
+        `Add ${topicMeta.get(blocker)?.name ?? 'its prerequisite'} first to add this topic.`,
+      )
       return
     }
     pushHistory()
@@ -597,7 +613,7 @@ export default function EditCurrentRoadmapPage() {
                 <div className="flex gap-3">
                   <button
                     onClick={() => selectedId && handleAddTopic(selectedId)}
-                    disabled={selectedEnrolled || !!addBlockerId}
+                    disabled={selectedEnrolled || !!addBlockerId || addPending}
                     className="border-brand-purple-600 text-brand-purple-600 hover:bg-bg-lavender focus-visible:ring-brand-purple-300 flex flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <RiAddLine /> Add topic
@@ -613,9 +629,11 @@ export default function EditCurrentRoadmapPage() {
                 {!selectedEnrolled ? (
                   <p className="text-text-muted flex items-start gap-2 text-xs">
                     <RiInformationLine className="mt-0.5 shrink-0 text-sm" />
-                    {addBlockerId
-                      ? `Add ${topicMeta.get(addBlockerId)?.name ?? 'its earlier topic'} first — this topic continues that branch.`
-                      : 'Not in your roadmap yet — add it to learn it (parallel branches stay side by side).'}
+                    {addPending
+                      ? 'Loading the roadmap paths…'
+                      : addBlockerId
+                        ? `Add ${topicMeta.get(addBlockerId)?.name ?? 'its earlier topic'} first — this topic continues that branch.`
+                        : 'Not in your roadmap yet — add it to learn it (parallel branches stay side by side).'}
                   </p>
                 ) : selectedRemoveCheck && !selectedRemoveCheck.ok ? (
                   <p className="text-text-muted flex items-start gap-2 text-xs">
