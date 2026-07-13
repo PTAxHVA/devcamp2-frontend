@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Clock, Star, ExternalLink, Pencil } from 'lucide-react'
 import { useMe, useMyProfile, useMyProgress } from '@/features/profile/hooks/use-profile'
@@ -9,6 +9,7 @@ import { ProfileStatsPanel } from '@/features/profile/components/profile-stats-p
 import { ProfileActivityCard } from '@/features/profile/components/profile-activity-card'
 import { EditProfileModal } from '@/features/profile/components/edit-profile-modal'
 import { useSidebar } from '@/components/layout/sidebar-context'
+import { useBreakpoints } from '@/hooks/use-breakpoints'
 
 const levelLabel: Record<string, string> = {
   beginner: 'Learner',
@@ -52,40 +53,7 @@ export default function ProfilePage() {
   const { data: roadmapsData, isLoading: loadingRoadmaps } = useMyRoadmaps()
   const { data: progressData, isLoading: loadingProgress } = useMyProgress()
   const { effectiveCollapsed } = useSidebar()
-
-  const [isMobile, setIsMobile] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches,
-  )
-  const [isTablet, setIsTablet] = useState(
-    () =>
-      typeof window !== 'undefined' &&
-      window.matchMedia('(min-width: 768px) and (max-width: 1279px)').matches,
-  )
-  const [isDesktop, setIsDesktop] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia('(min-width: 1280px)').matches,
-  )
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    const mobileMql = window.matchMedia('(max-width: 767px)')
-    const tabletMql = window.matchMedia('(min-width: 768px) and (max-width: 1279px)')
-    const desktopMql = window.matchMedia('(min-width: 1280px)')
-
-    const onMobileChange = () => setIsMobile(mobileMql.matches)
-    const onTabletChange = () => setIsTablet(tabletMql.matches)
-    const onDesktopChange = () => setIsDesktop(desktopMql.matches)
-
-    mobileMql.addEventListener('change', onMobileChange)
-    tabletMql.addEventListener('change', onTabletChange)
-    desktopMql.addEventListener('change', onDesktopChange)
-
-    return () => {
-      mobileMql.removeEventListener('change', onMobileChange)
-      tabletMql.removeEventListener('change', onTabletChange)
-      desktopMql.removeEventListener('change', onDesktopChange)
-    }
-  }, [])
+  const { isMobile, isTablet, isDesktop } = useBreakpoints()
 
   const activeRoadmaps = (roadmapsData ?? []).map((r) => {
     const prog = (progressData ?? []).find((p) => p.roadmapId === r.roadmapId)
@@ -194,23 +162,12 @@ export default function ProfilePage() {
         {/* ── Right (stats) ── */}
         <div className="flex w-full shrink-0 flex-col gap-4 lg:w-72">
           <ProfileStatsPanel />
-        </div>
-
-        {/* ── Right (stats) ── */}
-        <div className="flex w-full shrink-0 flex-col gap-4 lg:w-72">
-          <ProfileStatsPanel />
 
           {/* Tablet-only Banner */}
           {isTablet && !effectiveCollapsed && (
             <ProfileLearningBanner className="flex-col gap-4" buttonClassName="w-full" />
           )}
         </div>
-        <button
-          onClick={() => navigate('/roadmaps/browse')}
-          className="bg-brand-purple-500 hover:bg-brand-purple-600 focus-visible:ring-brand-purple-300 w-full shrink-0 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none sm:w-auto"
-        >
-          Explore Roadmaps
-        </button>
       </div>
 
       {/* Keep learning, keep growing banner */}
