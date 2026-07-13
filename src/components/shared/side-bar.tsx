@@ -11,13 +11,12 @@ import {
   RiCloseLine,
 } from 'react-icons/ri'
 import { VoraMark, VoraWordmark } from '@/components/ui/vora-logo'
+import { useSidebar } from '@/components/layout/sidebar-context'
 
 interface SidebarProps {
   mobileOpen?: boolean
   onClose?: () => void
 }
-
-import { useSidebar } from '@/components/layout/sidebar-context'
 
 export const Sidebar = ({ mobileOpen = false, onClose }: SidebarProps) => {
   const { isCollapsed, setIsCollapsed, effectiveCollapsed } = useSidebar()
