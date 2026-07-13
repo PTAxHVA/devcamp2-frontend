@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
 import { FiLogOut, FiCheck } from 'react-icons/fi'
+import { useModalDismiss } from '@/hooks/use-modal-dismiss'
 
 interface UnregisterModalProps {
   roadmapName: string
@@ -16,13 +16,7 @@ export function UnregisterModal({
   onConfirm,
   onClose,
 }: UnregisterModalProps) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+  const dialogRef = useModalDismiss(onClose)
 
   return (
     <div
@@ -33,6 +27,7 @@ export function UnregisterModal({
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
         className="bg-bg-card w-full max-w-md rounded-3xl p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
 
 interface UserAvatarProps {
@@ -13,10 +14,21 @@ interface UserAvatarProps {
  * edit-profile modal preview.
  */
 export function UserAvatar({ src, name, className }: UserAvatarProps) {
+  // Remember which src failed so a broken photo falls back to the silhouette, while a
+  // NEW src is retried — derived from src each render, no effect needed.
+  const [failedSrc, setFailedSrc] = useState<string | null>(null)
+
   const label = name ? `${name}'s avatar` : 'Avatar'
 
-  if (src) {
-    return <img src={src} alt={label} className={cn('rounded-full object-cover', className)} />
+  if (src && src !== failedSrc) {
+    return (
+      <img
+        src={src}
+        alt={label}
+        onError={() => setFailedSrc(src)}
+        className={cn('rounded-full object-cover', className)}
+      />
+    )
   }
 
   return (

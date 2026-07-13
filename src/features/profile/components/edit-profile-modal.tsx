@@ -4,6 +4,7 @@ import { FiX } from 'react-icons/fi'
 import { UserAvatar } from '@/components/shared/user-avatar'
 import { cropSquareToDataUrl, ImageProcessingError } from '@/lib/resize-image'
 import { extractApiError } from '@/lib/api-client'
+import { useModalDismiss } from '@/hooks/use-modal-dismiss'
 import { useUpdateProfile } from '../hooks/use-profile'
 
 interface EditProfileModalProps {
@@ -19,15 +20,17 @@ export function EditProfileModal({ initialName, initialAvatar, onClose }: EditPr
   const [avatar, setAvatar] = useState<string | null | undefined>(undefined)
   const [processing, setProcessing] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+  const mountedRef = useRef(true)
   const update = useUpdateProfile()
+  const dialogRef = useModalDismiss(onClose)
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+  // Image processing is async and the modal can close first — don't setState after unmount.
+  useEffect(
+    () => () => {
+      mountedRef.current = false
+    },
+    [],
+  )
 
   const preview = avatar === undefined ? initialAvatar : avatar
 
@@ -37,13 +40,16 @@ export function EditProfileModal({ initialName, initialAvatar, onClose }: EditPr
     if (!file) return
     setProcessing(true)
     try {
-      setAvatar(await cropSquareToDataUrl(file))
+      const dataUrl = await cropSquareToDataUrl(file)
+      if (mountedRef.current) setAvatar(dataUrl)
     } catch (err) {
-      toast.error(
-        err instanceof ImageProcessingError ? err.message : 'Could not process that image.',
-      )
+      if (mountedRef.current) {
+        toast.error(
+          err instanceof ImageProcessingError ? err.message : 'Could not process that image.',
+        )
+      }
     } finally {
-      setProcessing(false)
+      if (mountedRef.current) setProcessing(false)
     }
   }
 
@@ -73,6 +79,7 @@ export function EditProfileModal({ initialName, initialAvatar, onClose }: EditPr
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
         className="bg-bg-card w-full max-w-md rounded-3xl p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >

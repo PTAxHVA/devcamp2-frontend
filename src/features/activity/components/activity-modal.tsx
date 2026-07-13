@@ -1,16 +1,10 @@
-import { useEffect } from 'react'
 import { FiX } from 'react-icons/fi'
+import { useModalDismiss } from '@/hooks/use-modal-dismiss'
 import { ActivityPanel } from './activity-panel'
 
 /** Dashboard "View full" dialog wrapping the shared activity panel. */
 export function ActivityModal({ onClose }: { onClose: () => void }) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+  const dialogRef = useModalDismiss(onClose)
 
   return (
     <div
@@ -21,6 +15,7 @@ export function ActivityModal({ onClose }: { onClose: () => void }) {
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
         className="bg-bg-card w-full max-w-2xl rounded-3xl p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >

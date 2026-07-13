@@ -8,5 +8,8 @@ export function useActivity(days = 30) {
   return useQuery<ActivityResponse>({
     queryKey: ['activity', days],
     queryFn: async () => (await apiClient.get('/me/activity', { params: { days } })).data.data,
+    // ActivityPanel renders its own inline error; opt out of the global error toast
+    // so a failure (e.g. an old backend without the route) doesn't double up.
+    meta: { suppressToast: true },
   })
 }

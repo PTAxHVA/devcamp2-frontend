@@ -4,6 +4,7 @@
 
 const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/webp']
 const MAX_INPUT_BYTES = 10 * 1024 * 1024 // reject absurd inputs before decoding
+const MAX_DECODED_PIXELS = 40_000_000 // ~40 MP — a small file can decode to a huge bitmap
 const DEFAULT_SIZE = 256
 const DEFAULT_MAX_CHARS = 200_000 // comfortably under the BE 280k cap
 const QUALITY_STEPS = [0.9, 0.8, 0.7, 0.6, 0.5, 0.4]
@@ -29,6 +30,11 @@ export function validateImageFile(file: File): void {
 /** True when a data-URL is within the persisted-size cap (pure). */
 export const isWithinCap = (dataUrl: string, maxChars = DEFAULT_MAX_CHARS): boolean =>
   dataUrl.length <= maxChars
+
+/** True when a decoded image is too large to process safely — a small compressed
+ *  file can still decode to an enormous bitmap and OOM the tab (pure). */
+export const exceedsMaxPixels = (width: number, height: number): boolean =>
+  width * height > MAX_DECODED_PIXELS
 
 function readAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -63,6 +69,12 @@ export async function cropSquareToDataUrl(
   const source = await readAsDataUrl(file)
   const img = await loadImage(source)
 
+  if (exceedsMaxPixels(img.width, img.height)) {
+    throw new ImageProcessingError(
+      "That image's resolution is too large — please choose a smaller photo.",
+    )
+  }
+
   const side = Math.min(img.width, img.height)
   if (!side) throw new ImageProcessingError('Could not read that image.')
   const sx = (img.width - side) / 2
@@ -73,6 +85,9 @@ export async function cropSquareToDataUrl(
   canvas.height = size
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new ImageProcessingError('Your browser could not process the image.')
+  // Fill white first so transparent PNG/WebP areas don't flatten to black under JPEG.
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, size, size)
   ctx.drawImage(img, sx, sy, side, side, 0, 0, size, size)
 
   for (const quality of QUALITY_STEPS) {

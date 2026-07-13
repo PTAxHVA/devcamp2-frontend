@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { validateImageFile, isWithinCap, ImageProcessingError } from '../resize-image'
+import {
+  validateImageFile,
+  isWithinCap,
+  exceedsMaxPixels,
+  ImageProcessingError,
+} from '../resize-image'
 
 const makeFile = (type: string, size: number): File => ({ type, size }) as File
 
@@ -25,5 +30,13 @@ describe('isWithinCap', () => {
   it('is true at or under the cap and false above it', () => {
     expect(isWithinCap('x'.repeat(100), 100)).toBe(true)
     expect(isWithinCap('x'.repeat(101), 100)).toBe(false)
+  })
+})
+
+describe('exceedsMaxPixels', () => {
+  it('flags a decoded image over ~40 MP (decompression bomb) and passes normal ones', () => {
+    expect(exceedsMaxPixels(7000, 7000)).toBe(true) // 49 MP
+    expect(exceedsMaxPixels(4000, 4000)).toBe(false) // 16 MP
+    expect(exceedsMaxPixels(256, 256)).toBe(false)
   })
 })
