@@ -1,4 +1,4 @@
-import Logo from '@/assets/Logo.svg'
+import { VoraWordmark } from '@/components/ui/vora-logo'
 import { FiUser, FiTarget, FiCode, FiArrowRight } from 'react-icons/fi'
 
 const features = [
@@ -26,7 +26,7 @@ export default function OnboardingLayout() {
       <header className="border-base-200 bg-base-100 sticky top-0 z-50 border-b">
         <div className="navbar mx-auto h-20 max-w-screen-xl px-4">
           <div className="flex-1">
-            <img src={Logo} alt="VORA Logo" className="h-auto w-48 object-contain" />
+            <VoraWordmark />
           </div>
           <div className="flex-none gap-2 sm:gap-4">
             <button className="btn btn-ghost focus-visible:ring-brand-purple-300 font-semibold transition-colors duration-200 focus-visible:ring-2">
