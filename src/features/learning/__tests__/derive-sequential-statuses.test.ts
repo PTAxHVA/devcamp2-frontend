@@ -92,3 +92,43 @@ describe('deriveSequentialStatuses', () => {
     expect(result[0].title).toBe('Keep me')
   })
 })
+
+// Two mutually-exclusive branches learned in parallel (React + Vue). The content
+// seed gives each fork HEAD an explicit prerequisite on the shared pre-fork topic,
+// so they unlock TOGETHER and never gate on each other — the sequential fallback
+// (which would lock the later one) is bypassed whenever an explicit prereq exists.
+// These lock in that behaviour so a future edit to deriveSequentialStatuses can't
+// silently re-introduce parallel branches blocking each other.
+describe('deriveSequentialStatuses — parallel fork branches', () => {
+  const done = { sectionTotal: 2, sectionCompleted: 2 }
+
+  it('unlocks two parallel fork heads together once their shared predecessor is done', () => {
+    const topics = [
+      makeTopic({ masterTopicId: 'ts', orderIndex: 1, ...done, prerequisiteTopicIds: [] }),
+      makeTopic({ masterTopicId: 'react', orderIndex: 2, prerequisiteTopicIds: ['ts'] }),
+      makeTopic({ masterTopicId: 'vue', orderIndex: 3, prerequisiteTopicIds: ['ts'] }),
+      makeTopic({ masterTopicId: 'nextjs', orderIndex: 4, prerequisiteTopicIds: ['react'] }),
+    ]
+    const byId = Object.fromEntries(
+      deriveSequentialStatuses(topics).map((t) => [t.masterTopicId, t.status]),
+    )
+    // React and Vue are BOTH available — neither locks the other.
+    expect(byId.react).toBe('available')
+    expect(byId.vue).toBe('available')
+    // A continuation (Next.js after React) stays locked inside its branch.
+    expect(byId.nextjs).toBe('locked')
+  })
+
+  it('keeps both parallel fork heads locked until the shared predecessor is done', () => {
+    const topics = [
+      makeTopic({ masterTopicId: 'ts', orderIndex: 1, prerequisiteTopicIds: [] }), // not done
+      makeTopic({ masterTopicId: 'react', orderIndex: 2, prerequisiteTopicIds: ['ts'] }),
+      makeTopic({ masterTopicId: 'vue', orderIndex: 3, prerequisiteTopicIds: ['ts'] }),
+    ]
+    const byId = Object.fromEntries(
+      deriveSequentialStatuses(topics).map((t) => [t.masterTopicId, t.status]),
+    )
+    expect(byId.react).toBe('locked')
+    expect(byId.vue).toBe('locked')
+  })
+})

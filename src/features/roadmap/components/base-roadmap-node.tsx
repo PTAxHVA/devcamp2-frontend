@@ -25,6 +25,9 @@ export interface BaseNodeData extends Record<string, unknown> {
   branchName?: string
   /** Standard only: a small pill on the node, e.g. "Selected" for the chosen fork branch. */
   badge?: string
+  /** Standard only (Customize editor): a not-enrolled topic — greyed but still
+   *  clickable to open its details, where "Add topic" brings it into the roadmap. */
+  greyed?: boolean
 }
 
 export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
@@ -34,6 +37,9 @@ export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
   // The learner-view ghost fork node is inert too — but an editor ghost with
   // `clickable` IS an add-in-parallel affordance, so it looks and behaves clickable.
   const isGhostAdd = variant === 'ghost' && data.clickable === true
+  // A greyed standard node = a not-enrolled topic in the Customize editor. Still
+  // clickable (opens details → "Add topic"), but muted so the enrolled path stands out.
+  const isGreyed = variant === 'standard' && data.greyed === true
   const isInteractive = variant === 'standard' || isGhostAdd
 
   // Fork-group label pill (Customize editor): the "choose one" heading that sits
@@ -66,6 +72,11 @@ export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
       return isGhostAdd
         ? 'border-border-input bg-bg-section text-text-secondary hover:border-brand-purple-400 hover:text-brand-purple-700 border-dashed'
         : 'border-border-input bg-bg-section text-text-placeholder border-dashed opacity-80'
+    }
+    if (isGreyed) {
+      // Not-enrolled topic: muted + dashed but clickable — brightens on hover to
+      // invite opening its details (where "Add topic" lives).
+      return 'border-border-input bg-bg-section/50 text-text-placeholder border-dashed hover:border-brand-purple-400 hover:text-brand-purple-600'
     }
     switch (data.status) {
       case 'completed':
@@ -112,6 +123,15 @@ export const BaseRoadmapNode = ({ data }: { data: BaseNodeData }) => {
     // graph reads as an ordered path at a glance (not just anonymous dots).
     const badgeBase =
       'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold'
+    if (isGreyed) {
+      return (
+        <div
+          className={`${badgeBase} border-border-input text-text-placeholder border border-dashed bg-white/60`}
+        >
+          {data.number}
+        </div>
+      )
+    }
     switch (data.status) {
       case 'completed':
         return (

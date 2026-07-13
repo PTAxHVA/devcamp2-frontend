@@ -5,18 +5,18 @@ import { groupBranches, type ForkableBranch } from '@/features/roadmap/lib/branc
 const COLUMN_X = 0
 const ROW_GAP = 140 // vertical gap between column rows
 const PILL_GAP = 74 // the "choose one" pill sits this far above its fork row
-const GHOST_COLUMN_WIDTH = 300 // horizontal gap between a fork's inline siblings
+const BRANCH_COLUMN_WIDTH = 300 // horizontal gap between a fork group's parallel branches
 const EDGE_COLOR = '#CBD5E1'
 const EDGE_COLOR_DONE = '#10b981'
 const SOLID_EDGE = { stroke: EDGE_COLOR, strokeWidth: 2 }
 const DONE_EDGE = { stroke: EDGE_COLOR_DONE, strokeWidth: 2.5 }
 const GHOST_EDGE = { stroke: EDGE_COLOR, strokeWidth: 2, strokeDasharray: '6 4' }
 
-/** One real topic on the editor canvas, in column order. */
-export interface EditorCanvasTopic {
+/** One master topic fed to the editor layout — the FULL graph, every branch. */
+export interface EditorTopic {
   id: string
   label: string
-  status: NodeStatus
+  orderIndex: number
 }
 
 export interface EditorLayout {
@@ -24,90 +24,117 @@ export interface EditorLayout {
   edges: Edge[]
 }
 
-const columnEdge = (
-  source: string,
-  target: string,
-  sourceStatus: NodeStatus | undefined,
-): Edge => ({
-  id: `e-${source}-${target}`,
-  source,
-  target,
-  type: 'smoothstep',
-  style: sourceStatus === 'completed' ? DONE_EDGE : SOLID_EDGE,
-})
+/** The current end(s) of the vertical spine the next topic branches off. */
+interface SpineSource {
+  id: string
+  status: NodeStatus
+  enrolled: boolean
+}
+
+// An edge is dashed when it leads INTO a not-enrolled (greyed) topic, emerald when
+// its source topic is completed, plain otherwise.
+const edgeStyleFor = (targetEnrolled: boolean, sourceStatus: NodeStatus) =>
+  !targetEnrolled ? GHOST_EDGE : sourceStatus === 'completed' ? DONE_EDGE : SOLID_EDGE
 
 /**
- * Fork-aware layout for the Customize editor. Lays the enrolled topics as a
- * vertical column; at each mutually-exclusive fork group, the branch the learner
- * is on stays IN the column (with a "Selected" badge) while the branches they did
- * NOT choose sit inline to its right as dashed "+ Add" ghosts, under a
- * "Choose one · {group}" pill. Clicking a ghost adds that whole branch in
- * parallel (the caller reads the node's branchId/branchName).
+ * Full-master-graph layout for the Customize editor.
  *
- * Pure + derived from the canvas topics + the roadmap's branches:
- * - Only the FIRST canvas topic of a group is the "fork head" (badge + pill +
- *   ghosts); later topics of the chosen branch (e.g. Next.js after React) are
- *   plain column nodes.
- * - A branch is ghosted only while NONE of its topics are on the canvas, so a
- *   ghost disappears the moment its branch is added in parallel.
- * - A roadmap with no exclusive fork group (or before branches load) produces a
- *   plain vertical column identical to the pre-fork editor.
+ * The node set is the WHOLE roadmap (every parallel branch), FIXED. `membership`
+ * (the enrolled topic ids) is only an OVERLAY: an enrolled topic renders in its
+ * real status/colour, a not-enrolled topic renders greyed but in the SAME slot —
+ * so adding/removing a topic never moves it, it just flips grey ↔ solid in place.
+ *
+ * Layout: core topics form a vertical spine; each mutually-exclusive group becomes
+ * a horizontal band of parallel branch columns under a "Choose one · {group}" pill;
+ * after the band the spine rejoins from the enrolled branch tails. Pure + derived
+ * from the topics + branches, so a roadmap with no exclusive fork group (or before
+ * branches load) renders as a plain vertical column.
  */
 export function buildEditorLayout(params: {
-  canvasTopics: readonly EditorCanvasTopic[]
+  topics: readonly EditorTopic[]
   branches: ForkableBranch[] | undefined
+  membership: ReadonlySet<string>
+  statusOf: (id: string) => NodeStatus
 }): EditorLayout {
-  const { canvasTopics, branches } = params
+  const { topics, branches, membership, statusOf } = params
   const nodes: Node<BaseNodeData>[] = []
   const edges: Edge[] = []
 
   const groups = branches ? groupBranches(branches).groups : []
   const groupBySelectionGroup = new Map(groups.map((g) => [g.selectionGroup, g]))
-  // topicId -> the exclusive branch it belongs to.
+  // topicId -> the exclusive branch it belongs to (fork topics only).
   const branchByTopicId = new Map<string, ForkableBranch>()
   for (const group of groups) {
     for (const branch of group.branches) {
-      for (const topicId of branch.topicIds ?? []) branchByTopicId.set(topicId, branch)
+      for (const id of branch.topicIds ?? []) branchByTopicId.set(id, branch)
     }
   }
-  const canvasIds = new Set(canvasTopics.map((t) => t.id))
-  const forkHeadDone = new Set<string>() // selectionGroups already given a fork row
 
-  let y = 0
-  let prevColumnNodeId: string | undefined
-  let prevColumnStatus: NodeStatus | undefined
+  const ordered = [...topics].sort((a, b) => a.orderIndex - b.orderIndex)
+  const topicById = new Map(ordered.map((t) => [t.id, t]))
+  // Stable 1-based step number per topic (orderIndex order) — cosmetic hint only.
+  const numberById = new Map(ordered.map((t, i) => [t.id, String(i + 1)]))
 
-  const pushColumnTopic = (topic: EditorCanvasTopic, index: number, badge?: string) => {
-    if (prevColumnNodeId) edges.push(columnEdge(prevColumnNodeId, topic.id, prevColumnStatus))
-    nodes.push({
+  const nodeFor = (
+    topic: EditorTopic,
+    x: number,
+    yPos: number,
+    badge?: string,
+  ): Node<BaseNodeData> => {
+    const enrolled = membership.has(topic.id)
+    return {
       id: topic.id,
       type: 'roadmapNode',
-      position: { x: COLUMN_X, y },
+      position: { x, y: yPos },
       draggable: false,
-      data: { number: String(index + 1), label: topic.label, status: topic.status, badge },
-    })
-    prevColumnNodeId = topic.id
-    prevColumnStatus = topic.status
-    y += ROW_GAP
+      data: {
+        number: numberById.get(topic.id),
+        label: topic.label,
+        status: enrolled ? statusOf(topic.id) : 'upcoming',
+        greyed: !enrolled,
+        badge,
+      },
+    }
   }
 
-  canvasTopics.forEach((topic, index) => {
+  let y = 0
+  let spineSources: SpineSource[] = []
+  const emitted = new Set<string>() // selectionGroups already given a band
+
+  const connectFromSpine = (targetId: string) => {
+    for (const s of spineSources) {
+      edges.push({
+        id: `e-${s.id}-${targetId}`,
+        source: s.id,
+        target: targetId,
+        type: 'smoothstep',
+        style: edgeStyleFor(membership.has(targetId), s.status),
+      })
+    }
+  }
+
+  for (const topic of ordered) {
     const branch = branchByTopicId.get(topic.id)
     const group = branch?.selectionGroup
       ? groupBySelectionGroup.get(branch.selectionGroup)
       : undefined
 
-    if (!group || forkHeadDone.has(group.selectionGroup)) {
-      // Plain column node: a core topic, or a non-head topic of the chosen branch.
-      pushColumnTopic(topic, index)
-      return
+    if (!group) {
+      // Core spine topic.
+      connectFromSpine(topic.id)
+      nodes.push(nodeFor(topic, COLUMN_X, y))
+      const enrolled = membership.has(topic.id)
+      spineSources = [
+        { id: topic.id, status: enrolled ? statusOf(topic.id) : 'upcoming', enrolled },
+      ]
+      y += ROW_GAP
+      continue
     }
 
-    // Fork head: a "choose one" pill, the chosen topic (badged), and the unchosen
-    // branches inline to its right as add-in-parallel ghosts.
-    forkHeadDone.add(group.selectionGroup)
-    const forkSource = prevColumnNodeId // the topic the fork branches off (may be undefined)
+    if (emitted.has(group.selectionGroup)) continue // band already laid at first occurrence
+    emitted.add(group.selectionGroup)
 
+    // Fork band: a "choose one" pill, then each branch as a parallel column.
     nodes.push({
       id: `fork-label:${group.selectionGroup}`,
       type: 'roadmapNode',
@@ -120,40 +147,45 @@ export function buildEditorLayout(params: {
         variant: 'fork-label',
       },
     })
-    y += PILL_GAP
+    const bandTop = y + PILL_GAP
+    let maxLen = 0
+    const branchTails: SpineSource[] = []
 
-    pushColumnTopic(topic, index, 'Selected')
-
-    const ghostBranches = group.branches.filter(
-      (b) => !(b.topicIds ?? []).some((id) => canvasIds.has(id)),
-    )
-    ghostBranches.forEach((ghostBranch, gi) => {
-      const ghostId = `ghost:${ghostBranch._id}`
-      nodes.push({
-        id: ghostId,
-        type: 'roadmapNode',
-        position: { x: COLUMN_X + (gi + 1) * GHOST_COLUMN_WIDTH, y: y - ROW_GAP },
-        selectable: false,
-        draggable: false,
-        data: {
-          label: ghostBranch.name,
-          status: 'upcoming',
-          variant: 'ghost',
-          clickable: true,
-          branchId: ghostBranch._id,
-          branchName: ghostBranch.name,
-          hint: `Add ${ghostBranch.name} — learn in parallel`,
-        },
+    group.branches.forEach((br, bi) => {
+      const x = COLUMN_X + bi * BRANCH_COLUMN_WIDTH
+      const brTopics = (br.topicIds ?? [])
+        .map((id) => topicById.get(id))
+        .filter((t): t is EditorTopic => !!t)
+      let by = bandTop
+      let prev: SpineSource | undefined
+      brTopics.forEach((t, ti) => {
+        const enrolled = membership.has(t.id)
+        const status: NodeStatus = enrolled ? statusOf(t.id) : 'upcoming'
+        // Badge the enrolled branch HEAD so the chosen path reads at a glance.
+        nodes.push(nodeFor(t, x, by, ti === 0 && enrolled ? 'Selected' : undefined))
+        if (ti === 0) {
+          connectFromSpine(t.id) // fork edge(s) from the pre-fork predecessor
+        } else if (prev) {
+          edges.push({
+            id: `e-${prev.id}-${t.id}`,
+            source: prev.id,
+            target: t.id,
+            type: 'smoothstep',
+            style: edgeStyleFor(membership.has(t.id), prev.status),
+          })
+        }
+        prev = { id: t.id, status, enrolled }
+        by += ROW_GAP
       })
-      edges.push({
-        id: `e-ghost-${ghostId}`,
-        source: forkSource ?? topic.id,
-        target: ghostId,
-        type: 'smoothstep',
-        style: GHOST_EDGE,
-      })
+      maxLen = Math.max(maxLen, brTopics.length)
+      if (prev) branchTails.push(prev)
     })
-  })
+
+    // Spine rejoins from the enrolled branch tails (fallback: all tails).
+    const enrolledTails = branchTails.filter((s) => s.enrolled)
+    spineSources = enrolledTails.length > 0 ? enrolledTails : branchTails
+    y = bandTop + Math.max(maxLen, 1) * ROW_GAP
+  }
 
   return { nodes, edges }
 }

@@ -1,9 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import {
-  findDependentTopicIds,
-  insertAtIndex,
-  resolveOnCanvasPrereqNames,
-} from '../lib/editor-remove-ops'
+import { findDependentTopicIds, resolveOnCanvasPrereqNames } from '../lib/editor-remove-ops'
 
 describe('findDependentTopicIds', () => {
   // b requires a; c requires b.
@@ -29,30 +25,6 @@ describe('findDependentTopicIds', () => {
 
   it('treats an unknown/undefined prerequisite list as no dependency', () => {
     expect(findDependentTopicIds(['a', 'b'], () => undefined, 'a')).toEqual([])
-  })
-})
-
-describe('insertAtIndex', () => {
-  it('re-inserts at the original slot', () => {
-    expect(insertAtIndex(['a', 'c'], 'b', 1)).toEqual(['a', 'b', 'c'])
-  })
-
-  it('inserts at the front', () => {
-    expect(insertAtIndex(['b', 'c'], 'a', 0)).toEqual(['a', 'b', 'c'])
-  })
-
-  it('clamps a too-large index to the end (canvas shrank since removal)', () => {
-    expect(insertAtIndex(['a'], 'b', 5)).toEqual(['a', 'b'])
-  })
-
-  it('clamps a negative index to the front', () => {
-    expect(insertAtIndex(['b'], 'a', -3)).toEqual(['a', 'b'])
-  })
-
-  it('does not mutate the input array', () => {
-    const input = ['a', 'c']
-    insertAtIndex(input, 'b', 1)
-    expect(input).toEqual(['a', 'c'])
   })
 })
 

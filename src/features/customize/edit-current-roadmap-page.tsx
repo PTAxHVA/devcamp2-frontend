@@ -1,33 +1,18 @@
 import { useMemo, useState, useEffect, useRef, type RefObject } from 'react'
-import { BaseRoadmapNode, type BaseNodeData } from '@/features/roadmap/components/base-roadmap-node'
+import { BaseRoadmapNode, type NodeStatus } from '@/features/roadmap/components/base-roadmap-node'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
 import { logger } from '@/lib/logger'
 import toast from 'react-hot-toast'
 import { useParams, useNavigate } from 'react-router'
-import { useRoadmapDetail, type BEGraphTopic } from '@/features/roadmap/hooks/use-roadmap-detail'
-import {
-  useAvailableTopics,
-  type AvailableTopic,
-} from '@/features/roadmap/hooks/use-available-topics'
+import { useRoadmapDetail } from '@/features/roadmap/hooks/use-roadmap-detail'
 import { useMasterRoadmap } from '@/features/roadmap/hooks/use-master-roadmap'
 import { useMasterRoadmapGraph } from '@/features/roadmap/hooks/use-master-roadmap-graph'
-import { buildFlowGraph } from '@/features/roadmap/lib/build-flow-graph'
-import { buildEditorLayout } from './lib/build-editor-layout'
+import { buildEditorLayout, type EditorTopic } from './lib/build-editor-layout'
 import { resolveAiFeedbackView, type AiFeedbackData } from './lib/resolve-ai-feedback-view'
-import {
-  findDependentTopicIds,
-  insertAtIndex,
-  resolveOnCanvasPrereqNames,
-} from './lib/editor-remove-ops'
-import {
-  ReactFlow,
-  Background,
-  Controls,
-  useNodesState,
-  useReactFlow,
-  type Node,
-} from '@xyflow/react'
+import { resolveOnCanvasPrereqNames } from './lib/editor-remove-ops'
+import { computeMembershipDiff, canRemoveTopic } from './lib/membership-ops'
+import { ReactFlow, Background, Controls, useReactFlow, type Node } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import {
   RiArrowLeftLine,
@@ -35,6 +20,7 @@ import {
   RiAlertLine,
   RiSubtractLine,
   RiAddLine,
+  RiArrowGoBackLine,
   RiCloseLine,
   RiSparklingFill,
   RiLoader4Line,
@@ -42,46 +28,51 @@ import {
   RiLockLine,
 } from 'react-icons/ri'
 
+/** Per-topic metadata for the details panel + remove rules (built for EVERY topic
+ *  in the master graph, with the enrolled ones' real progress merged in). */
 interface TopicMeta {
   name: string
-  status: BEGraphTopic['status']
+  /** Display status when enrolled (never 'locked' — the editor shows everything editable). */
+  status: NodeStatus
   estimatedHours: number
   sectionTotal: number
   sectionCompleted: number
   /** A topic the learner has started cannot be removed (backend enforces this too). */
   hasProgress: boolean
-  /** MasterTopic ids this topic depends on — shown in the details panel and used to
-   *  guard removals (you can't drop a topic another on-canvas topic requires). */
+  /** Prerequisite master topic ids — guards removals + shown in the details panel. */
   prerequisiteTopicIds: string[]
 }
 
-const STATUS_LABEL: Record<BEGraphTopic['status'], string> = {
+const STATUS_LABEL: Record<NodeStatus, string> = {
   completed: 'Completed',
-  in_progress: 'In progress',
-  available: 'Available',
+  current: 'In progress',
+  upcoming: 'Available',
   locked: 'Locked',
 }
+
+/** Backend 4-state status → node status, mapping `locked`/`available` to `upcoming`
+ *  (the editor shows every enrolled topic as editable, never a dashed lock). */
+const toNodeStatus = (s: 'locked' | 'available' | 'in_progress' | 'completed'): NodeStatus =>
+  s === 'completed' ? 'completed' : s === 'in_progress' ? 'current' : 'upcoming'
 
 /** Pull the backend error code out of an axios error, if present. */
 const errorCode = (error: unknown): string | undefined =>
   (error as { response?: { data?: { error?: { code?: string } } } })?.response?.data?.error?.code
 
-// Keep the whole fork (chosen column + inline ghost branches) framed in the canvas
-// at every viewport. The top padding reserves screen space so the first node never
-// hides under the fit-view Controls overlay (top-left of the canvas); the percent
-// sides give breathing room; maxZoom 1 stops a small (non-forked) roadmap from
-// blowing up past 100%.
+// Keep the whole graph (spine + parallel fork branches) framed at every viewport.
+// Top padding reserves room so the first node never hides under the fit-view
+// Controls overlay; the percent sides give breathing room; maxZoom 1 stops a small
+// roadmap from blowing up past 100%.
 const FIT_VIEW_OPTIONS = {
   padding: { top: '64px', right: '8%', bottom: '8%', left: '8%' },
   maxZoom: 1,
 } as const
 
 /**
- * Re-fits the React Flow viewport so the fork is never clipped. The fork can be
- * ~3 node-columns wide, so a narrow canvas needs a small zoom to show it whole;
- * the plain `fitView` prop only runs once on mount (before the async nodes land),
- * so we re-fit here whenever the node set OR the canvas size changes.
- * Rendered inside <ReactFlow> so it can read the flow instance via useReactFlow.
+ * Re-fits the React Flow viewport so the full graph is never clipped. Rendered
+ * inside <ReactFlow> so it can read the flow instance; re-fits whenever the node
+ * set OR the canvas size changes (the plain `fitView` prop only runs once on mount,
+ * before the async nodes land).
  */
 function FitViewController({
   wrapperRef,
@@ -92,8 +83,6 @@ function FitViewController({
 }) {
   const { fitView } = useReactFlow()
 
-  // Node set changed: initial async load, add topic, remove topic, add-in-parallel
-  // ghost. rAF lets React Flow measure the new nodes before we frame them.
   useEffect(() => {
     const raf = requestAnimationFrame(() => {
       void fitView(FIT_VIEW_OPTIONS)
@@ -101,8 +90,6 @@ function FitViewController({
     return () => cancelAnimationFrame(raf)
   }, [signature, fitView])
 
-  // Canvas resized: viewport/orientation change, the mobile↔desktop and lg↔xl
-  // breakpoint reflows, or the alert card being dismissed. Debounced via rAF.
   useEffect(() => {
     const el = wrapperRef.current
     if (!el) return
@@ -129,138 +116,122 @@ export default function EditCurrentRoadmapPage() {
   const queryClient = useQueryClient()
 
   const nodeTypes = useMemo(() => ({ roadmapNode: BaseRoadmapNode }), [])
-  // The canvas wrapper — observed so the graph re-fits when its size changes.
   const flowWrapperRef = useRef<HTMLDivElement>(null)
   const [showAlert, setShowAlert] = useState(true)
-  // Below xl the topic-details panel is a bottom sheet that opens when a node is
-  // tapped; on xl+ it is a static sidebar and this flag is ignored.
+  // Below xl the topic-details panel is a bottom sheet that opens on node tap.
   const [sheetOpen, setSheetOpen] = useState(false)
-  const [pickerOpen, setPickerOpen] = useState(false)
 
   const { data, isLoading, isError } = useRoadmapDetail(roadmapId ?? '')
-  const { data: availableTopics, isLoading: isLoadingTopics } = useAvailableTopics(roadmapId ?? '')
-  // Master branches carry the fork metadata (selectionGroup + topicIds) that
-  // powers the "Learning path" switch card for forked roadmaps.
+  // Branch metadata (selectionGroup + topicIds) powers the fork bands.
   const { data: masterPreview } = useMasterRoadmap(data?.roadmap.masterRoadmapId)
-  // The all-branches master graph resolves a ghost branch's topics when the learner
-  // clicks "+ Add" to learn it in parallel (see handleAddGhostBranch). The ghost
-  // NODES themselves are derived from the branch metadata by buildEditorLayout.
-  const { data: masterGraph } = useMasterRoadmapGraph(data?.roadmap.masterRoadmapId)
+  // The all-branches master graph is the FIXED node set — every parallel branch's
+  // topics, so not-enrolled topics show greyed instead of disappearing.
+  const { data: masterGraph, isFetching: graphFetching } = useMasterRoadmapGraph(
+    data?.roadmap.masterRoadmapId,
+  )
 
-  const [nodes, setNodes] = useNodesState<Node<BaseNodeData>>([])
+  // Enrolled topic ids (the "membership"). Adding/removing a topic only toggles this
+  // set — nodes never move. `originalMembership` is the load-time snapshot the save
+  // diff reads; `history` is the multi-step undo stack of prior membership snapshots.
+  const [membership, setMembership] = useState<ReadonlySet<string>>(new Set())
+  const [originalMembership, setOriginalMembership] = useState<ReadonlySet<string>>(new Set())
+  const [history, setHistory] = useState<ReadonlySet<string>[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [aiFeedback, setAiFeedback] = useState<AiFeedbackData | null>(null)
   const [aiError, setAiError] = useState(false)
 
-  // Captured once from the fetched roadmap: per-topic metadata (for removal rules
-  // and the details panel) and the original topic set (to diff into removeTopicIds).
+  // Seed membership from the enrolled roadmap the first time it arrives.
   const initializedRef = useRef(false)
-  // The id of the outstanding "Removed … / Undo" toast, if any. A single undo is live
-  // at a time: any later structural change (add/remove/add-branch) dismisses it, so
-  // undo can never restore a stale snapshot on top of newer edits.
-  const undoToastIdRef = useRef<string | null>(null)
-  const [topicMeta, setTopicMeta] = useState<Map<string, TopicMeta>>(new Map())
-  const [originalIds, setOriginalIds] = useState<string[]>([])
-  // Seed the editor from real roadmap data the first time it arrives. Node ids are
-  // the real MasterTopic ObjectIds, so the diff produces valid PATCH payloads.
   useEffect(() => {
     if (!data || initializedRef.current) return
     initializedRef.current = true
+    const ids = data.topics.map((t) => t.masterTopicId)
+    setMembership(new Set(ids))
+    setOriginalMembership(new Set(ids))
+    setSelectedId(ids[0] ?? null)
+  }, [data])
 
-    // neverLocked: the editor shows every topic as editable, never a dashed "lock".
-    // Positions, fork rows, ghosts and edges are derived below by buildEditorLayout.
-    const graph = buildFlowGraph(data, { neverLocked: true })
-    setNodes(graph.nodes)
+  // The node set: the full master graph if loaded, else the enrolled topics (so the
+  // editor works — showing the current path — even if /graph is cold or down; the
+  // greyed alternatives appear once the graph lands).
+  const graphTopics = useMemo(() => masterGraph?.topics ?? data?.topics ?? [], [masterGraph, data])
 
+  // Per-topic metadata for EVERY graph topic, merging the enrolled ones' progress.
+  const topicMeta = useMemo(() => {
+    const enrolledById = new Map((data?.topics ?? []).map((t) => [t.masterTopicId, t]))
     const meta = new Map<string, TopicMeta>()
-    for (const t of data.topics) {
+    for (const t of graphTopics) {
+      const enrolled = enrolledById.get(t.masterTopicId)
       meta.set(t.masterTopicId, {
         name: t.name,
-        status: t.status,
+        status: enrolled ? toNodeStatus(enrolled.status) : 'upcoming',
         estimatedHours: t.estimatedHours,
         sectionTotal: t.sectionTotal,
-        sectionCompleted: t.sectionCompleted,
-        hasProgress: t.sectionCompleted > 0,
-        prerequisiteTopicIds: t.prerequisiteTopicIds ?? [],
+        sectionCompleted: enrolled?.sectionCompleted ?? 0,
+        hasProgress: (enrolled?.sectionCompleted ?? 0) > 0,
+        // Enrolled → in-roadmap-filtered prereqs; not-enrolled → master graph prereqs.
+        prerequisiteTopicIds: (enrolled ?? t).prerequisiteTopicIds ?? [],
       })
     }
-    setTopicMeta(meta)
-    setOriginalIds(data.topics.map((t) => t.masterTopicId))
-    setSelectedId(graph.nodes[0]?.id ?? null)
-  }, [data, setNodes])
+    return meta
+  }, [graphTopics, data])
 
-  // Topics present at load but no longer on the canvas — the PATCH removal diff.
-  const removedIds = useMemo(() => {
-    const present = new Set(nodes.map((n) => n.id))
-    return originalIds.filter((id) => !present.has(id))
-  }, [nodes, originalIds])
-
-  // Topics on canvas that were NOT in the original load — queued to add on save.
-  const addedIds = useMemo(() => {
-    const origSet = new Set(originalIds)
-    return nodes.map((n) => n.id).filter((id) => !origSet.has(id))
-  }, [nodes, originalIds])
-
-  // Available topics that aren't already on the canvas (original or newly added).
-  const canvasIds = useMemo(() => new Set(nodes.map((n) => n.id)), [nodes])
-  const filteredAvailableTopics = useMemo(
-    () => (availableTopics ?? []).filter((t) => !canvasIds.has(t.masterTopicId)),
-    [availableTopics, canvasIds],
+  // Fork-aware full-graph layout: enrolled topics in real colour, not-enrolled greyed
+  // in the SAME slot. Derived purely from the topics + branches + membership.
+  const layoutTopics = useMemo<EditorTopic[]>(
+    () =>
+      graphTopics.map((t) => ({ id: t.masterTopicId, label: t.name, orderIndex: t.orderIndex })),
+    [graphTopics],
   )
-
-  // Fork-aware display layout: enrolled topics as a vertical column, with the chosen
-  // fork branch badged in-column and the unchosen branches inline to its right as
-  // add-in-parallel "ghost" cards under a "Choose one" pill. Derived purely from the
-  // canvas topics + the roadmap's branches, so a non-forked roadmap renders as a
-  // plain column exactly as before.
   const { nodes: displayNodes, edges: displayEdges } = useMemo(
     () =>
       buildEditorLayout({
-        canvasTopics: nodes.map((n) => ({ id: n.id, label: n.data.label, status: n.data.status })),
+        topics: layoutTopics,
         branches: masterPreview?.branches,
+        membership,
+        statusOf: (id) => topicMeta.get(id)?.status ?? 'upcoming',
       }),
-    [nodes, masterPreview],
+    [layoutTopics, masterPreview, membership, topicMeta],
   )
 
-  // A stable signature of the displayed node set — changes on load, add, remove,
-  // or add-in-parallel — so FitViewController can re-frame the canvas.
+  // A stable signature so FitViewController re-frames when the node set changes.
   const nodeSignature = useMemo(() => displayNodes.map((n) => n.id).join('|'), [displayNodes])
 
-  const selectedMeta = selectedId ? topicMeta.get(selectedId) : undefined
+  // Save diff — what changed vs the load-time enrolled set.
+  const { addTopicIds, removeTopicIds } = useMemo(
+    () => computeMembershipDiff(originalMembership, membership),
+    [originalMembership, membership],
+  )
+  const hasChanges = addTopicIds.length > 0 || removeTopicIds.length > 0
+  const canUndo = history.length > 0
 
-  // Prerequisite topics of the selected topic, resolved to names (only those still
-  // on the canvas can be named). Surfaces the dependency the graph edges imply.
+  const selectedMeta = selectedId ? topicMeta.get(selectedId) : undefined
+  const selectedEnrolled = selectedId ? membership.has(selectedId) : false
+
+  // Prerequisites of the selected topic that are still enrolled (named for the panel).
   const selectedPrereqNames = useMemo(
     () =>
       resolveOnCanvasPrereqNames(
         selectedMeta?.prerequisiteTopicIds,
-        (id) => canvasIds.has(id),
+        (id) => membership.has(id),
         (id) => topicMeta.get(id)?.name,
       ),
-    [selectedMeta, topicMeta, canvasIds],
+    [selectedMeta, topicMeta, membership],
   )
 
-  // Topics still on the canvas that list the selected topic as a prerequisite — used
-  // to warn that removing it would break their chain.
-  const selectedRequiredByNames = useMemo(
+  // Enrolled topics that require the selected one — removing it would break them.
+  const selectedRemoveCheck = useMemo(
     () =>
-      selectedId
-        ? findDependentTopicIds(
-            nodes.map((n) => n.id),
-            (id) => topicMeta.get(id)?.prerequisiteTopicIds,
-            selectedId,
-          )
-            .map((id) => topicMeta.get(id)?.name)
-            .filter((name): name is string => !!name)
-        : [],
-    [selectedId, nodes, topicMeta],
+      selectedId && selectedEnrolled
+        ? canRemoveTopic({
+            topicId: selectedId,
+            membership,
+            hasProgress: (id) => !!topicMeta.get(id)?.hasProgress,
+            prerequisitesOf: (id) => topicMeta.get(id)?.prerequisiteTopicIds,
+          })
+        : null,
+    [selectedId, selectedEnrolled, membership, topicMeta],
   )
-
-  // Update the canvas topic set + order after a structural change. Positions,
-  // numbering, fork rows, ghosts and edges are all derived from `nodes` by
-  // buildEditorLayout (display), so this just keeps `nodes` as the ordered
-  // membership list that the save diff (added/removed ids) reads.
-  const relayout = (nextNodes: Node<BaseNodeData>[]) => setNodes(nextNodes)
 
   const aiFeedbackMutation = useMutation({
     mutationFn: async (vars: { action: 'add' | 'remove'; topicId: string }) => {
@@ -277,8 +248,6 @@ export default function EditCurrentRoadmapPage() {
       setAiError(false)
     },
     onError: (error) => {
-      // Surface the failure in the card (see resolveAiFeedbackView) instead of
-      // silently blanking it, which read as "the AI did nothing".
       logger.error(
         'Failed to fetch AI feedback:',
         error instanceof Error ? error.message : String(error),
@@ -287,184 +256,61 @@ export default function EditCurrentRoadmapPage() {
     },
   })
 
-  // Dismiss the outstanding undo toast, if any. Called before every structural change
-  // so a stale undo can never fire against a canvas that has since moved on.
-  const dismissUndo = () => {
-    if (undoToastIdRef.current) {
-      toast.dismiss(undoToastIdRef.current)
-      undoToastIdRef.current = null
-    }
+  // Snapshot the current membership onto the undo stack before a structural change.
+  const pushHistory = () => setHistory((h) => [...h, new Set(membership)])
+
+  const handleAddTopic = (topicId: string) => {
+    if (membership.has(topicId)) return
+    pushHistory()
+    const next = new Set(membership)
+    next.add(topicId)
+    setMembership(next)
+    setSelectedId(topicId)
+    aiFeedbackMutation.mutate({ action: 'add', topicId })
   }
 
-  const handleRemoveTopic = () => {
-    if (!selectedId) return
-    const meta = topicMeta.get(selectedId)
-    if (meta?.hasProgress) {
-      toast.error("You can't remove a topic you've already started.")
-      return
-    }
-    // Guard the prerequisite chain: refuse to remove a topic that another topic
-    // still on the canvas depends on, and name the dependents so the reason is clear.
-    const dependentIds = findDependentTopicIds(
-      nodes.map((n) => n.id),
-      (id) => topicMeta.get(id)?.prerequisiteTopicIds,
-      selectedId,
-    )
-    if (dependentIds.length > 0) {
-      const names = dependentIds.map((id) => topicMeta.get(id)?.name ?? 'another topic')
-      toast.error(`Required by ${names.join(', ')} — remove those first.`)
-      return
-    }
-    if (nodes.length <= 1) {
-      toast.error('A roadmap must keep at least one topic.')
-      return
-    }
-
-    dismissUndo()
-    const removedTopicId = selectedId
-    const removedName = meta?.name ?? 'Topic'
-    // Remember the removed node and its column position so undo can splice it back
-    // exactly where it was, rather than restoring a full-canvas snapshot that would
-    // clobber any edits made in the undo window. Display + edges are re-derived.
-    const removedIndex = nodes.findIndex((n) => n.id === removedTopicId)
-    // Unreachable today (selectedId is always a real on-canvas node id), but guards a
-    // future mutation path that forgets to keep selectedId in sync: splicing an
-    // undefined node back in on undo would hard-crash the next render.
-    if (removedIndex === -1) return
-    const removedNode = nodes[removedIndex]
-    const remaining = nodes.filter((n) => n.id !== removedTopicId)
-    relayout(remaining)
-    setSelectedId(remaining[0]?.id ?? null)
-
-    // Advisory only: tell the learner what removing this topic implies.
-    aiFeedbackMutation.mutate({ action: 'remove', topicId: removedTopicId })
-
-    const toastId = toast(
-      () => (
-        <span className="flex items-center gap-3">
-          <span className="text-sm">
-            Removed <span className="font-semibold">{removedName}</span>.
-          </span>
-          <button
-            onClick={() => {
-              // Splice the removed node back at its original slot. No structural change
-              // can have happened since (any would have dismissed this toast), so
-              // `remaining` is still the live canvas; the display is re-derived.
-              relayout(insertAtIndex(remaining, removedNode, removedIndex))
-              setSelectedId(removedTopicId)
-              dismissUndo()
-            }}
-            className="text-brand-purple-600 hover:text-brand-purple-700 shrink-0 text-sm font-bold"
-          >
-            Undo
-          </button>
-        </span>
-      ),
-      { icon: <RiSubtractLine className="text-error-text" />, duration: 6000 },
-    )
-    undoToastIdRef.current = toastId
-  }
-
-  const handleAddTopic = (topic: AvailableTopic) => {
-    dismissUndo()
-    const newNode: Node<BaseNodeData> = {
-      id: topic.masterTopicId,
-      type: 'roadmapNode',
-      position: { x: 0, y: 0 }, // display position is derived by buildEditorLayout
-      data: { label: topic.name, status: 'upcoming' },
-    }
-    setTopicMeta((prev) => {
-      const next = new Map(prev)
-      next.set(topic.masterTopicId, {
-        name: topic.name,
-        status: 'available',
-        estimatedHours: topic.estimatedHours,
-        sectionTotal: topic.sectionTotal,
-        sectionCompleted: 0,
-        hasProgress: false,
-        // Symmetric prereq guard: once /available-topics returns prerequisiteTopicIds,
-        // a picker-added topic's prerequisites are protected too. Defaults to [] until
-        // the backend field lands.
-        prerequisiteTopicIds: topic.prerequisiteTopicIds ?? [],
-      })
-      return next
+  const handleRemoveTopic = (topicId: string) => {
+    const check = canRemoveTopic({
+      topicId,
+      membership,
+      hasProgress: (id) => !!topicMeta.get(id)?.hasProgress,
+      prerequisitesOf: (id) => topicMeta.get(id)?.prerequisiteTopicIds,
     })
-    relayout([...nodes, newNode])
-    setSelectedId(topic.masterTopicId)
-    aiFeedbackMutation.mutate({ action: 'add', topicId: topic.masterTopicId })
-  }
-
-  // Add every not-yet-enrolled topic of a ghost branch to the canvas in one pass —
-  // learn it in parallel (keeps the current path, only adds). Save persists it via the
-  // normal PATCH addTopicIds. Fires AI feedback once so the branch-conflict warning
-  // (two frameworks at once) surfaces, degrading to data when Gemini is down.
-  const handleAddGhostBranch = (branchId?: string, branchName?: string) => {
-    if (!branchId) return
-    // The ghost card renders from the branch list, but adding its topics needs the
-    // heavier all-branches graph. If that hasn't loaded yet (or the endpoint is cold),
-    // tell the learner instead of dead-clicking — mirrors the switch-path panel.
-    if (!masterGraph) {
-      toast.error('Still loading the other paths — try again in a moment.')
-      return
-    }
-    const branch = masterPreview?.branches.find((b) => b._id === branchId)
-    if (!branch?.topicIds?.length) return
-    const canvas = new Set(nodes.map((n) => n.id))
-    const topicById = new Map(masterGraph.topics.map((t) => [t.masterTopicId, t]))
-    const toAdd = branch.topicIds
-      .map((id) => topicById.get(id))
-      .filter((t): t is BEGraphTopic => !!t && !canvas.has(t.masterTopicId))
-    if (toAdd.length === 0) return
-
-    dismissUndo()
-    setTopicMeta((prev) => {
-      const next = new Map(prev)
-      for (const t of toAdd) {
-        next.set(t.masterTopicId, {
-          name: t.name,
-          status: 'available',
-          estimatedHours: t.estimatedHours,
-          sectionTotal: t.sectionTotal,
-          sectionCompleted: 0,
-          hasProgress: false,
-          prerequisiteTopicIds: t.prerequisiteTopicIds ?? [],
-        })
+    if (!check.ok) {
+      if (check.reason === 'has-progress') {
+        toast.error("You can't remove a topic you've already started.")
+      } else if (check.reason === 'last-topic') {
+        toast.error('A roadmap must keep at least one topic.')
+      } else {
+        const names = check.dependentIds.map((id) => topicMeta.get(id)?.name ?? 'another topic')
+        toast.error(`Required by ${names.join(', ')} — remove those first.`)
       }
-      return next
-    })
+      return
+    }
+    pushHistory()
+    const next = new Set(membership)
+    next.delete(topicId)
+    setMembership(next)
+    // Keep the topic selected so the learner sees it flip to greyed (and can undo).
+    aiFeedbackMutation.mutate({ action: 'remove', topicId })
+  }
 
-    const newNodes: Node<BaseNodeData>[] = toAdd.map((t) => ({
-      id: t.masterTopicId,
-      type: 'roadmapNode',
-      position: { x: 0, y: 0 }, // display position is derived by buildEditorLayout
-      data: { label: t.name, status: 'upcoming' },
-    }))
-    relayout([...nodes, ...newNodes])
-    setSelectedId(toAdd[0].masterTopicId)
-    aiFeedbackMutation.mutate({ action: 'add', topicId: toAdd[0].masterTopicId })
-    toast.success(`Added the ${branchName ?? branch.name} path — press Save changes to apply.`)
+  const handleUndo = () => {
+    if (history.length === 0) return
+    setMembership(new Set(history[history.length - 1]))
+    setHistory(history.slice(0, -1))
   }
 
   const onNodeClick = (_: React.MouseEvent, node: Node) => {
-    // The "choose one" pill is an inert label, not a topic — ignore clicks on it.
+    // The "choose one" pill is an inert label, not a topic.
     if (node.id.startsWith('fork-label:')) return
-    // A ghost node = an unchosen fork branch. Clicking it adds that branch in parallel;
-    // a real topic node just opens its details.
-    if (node.id.startsWith('ghost:')) {
-      const ghostData = node.data as BaseNodeData
-      handleAddGhostBranch(ghostData.branchId, ghostData.branchName)
-      return
-    }
     setSelectedId(node.id)
     setSheetOpen(true)
   }
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiClient.patch(`/roadmaps/${roadmapId}`, {
-        addTopicIds: addedIds,
-        removeTopicIds: removedIds,
-      })
+      const res = await apiClient.patch(`/roadmaps/${roadmapId}`, { addTopicIds, removeTopicIds })
       return res.data
     },
     onSuccess: () => {
@@ -485,6 +331,8 @@ export default function EditCurrentRoadmapPage() {
         toast.error('One of those topics has learning progress and cannot be removed.')
       } else if (code === 'ROADMAP_EMPTY') {
         toast.error('A roadmap must keep at least one topic.')
+      } else if (code === 'TOPIC_NOT_IN_BRANCH') {
+        toast.error("That topic isn't part of this roadmap.")
       } else {
         toast.error('Could not save your changes. Please try again.')
       }
@@ -516,7 +364,6 @@ export default function EditCurrentRoadmapPage() {
     )
   }
 
-  const hasChanges = removedIds.length > 0 || addedIds.length > 0
   const aiView = resolveAiFeedbackView({
     pending: aiFeedbackMutation.isPending,
     error: aiError,
@@ -537,6 +384,11 @@ export default function EditCurrentRoadmapPage() {
           <h1 className="text-text-primary text-3xl font-bold">Edit current roadmap</h1>
           <RiBookmarkLine className="text-brand-purple-600 text-2xl" />
         </div>
+        <p className="text-text-muted mt-1 text-sm">
+          Click any topic to see its details. Greyed topics aren&apos;t in your roadmap yet — open
+          one and press <span className="font-semibold">Add topic</span> to learn it (parallel
+          branches stay side by side).
+        </p>
       </div>
 
       {/* Alert Warning */}
@@ -560,8 +412,8 @@ export default function EditCurrentRoadmapPage() {
         </div>
       )}
 
-      {/* AI feedback (F19) — surfaced above the canvas so it's visible right after an
-          edit, with an explicit busy/error state instead of silently blanking out. */}
+      {/* AI feedback (F19) — above the canvas so it's visible right after an edit,
+          with an explicit busy/error state instead of silently blanking out. */}
       <div
         className={`mb-6 flex items-start gap-4 rounded-xl border p-4 ${
           aiView.tone === 'warning'
@@ -597,87 +449,28 @@ export default function EditCurrentRoadmapPage() {
         </div>
       </div>
 
-      {/* Main Container — canvas keeps full width until xl (1280px); below that the
-          topic details open as a tap-to-reveal bottom sheet so the fork stays
-          readable on tablets/small laptops (~1024px) instead of being squeezed by
-          a side panel. Two-column layout only where there's room for both. */}
+      {/* Main Container — canvas full width until xl; below that the details open as a
+          bottom sheet so the fork stays readable on tablets/small laptops. */}
       <div className="flex min-h-150 flex-1 flex-col gap-6 xl:flex-row">
         {/* === CANVAS === */}
         <div className="border-border-soft bg-bg-card flex flex-1 flex-col rounded-2xl border">
-          <div className="border-border-soft flex flex-wrap items-center justify-between border-b p-4">
-            <div className="relative flex items-center gap-2">
-              <button
-                onClick={handleRemoveTopic}
-                disabled={!selectedId || selectedMeta?.hasProgress}
-                className="border-border-soft text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-40"
-              >
-                <RiSubtractLine className="text-error-text" /> Remove topic
-              </button>
-
-              <button
-                onClick={() => setPickerOpen((o) => !o)}
-                className={`border-border-soft focus-visible:ring-brand-purple-300 flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none ${pickerOpen ? 'bg-brand-purple-600 text-white' : 'text-text-secondary hover:bg-bg-section'}`}
-              >
-                <RiAddLine /> Add topic
-              </button>
-
-              {pickerOpen && (
-                <>
-                  <div className="fixed inset-0 z-10" onClick={() => setPickerOpen(false)} />
-                  <div className="border-border-soft bg-bg-card absolute top-full left-0 z-20 mt-2 w-72 overflow-hidden rounded-xl border shadow-lg">
-                    <div className="border-border-soft flex items-center justify-between border-b px-4 py-3">
-                      <h3 className="text-text-primary text-sm font-bold">Add Topics</h3>
-                      <button
-                        onClick={() => setPickerOpen(false)}
-                        className="text-text-placeholder hover:text-text-secondary focus-visible:ring-brand-purple-300 rounded-lg transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
-                      >
-                        <RiCloseLine className="text-xl" />
-                      </button>
-                    </div>
-                    <div className="max-h-72 overflow-y-auto">
-                      {isLoadingTopics ? (
-                        <div className="flex items-center justify-center py-8">
-                          <RiLoader4Line className="text-text-muted animate-spin text-xl" />
-                        </div>
-                      ) : filteredAvailableTopics.length === 0 ? (
-                        <p className="text-text-muted py-8 text-center text-sm">
-                          No more topics to add.
-                        </p>
-                      ) : (
-                        <ul className="p-2">
-                          {filteredAvailableTopics.map((topic) => (
-                            <li
-                              key={topic.masterTopicId}
-                              className="hover:bg-bg-section flex items-center justify-between gap-3 rounded-lg p-3 transition-colors duration-200"
-                            >
-                              <div className="min-w-0">
-                                <p className="text-text-primary truncate text-sm font-semibold">
-                                  {topic.name}
-                                </p>
-                                <p className="text-text-muted text-xs">
-                                  {topic.estimatedHours}h · {topic.sectionTotal} sections
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => handleAddTopic(topic)}
-                                className="text-brand-purple-600 hover:bg-bg-lavender focus-visible:ring-brand-purple-300 flex shrink-0 items-center gap-1 rounded-lg px-2 py-1 text-xs font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
-                              >
-                                <RiAddLine /> Add
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
+          <div className="border-border-soft flex flex-wrap items-center justify-between gap-2 border-b p-4">
+            <button
+              onClick={handleUndo}
+              disabled={!canUndo}
+              className="border-border-soft text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:opacity-40"
+            >
+              <RiArrowGoBackLine /> Undo
+            </button>
+            {graphFetching && !masterGraph && (
+              <span className="text-text-muted flex items-center gap-1.5 text-xs">
+                <RiLoader4Line className="animate-spin" /> Loading other paths…
+              </span>
+            )}
           </div>
 
           {/* isolate = a stacking context scoped to THIS canvas so React Flow's high
-              internal z-indexes stay contained and can't paint over the app sidebar.
-              Scoped here (not on the global layout wrapper) so page modals are unaffected. */}
+              internal z-indexes can't paint over the app sidebar. */}
           <div ref={flowWrapperRef} className="bg-bg-section/50 relative isolate flex-1">
             <ReactFlow
               nodes={displayNodes}
@@ -687,19 +480,17 @@ export default function EditCurrentRoadmapPage() {
               nodesDraggable={false}
               fitView
               fitViewOptions={FIT_VIEW_OPTIONS}
-              // A ~3-column-wide fork can't fit a narrow canvas at the default
-              // minZoom (0.5) — it clips the column left and the last ghost right.
-              // Allow a smaller zoom so fitView always frames the whole fork.
               minZoom={0.2}
               maxZoom={1.5}
               proOptions={{ hideAttribution: true }}
             >
               <FitViewController wrapperRef={flowWrapperRef} signature={nodeSignature} />
               <Background color="#cbd5e1" gap={20} size={1} />
-              {/* Same fit options as the auto-fit so the manual fit-view button frames
-                  the whole fork and clears the Controls too. */}
+              {/* showInteractive={false} drops the lock button — in this editor it only
+                  toggled node selection off, which read as "the graph is broken". */}
               <Controls
                 position="top-right"
+                showInteractive={false}
                 fitViewOptions={FIT_VIEW_OPTIONS}
                 className="flex! flex-row! gap-1! border-none! shadow-sm!"
               />
@@ -716,15 +507,13 @@ export default function EditCurrentRoadmapPage() {
           />
         )}
 
-        {/* === TOPIC DETAILS (read-only) ===
+        {/* === TOPIC DETAILS ===
             Below xl: bottom sheet that slides up. xl+: static sidebar. */}
         <div
           className={`border-border-soft bg-bg-card flex flex-col border shadow-sm transition-transform duration-300 ease-out xl:static! xl:z-auto xl:max-h-none xl:w-100 xl:translate-y-0 xl:overflow-visible xl:rounded-2xl ${
             sheetOpen ? 'translate-y-0' : 'translate-y-full'
           } fixed inset-x-0 bottom-0 z-40 max-h-[75vh] overflow-y-auto rounded-t-2xl p-6`}
         >
-          {/* Mobile/tablet sheet header: drag handle + close (hidden once the panel
-              becomes a static sidebar at xl). */}
           <div className="relative mb-4 xl:hidden">
             <div className="mx-auto h-1.5 w-12 rounded-full bg-slate-300" />
             <button
@@ -748,7 +537,7 @@ export default function EditCurrentRoadmapPage() {
                 <div className="flex-1">
                   <p className="text-text-secondary mb-1.5 text-sm font-bold">Status</p>
                   <span className="bg-bg-section text-text-primary inline-block rounded-lg px-3 py-1 text-sm font-semibold">
-                    {STATUS_LABEL[selectedMeta.status]}
+                    {selectedEnrolled ? STATUS_LABEL[selectedMeta.status] : 'Not added yet'}
                   </span>
                 </div>
                 <div className="flex-1">
@@ -785,23 +574,43 @@ export default function EditCurrentRoadmapPage() {
                 )}
               </div>
 
-              <div className="border-border-soft mt-auto border-t pt-4">
-                {selectedMeta.hasProgress ? (
+              {/* Actions — both buttons, each disabled when it doesn't apply to the
+                  selected topic (D4). */}
+              <div className="border-border-soft mt-auto flex flex-col gap-3 border-t pt-4">
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => selectedId && handleAddTopic(selectedId)}
+                    disabled={selectedEnrolled}
+                    className="border-brand-purple-600 text-brand-purple-600 hover:bg-bg-lavender focus-visible:ring-brand-purple-300 flex flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <RiAddLine /> Add topic
+                  </button>
+                  <button
+                    onClick={() => selectedId && handleRemoveTopic(selectedId)}
+                    disabled={!selectedEnrolled || !selectedRemoveCheck?.ok}
+                    className="border-border-soft text-text-secondary hover:bg-bg-section focus-visible:ring-brand-purple-300 flex flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-bold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <RiSubtractLine className="text-error-text" /> Remove topic
+                  </button>
+                </div>
+                {!selectedEnrolled ? (
                   <p className="text-text-muted flex items-start gap-2 text-xs">
                     <RiInformationLine className="mt-0.5 shrink-0 text-sm" />
-                    You have already started this topic, so it can&apos;t be removed.
+                    Not in your roadmap yet — add it to learn it (parallel branches stay side by
+                    side).
                   </p>
-                ) : selectedRequiredByNames.length > 0 ? (
+                ) : selectedRemoveCheck && !selectedRemoveCheck.ok ? (
                   <p className="text-text-muted flex items-start gap-2 text-xs">
                     <RiInformationLine className="mt-0.5 shrink-0 text-sm" />
-                    Required by {selectedRequiredByNames.join(', ')} — remove those first.
+                    {selectedRemoveCheck.reason === 'has-progress'
+                      ? "You've already started this topic, so it can't be removed."
+                      : selectedRemoveCheck.reason === 'last-topic'
+                        ? 'A roadmap must keep at least one topic.'
+                        : `Required by ${selectedRemoveCheck.dependentIds
+                            .map((id) => topicMeta.get(id)?.name ?? 'another topic')
+                            .join(', ')} — remove those first.`}
                   </p>
-                ) : (
-                  <p className="text-text-muted flex items-start gap-2 text-xs">
-                    <RiInformationLine className="mt-0.5 shrink-0 text-sm" />
-                    Use the toolbar to remove this topic.
-                  </p>
-                )}
+                ) : null}
               </div>
             </div>
           ) : (
@@ -812,7 +621,7 @@ export default function EditCurrentRoadmapPage() {
         </div>
       </div>
 
-      {/* Footer — the AI feedback card now lives above the canvas. */}
+      {/* Footer */}
       <div className="mt-6 flex justify-end">
         <div className="flex w-full gap-3 sm:w-100">
           <button
