@@ -7,6 +7,14 @@ import { useEffect, useRef } from 'react'
  */
 export function useModalDismiss(onClose: () => void) {
   const containerRef = useRef<HTMLDivElement>(null)
+  // Keep the latest onClose in a ref so the trap effect can run ONCE (deps `[]`).
+  // Modals pass a new inline-arrow onClose each parent render; depending on it would
+  // tear the effect down + re-run it, re-focusing the first control and yanking focus
+  // off an input (e.g. the edit-profile name field) mid-typing.
+  const onCloseRef = useRef(onClose)
+  useEffect(() => {
+    onCloseRef.current = onClose
+  })
 
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null
@@ -27,7 +35,7 @@ export function useModalDismiss(onClose: () => void) {
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onClose()
+        onCloseRef.current()
         return
       }
       if (e.key !== 'Tab' || !container) return
@@ -53,7 +61,8 @@ export function useModalDismiss(onClose: () => void) {
       window.removeEventListener('keydown', onKeyDown)
       previouslyFocused?.focus?.()
     }
-  }, [onClose])
+    // Set up once on mount; a parent re-render (new inline onClose) must not re-run this.
+  }, [])
 
   return containerRef
 }
