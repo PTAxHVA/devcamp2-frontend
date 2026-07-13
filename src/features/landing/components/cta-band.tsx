@@ -14,8 +14,12 @@ export const CtaBand = () => (
         <p className="text-text-secondary max-w-[48ch] text-[clamp(1rem,0.95rem+0.3vw,1.18rem)]">
           Answer a few questions, get a roadmap built for you, and prove every skill as you go.
         </p>
-        <Link to="/signup" className="btn btn-primary px-7 font-semibold">
-          Get Started <RiArrowRightLine aria-hidden className="h-[18px] w-[18px]" />
+        <Link to="/signup" className="btn btn-primary group px-7 font-semibold">
+          Get Started
+          <RiArrowRightLine
+            aria-hidden
+            className="h-[18px] w-[18px] transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transform-none"
+          />
         </Link>
       </Reveal>
     </div>

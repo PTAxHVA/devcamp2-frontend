@@ -145,3 +145,18 @@
 .animate-float-slow {
   animation: float 9s ease-in-out infinite 1s;
 }
+
+/* Hard on/off blink for the typewriter caret (step-end = no fade, terminal feel). */
+@keyframes caret-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.animate-caret {
+  animation: caret-blink 1s step-end infinite;
+}
