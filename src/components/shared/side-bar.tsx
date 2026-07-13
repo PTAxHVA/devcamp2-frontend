@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import { Link, NavLink, useLocation } from 'react-router'
 import { TbTargetArrow } from 'react-icons/tb'
 import {
@@ -12,44 +11,20 @@ import {
   RiCloseLine,
 } from 'react-icons/ri'
 import { VoraMark, VoraWordmark } from '@/components/ui/vora-logo'
-import { useIsMobile } from '@/hooks/use-is-mobile'
-
-const SIDEBAR_COLLAPSED_KEY = 'vora:sidebar-collapsed'
 
 interface SidebarProps {
   mobileOpen?: boolean
   onClose?: () => void
 }
 
-export const Sidebar = ({ mobileOpen = false, onClose }: SidebarProps) => {
-  // Persist the collapse choice so it survives a reload (was reset on every F5).
-  const [isCollapsed, setIsCollapsed] = useState(
-    () => localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1',
-  )
-  const location = useLocation()
-  const isMobile = useIsMobile()
-  // Collapse is a desktop-only affordance (the toggle button is md:grid). On mobile
-  // the drawer must always render expanded, otherwise a desktop-persisted collapse
-  // leaves the mobile menu icon-only with no labels and no way to expand it.
-  const effectiveCollapsed = isCollapsed && !isMobile
+import { useSidebar } from '@/components/layout/sidebar-context'
 
-  useEffect(() => {
-    if (effectiveCollapsed) {
-      document.body.classList.add('sidebar-collapsed')
-    } else {
-      document.body.classList.remove('sidebar-collapsed')
-    }
-    return () => {
-      document.body.classList.remove('sidebar-collapsed')
-    }
-  }, [effectiveCollapsed])
+export const Sidebar = ({ mobileOpen = false, onClose }: SidebarProps) => {
+  const { isCollapsed, setIsCollapsed, effectiveCollapsed } = useSidebar()
+  const location = useLocation()
 
   const toggleCollapsed = () => {
-    setIsCollapsed((prev) => {
-      const next = !prev
-      localStorage.setItem(SIDEBAR_COLLAPSED_KEY, next ? '1' : '0')
-      return next
-    })
+    setIsCollapsed(!isCollapsed)
   }
 
   const isMenuMatch = (pathKeywords: string | string[]) => {

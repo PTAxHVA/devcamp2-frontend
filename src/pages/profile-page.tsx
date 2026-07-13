@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router'
 import { Clock, Star, ExternalLink, Pencil } from 'lucide-react'
 import { useMe, useMyProfile, useMyProgress } from '@/features/profile/hooks/use-profile'
@@ -8,11 +8,40 @@ import { ActiveRoadmapCard } from '@/features/profile/components/active-roadmap-
 import { ProfileStatsPanel } from '@/features/profile/components/profile-stats-panel'
 import { ProfileActivityCard } from '@/features/profile/components/profile-activity-card'
 import { EditProfileModal } from '@/features/profile/components/edit-profile-modal'
+import { useSidebar } from '@/components/layout/sidebar-context'
 
 const levelLabel: Record<string, string> = {
   beginner: 'Learner',
   intermediate: 'Intermediate',
   advanced: 'Advanced',
+}
+
+interface ProfileLearningBannerProps {
+  className: string
+  buttonClassName: string
+}
+
+function ProfileLearningBanner({ className, buttonClassName }: ProfileLearningBannerProps) {
+  const navigate = useNavigate()
+  return (
+    <div className={`border-border-soft bg-bg-card flex rounded-2xl border p-5 ${className}`}>
+      <div className="flex items-center gap-4">
+        <Star className="h-8 w-8 shrink-0 text-yellow-400" />
+        <div>
+          <p className="text-text-primary text-sm font-bold">Keep learning, keep growing!</p>
+          <p className="text-text-muted text-xs">
+            You're making great progress. Stay consistent and unlock new achievements.
+          </p>
+        </div>
+      </div>
+      <button
+        onClick={() => navigate('/roadmaps/browse')}
+        className={`bg-brand-purple-500 hover:bg-brand-purple-600 focus-visible:ring-brand-purple-300 rounded-xl py-2.5 text-sm font-semibold text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none ${buttonClassName}`}
+      >
+        Explore Roadmaps
+      </button>
+    </div>
+  )
 }
 
 export default function ProfilePage() {
@@ -22,6 +51,41 @@ export default function ProfilePage() {
   const { data: profile, isLoading: loadingProfile } = useMyProfile()
   const { data: roadmapsData, isLoading: loadingRoadmaps } = useMyRoadmaps()
   const { data: progressData, isLoading: loadingProgress } = useMyProgress()
+  const { effectiveCollapsed } = useSidebar()
+
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches,
+  )
+  const [isTablet, setIsTablet] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      window.matchMedia('(min-width: 768px) and (max-width: 1279px)').matches,
+  )
+  const [isDesktop, setIsDesktop] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(min-width: 1280px)').matches,
+  )
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const mobileMql = window.matchMedia('(max-width: 767px)')
+    const tabletMql = window.matchMedia('(min-width: 768px) and (max-width: 1279px)')
+    const desktopMql = window.matchMedia('(min-width: 1280px)')
+
+    const onMobileChange = () => setIsMobile(mobileMql.matches)
+    const onTabletChange = () => setIsTablet(tabletMql.matches)
+    const onDesktopChange = () => setIsDesktop(desktopMql.matches)
+
+    mobileMql.addEventListener('change', onMobileChange)
+    tabletMql.addEventListener('change', onTabletChange)
+    desktopMql.addEventListener('change', onDesktopChange)
+
+    return () => {
+      mobileMql.removeEventListener('change', onMobileChange)
+      tabletMql.removeEventListener('change', onTabletChange)
+      desktopMql.removeEventListener('change', onDesktopChange)
+    }
+  }, [])
 
   const activeRoadmaps = (roadmapsData ?? []).map((r) => {
     const prog = (progressData ?? []).find((p) => p.roadmapId === r.roadmapId)
@@ -73,13 +137,15 @@ export default function ProfilePage() {
                   {levelLabel[profile?.level?.toLowerCase()] ?? 'Learner'}
                 </span>
 
-                {/* Mobile/Tablet Edit Profile button */}
-                <button
-                  onClick={() => setEditing(true)}
-                  className="border-border-input text-text-primary hover:bg-bg-section focus-visible:ring-brand-purple-300 flex shrink-0 items-center gap-1.5 rounded-xl border px-3 py-1 text-xs font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none xl:hidden"
-                >
-                  <Pencil className="h-3 w-3" /> Edit profile
-                </button>
+                {/* Tablet/Mobile Edit Profile button */}
+                {(isMobile || (isTablet && !effectiveCollapsed)) && (
+                  <button
+                    onClick={() => setEditing(true)}
+                    className="border-border-input text-text-primary hover:bg-bg-section focus-visible:ring-brand-purple-300 flex shrink-0 items-center gap-1.5 rounded-xl border px-3 py-1 text-xs font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
+                  >
+                    <Pencil className="h-3 w-3" /> Edit profile
+                  </button>
+                )}
               </div>
               <p className="text-text-muted mb-3 truncate text-sm">{me?.email ?? ''}</p>
               <div className="text-text-muted flex items-center gap-1.5 text-xs">
@@ -89,12 +155,14 @@ export default function ProfilePage() {
             </div>
 
             {/* Desktop Edit Profile button */}
-            <button
-              onClick={() => setEditing(true)}
-              className="border-border-input text-text-primary hover:bg-bg-section focus-visible:ring-brand-purple-300 hidden shrink-0 items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none xl:flex"
-            >
-              <Pencil className="h-3.5 w-3.5" /> Edit profile
-            </button>
+            {(isDesktop || (isTablet && effectiveCollapsed)) && (
+              <button
+                onClick={() => setEditing(true)}
+                className="border-border-input text-text-primary hover:bg-bg-section focus-visible:ring-brand-purple-300 flex shrink-0 items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
+              >
+                <Pencil className="h-3.5 w-3.5" /> Edit profile
+              </button>
+            )}
           </div>
 
           {/* Active Roadmaps */}
@@ -126,38 +194,16 @@ export default function ProfilePage() {
         {/* ── Right (stats) ── */}
         <div className="flex w-full shrink-0 flex-col gap-4 lg:w-72">
           <ProfileStatsPanel />
+        </div>
+
+        {/* ── Right (stats) ── */}
+        <div className="flex w-full shrink-0 flex-col gap-4 lg:w-72">
+          <ProfileStatsPanel />
 
           {/* Tablet-only Banner */}
-          <div className="profile-tablet-banner border-border-soft bg-bg-card flex hidden flex-col gap-4 rounded-2xl border p-5 md:flex xl:hidden">
-            <div className="flex items-center gap-4">
-              <Star className="h-8 w-8 shrink-0 text-yellow-400" />
-              <div>
-                <p className="text-text-primary text-sm font-bold">Keep learning, keep growing!</p>
-                <p className="text-text-muted text-xs">
-                  You're making great progress. Stay consistent and unlock new achievements.
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => navigate('/roadmaps/browse')}
-              className="bg-brand-purple-500 hover:bg-brand-purple-600 focus-visible:ring-brand-purple-300 w-full rounded-xl py-2.5 text-sm font-semibold text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
-            >
-              Explore Roadmaps
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Keep learning, keep growing banner (Mobile & Desktop) */}
-      <div className="profile-general-banner border-border-soft bg-bg-card flex flex-wrap items-center justify-between gap-4 rounded-2xl border p-5 md:hidden xl:flex">
-        <div className="flex items-center gap-4">
-          <Star className="h-8 w-8 shrink-0 text-yellow-400" />
-          <div>
-            <p className="text-text-primary text-sm font-bold">Keep learning, keep growing!</p>
-            <p className="text-text-muted text-xs">
-              You're making great progress. Stay consistent and unlock new achievements.
-            </p>
-          </div>
+          {isTablet && !effectiveCollapsed && (
+            <ProfileLearningBanner className="flex-col gap-4" buttonClassName="w-full" />
+          )}
         </div>
         <button
           onClick={() => navigate('/roadmaps/browse')}
@@ -166,6 +212,14 @@ export default function ProfilePage() {
           Explore Roadmaps
         </button>
       </div>
+
+      {/* Keep learning, keep growing banner */}
+      {(isMobile || isDesktop || (isTablet && effectiveCollapsed)) && (
+        <ProfileLearningBanner
+          className="flex-wrap items-center justify-between gap-4"
+          buttonClassName="w-full sm:w-auto shrink-0 px-5"
+        />
+      )}
 
       {/* Full-width activity chart (same bars+line as the dashboard's View full) */}
       <ProfileActivityCard />
