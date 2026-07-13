@@ -38,7 +38,8 @@ describe('Navbar', () => {
 
   it('renders the account chip and menu', () => {
     renderNavbar('/dashboard')
-    expect(screen.getByText('TH')).toBeInTheDocument()
+    // No avatar set → the chip shows the silhouette fallback, not initials.
+    expect(screen.getByRole('img', { name: /thai's avatar/i })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /profile/i })).toHaveAttribute('href', '/profile')
     expect(screen.getByRole('button', { name: /log out/i })).toBeInTheDocument()
   })

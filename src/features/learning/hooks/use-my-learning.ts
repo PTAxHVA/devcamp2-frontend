@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
 import type { UserRoadmapDetail, RoadmapSummary, LearningTopic, TopicStatus } from '../types'
 
@@ -78,6 +78,22 @@ export function useMyRoadmaps() {
     queryFn: async () => {
       const res = await apiClient.get('/roadmaps')
       return res.data.data
+    },
+  })
+}
+
+/** Unregister (soft-delete) a roadmap. The BE keeps all progress, so re-enrolling
+ *  restores it. Refresh the lists that show active roadmaps. */
+export function useUnregisterRoadmap() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (roadmapId: string) => {
+      await apiClient.delete(`/roadmaps/${roadmapId}`)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-roadmaps'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+      queryClient.invalidateQueries({ queryKey: ['me', 'progress'] })
     },
   })
 }

@@ -11,6 +11,9 @@ export interface ProgressItem {
 interface UpdateProfileBody {
   username?: string
   level?: string
+  // Avatar data-URL; `null` clears it. Invalidating ['me'] refreshes the nav-bar
+  // chip and the profile header (both read `me.avatarUrl`).
+  avatarUrl?: string | null
 }
 
 interface UpdateAccountBody {

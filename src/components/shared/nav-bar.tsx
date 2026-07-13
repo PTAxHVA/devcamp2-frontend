@@ -11,6 +11,7 @@ import { useMe } from '@/features/profile/hooks/use-profile'
 import { useAuthStore } from '@/stores/auth-store'
 import { queryClient } from '@/lib/query-client'
 import { getPageMeta } from './page-meta'
+import { UserAvatar } from './user-avatar'
 
 interface NavbarProps {
   onMenuClick?: () => void
@@ -21,7 +22,6 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const setAuth = useAuthStore((s) => s.setAuth)
-  const initials = me?.username?.slice(0, 2).toUpperCase() ?? '??'
   const displayName = me?.username ?? ''
   // Contextual title so the top bar reflects the current page (not dead space).
   const { title, Icon } = getPageMeta(pathname)
@@ -100,9 +100,7 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
             className="hover:bg-bg-section focus-visible:ring-brand-purple-300 flex cursor-pointer items-center gap-2.5 rounded-xl py-1 pr-2 pl-1 transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
           >
             <span className="from-brand-purple-400 to-brand-purple-700 flex shrink-0 rounded-full bg-gradient-to-br p-0.5">
-              <span className="text-brand-purple-700 flex h-9 w-9 items-center justify-center rounded-full bg-white text-sm font-bold">
-                {initials}
-              </span>
+              <UserAvatar src={me?.avatarUrl} name={displayName} className="h-9 w-9 bg-white" />
             </span>
             <span className="text-text-primary hidden max-w-[10rem] truncate text-sm font-semibold sm:block">
               {displayName}
