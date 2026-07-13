@@ -51,24 +51,30 @@ export const Footer = () => (
             job-ready web developer.
           </p>
         </div>
-        <div>
-          <h4 className="font-secondary text-text-secondary mb-3.5 text-[0.72rem] font-bold tracking-[0.08em] uppercase">
+        <nav aria-labelledby="footer-product">
+          <h3
+            id="footer-product"
+            className="font-secondary text-text-secondary mb-3.5 text-[0.72rem] font-bold tracking-[0.08em] uppercase"
+          >
             Product
-          </h4>
-          <Link to="/roadmaps" className={linkClass}>
-            Browse roadmaps
-          </Link>
+          </h3>
           <Link to="/demo-roadmap" className={linkClass}>
             View demo
           </Link>
           <Link to="/signup" className={linkClass}>
             Sign up
           </Link>
-        </div>
-        <div>
-          <h4 className="font-secondary text-text-secondary mb-3.5 text-[0.72rem] font-bold tracking-[0.08em] uppercase">
+          <Link to="/login" className={linkClass}>
+            Log in
+          </Link>
+        </nav>
+        <nav aria-labelledby="footer-legal">
+          <h3
+            id="footer-legal"
+            className="font-secondary text-text-secondary mb-3.5 text-[0.72rem] font-bold tracking-[0.08em] uppercase"
+          >
             Legal
-          </h4>
+          </h3>
           <Link to="/terms" className={linkClass}>
             Terms
           </Link>
@@ -83,7 +89,7 @@ export const Footer = () => (
           >
             GitHub
           </a>
-        </div>
+        </nav>
       </div>
 
       <div className="border-border-soft text-text-muted border-t pt-5 text-center text-[0.82rem]">

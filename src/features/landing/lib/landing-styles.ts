@@ -17,13 +17,10 @@ export const SHADOW_CARD = 'shadow-[0_22px_60px_-30px_rgba(6,26,53,0.28)]'
 /** Benefit / feature resting elevation. */
 export const SHADOW_SOFT = 'shadow-[0_12px_32px_-20px_rgba(6,26,53,0.22)]'
 
-/** Hover-lift elevation for interactive cards. */
-export const SHADOW_LIFT = 'shadow-[0_20px_44px_-24px_rgba(6,26,53,0.30)]'
-
 /**
  * Interactive-card hover treatment (benefit + feature cards): subtle lift, purple
- * border tint, lift shadow. One complete literal so Tailwind emits the hover
- * `shadow-[…]` variant (a `hover:${SHADOW_LIFT}` fragment would never be generated).
+ * border tint, lift shadow. Kept as ONE complete literal so Tailwind emits the
+ * hover `shadow-[…]` variant — a `hover:${var}` fragment would never be generated.
  */
 export const CARD_HOVER =
   'transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-brand-purple-400/35 hover:shadow-[0_20px_44px_-24px_rgba(6,26,53,0.30)]'

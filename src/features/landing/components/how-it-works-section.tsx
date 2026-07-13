@@ -93,7 +93,9 @@ export const HowItWorksSection = () => (
           <h3 className="text-text-primary mb-1 text-[clamp(1.15rem,1rem+0.5vw,1.4rem)] font-extrabold">
             Verified &amp; ready to share
           </h3>
-          <p className="text-text-muted text-[0.9rem]">
+          {/* text-secondary (not muted) — this copy sits on lavender, where muted
+              dips below AA contrast. */}
+          <p className="text-text-secondary text-[0.9rem]">
             Complete a track and your proven skills become a public Skill Passport — a link that
             shows what you can actually do.
           </p>
