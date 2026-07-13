@@ -29,6 +29,20 @@ const LandingPage = () => {
     }
   }, [reduced])
 
+  // The landing is very tall, so navigating from a below-the-fold CTA (e.g. the
+  // closing "Get Started") would otherwise leave the next route scrolled mid-page.
+  // Reset scroll to the top when this page unmounts — forced instant so the
+  // smooth-scroll style can't animate it after the route swaps.
+  useEffect(() => {
+    return () => {
+      const html = document.documentElement
+      const previousBehavior = html.style.scrollBehavior
+      html.style.scrollBehavior = 'auto'
+      window.scrollTo(0, 0)
+      html.style.scrollBehavior = previousBehavior
+    }
+  }, [])
+
   return (
     <div className="bg-bg-soft text-text-primary flex min-h-screen flex-col overflow-x-clip">
       <Navbar />

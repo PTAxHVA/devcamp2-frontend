@@ -21,13 +21,18 @@ export const Navbar = () => {
   const [open, setOpen] = useState(false)
   const close = () => setOpen(false)
   const headerRef = useRef<HTMLElement>(null)
+  const burgerRef = useRef<HTMLButtonElement>(null)
 
   // While the mobile menu is open, close it on Escape or a click/tap outside the
-  // navbar. Links inside close it via their own onClick.
+  // navbar. Links inside close it via their own onClick. Escape also returns focus
+  // to the hamburger so keyboard focus never lands on the now-hidden menu.
   useEffect(() => {
     if (!open) return
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false)
+      if (event.key === 'Escape') {
+        setOpen(false)
+        burgerRef.current?.focus()
+      }
     }
     const onPointerDown = (event: PointerEvent) => {
       if (headerRef.current && !headerRef.current.contains(event.target as Node)) setOpen(false)
@@ -70,6 +75,7 @@ export const Navbar = () => {
             Get Started
           </Link>
           <button
+            ref={burgerRef}
             type="button"
             aria-label={open ? 'Close menu' : 'Open menu'}
             aria-expanded={open}

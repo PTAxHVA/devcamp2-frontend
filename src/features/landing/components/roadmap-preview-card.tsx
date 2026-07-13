@@ -102,7 +102,16 @@ export const RoadmapPreviewCard = () => (
             <b className="text-text-primary block text-[0.92rem] leading-tight font-bold">
               {node.title}
             </b>
-            <small className="text-text-muted text-[0.75rem]">{node.sub}</small>
+            {/* On the current node the subtitle sits on lavender, where text-muted
+                dips below AA (4.38:1) — use the darker secondary there. */}
+            <small
+              className={cn(
+                'text-[0.75rem]',
+                node.status === 'current' ? 'text-text-secondary' : 'text-text-muted',
+              )}
+            >
+              {node.sub}
+            </small>
           </div>
           {node.status === 'current' && (
             <span className="font-secondary bg-bg-lavender text-brand-purple-700 ml-auto rounded-md px-2 py-0.5 text-[0.6rem] font-bold tracking-[0.1em] uppercase">

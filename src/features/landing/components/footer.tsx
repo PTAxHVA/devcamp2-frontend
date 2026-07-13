@@ -22,9 +22,9 @@ const linkClass =
 export const Footer = () => (
   <footer className="border-border-soft mt-2 border-t bg-white pt-11 pb-7">
     <div className={WRAP}>
-      <div className="border-border-soft grid gap-6 border-b pb-8 sm:grid-cols-3">
+      <div className="border-border-soft flex flex-col items-start gap-6 border-b pb-8 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-x-14 sm:gap-y-5">
         {VALUES.map(({ icon: Icon, title, sub }) => (
-          <div key={title} className="flex items-center justify-center gap-3">
+          <div key={title} className="flex items-center gap-3">
             <span
               aria-hidden
               className="bg-bg-lavender text-brand-purple-600 grid h-11 w-11 shrink-0 place-items-center rounded-xl"
@@ -51,24 +51,30 @@ export const Footer = () => (
             job-ready web developer.
           </p>
         </div>
-        <div>
-          <h4 className="font-secondary text-text-secondary mb-3.5 text-[0.72rem] font-bold tracking-[0.08em] uppercase">
+        <nav aria-labelledby="footer-product">
+          <h3
+            id="footer-product"
+            className="font-secondary text-text-secondary mb-3.5 text-[0.72rem] font-bold tracking-[0.08em] uppercase"
+          >
             Product
-          </h4>
-          <Link to="/roadmaps" className={linkClass}>
-            Browse roadmaps
-          </Link>
+          </h3>
           <Link to="/demo-roadmap" className={linkClass}>
             View demo
           </Link>
           <Link to="/signup" className={linkClass}>
             Sign up
           </Link>
-        </div>
-        <div>
-          <h4 className="font-secondary text-text-secondary mb-3.5 text-[0.72rem] font-bold tracking-[0.08em] uppercase">
+          <Link to="/login" className={linkClass}>
+            Log in
+          </Link>
+        </nav>
+        <nav aria-labelledby="footer-legal">
+          <h3
+            id="footer-legal"
+            className="font-secondary text-text-secondary mb-3.5 text-[0.72rem] font-bold tracking-[0.08em] uppercase"
+          >
             Legal
-          </h4>
+          </h3>
           <Link to="/terms" className={linkClass}>
             Terms
           </Link>
@@ -83,7 +89,7 @@ export const Footer = () => (
           >
             GitHub
           </a>
-        </div>
+        </nav>
       </div>
 
       <div className="border-border-soft text-text-muted border-t pt-5 text-center text-[0.82rem]">
