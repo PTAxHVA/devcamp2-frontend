@@ -22,9 +22,9 @@ const linkClass =
 export const Footer = () => (
   <footer className="border-border-soft mt-2 border-t bg-white pt-11 pb-7">
     <div className={WRAP}>
-      <div className="border-border-soft grid gap-6 border-b pb-8 sm:grid-cols-3">
+      <div className="border-border-soft flex flex-col items-start gap-6 border-b pb-8 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-x-14 sm:gap-y-5">
         {VALUES.map(({ icon: Icon, title, sub }) => (
-          <div key={title} className="flex items-center justify-center gap-3">
+          <div key={title} className="flex items-center gap-3">
             <span
               aria-hidden
               className="bg-bg-lavender text-brand-purple-600 grid h-11 w-11 shrink-0 place-items-center rounded-xl"
