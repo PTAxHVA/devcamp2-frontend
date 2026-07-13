@@ -1,108 +1,72 @@
-import { RiAccountCircleLine, RiArrowRightLine, RiCheckLine } from 'react-icons/ri'
-import { LuShieldCheck } from 'react-icons/lu'
-import { FaCode } from 'react-icons/fa6'
 import { Link } from 'react-router'
-import Roadmap from '@/features/roadmap/components/roadmap'
-import FloatingTechIcons from './floating-tech-icons'
+import { RiArrowRightLine, RiPlayFill } from 'react-icons/ri'
+import { LuCode, LuShieldCheck, LuTarget } from 'react-icons/lu'
+import { cn } from '@/lib/utils'
+import { EYEBROW, WRAP } from '../lib/landing-styles'
+import { HeroGlyphs } from './hero-glyphs'
+import { Reveal } from './reveal'
+import { RoadmapPreviewCard } from './roadmap-preview-card'
 
-export const HeroSection = () => {
-  return (
-    <section className="mx-auto max-w-450 px-6 py-16 lg:px-16 lg:py-10">
-      <FloatingTechIcons />
-      <div className="relative z-10 flex w-full flex-col items-center justify-between gap-12 lg:flex-row lg:gap-24">
-        {/* Cột Trái */}
-        <div className="w-full space-y-9 lg:w-1/2">
-          <h1 className="text-text-primary text-3xl leading-tight font-extrabold lg:text-5xl">
-            Build your verified <br className="hidden lg:block" /> web development roadmap
-          </h1>
-          <p className="text-text-secondary text-lg font-medium">
-            VORA creates a personalized roadmap based on your goals,
-            <br className="hidden lg:block" /> experience, and preferences. Learn step by step,
-            practice with <br className="hidden lg:block" />
-            real projects, and track your progress with confidence.
-          </p>
+const TRUST = [
+  { icon: LuTarget, title: 'Personalized for you', sub: 'Tuned to your goals & pace' },
+  { icon: LuShieldCheck, title: 'Quiz-verified progress', sub: "Prove it, don't self-report" },
+  { icon: LuCode, title: 'Real projects', sub: 'Build a portfolio as you go' },
+]
 
-          <div className="flex flex-wrap items-center gap-4 pt-2">
-            <Link to="/signup" className="btn btn-primary px-8">
-              Get Started <RiArrowRightLine className="ml-1" />
-            </Link>
-            <Link to="/demo-roadmap" className="btn btn-outline px-8">
-              <span>▶</span> View Demo Roadmap
-            </Link>
-          </div>
+export const HeroSection = () => (
+  <section className="relative py-15 lg:py-24">
+    <HeroGlyphs />
+    <div
+      className={cn(
+        WRAP,
+        'relative z-10 grid items-center gap-11 lg:grid-cols-[1.05fr_1fr] lg:gap-14',
+      )}
+    >
+      <div className="flex flex-col gap-5">
+        <span className={EYEBROW}>Verified learning, not guesswork</span>
+        <h1 className="text-text-primary text-[clamp(2.5rem,1.7rem+2.9vw,3.6rem)] leading-[1.05] font-extrabold tracking-[-0.02em] text-balance">
+          Build your verified web development roadmap
+        </h1>
+        <p className="text-text-secondary max-w-[46ch] text-[clamp(1rem,0.95rem+0.3vw,1.18rem)]">
+          VORA creates a personalized roadmap from your goals, experience, and preferences. Learn
+          step by step, practice with real projects, and prove every skill with quizzes as you go.
+        </p>
 
-          <div className="pt-10">
-            <div className="divide-border-soft grid w-full grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-2 sm:divide-x">
-              {[
-                {
-                  icon: <RiAccountCircleLine className="text-brand-purple-500 h-8 w-8" />,
-                  title: 'Personalized for you',
-                  desc: 'Tailored to your goals and experience',
-                },
-                {
-                  icon: <LuShieldCheck className="text-brand-purple-500 h-8 w-8" />,
-                  title: 'Structured learning',
-                  desc: 'Clear, logical step-by-step progression',
-                },
-                {
-                  icon: <FaCode className="text-brand-purple-500 h-8 w-8" />,
-                  title: 'Practice with real projects',
-                  desc: 'Build portfolio projects and apply your skills',
-                },
-              ].map((item, index) => (
-                <div key={index} className={`flex items-start gap-3 ${index !== 0 && 'sm:pl-4'}`}>
-                  <div className="mt-1 flex shrink-0 items-center justify-center">{item.icon}</div>
-                  <div className="flex flex-col">
-                    <h4 className="text-text-primary text-base leading-tight font-bold">
-                      {item.title}
-                    </h4>
-                    <p className="text-text-muted mt-1 text-sm">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link to="/signup" className="btn btn-primary px-7 font-semibold">
+            Get Started <RiArrowRightLine aria-hidden className="h-[18px] w-[18px]" />
+          </Link>
+          <Link
+            to="/demo-roadmap"
+            className="btn border-border-purple text-brand-purple-700 hover:bg-bg-lavender hover:border-border-purple border-2 bg-white px-7 font-semibold"
+          >
+            <RiPlayFill aria-hidden className="h-[15px] w-[15px]" /> View Demo Roadmap
+          </Link>
         </div>
 
-        {/* Roadmap Preview */}
-        <div className="border-border-soft bg-bg-card flex h-125 w-full flex-col overflow-hidden rounded-xl border shadow-sm lg:h-150 lg:w-1/2">
-          <div className="border-border-soft flex h-16 items-center justify-between gap-2 overflow-hidden border-b px-4 sm:px-6">
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="flex min-w-0 shrink items-center gap-2">
-                <h3 className="text-text-primary hidden text-lg font-bold whitespace-nowrap sm:block">
-                  Your Roadmap
-                </h3>
-                <span className="badge badge-primary badge-outline badge-sm max-w-32 truncate px-2 py-1 font-semibold">
-                  Frontend Developer
-                </span>
+        <div className="mt-3 grid grid-cols-1 gap-4 min-[560px]:max-[899px]:grid-cols-3 min-[1120px]:grid-cols-3">
+          {TRUST.map(({ icon: Icon, title, sub }) => (
+            <div key={title} className="flex items-start gap-3">
+              <span
+                aria-hidden
+                className="bg-bg-lavender text-brand-purple-600 grid h-[38px] w-[38px] shrink-0 place-items-center rounded-[10px]"
+              >
+                <Icon className="h-[19px] w-[19px]" />
+              </span>
+              <div>
+                <b className="text-text-primary block text-[0.94rem] leading-tight font-bold">
+                  {title}
+                </b>
+                <small className="text-text-muted text-[0.82rem]">{sub}</small>
               </div>
             </div>
-
-            <div className="text-text-secondary flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium sm:text-sm">
-              <div className="flex items-center gap-1.5">
-                <div className="bg-brand-navy-900 flex h-5 w-5 items-center justify-center rounded-full text-white">
-                  <RiCheckLine className="h-3 w-3" />
-                </div>
-                <span>Done</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="border-brand-purple-500 bg-bg-card flex h-5 w-5 items-center justify-center rounded-full border-[3px]">
-                  <div className="bg-brand-purple-700 h-2 w-2 rounded-full" />
-                </div>
-                <span>Current</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="border-border-input bg-bg-card h-5 w-5 rounded-full border-2" />
-                <span>Upcoming</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-bg-soft relative w-full flex-1">
-            <Roadmap />
-          </div>
+          ))}
         </div>
       </div>
-    </section>
-  )
-}
+
+      <Reveal>
+        <RoadmapPreviewCard />
+      </Reveal>
+    </div>
+  </section>
+)
