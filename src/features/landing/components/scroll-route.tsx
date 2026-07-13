@@ -13,7 +13,11 @@ interface ScrollRouteProps {
 }
 
 const CP_BASE =
-  'absolute -left-[50px] top-[22px] z-[3] grid h-[34px] w-[34px] place-items-center rounded-full border-2 transition-[background-color,border-color,box-shadow] duration-[400ms] lg:-left-[68px]'
+  'absolute -left-[50px] top-[22px] z-[3] grid h-[34px] w-[34px] place-items-center rounded-full border-2 lg:-left-[68px]'
+// Applied only when motion is allowed — under reduced-motion the rail is committed
+// static (all checkpoints lit on the first paint), so the idle→lit color/shadow and
+// the check fade must NOT transition.
+const CP_TRANSITION = 'transition-[background-color,border-color,box-shadow] duration-[400ms]'
 const CP_REACHED = 'border-brand-navy-900 bg-brand-navy-900 shadow-[0_0_0_5px_rgba(6,26,53,0.1)]'
 const CP_IDLE = 'border-border-input bg-white'
 
@@ -137,12 +141,17 @@ export const ScrollRoute = ({ items, itemsClassName = 'gap-[22px]' }: ScrollRout
                 cpRefs.current[index] = el
               }}
               aria-hidden
-              className={cn(CP_BASE, reached[index] ? CP_REACHED : CP_IDLE)}
+              className={cn(
+                CP_BASE,
+                !reduced && CP_TRANSITION,
+                reached[index] ? CP_REACHED : CP_IDLE,
+              )}
             >
               <RiCheckLine
                 aria-hidden
                 className={cn(
-                  'h-[15px] w-[15px] text-white transition-opacity duration-300',
+                  'h-[15px] w-[15px] text-white',
+                  !reduced && 'transition-opacity duration-300',
                   reached[index] ? 'opacity-100' : 'opacity-0',
                 )}
               />

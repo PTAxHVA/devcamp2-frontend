@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { RiCloseLine, RiMenuLine } from 'react-icons/ri'
 import { VoraWordmark } from '@/components/ui/vora-logo'
@@ -20,9 +20,31 @@ const NAV_LINKS = [
 export const Navbar = () => {
   const [open, setOpen] = useState(false)
   const close = () => setOpen(false)
+  const headerRef = useRef<HTMLElement>(null)
+
+  // While the mobile menu is open, close it on Escape or a click/tap outside the
+  // navbar. Links inside close it via their own onClick.
+  useEffect(() => {
+    if (!open) return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false)
+    }
+    const onPointerDown = (event: PointerEvent) => {
+      if (headerRef.current && !headerRef.current.contains(event.target as Node)) setOpen(false)
+    }
+    document.addEventListener('keydown', onKeyDown)
+    document.addEventListener('pointerdown', onPointerDown)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      document.removeEventListener('pointerdown', onPointerDown)
+    }
+  }, [open])
 
   return (
-    <header className="border-border-soft sticky top-0 z-50 border-b bg-white/90 backdrop-blur-md backdrop-saturate-150">
+    <header
+      ref={headerRef}
+      className="border-border-soft sticky top-0 z-50 border-b bg-white/90 backdrop-blur-md backdrop-saturate-150"
+    >
       <div className="mx-auto flex h-17 max-w-[1160px] items-center justify-between gap-3 px-5">
         <Link to="/" aria-label="VORA home" onClick={close}>
           <VoraWordmark />

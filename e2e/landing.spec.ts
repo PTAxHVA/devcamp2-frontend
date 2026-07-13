@@ -17,8 +17,8 @@ test.describe('Landing page', () => {
     await expect(page.getByText(/all rights reserved/i)).toBeVisible()
   })
 
-  test('has no horizontal overflow at 375 and 1280', async ({ page }) => {
-    for (const width of [375, 1280]) {
+  test('has no horizontal overflow across the target width range', async ({ page }) => {
+    for (const width of [320, 375, 900, 1280, 1920]) {
       await page.setViewportSize({ width, height: 900 })
       await page.goto('/')
       const overflow = await page.evaluate(

@@ -43,24 +43,26 @@ export const FaqSection = () => {
                 key={item.q}
                 className="border-border-soft mb-3 overflow-hidden rounded-[14px] border bg-white"
               >
-                <button
-                  type="button"
-                  aria-expanded={isOpen}
-                  aria-controls={panelId}
-                  onClick={() => setOpenIndex(isOpen ? -1 : index)}
-                  className="text-text-primary flex w-full items-center justify-between gap-4 px-5 py-[18px] text-left text-[1.02rem] font-bold"
-                >
-                  {item.q}
-                  <span
-                    aria-hidden
-                    className={cn(
-                      'bg-bg-lavender text-brand-purple-600 grid h-[26px] w-[26px] shrink-0 place-items-center rounded-full transition-transform duration-200 motion-reduce:transition-none',
-                      isOpen && 'rotate-45',
-                    )}
+                <h3 className="m-0">
+                  <button
+                    type="button"
+                    aria-expanded={isOpen}
+                    aria-controls={panelId}
+                    onClick={() => setOpenIndex(isOpen ? -1 : index)}
+                    className="text-text-primary flex w-full items-center justify-between gap-4 px-5 py-[18px] text-left text-[1.02rem] font-bold"
                   >
-                    <RiAddLine className="h-[18px] w-[18px]" />
-                  </span>
-                </button>
+                    {item.q}
+                    <span
+                      aria-hidden
+                      className={cn(
+                        'bg-bg-lavender text-brand-purple-600 grid h-[26px] w-[26px] shrink-0 place-items-center rounded-full transition-transform duration-200 motion-reduce:transition-none',
+                        isOpen && 'rotate-45',
+                      )}
+                    >
+                      <RiAddLine className="h-[18px] w-[18px]" />
+                    </span>
+                  </button>
+                </h3>
                 {/* grid-rows 0fr↔1fr height animation: no JS measurement, never clips
                     on resize / late-font reflow. */}
                 <div

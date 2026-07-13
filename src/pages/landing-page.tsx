@@ -10,25 +10,24 @@ import {
   StatsSection,
   WhyVoraSection,
 } from '@/features/landing/components'
+import { usePrefersReducedMotion } from '@/features/landing/lib/use-prefers-reduced-motion'
 
 const LandingPage = () => {
-  // Smooth in-page anchor scrolling + a sticky-navbar scroll offset, scoped to this
-  // page and reverted on unmount so other routes keep the default scroll behavior.
-  // Honors reduced-motion (no smooth scroll).
+  const reduced = usePrefersReducedMotion()
+
+  // Smooth in-page anchor scrolling, scoped to this page and reverted on unmount so
+  // other routes keep their default behavior. Driven by the LIVE reduced-motion
+  // preference (re-runs if the user toggles it while the page is open). The 84px
+  // sticky-navbar offset comes from `scroll-mt-[84px]` on each anchored section —
+  // it is NOT also set here, so the offset never stacks.
   useEffect(() => {
     const html = document.documentElement
-    const prevBehavior = html.style.scrollBehavior
-    const prevPadding = html.style.scrollPaddingTop
-    const reduced =
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (!reduced) html.style.scrollBehavior = 'smooth'
-    html.style.scrollPaddingTop = '84px'
+    const prev = html.style.scrollBehavior
+    html.style.scrollBehavior = reduced ? 'auto' : 'smooth'
     return () => {
-      html.style.scrollBehavior = prevBehavior
-      html.style.scrollPaddingTop = prevPadding
+      html.style.scrollBehavior = prev
     }
-  }, [])
+  }, [reduced])
 
   return (
     <div className="bg-bg-soft text-text-primary flex min-h-screen flex-col overflow-x-clip">
