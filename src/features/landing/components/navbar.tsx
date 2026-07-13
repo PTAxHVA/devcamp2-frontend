@@ -19,9 +19,19 @@ const NAV_LINKS = [
  */
 export const Navbar = () => {
   const [open, setOpen] = useState(false)
+  // Lift the bar with a soft shadow once the page leaves the very top.
+  const [scrolled, setScrolled] = useState(
+    () => typeof window !== 'undefined' && window.scrollY > 4,
+  )
   const close = () => setOpen(false)
   const headerRef = useRef<HTMLElement>(null)
   const burgerRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   // While the mobile menu is open, close it on Escape or a click/tap outside the
   // navbar. Links inside close it via their own onClick. Escape also returns focus
@@ -48,7 +58,12 @@ export const Navbar = () => {
   return (
     <header
       ref={headerRef}
-      className="border-border-soft sticky top-0 z-50 border-b bg-white/90 backdrop-blur-md backdrop-saturate-150"
+      className={cn(
+        'border-border-soft sticky top-0 z-50 border-b backdrop-blur-md backdrop-saturate-150 transition-shadow duration-300',
+        scrolled
+          ? 'bg-white/95 shadow-[0_10px_30px_-18px_rgba(6,26,53,0.25)]'
+          : 'bg-white/90 shadow-none',
+      )}
     >
       <div className="mx-auto flex h-17 max-w-[1160px] items-center justify-between gap-3 px-5">
         <Link to="/" aria-label="VORA home" onClick={close}>
