@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, NavLink, useLocation } from 'react-router'
 import { TbTargetArrow } from 'react-icons/tb'
 import {
@@ -32,6 +32,17 @@ export const Sidebar = ({ mobileOpen = false, onClose }: SidebarProps) => {
   // the drawer must always render expanded, otherwise a desktop-persisted collapse
   // leaves the mobile menu icon-only with no labels and no way to expand it.
   const effectiveCollapsed = isCollapsed && !isMobile
+
+  useEffect(() => {
+    if (effectiveCollapsed) {
+      document.body.classList.add('sidebar-collapsed')
+    } else {
+      document.body.classList.remove('sidebar-collapsed')
+    }
+    return () => {
+      document.body.classList.remove('sidebar-collapsed')
+    }
+  }, [effectiveCollapsed])
 
   const toggleCollapsed = () => {
     setIsCollapsed((prev) => {

@@ -175,3 +175,13 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Tablet sidebar collapsed banner layout shift */
+@media (min-width: 768px) and (max-width: 1279px) {
+  body.sidebar-collapsed .profile-tablet-banner {
+    display: none !important;
+  }
+  body.sidebar-collapsed .profile-general-banner {
+    display: flex !important;
+  }
+}
