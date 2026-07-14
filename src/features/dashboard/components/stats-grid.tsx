@@ -49,7 +49,7 @@ export function StatsGrid({
   ]
 
   return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+    <div className="grid grid-cols-2 gap-4">
       {stats.map((stat, i) => {
         const { Icon } = stat
         return (
