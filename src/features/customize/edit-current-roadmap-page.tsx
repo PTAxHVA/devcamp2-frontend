@@ -205,6 +205,19 @@ export default function EditCurrentRoadmapPage() {
   const hasChanges = addTopicIds.length > 0 || removeTopicIds.length > 0
   const canUndo = history.length > 0
 
+  // Warn before a reload / tab-close discards unsaved topic edits. Only armed while
+  // there are pending changes; a normal in-app navigate (Save/Cancel/Back) doesn't
+  // fire beforeunload, so the save redirect stays clean.
+  useEffect(() => {
+    if (!hasChanges) return
+    const warnOnLeave = (event: BeforeUnloadEvent) => {
+      event.preventDefault()
+      event.returnValue = ''
+    }
+    window.addEventListener('beforeunload', warnOnLeave)
+    return () => window.removeEventListener('beforeunload', warnOnLeave)
+  }, [hasChanges])
+
   const selectedMeta = selectedId ? topicMeta.get(selectedId) : undefined
   const selectedEnrolled = selectedId ? membership.has(selectedId) : false
 

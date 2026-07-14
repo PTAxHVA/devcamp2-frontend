@@ -1,5 +1,6 @@
 import { useWizardStore } from '../../onboarding-store'
-import { LuCode } from 'react-icons/lu'
+import { RECOMMEND_CHOICE_VALUE } from '../../data/onboarding-data'
+import { LuCode, LuSparkles } from 'react-icons/lu'
 import {
   RiReactjsLine,
   RiAngularjsLine,
@@ -9,6 +10,16 @@ import {
   RiDashboardLine,
   RiShoppingCartLine,
 } from 'react-icons/ri'
+
+// A "let VORA choose" card offered on each fork step. Selecting it stores the
+// RECOMMEND_CHOICE_VALUE sentinel, which the branch resolver reads as "no
+// preference" and falls back to that group's recommended default branch.
+const recommendOption = {
+  id: RECOMMEND_CHOICE_VALUE,
+  title: 'Not sure yet',
+  desc: "We'll recommend a beginner-friendly path for you.",
+  icon: <LuSparkles className="text-brand-purple-600 h-10 w-10" />,
+}
 
 export const StepLearningPath = () => {
   const { answers, setAnswer } = useWizardStore()
@@ -43,6 +54,7 @@ export const StepLearningPath = () => {
           desc: 'A full-featured framework for scalable applications.',
           icon: <RiAngularjsLine className="h-10 w-10 text-[#DD0031]" />,
         },
+        recommendOption,
       ],
     },
     {
@@ -64,6 +76,7 @@ export const StepLearningPath = () => {
           desc: 'A component-rich framework for fast, responsive UIs.',
           icon: <RiBootstrapLine className="h-10 w-10 text-[#7952B3]" />,
         },
+        recommendOption,
       ],
     },
     {

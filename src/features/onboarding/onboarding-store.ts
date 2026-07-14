@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 type AnswerValue = string | number | boolean | string[] | null | undefined
 interface WizardAnswers {
@@ -40,29 +41,58 @@ interface WizardStore {
   setSuggestion: (suggestion: RoadmapSuggestion | null) => void
   resetWizard: () => void
 }
-export const useWizardStore = create<WizardStore>((set) => ({
-  // Initial State
-  step: 1,
-  answers: {},
-  suggestion: null,
 
-  // Navigation
-  nextStep: () => set((state) => ({ step: state.step + 1 })),
-  prevStep: () => set((state) => ({ step: Math.max(1, state.step - 1) })),
-  goToStep: (step) => set({ step }),
+// Last user-input step. Steps beyond this (6 = AI generating, 7 = gate) are driven
+// by the AI suggestion, which is intentionally NOT persisted — so a reload never
+// rehydrates straight into a half-generated state with no suggestion behind it.
+const LAST_INPUT_STEP = 5
 
-  // Answers
-  setAnswer: (key, value) =>
-    set((state) => ({
-      answers: {
-        ...state.answers,
-        [key]: value,
+export const useWizardStore = create<WizardStore>()(
+  persist(
+    (set) => ({
+      // Initial State
+      step: 1,
+      answers: {},
+      suggestion: null,
+
+      // Navigation
+      nextStep: () => set((state) => ({ step: state.step + 1 })),
+      prevStep: () => set((state) => ({ step: Math.max(1, state.step - 1) })),
+      goToStep: (step) => set({ step }),
+
+      // Answers
+      setAnswer: (key, value) =>
+        set((state) => ({
+          answers: {
+            ...state.answers,
+            [key]: value,
+          },
+        })),
+
+      // AI suggestion (pinned when the learner leaves the generating step)
+      setSuggestion: (suggestion) => set({ suggestion }),
+
+      // Reset
+      resetWizard: () => set({ step: 1, answers: {}, suggestion: null }),
+    }),
+    {
+      // Persist step + answers so an accidental reload mid-onboarding resumes where
+      // the learner left off. The suggestion is re-derived at the generating step,
+      // so it is deliberately left out.
+      name: 'vora-onboarding',
+      version: 1,
+      partialize: (state) => ({ step: state.step, answers: state.answers }),
+      merge: (persisted, current) => {
+        const saved = (persisted ?? {}) as Partial<Pick<WizardStore, 'step' | 'answers'>>
+        return {
+          ...current,
+          answers: saved.answers ?? current.answers,
+          // Clamp the resumed step to the last input step: 6/7 need the (unpersisted)
+          // suggestion, so resume on the last question and let generation re-run.
+          step: Math.min(Math.max(1, saved.step ?? current.step), LAST_INPUT_STEP),
+          suggestion: null,
+        }
       },
-    })),
-
-  // AI suggestion (pinned when the learner leaves the generating step)
-  setSuggestion: (suggestion) => set({ suggestion }),
-
-  // Reset
-  resetWizard: () => set({ step: 1, answers: {}, suggestion: null }),
-}))
+    },
+  ),
+)

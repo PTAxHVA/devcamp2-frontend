@@ -30,8 +30,18 @@ describe('getPreferenceQuestions (H11)', () => {
     expect(getPreferenceQuestions('fullstack').map((q) => q.id)).not.toContain('database')
   })
 
-  it('offers database options that match the seeded Database fork branches', () => {
+  it('offers database options that match the seeded Database fork branches, plus a recommend option', () => {
     const database = getPreferenceQuestions('backend').find((q) => q.id === 'database')
-    expect(database?.options?.map((o) => o.value)).toEqual(['mongodb', 'postgresql', 'mysql'])
+    expect(database?.options?.map((o) => o.value)).toEqual([
+      'mongodb',
+      'postgresql',
+      'mysql',
+      'auto',
+    ])
+  })
+
+  it('offers a "recommend one" option on the framework fork choice', () => {
+    const framework = getPreferenceQuestions('frontend').find((q) => q.id === 'framework')
+    expect(framework?.options?.map((o) => o.value)).toContain('auto')
   })
 })

@@ -73,4 +73,23 @@ describe('resolveBranchSelectionFromAnswers', () => {
     expect(ids).toContain('tailwind')
     expect(ids).not.toContain('bootstrap')
   })
+
+  it('treats the "auto" recommend sentinel as no preference (group default)', () => {
+    // The onboarding "Not sure yet — recommend one" option stores 'auto', which
+    // matches no branch name, so every group falls back to its default branch.
+    expect(
+      resolveBranchSelectionFromAnswers(feBranches, { learningFramework: 'auto', styling: 'auto' }),
+    ).toEqual(['core', 'react', 'tailwind'])
+    expect(resolveBranchSelectionFromAnswers(beBranches, { database: 'auto' })).toEqual([
+      'be-core',
+      'mongo',
+    ])
+    // 'auto' on one group still honours a real choice on another.
+    expect(
+      resolveBranchSelectionFromAnswers(feBranches, {
+        learningFramework: 'auto',
+        styling: 'bootstrap',
+      }),
+    ).toEqual(['core', 'react', 'bootstrap'])
+  })
 })

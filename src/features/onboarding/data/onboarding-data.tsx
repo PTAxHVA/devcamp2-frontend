@@ -17,6 +17,13 @@ import { LuLayoutTemplate, LuDatabase, LuCode } from 'react-icons/lu'
 
 export const steps = ['Welcome', 'Role', 'Goal', 'Level', 'Preferences', 'Roadmap']
 
+// Sentinel for the "let VORA pick a path for me" option offered on every fork
+// choice (framework / styling / database). It is non-empty (so the step's presence
+// check passes) but matches no branch name, so resolveBranchSelectionFromAnswers
+// falls back to that group's default branch — no backend/resolver change needed.
+export const RECOMMEND_CHOICE_VALUE = 'auto'
+export const RECOMMEND_CHOICE_LABEL = 'Not sure yet — recommend one'
+
 export const roles = [
   {
     id: 'frontend',
@@ -162,6 +169,7 @@ export const PREFERENCE_QUESTIONS = [
       { value: 'react', label: 'React' },
       { value: 'vue', label: 'Vue' },
       { value: 'angular', label: 'Angular' },
+      { value: RECOMMEND_CHOICE_VALUE, label: RECOMMEND_CHOICE_LABEL },
     ],
   },
   {
@@ -175,6 +183,7 @@ export const PREFERENCE_QUESTIONS = [
       { value: 'mongodb', label: 'MongoDB' },
       { value: 'postgresql', label: 'PostgreSQL' },
       { value: 'mysql', label: 'MySQL (with Prisma)' },
+      { value: RECOMMEND_CHOICE_VALUE, label: RECOMMEND_CHOICE_LABEL },
     ],
   },
   {
