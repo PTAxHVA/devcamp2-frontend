@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { RiArrowRightLine, RiKey2Line, RiLightbulbFlashLine, RiSearchLine } from 'react-icons/ri'
 import { useWizardStore } from '../../onboarding-store'
 import { useRoadmapSuggestion } from '../../hooks/use-roadmap-suggestion'
+import { TopicPreviewPanel } from '../topic-preview-panel'
 
 /** Shown when the suggestion request fails — the flow continues with the default order. */
 export const DEFAULT_REASON =
@@ -81,6 +82,9 @@ export const StepGenerating = ({ onContinue, minDwellMs = MIN_DWELL_MS }: StepGe
   const setSuggestion = useWizardStore((s) => s.setSuggestion)
   const { data, isPending } = useRoadmapSuggestion()
 
+  // The topic the learner tapped to preview (why-learn + sections). Null = closed.
+  const [selectedTopic, setSelectedTopic] = useState<{ id: string; name: string } | null>(null)
+
   const [dwellDone, setDwellDone] = useState(minDwellMs <= 0)
   useEffect(() => {
     if (minDwellMs <= 0) return
@@ -130,21 +134,47 @@ export const StepGenerating = ({ onContinue, minDwellMs = MIN_DWELL_MS }: StepGe
 
       {data && data.topics.length > 0 && (
         <div className="border-border-soft bg-bg-card w-full rounded-2xl border p-6 shadow-sm">
-          <p className="text-text-primary mb-4 text-sm font-bold tracking-wide uppercase">
-            Your learning order
-          </p>
+          <div className="mb-4">
+            <p className="text-text-primary text-sm font-bold tracking-wide uppercase">
+              Your learning order
+            </p>
+            <p className="text-text-muted mt-1 text-xs">
+              Tap a topic to see why it matters and what you&apos;ll learn.
+            </p>
+          </div>
           <ol className="flex flex-wrap gap-2">
-            {data.topics.map((topic, index) => (
-              <li
-                key={topic.id}
-                className="border-border-soft bg-bg-section text-text-secondary flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium"
-              >
-                <span className="text-brand-purple-600 font-bold">{index + 1}</span>
-                {topic.name}
-              </li>
-            ))}
+            {data.topics.map((topic, index) => {
+              const isSelected = selectedTopic?.id === topic.id
+              return (
+                <li key={topic.id}>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSelectedTopic(isSelected ? null : { id: topic.id, name: topic.name })
+                    }
+                    aria-pressed={isSelected}
+                    className={`focus-visible:ring-brand-purple-300 flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none ${
+                      isSelected
+                        ? 'border-brand-purple-400 bg-bg-lavender text-brand-purple-700'
+                        : 'border-border-soft bg-bg-section text-text-secondary hover:border-brand-purple-300 hover:bg-bg-lavender/40'
+                    }`}
+                  >
+                    <span className="text-brand-purple-600 font-bold">{index + 1}</span>
+                    {topic.name}
+                  </button>
+                </li>
+              )
+            })}
           </ol>
         </div>
+      )}
+
+      {selectedTopic && (
+        <TopicPreviewPanel
+          topicId={selectedTopic.id}
+          topicName={selectedTopic.name}
+          onClose={() => setSelectedTopic(null)}
+        />
       )}
 
       <button
