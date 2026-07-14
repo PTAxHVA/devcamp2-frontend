@@ -1,10 +1,12 @@
 import { describe, it, expect } from 'vitest'
 import {
   isFrontendFocusedRole,
+  roleHasLearningPath,
+  getLearningPathKeys,
   getPreferenceQuestions,
 } from '@/features/onboarding/data/onboarding-data'
 
-describe('isFrontendFocusedRole (H11)', () => {
+describe('isFrontendFocusedRole', () => {
   it('is true for frontend + fullstack, false for backend/unknown', () => {
     expect(isFrontendFocusedRole('frontend')).toBe(true)
     expect(isFrontendFocusedRole('fullstack')).toBe(true)
@@ -13,35 +15,49 @@ describe('isFrontendFocusedRole (H11)', () => {
   })
 })
 
-describe('getPreferenceQuestions (H11)', () => {
-  it('includes the frontend framework question for frontend roles', () => {
-    const ids = getPreferenceQuestions('frontend').map((q) => q.id)
-    expect(ids).toContain('framework')
+describe('roleHasLearningPath', () => {
+  it('is true for every current role — each has a "Choose your learning path" step', () => {
+    expect(roleHasLearningPath('frontend')).toBe(true)
+    expect(roleHasLearningPath('fullstack')).toBe(true)
+    expect(roleHasLearningPath('backend')).toBe(true)
   })
 
-  it('excludes the frontend framework question for a backend learner', () => {
-    const ids = getPreferenceQuestions('backend').map((q) => q.id)
+  it('is false for an unknown/undefined role (skips straight to generating)', () => {
+    expect(roleHasLearningPath('devops')).toBe(false)
+    expect(roleHasLearningPath(undefined)).toBe(false)
+    expect(roleHasLearningPath(null)).toBe(false)
+  })
+})
+
+describe('getLearningPathKeys', () => {
+  it('asks a backend learner only for a database', () => {
+    expect(getLearningPathKeys('backend')).toEqual(['database'])
+  })
+
+  it('asks frontend/fullstack for framework + styling + project direction', () => {
+    const keys = ['learningFramework', 'styling', 'projectDirection']
+    expect(getLearningPathKeys('frontend')).toEqual(keys)
+    expect(getLearningPathKeys('fullstack')).toEqual(keys)
+  })
+})
+
+describe('getPreferenceQuestions', () => {
+  const ids = getPreferenceQuestions().map((q) => q.id)
+
+  it('no longer asks framework or database here — those are learning-path cards now', () => {
     expect(ids).not.toContain('framework')
+    expect(ids).not.toContain('database')
   })
 
-  it('asks a backend learner for a database, but not a frontend learner', () => {
-    expect(getPreferenceQuestions('backend').map((q) => q.id)).toContain('database')
-    expect(getPreferenceQuestions('frontend').map((q) => q.id)).not.toContain('database')
-    expect(getPreferenceQuestions('fullstack').map((q) => q.id)).not.toContain('database')
-  })
-
-  it('offers database options that match the seeded Database fork branches, plus a recommend option', () => {
-    const database = getPreferenceQuestions('backend').find((q) => q.id === 'database')
-    expect(database?.options?.map((o) => o.value)).toEqual([
-      'mongodb',
-      'postgresql',
-      'mysql',
-      'auto',
+  it('keeps the shared preference questions for every role', () => {
+    expect(ids).toEqual([
+      'weeklyTime',
+      'projectType',
+      'learningStyle',
+      'targetTimeline',
+      'os',
+      'cliComfort',
+      'additionalInfo',
     ])
-  })
-
-  it('offers a "recommend one" option on the framework fork choice', () => {
-    const framework = getPreferenceQuestions('frontend').find((q) => q.id === 'framework')
-    expect(framework?.options?.map((o) => o.value)).toContain('auto')
   })
 })
