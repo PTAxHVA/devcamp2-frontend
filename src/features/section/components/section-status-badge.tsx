@@ -23,7 +23,10 @@ export const SectionStatusBadge = ({ status, className = '' }: SectionStatusBadg
   <span
     className={`inline-flex items-center justify-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${BADGE_STYLES[status]} ${className}`}
   >
-    <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${DOT_STYLES[status]}`} />
+    <span
+      aria-hidden="true"
+      className={`h-1.5 w-1.5 shrink-0 rounded-full ${DOT_STYLES[status]}`}
+    />
     {SECTION_STATUS_LABEL[status]}
   </span>
 )
@@ -37,11 +40,26 @@ interface SectionStatusIconProps {
  * (e.g. the trailing column of the topic-detail sections table). */
 export const SectionStatusIcon = ({ status, className = 'h-5 w-5' }: SectionStatusIconProps) => {
   if (status === 'completed')
-    return <RiCheckboxCircleFill className={`${className} text-emerald-500`} />
+    return (
+      <RiCheckboxCircleFill
+        aria-hidden="true"
+        focusable="false"
+        className={`${className} text-emerald-500`}
+      />
+    )
   if (status === 'in_progress') {
     return (
-      <span className={`${className} block rounded-full border-2 border-dashed border-amber-400`} />
+      <span
+        aria-hidden="true"
+        className={`${className} block rounded-full border-2 border-dashed border-amber-400`}
+      />
     )
   }
-  return <RiCheckboxBlankCircleLine className={`${className} text-red-300`} />
+  return (
+    <RiCheckboxBlankCircleLine
+      aria-hidden="true"
+      focusable="false"
+      className={`${className} text-red-300`}
+    />
+  )
 }

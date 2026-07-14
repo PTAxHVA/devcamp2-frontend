@@ -36,9 +36,14 @@ export const TopicWhyPanel = ({
   const whyText = whyLearn.trim() || description.trim() || FALLBACK_WHY
 
   return (
-    <div className="border-border-soft bg-bg-card flex flex-col rounded-2xl border lg:max-h-120 lg:overflow-hidden">
+    <section
+      aria-labelledby="topic-why-heading"
+      className="border-border-soft bg-bg-card flex flex-col rounded-2xl border lg:max-h-120 lg:overflow-hidden"
+    >
       <div className="p-6 pb-3">
-        <h3 className="text-text-primary font-semibold">Why learn this topic</h3>
+        <h3 id="topic-why-heading" className="text-text-primary font-semibold">
+          Why learn this topic
+        </h3>
       </div>
 
       <div className="min-h-0 space-y-4 px-6 pb-4 lg:overflow-y-auto">
@@ -52,7 +57,9 @@ export const TopicWhyPanel = ({
             <ul className="space-y-1.5">
               {sections.map((sec) => (
                 <li key={sec._id} className="text-text-secondary flex items-start gap-2 text-sm">
-                  <span className="text-brand-purple-500 mt-0.5">▸</span>
+                  <span aria-hidden="true" className="text-brand-purple-500 mt-0.5">
+                    ▸
+                  </span>
                   <span>{sec.name}</span>
                 </li>
               ))}
@@ -69,11 +76,12 @@ export const TopicWhyPanel = ({
         </span>
         <button
           onClick={onContinue}
-          className="focus-visible:ring-brand-purple-300 flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-[#0B1221] px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-slate-800 focus-visible:ring-2 focus-visible:outline-none"
+          disabled={totalSections === 0}
+          className="focus-visible:ring-brand-purple-300 flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-[#0B1221] px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-slate-800 focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-[#0B1221]"
         >
-          Continue topic <RiArrowRightLine className="h-4 w-4" />
+          Continue topic <RiArrowRightLine aria-hidden="true" className="h-4 w-4" />
         </button>
       </div>
-    </div>
+    </section>
   )
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import TopicDetailPage from '../topic-detail-page'
 import type { BETopicDetail } from '../hooks/use-topic-detail'
@@ -121,11 +121,24 @@ describe('TopicDetailPage why-learn panel (J)', () => {
 
     renderPage()
 
-    expect(screen.getByText(/What you'll learn \(2 sections\)/i)).toBeInTheDocument()
-    // Section names appear both in the "What you'll learn" list and the
-    // interactive Sections table below it, by design — assert at least one.
-    expect(screen.getAllByText('Components & JSX').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('Hooks').length).toBeGreaterThan(0)
+    // Scope to the why-panel region so this can't false-positive on the
+    // separate Sections table, which lists the same section names below it.
+    const panel = screen.getByRole('region', { name: /why learn this topic/i })
+    expect(within(panel).getByText(/What you'll learn \(2 sections\)/i)).toBeInTheDocument()
+    expect(within(panel).getByText('Components & JSX')).toBeInTheDocument()
+    expect(within(panel).getByText('Hooks')).toBeInTheDocument()
+  })
+
+  it('disables the Continue button when the topic has no sections', () => {
+    ;(mocks.useTopicDetail as Mock).mockReturnValue({
+      data: { ...baseTopic, sectionList: [], userProgress: [] },
+      isLoading: false,
+      isError: false,
+    })
+
+    renderPage()
+
+    expect(screen.getByRole('button', { name: /continue topic/i })).toBeDisabled()
   })
 
   it('reflects the 3-state status badge for each section in the sections table', () => {
