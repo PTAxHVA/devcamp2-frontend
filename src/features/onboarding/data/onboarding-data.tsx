@@ -21,7 +21,6 @@ export const steps = ['Welcome', 'Role', 'Goal', 'Level', 'Preferences', 'Roadma
 // check passes) but matches no branch name, so resolveBranchSelectionFromAnswers
 // falls back to that group's default branch — no backend/resolver change needed.
 export const RECOMMEND_CHOICE_VALUE = 'auto'
-export const RECOMMEND_CHOICE_LABEL = 'Not sure yet — recommend one'
 
 export const roles = [
   {
