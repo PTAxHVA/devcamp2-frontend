@@ -20,6 +20,8 @@ import toast from 'react-hot-toast'
 import { useSectionDetail } from './hooks/use-section-detail'
 import { useTopicDetail } from '@/features/topic/hooks/use-topic-detail'
 import { useSectionQuiz } from './hooks/use-section-quiz'
+import { getSectionStatus } from './section-status'
+import { SectionStatusBadge } from './components/section-status-badge'
 import { QUIZ_PASS_THRESHOLD } from '@/constants/learning'
 import { safeUrl } from '@/lib/utils'
 
@@ -113,6 +115,10 @@ export default function SectionDetailPage() {
     )
   }
 
+  // 3-state status (K) — derived from the topic's already-fetched userProgress
+  // rows, no dedicated section-status hook/endpoint needed.
+  const sectionStatus = getSectionStatus(topic.userProgress || [], sectionId ?? '')
+
   // Sibling calculations
   const sectionList = topic.sectionList || []
   const currentIdx = sectionList.findIndex((s) => s._id === sectionId)
@@ -181,12 +187,7 @@ export default function SectionDetailPage() {
           <div className="max-w-full min-w-0">
             <h1 className="text-text-primary mb-2 flex flex-wrap items-center gap-3 text-3xl font-bold">
               <span className="max-w-full min-w-0 break-words">{section.title}</span>
-              {quiz?.lastAttemptPassed && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                  Passed
-                </span>
-              )}
+              <SectionStatusBadge status={sectionStatus} />
             </h1>
             <p className="text-text-secondary max-w-2xl text-sm leading-relaxed md:text-base">
               Understand the core specifications, methods, and practical aspects of this section.
