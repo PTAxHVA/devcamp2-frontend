@@ -3,6 +3,7 @@ import { FiCheck, FiCompass, FiGrid, FiPrinter } from 'react-icons/fi'
 import { useRoadmapDetail } from '@/features/roadmap/hooks/use-roadmap-detail'
 import { useMe } from '@/features/profile/hooks/use-profile'
 import { CertificateCard } from '@/features/passport/components/certificate-card'
+import { isRoadmapComplete } from '@/features/learning/lib/roadmap-completion'
 
 /**
  * Roadmap-completion celebration. Reached at /roadmaps/:id/complete.
@@ -27,9 +28,10 @@ export function RoadmapCompletePage() {
   }
 
   // Only celebrate a genuinely 100%-complete roadmap (M4) — otherwise send the
-  // learner back to the roadmap instead of a false "Congratulations".
-  const isGenuinelyComplete =
-    !!data && data.topics.length > 0 && data.topics.every((t) => t.status === 'completed')
+  // learner back to the roadmap instead of a false "Congratulations". Uses the
+  // shared section-progress predicate so this gate can't disagree with the
+  // my-learning FINISH node / certificate CTA that navigates here.
+  const isGenuinelyComplete = !!data && isRoadmapComplete(data.topics)
   const allComplete = isPreview || isGenuinelyComplete
   if (!allComplete) {
     return <Navigate to={id ? `/roadmaps/${id}` : '/dashboard'} replace />
