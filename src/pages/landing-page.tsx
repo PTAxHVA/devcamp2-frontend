@@ -11,15 +11,12 @@ import {
   WhyVoraSection,
 } from '@/features/landing/components'
 import { usePrefersReducedMotion } from '@/features/landing/lib/use-prefers-reduced-motion'
+// Import Component Stickers
+import { FloatingStickers } from '@/features/landing/components/floating-sticker.tsx'
 
 const LandingPage = () => {
   const reduced = usePrefersReducedMotion()
 
-  // Smooth in-page anchor scrolling, scoped to this page and reverted on unmount so
-  // other routes keep their default behavior. Driven by the LIVE reduced-motion
-  // preference (re-runs if the user toggles it while the page is open). The 84px
-  // sticky-navbar offset comes from `scroll-mt-[84px]` on each anchored section —
-  // it is NOT also set here, so the offset never stacks.
   useEffect(() => {
     const html = document.documentElement
     const prev = html.style.scrollBehavior
@@ -29,10 +26,6 @@ const LandingPage = () => {
     }
   }, [reduced])
 
-  // The landing is very tall, so navigating from a below-the-fold CTA (e.g. the
-  // closing "Get Started") would otherwise leave the next route scrolled mid-page.
-  // Reset scroll to the top when this page unmounts — forced instant so the
-  // smooth-scroll style can't animate it after the route swaps.
   useEffect(() => {
     return () => {
       const html = document.documentElement
@@ -44,9 +37,20 @@ const LandingPage = () => {
   }, [])
 
   return (
-    <div className="bg-bg-soft text-text-primary flex min-h-screen flex-col overflow-x-clip">
-      <Navbar />
-      <main>
+    <div className="bg-bg-soft text-text-primary relative flex min-h-screen flex-col overflow-x-clip">
+      {/* 
+        FloatingStickers lúc này đã mang z-40 (trong code của nó) 
+        => Sẽ lơ lửng đè lên cả các khối trắng của StatsSection bên dưới 
+      */}
+      <FloatingStickers reducedMotion={reduced} />
+
+      {/* Đảm bảo Navbar có z-50 để luôn là layer cao nhất, đè lên cả Sticker */}
+      <div className="relative z-50">
+        <Navbar />
+      </div>
+
+      {/* Thẻ main giữ relative mặc định, không cần z-10 nữa để nhường ưu tiên cho Sticker */}
+      <main className="relative">
         <HeroSection />
         <StatsSection />
         <WhyVoraSection />
@@ -55,7 +59,11 @@ const LandingPage = () => {
         <FaqSection />
         <CtaBand />
       </main>
-      <Footer />
+
+      {/* Bọc Footer bằng thẻ div thay vì chèn className trực tiếp để tránh lỗi TypeScript */}
+      <div className="relative">
+        <Footer />
+      </div>
     </div>
   )
 }
