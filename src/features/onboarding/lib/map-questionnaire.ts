@@ -1,4 +1,5 @@
 import type { BrowseRoadmap } from '@/features/roadmap/hooks/use-browse-roadmaps'
+import { RECOMMEND_CHOICE_VALUE } from '../data/onboarding-data'
 
 /**
  * Wizard answers are an untyped bag (zustand store keyed by question id). These
@@ -30,6 +31,16 @@ const str = (value: unknown): string | undefined => {
   return trimmed.length > 0 ? trimmed : undefined
 }
 
+/**
+ * Like str(), but treats the "recommend one" sentinel as no answer. The sentinel
+ * only drives FE branch selection (→ group default); it must never land in the
+ * saved learner profile or the AI prompt as a literal "auto" framework preference.
+ */
+const preference = (value: unknown): string | undefined => {
+  const s = str(value)
+  return s === RECOMMEND_CHOICE_VALUE ? undefined : s
+}
+
 // The weekly-time question stores a range ('5-10'); the API wants an integer
 // number of hours. Map each bucket to a representative value.
 const WEEKLY_TIME_HOURS: Record<string, number> = {
@@ -54,8 +65,8 @@ export function mapAnswersToQuestionnaire(
   // field — fold them into extraPreferences so the AI still sees them.
   const extras = [
     str(answers.additionalInfo),
-    str(answers.styling) && `Preferred styling: ${str(answers.styling)}`,
-    str(answers.database) && `Preferred database: ${str(answers.database)}`,
+    preference(answers.styling) && `Preferred styling: ${preference(answers.styling)}`,
+    preference(answers.database) && `Preferred database: ${preference(answers.database)}`,
     str(answers.projectDirection) && `Project direction: ${str(answers.projectDirection)}`,
     // Free-text "Talk to AI" request from the Customize step.
     str(answers.aiRefinement) && `Customization request: ${str(answers.aiRefinement)}`,
@@ -71,7 +82,7 @@ export function mapAnswersToQuestionnaire(
     learningStyle: str(answers.learningStyle),
     // The learning-path step (learningFramework) is the more specific choice;
     // fall back to the preferences-step framework question.
-    frameworkPreference: str(answers.learningFramework) ?? str(answers.framework),
+    frameworkPreference: preference(answers.learningFramework) ?? preference(answers.framework),
     projectType: str(answers.projectType),
     cliComfort: str(answers.cliComfort),
     timelineGoal: str(answers.targetTimeline),

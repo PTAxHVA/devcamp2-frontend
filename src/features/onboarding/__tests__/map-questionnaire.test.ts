@@ -83,6 +83,15 @@ describe('mapAnswersToQuestionnaire', () => {
     expect(payload.frameworkPreference).toBe('vue')
   })
 
+  it('never sends the "auto" recommend sentinel to the saved profile', () => {
+    const payload = mapAnswersToQuestionnaire(
+      { ...base, framework: 'auto', learningFramework: 'auto', styling: 'auto', database: 'auto' },
+      [],
+    )
+    expect(payload.frameworkPreference).toBeUndefined()
+    expect(payload.extraPreferences ?? '').not.toContain('auto')
+  })
+
   it('strips undefined keys from the payload', () => {
     const payload = mapAnswersToQuestionnaire({ role: 'backend', goal: 'fun' }, [])
     const keys = Object.keys(payload)
