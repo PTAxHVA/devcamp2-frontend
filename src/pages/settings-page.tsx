@@ -356,58 +356,60 @@ export default function SettingsPage() {
               </div>
             </div>
           </Section>
+
+          {/* Verified Skill Passport sharing */}
+          <PassportSettingsCard />
         </div>
 
         {/* ── Right column ── */}
         <div className="flex flex-col gap-4">
-          {/* Verified Skill Passport sharing */}
-          <PassportSettingsCard />
-
-          {/* Account Actions */}
-          <Section icon={LogOut} title="Account actions" subtitle="Sign out of your VORA session.">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="bg-bg-section flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
-                  <LogOut className="text-text-muted h-4 w-4" />
-                </div>
-                <div>
-                  <p className="text-text-primary text-sm font-medium">Log out</p>
-                  <p className="text-text-muted text-xs">Sign out of VORA on this device.</p>
-                </div>
-              </div>
-              <button
-                onClick={logout}
-                className="border-border-input text-text-primary hover:bg-bg-section focus-visible:ring-brand-purple-300 rounded-lg border px-4 py-2 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
-              >
-                Log out
-              </button>
-            </div>
-          </Section>
-
-          {/* Account Deactivation */}
+          {/* Log out + deactivate combined into one card so this column isn't
+              three short cards taller than the left. A "Language" card slots in
+              above/below this once i18n ships (separate task) — this column is
+              a plain flex stack so it drops in without a layout rework. */}
           <Section
-            icon={User}
-            title="Account deactivation"
-            subtitle="Turn off access to your VORA account."
+            icon={LogOut}
+            title="Account actions"
+            subtitle="Sign out or deactivate your VORA account."
           >
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="bg-bg-section flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
-                  <User className="text-text-muted h-4 w-4" />
+            <div className="divide-border-soft flex flex-col divide-y">
+              <div className="flex items-center justify-between gap-3 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-bg-section flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
+                    <LogOut className="text-text-muted h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="text-text-primary text-sm font-medium">Log out</p>
+                    <p className="text-text-muted text-xs">Sign out of VORA on this device.</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-text-primary text-sm font-medium">Deactivate account</p>
-                  <p className="text-text-muted text-xs">
-                    You'll be signed out and can't sign in until reactivated.
-                  </p>
-                </div>
+                <button
+                  onClick={logout}
+                  className="border-border-input text-text-primary hover:bg-bg-section focus-visible:ring-brand-purple-300 shrink-0 rounded-lg border px-4 py-2 text-sm font-semibold transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
+                >
+                  Log out
+                </button>
               </div>
-              <button
-                onClick={() => setShowDeactivatePassword(true)}
-                className="shrink-0 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold whitespace-nowrap text-white transition-colors duration-200 hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-red-300 focus-visible:outline-none"
-              >
-                Deactivate account
-              </button>
+
+              <div className="flex flex-wrap items-center justify-between gap-4 pt-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-bg-section flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
+                    <User className="text-text-muted h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="text-text-primary text-sm font-medium">Deactivate account</p>
+                    <p className="text-text-muted text-xs">
+                      You'll be signed out and can't sign in until reactivated.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowDeactivatePassword(true)}
+                  className="shrink-0 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold whitespace-nowrap text-white transition-colors duration-200 hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-red-300 focus-visible:outline-none"
+                >
+                  Deactivate account
+                </button>
+              </div>
             </div>
           </Section>
         </div>
