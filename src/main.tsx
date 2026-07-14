@@ -6,7 +6,12 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { Toaster } from 'react-hot-toast'
 import App from './App.tsx'
 import { queryClient } from './lib/query-client'
+import { startSessionSync } from './lib/session-sync'
 import './index.css'
+
+// Reset per-user persisted flow state (onboarding wizard + quiz session) whenever
+// the signed-in user changes, so a shared browser doesn't leak it across accounts.
+startSessionSync()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
