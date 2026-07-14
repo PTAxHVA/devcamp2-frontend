@@ -6,6 +6,7 @@ import { apiClient } from '@/lib/api-client'
 import { useEnrollRoadmap } from '../hooks/use-enroll-roadmap'
 import { roadmapSlug } from '@/features/learning/lib/roadmap-slug'
 import RoadmapPreviewModal from './roadmap-preview-modal'
+import { RoadmapArt } from './roadmap-art'
 import { resolveDefaultBranchSelection, type ForkableBranch } from '../lib/branch-selection'
 
 interface RoadmapCardData {
@@ -49,29 +50,11 @@ export default function RoadmapCard({ data, isEnrolled = false, userRoadmapId }:
       branchSelections: resolveDefaultBranchSelection(branches),
     })
 
-  const gradientCls = displayTitle.toLowerCase().includes('frontend')
-    ? 'bg-linear-to-br from-blue-50 to-indigo-100 border-indigo-200'
-    : displayTitle.toLowerCase().includes('backend')
-      ? 'bg-linear-to-br from-emerald-50 to-teal-100 border-teal-200'
-      : 'bg-linear-to-br from-slate-50 to-gray-100 border-border-soft'
-
-  const textCls = displayTitle.toLowerCase().includes('frontend')
-    ? 'text-indigo-600'
-    : displayTitle.toLowerCase().includes('backend')
-      ? 'text-teal-600'
-      : 'text-text-placeholder'
-
   return (
     <div className="border-border-soft bg-bg-card flex h-full flex-col justify-between rounded-3xl border p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
-      <div
-        className={`mb-4 flex h-36 items-center justify-center rounded-2xl border border-transparent p-4 text-center ${gradientCls}`}
-      >
-        <span className={`max-w-full text-xl font-black break-words opacity-80 ${textCls}`}>
-          {displayTitle}
-        </span>
-      </div>
+      <RoadmapArt title={displayTitle} variant="default" />
 
-      <div>
+      <div className="mt-4">
         <h3 className="text-text-primary mb-1.5 text-[17px] leading-tight font-bold break-words">
           {displayTitle}
         </h3>
