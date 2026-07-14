@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { RoadmapArt } from '../roadmap-art'
@@ -38,5 +40,24 @@ describe('RoadmapArt', () => {
     render(<RoadmapArt title="Frontend Web Developer" />)
     const art = screen.getByRole('img')
     expect(art.className).toContain('h-36')
+  })
+
+  // The accent + surface classes RoadmapArt applies must map to real @theme
+  // color tokens in index.css. The class-presence checks above still pass if a
+  // token is renamed away (the art then renders colorless), so tie the
+  // component's classes to their token definitions — a rename fails this test.
+  it('every theme class it uses maps to a defined @theme color token', () => {
+    const css = readFileSync(resolve(process.cwd(), 'src/index.css'), 'utf8')
+    const themeClasses = [
+      'text-brand-purple-500',
+      'text-brand-navy-700',
+      'text-text-placeholder',
+      'bg-bg-lavender',
+      'border-border-soft',
+    ]
+    for (const cls of themeClasses) {
+      const token = '--color-' + cls.replace(/^(text|bg|border)-/, '')
+      expect(css, `${cls} → ${token}`).toContain(token)
+    }
   })
 })
