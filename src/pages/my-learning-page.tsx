@@ -12,6 +12,7 @@ import {
 import { formatRoadmapSource } from '../features/roadmap/lib/roadmap-source-label'
 import ProgressHeader from '../features/learning/progress-header'
 import RoadmapSnakePath from '../features/learning/components/snake-roadmap'
+import RoadmapCompleteBanner from '../features/learning/components/roadmap-complete-banner'
 import ForkPathBanner from '../features/learning/components/fork-path-banner'
 import TopicDetailSidebar from '../features/learning/components/topic-side-bar'
 import { UnregisterModal } from '../features/learning/components/unregister-modal'
@@ -21,6 +22,7 @@ import {
   useUnregisterRoadmap,
 } from '../features/learning/hooks/use-my-learning'
 import { roadmapSlug } from '../features/learning/lib/roadmap-slug'
+import { isRoadmapComplete } from '../features/learning/lib/roadmap-completion'
 import type { LearningTopic } from '../features/learning/types'
 
 function getShortRoleName(name: string | null | undefined): string {
@@ -173,6 +175,12 @@ export default function MyLearningJourneyPage() {
   // Sum real estimates only — don't fabricate hours for topics missing one.
   const durationTotal = topics.reduce((sum, t) => sum + (t.estimatedHours || 0), 0)
 
+  // Every topic done → surface the celebration/certificate entry points.
+  const roadmapComplete = isRoadmapComplete(topics)
+  const goToComplete = () => {
+    if (activeRoadmapId) navigate(`/roadmaps/${activeRoadmapId}/complete`)
+  }
+
   const handleUnregister = () => {
     if (!activeRoadmapId) return
     // Capture the other roadmap BEFORE the list refetches so we can navigate to it.
@@ -260,6 +268,9 @@ export default function MyLearningJourneyPage() {
       {/* Main grid */}
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-3">
         <div className="flex flex-col gap-4 lg:col-span-2">
+          {roadmapComplete && activeRoadmapId && (
+            <RoadmapCompleteBanner onViewCertificate={goToComplete} />
+          )}
           <ProgressHeader topics={topics} />
           <ForkPathBanner
             masterRoadmapId={roadmap.masterRoadmapId}
@@ -273,6 +284,7 @@ export default function MyLearningJourneyPage() {
               activeRoadmapId &&
               setSelected({ roadmapId: activeRoadmapId, topicId: topic.masterTopicId })
             }
+            onFinish={goToComplete}
           />
         </div>
 

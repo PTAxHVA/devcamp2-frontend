@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
 import { RiCheckFill, RiFlagFill, RiStarFill, RiPlayMiniFill } from 'react-icons/ri'
 import type { LearningTopic } from '../types'
+import { isRoadmapComplete } from '../lib/roadmap-completion'
 
 interface RoadmapSnakePathProps {
   topics: LearningTopic[]
   activeTopicId: string | undefined
   onNodeClick: (topic: LearningTopic) => void
+  /** Called when the learner clicks the FINISH node after completing every topic. */
+  onFinish?: () => void
 }
 
 type AnyNode =
@@ -16,11 +19,22 @@ export default function RoadmapSnakePath({
   topics,
   activeTopicId,
   onNodeClick,
+  onFinish,
 }: RoadmapSnakePathProps) {
+  // Once every topic is done the FINISH node becomes a real, clickable milestone
+  // (emerald + solid connector) that leads to the celebration/certificate page —
+  // instead of the permanently-locked grey flag it used to be.
+  const roadmapComplete = isRoadmapComplete(topics)
+
   const allNodes: AnyNode[] = [
     { masterTopicId: 'start-node', title: 'START', status: 'completed', type: 'start' },
     ...topics,
-    { masterTopicId: 'finish-node', title: 'FINISH', status: 'locked', type: 'finish' },
+    {
+      masterTopicId: 'finish-node',
+      title: 'FINISH',
+      status: roadmapComplete ? 'completed' : 'locked',
+      type: 'finish',
+    },
   ]
 
   const [chunkSize, setChunkSize] = useState(3)
@@ -135,10 +149,19 @@ export default function RoadmapSnakePath({
                     labelCls = 'text-text-muted font-semibold tracking-widest uppercase text-[10px]'
                     icon = <RiStarFill size={20} />
                   } else if (typeNode?.type === 'finish') {
-                    ringCls = 'bg-bg-card ring-1 ring-slate-200'
-                    circleCls = 'bg-border-soft text-text-muted'
-                    labelCls =
-                      'text-text-placeholder font-semibold tracking-widest uppercase text-[10px]'
+                    // Completed roadmap → celebratory emerald flag; otherwise the
+                    // grey locked flag it stays until the last topic is done.
+                    if (node.status === 'completed') {
+                      ringCls = 'bg-bg-card ring-1 ring-emerald-200'
+                      circleCls = 'bg-emerald-500 text-white'
+                      labelCls =
+                        'text-emerald-700 font-semibold tracking-widest uppercase text-[10px]'
+                    } else {
+                      ringCls = 'bg-bg-card ring-1 ring-slate-200'
+                      circleCls = 'bg-border-soft text-text-muted'
+                      labelCls =
+                        'text-text-placeholder font-semibold tracking-widest uppercase text-[10px]'
+                    }
                     icon = <RiFlagFill size={20} />
                   } else if (isCompleted) {
                     ringCls = 'bg-bg-card ring-1 ring-emerald-200'
@@ -169,6 +192,13 @@ export default function RoadmapSnakePath({
                   const pulseColor = 'bg-amber-300'
 
                   const learningTopic = !typeNode ? (node as LearningTopic) : null
+                  // The FINISH node is only interactive once the whole roadmap is done.
+                  const isFinishDone = typeNode?.type === 'finish' && node.status === 'completed'
+                  const isInteractive = !typeNode || isFinishDone
+                  const handleActivate = () => {
+                    if (isFinishDone) onFinish?.()
+                    else if (learningTopic) onNodeClick(learningTopic)
+                  }
 
                   return (
                     <div
@@ -221,10 +251,16 @@ export default function RoadmapSnakePath({
 
                       {/* Node */}
                       <div
-                        onClick={() =>
-                          typeNode ? null : learningTopic && onNodeClick(learningTopic)
-                        }
-                        className={`group relative z-10 flex flex-col items-center ${typeNode ? 'cursor-default' : 'cursor-pointer'}`}
+                        role={isInteractive ? 'button' : undefined}
+                        tabIndex={isInteractive ? 0 : undefined}
+                        onClick={handleActivate}
+                        onKeyDown={(e) => {
+                          if (isInteractive && (e.key === 'Enter' || e.key === ' ')) {
+                            e.preventDefault()
+                            handleActivate()
+                          }
+                        }}
+                        className={`group focus-visible:ring-brand-purple-300 relative z-10 flex flex-col items-center rounded-2xl outline-none focus-visible:ring-2 ${isInteractive ? 'cursor-pointer' : 'cursor-default'}`}
                       >
                         {/* Tooltip */}
                         {!typeNode && (
@@ -279,7 +315,7 @@ export default function RoadmapSnakePath({
 
                         {/* Ring + circle */}
                         <div
-                          className={`rounded-full p-1.25 transition-all duration-200 ${ringCls} ${!typeNode ? 'group-hover:-translate-y-1 group-hover:scale-110' : ''} `}
+                          className={`rounded-full p-1.25 transition-all duration-200 ${ringCls} ${isInteractive ? 'group-hover:-translate-y-1 group-hover:scale-110' : ''} `}
                         >
                           <div
                             className={`flex h-14 w-14 items-center justify-center rounded-full ${circleCls}`}
