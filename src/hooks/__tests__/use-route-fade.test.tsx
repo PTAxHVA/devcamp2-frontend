@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 import { MemoryRouter, Routes, Route, useNavigate } from 'react-router'
 import { useRouteFade } from '../use-route-fade'
@@ -30,17 +30,23 @@ describe('useRouteFade', () => {
     expect(getByTestId('shell').classList.contains('animate-route-fade')).toBe(true)
   })
 
-  it('keeps the same element (no remount) and re-applies the fade on navigation', () => {
+  it('restarts the fade (remove → re-add) on navigation without remounting the shell', () => {
     const { getByTestId, getByText } = render(
       <MemoryRouter initialEntries={['/a']}>
         <Shell />
       </MemoryRouter>,
     )
-    const before = getByTestId('shell')
+    const shell = getByTestId('shell')
+    const removeSpy = vi.spyOn(shell.classList, 'remove')
+    const addSpy = vi.spyOn(shell.classList, 'add')
+
     fireEvent.click(getByText('go'))
-    const after = getByTestId('shell')
+
     // Same DOM node across navigation → the routed page swapped without remounting the shell.
-    expect(after).toBe(before)
-    expect(after.classList.contains('animate-route-fade')).toBe(true)
+    expect(getByTestId('shell')).toBe(shell)
+    // The remove → reflow → add sequence ran, restarting the CSS animation.
+    expect(removeSpy).toHaveBeenCalledWith('animate-route-fade')
+    expect(addSpy).toHaveBeenCalledWith('animate-route-fade')
+    expect(shell.classList.contains('animate-route-fade')).toBe(true)
   })
 })

@@ -253,8 +253,11 @@
   animation: marquee-drift 30s linear infinite;
 }
 
+/* Paused on hover (mouse) and via the Pause/Play control (.is-paused — keyboard/touch
+   accessible, WCAG 2.2.2). Both selectors are unlayered so they beat the `animation`
+   shorthand's implicit `running`. */
 .animate-marquee:hover,
-.animate-marquee:focus-within {
+.animate-marquee.is-paused {
   animation-play-state: paused;
 }
 

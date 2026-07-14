@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import type { IconType } from 'react-icons'
-import { RiIdCardLine, RiLightbulbLine, RiTimeLine } from 'react-icons/ri'
+import { RiIdCardLine, RiLightbulbLine, RiPauseLine, RiPlayLine, RiTimeLine } from 'react-icons/ri'
 import { cn } from '@/lib/utils'
 import { CARD_HOVER, SHADOW_SOFT, WRAP } from '../lib/landing-styles'
 import { usePrefersReducedMotion } from '../lib/use-prefers-reduced-motion'
@@ -57,11 +58,13 @@ const FeatureCard = ({ tag, icon: Icon, title, desc }: Feature) => (
 
 /**
  * Signature-features cards. With motion allowed they scroll in a seamless, endlessly
- * looping marquee (pauses on hover); under reduced-motion the section falls back to a
- * static 3-up grid so every card stays fully readable and reachable.
+ * looping marquee; under reduced-motion the section falls back to a static 3-up grid so
+ * every card stays fully readable and reachable. The marquee pauses on hover AND via a
+ * keyboard/touch-accessible Pause/Play control (WCAG 2.2.2).
  */
 export const SignatureFeaturesSection = () => {
   const reduced = usePrefersReducedMotion()
+  const [paused, setPaused] = useState(false)
 
   return (
     <section id="features" className="scroll-mt-[84px] py-18 lg:py-24">
@@ -80,22 +83,44 @@ export const SignatureFeaturesSection = () => {
             ))}
           </div>
         ) : (
-          <div className="marquee-mask mt-3 overflow-hidden">
-            {/*
-              Two identical sets: the first is the accessible content, the second is
-              aria-hidden and exists only so the -50% loop lands exactly on the copy.
-              Each card owns its trailing gap (mr-5) so the wrap-around has no jump.
-            */}
-            <div className="animate-marquee flex w-max">
-              {[...FEATURES, ...FEATURES].map((feature, index) => (
-                <div
-                  key={`${feature.title}-${index}`}
-                  aria-hidden={index >= FEATURES.length}
-                  className="mr-5 w-[280px] shrink-0 sm:w-[340px]"
-                >
-                  <FeatureCard {...feature} />
-                </div>
-              ))}
+          <div className="mt-3">
+            <div className="marquee-mask overflow-hidden">
+              {/*
+                Two identical sets: the first is the accessible content, the second is
+                aria-hidden and exists only so the -50% loop lands exactly on the copy.
+                Each card owns its trailing gap (mr-5) so the wrap-around has no jump.
+              */}
+              <div className={cn('animate-marquee flex w-max', paused && 'is-paused')}>
+                {[...FEATURES, ...FEATURES].map((feature, index) => (
+                  <div
+                    key={`${feature.title}-${index}`}
+                    aria-hidden={index >= FEATURES.length}
+                    className="mr-5 w-[280px] shrink-0 sm:w-[340px]"
+                  >
+                    <FeatureCard {...feature} />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mt-4 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setPaused((prev) => !prev)}
+                aria-pressed={paused}
+                aria-label={
+                  paused
+                    ? 'Play the signature features carousel'
+                    : 'Pause the signature features carousel'
+                }
+                className="text-text-muted hover:text-brand-purple-600 focus-visible:ring-brand-purple-300 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none"
+              >
+                {paused ? (
+                  <RiPlayLine className="h-3.5 w-3.5" aria-hidden />
+                ) : (
+                  <RiPauseLine className="h-3.5 w-3.5" aria-hidden />
+                )}
+                {paused ? 'Play' : 'Pause'}
+              </button>
             </div>
           </div>
         )}
