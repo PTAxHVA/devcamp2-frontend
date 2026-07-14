@@ -55,10 +55,11 @@ export function WeeklyProgressChart({
               {counts.map((count, i) => (
                 <div key={DAYS[i]} className="group flex h-full w-full items-end">
                   <div
-                    className="bg-brand-purple-300/40 group-hover:bg-brand-purple-500 w-full rounded-t-sm transition-colors duration-200"
+                    className="bg-brand-purple-300/40 group-hover:bg-brand-purple-500 animate-bar-grow w-full rounded-t-sm transition-colors duration-200"
                     style={{
                       height: `${(count / niceMax) * 100}%`,
                       minHeight: count > 0 ? '4px' : '0',
+                      animationDelay: `${250 + i * 70}ms`,
                     }}
                     title={`${count} section${count === 1 ? '' : 's'}`}
                   />

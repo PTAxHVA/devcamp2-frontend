@@ -38,7 +38,7 @@ export function MyRoadmapsGrid({ roadmaps, hasAvailableRoles }: MyRoadmapsGridPr
           <Link
             key={roadmap.id}
             to={`/my-learning/${roadmapSlug(roadmap.roleName)}`}
-            className="card bg-base-100 border-base-200 hover:border-primary/40 group focus:ring-primary border no-underline shadow-sm transition-all duration-200 hover:shadow-md focus:border-transparent focus:ring-2 focus:outline-none"
+            className="card bg-base-100 border-base-200 hover:border-primary/40 group focus:ring-primary border no-underline shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md focus:border-transparent focus:ring-2 focus:outline-none"
           >
             <div className="card-body flex h-full flex-col gap-4 p-5">
               <div className="flex items-start justify-between gap-3">
@@ -96,7 +96,7 @@ export function MyRoadmapsGrid({ roadmaps, hasAvailableRoles }: MyRoadmapsGridPr
           // Trạng thái bình thường (GIỮ NGUYÊN 100% CODE CỦA FILE GỐC)
           <Link
             to="/dashboard/add-role"
-            className="card bg-base-200/50 border-base-300 hover:border-primary/60 hover:bg-primary/5 group focus:ring-primary min-h-[160px] w-full border-2 border-dashed no-underline transition-all duration-200 focus:border-transparent focus:ring-2 focus:outline-none"
+            className="card bg-base-200/50 border-base-300 hover:border-primary/60 hover:bg-primary/5 group focus:ring-primary min-h-[160px] w-full border-2 border-dashed no-underline transition-all duration-200 hover:-translate-y-1 focus:border-transparent focus:ring-2 focus:outline-none"
           >
             <div className="card-body text-base-content/60 group-hover:text-primary flex flex-col items-center justify-center p-5 transition-colors duration-200">
               <div className="bg-base-200 group-hover:bg-primary/20 mb-2 flex h-12 w-12 items-center justify-center rounded-full transition-colors duration-200">
