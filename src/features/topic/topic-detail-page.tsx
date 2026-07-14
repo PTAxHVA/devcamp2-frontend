@@ -3,11 +3,8 @@ import { useParams, useNavigate, useSearchParams } from 'react-router'
 import type { IconType } from 'react-icons'
 import {
   RiArrowLeftLine,
-  RiArrowRightLine,
   RiListUnordered,
   RiFileList2Line,
-  RiCheckboxCircleFill,
-  RiCheckboxBlankCircleLine,
   RiDraggable,
   RiBookOpenLine,
   RiTimeLine,
@@ -20,6 +17,9 @@ import {
 
 import { useTopicDetail } from './hooks/use-topic-detail'
 import { dedupeResources } from './lib/dedupe-resources'
+import { TopicWhyPanel } from './components/topic-why-panel'
+import { getSectionStatus } from '../section/section-status'
+import { SectionStatusBadge, SectionStatusIcon } from '../section/components/section-status-badge'
 import { safeUrl } from '@/lib/utils'
 
 /* --------------------------- Vòng tròn % ---------------------------- */
@@ -62,30 +62,6 @@ const CircularProgress = ({ value, size = 84, stroke = 8 }: CircularProgressProp
       </span>
     </div>
   )
-}
-
-/* ------------------------- Badge & icon trạng thái ------------------------- */
-export type Status = 'Completed' | 'In Progress' | 'Not Started'
-
-const statusStyles: Record<Status, string> = {
-  Completed: 'bg-emerald-50 text-emerald-600',
-  'In Progress': 'bg-indigo-50 text-indigo-600',
-  'Not Started': 'bg-bg-section text-text-muted',
-}
-
-const StatusBadge = ({ status }: { status: Status }) => (
-  <span
-    className={`inline-flex justify-center rounded-md px-2.5 py-1 text-xs font-medium ${statusStyles[status]}`}
-  >
-    {status}
-  </span>
-)
-
-const StatusIcon = ({ status }: { status: Status }) => {
-  if (status === 'Completed') return <RiCheckboxCircleFill className="h-5 w-5 text-emerald-500" />
-  if (status === 'In Progress')
-    return <span className="block h-5 w-5 rounded-full border-2 border-dashed border-indigo-400" />
-  return <RiCheckboxBlankCircleLine className="text-text-disabled h-5 w-5" />
 }
 
 /* --------------------------------- Card ---------------------------------- */
@@ -164,15 +140,14 @@ export default function TopicDetailPage() {
   }
 
   const topicName = data.name || 'Untitled Topic'
-  const topicDescription = data.description || 'No description available for this topic.'
   const orderIndex = data.orderIndex || 0
   const sections = data.sectionList || []
   const userProgress = data.userProgress || []
 
   // Sibling calculations
   const totalSections = sections.length
-  const completedSections = sections.filter((s) =>
-    userProgress.some((p) => p.sectionId === s._id && p.isCompleted),
+  const completedSections = sections.filter(
+    (s) => getSectionStatus(userProgress, s._id) === 'completed',
   ).length
   const progressPercent =
     totalSections > 0 ? Math.round((completedSections / totalSections) * 100) : 0
@@ -202,15 +177,9 @@ export default function TopicDetailPage() {
   // pushed the status icon off-screen.
   const cols = 'grid-cols-[24px_1fr_auto] gap-2 sm:grid-cols-[20px_22px_1fr_104px_24px] sm:gap-4'
 
-  const getSectionStatus = (secId: string): Status => {
-    const progress = userProgress.find((p) => p.sectionId === secId)
-    if (!progress) return 'Not Started'
-    return progress.isCompleted ? 'Completed' : 'In Progress'
-  }
-
   const handleContinueTopic = () => {
     const nextIncomplete =
-      sections.find((s) => getSectionStatus(s._id) !== 'Completed') || sections[0]
+      sections.find((s) => getSectionStatus(userProgress, s._id) !== 'completed') || sections[0]
     if (nextIncomplete) {
       const q = roadmapId ? `?roadmapId=${roadmapId}` : ''
       navigate(`/my-learning/topics/${id}/sections/${nextIncomplete._id}${q}`)
@@ -267,7 +236,16 @@ export default function TopicDetailPage() {
               </div>
             </div>
 
-            <p className="text-text-secondary max-w-3xl leading-relaxed">{topicDescription}</p>
+            {/* Why learn this + what you'll learn (J) — scrolls in its own frame with a
+                sticky CTA footer at lg:, normal page scroll on mobile. */}
+            <TopicWhyPanel
+              whyLearn={data.whyLearn || ''}
+              description={data.description || ''}
+              sections={sections}
+              completedSections={completedSections}
+              totalSections={totalSections}
+              onContinue={handleContinueTopic}
+            />
 
             {/* Resources */}
             {resources.length > 0 && (
@@ -321,7 +299,7 @@ export default function TopicDetailPage() {
                 <span className="hidden sm:block" />
               </div>
               {sections.map((sec, idx) => {
-                const status = getSectionStatus(sec._id)
+                const status = getSectionStatus(userProgress, sec._id)
                 return (
                   <div
                     key={sec._id}
@@ -347,9 +325,9 @@ export default function TopicDetailPage() {
                           : 'Understand the core concepts of this section.'}
                       </p>
                     </div>
-                    <StatusBadge status={status} />
+                    <SectionStatusBadge status={status} />
                     <span className="hidden sm:block">
-                      <StatusIcon status={status} />
+                      <SectionStatusIcon status={status} />
                     </span>
                   </div>
                 )
@@ -386,13 +364,6 @@ export default function TopicDetailPage() {
                 <StatRow icon={RiListUnordered} label="Sections" value={totalSections} />
                 <StatRow icon={RiFileList2Line} label="Resources" value={resources.length} />
               </div>
-
-              <button
-                onClick={handleContinueTopic}
-                className="focus-visible:ring-brand-purple-300 mt-5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#0B1221] py-3.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-slate-800 focus-visible:ring-2 focus-visible:outline-none"
-              >
-                Continue topic <RiArrowRightLine className="h-4 w-4" />
-              </button>
             </Card>
           </aside>
         </div>

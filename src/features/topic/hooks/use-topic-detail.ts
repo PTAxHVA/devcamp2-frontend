@@ -34,6 +34,10 @@ export interface BETopicDetail {
   _id: string
   name: string
   description: string
+  /** Curated "why learn this" line (BE PR #62). Empty string `''` when the
+   * topic hasn't been reseeded yet — callers must degrade, never assume it's
+   * populated. */
+  whyLearn: string
   estimatedHours: number
   resources: unknown[]
   orderIndex: number
