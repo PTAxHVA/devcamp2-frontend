@@ -137,9 +137,14 @@ const stickersConfig = [
 
 export const FloatingStickers = ({ reducedMotion }: { reducedMotion: boolean }) => {
   return (
-    // QUAN TRỌNG: Thêm "hidden md:block" vào thẻ div tổng.
-    // Việc này sẽ tàng hình toàn bộ dải sticker trên điện thoại và chỉ hiện ra từ tablet trở lên.
-    <div className="pointer-events-none absolute inset-0 z-40 hidden overflow-hidden md:block">
+    // Decorative tech-logo layer: purely visual, so it is aria-hidden and pointer-events-none
+    // (never intercepts clicks). Hidden below md to avoid clutter/overflow on phones. Sits at
+    // z-40 — above page content but below the sticky navbar (z-50). Each icon's float animation
+    // is dropped under reduced motion.
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-0 z-40 hidden overflow-hidden md:block"
+    >
       {stickersConfig.map(({ id, Icon, top, left, right, style, anim }) => (
         <div
           key={id}

@@ -52,6 +52,7 @@ const useCountUp = (target: number, active: boolean, reduced: boolean) => {
 
   return value
 }
+
 const StatCard = ({
   icon: Icon,
   prefix,
@@ -66,7 +67,7 @@ const StatCard = ({
 }) => {
   const shown = useCountUp(value, active, reduced)
   return (
-    <div className="border-border-soft bg-bg-soft hover:border-brand-purple-500/20 flex flex-col items-center gap-2 rounded-2xl border px-3 py-5 text-center shadow-md transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-2 hover:shadow-[0_16px_34px_-24px_rgba(6,26,53,0.35)] sm:px-4">
+    <div className="border-border-soft bg-bg-soft hover:border-brand-purple-300/50 flex flex-col items-center gap-2 rounded-2xl border px-3 py-5 text-center transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_34px_-24px_rgba(6,26,53,0.35)] sm:px-4">
       <span
         aria-hidden
         className="bg-bg-lavender text-brand-purple-600 grid h-11 w-11 place-items-center rounded-xl"
@@ -109,7 +110,7 @@ export const StatsSection = () => {
   }, [])
 
   return (
-    <section className="bg-white">
+    <section className="border-border-soft border-y bg-white">
       <div
         ref={ref}
         className={cn(

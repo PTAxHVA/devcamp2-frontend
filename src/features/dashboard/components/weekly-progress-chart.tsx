@@ -80,7 +80,7 @@ export function WeeklyProgressChart({
 
       {isEmptyWeek && (
         <p className="bg-bg-lavender text-brand-purple-700 mt-3 rounded-lg border border-[#ece5ff] px-3 py-2.5 text-xs">
-          No sections completed this week yet — finish a quiz to log your first bar.
+          No sections completed this week yet — finish a quiz to log your first bar. 💪
         </p>
       )}
     </div>

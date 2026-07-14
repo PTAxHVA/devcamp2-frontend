@@ -1,6 +1,4 @@
 @import 'tailwindcss';
-@tailwind components;
-@tailwind utilities;
 /* Light-only product: ship just the light daisyUI theme so a dark-mode OS/browser
    can never flip daisyUI tokens (e.g. bg-base-100) to a dark variant. */
 @plugin 'daisyui/index.js' {
@@ -126,26 +124,26 @@
   }
 }
 
-@layer utilities {
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0) rotate(0deg);
-    }
-    50% {
-      transform: translateY(-20px) rotate(10deg);
-    }
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
   }
+  50% {
+    transform: translateY(-20px) rotate(10deg);
+  }
+}
 
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
-  }
-  .animate-float-delayed {
-    animation: float 7s ease-in-out infinite 2s;
-  }
-  .animate-float-slow {
-    animation: float 9s ease-in-out infinite 1s;
-  }
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 7s ease-in-out infinite 2s;
+}
+
+.animate-float-slow {
+  animation: float 9s ease-in-out infinite 1s;
 }
 
 /* Hard on/off blink for the typewriter caret (step-end = no fade, terminal feel). */

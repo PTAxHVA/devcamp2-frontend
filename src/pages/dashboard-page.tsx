@@ -104,7 +104,7 @@ const DashboardPage = () => {
               <div className="flex items-center justify-between">
                 <h2 className="text-text-primary text-xl font-bold">Learning Streak</h2>
                 <div className="flex items-center gap-2 text-sm font-bold">
-                  This week <span className="text-warning text-lg"></span>
+                  This week <span className="text-warning text-lg">🔥</span>
                 </div>
               </div>
               <StreakCalendar streak={data.streak} />
