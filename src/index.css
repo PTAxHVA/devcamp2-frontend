@@ -228,6 +228,42 @@
   animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
 
+/* Route-change fade for app/auth pages: replayed on navigation by re-adding the class
+   (use-route-fade), NOT by remounting the routed page — so scroll position, component
+   state and in-flight queries survive. Opacity-only (compositor-friendly, no CLS on
+   tables/charts). Reduced-motion is neutralized by the global reset below. */
+.animate-route-fade {
+  animation: fade-in 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Landing signature-features marquee: a duplicated track drifts left by 50%, which
+   lands exactly on the copy because every card owns its trailing gap (mr-*), so the
+   loop is seamless. Pauses on hover/focus; under reduced-motion the section renders a
+   static grid instead (signature-features-section.tsx) so every card stays reachable. */
+@keyframes marquee-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee-drift 30s linear infinite;
+}
+
+.animate-marquee:hover,
+.animate-marquee:focus-within {
+  animation-play-state: paused;
+}
+
+/* Soft fade at the strip edges so cards enter/exit the marquee gracefully. */
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
 /* Global reduced-motion safety net: neutralize all animations/transitions (incl.
    hover lifts and scroll-behavior) for users who ask for reduced motion. The
    landing already JS-gates its major motion; this catches any CSS-only transitions
