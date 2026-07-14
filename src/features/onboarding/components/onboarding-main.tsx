@@ -15,9 +15,9 @@ import {
 import { StepGate } from './steps/gate'
 import {
   steps,
-  LEARNING_PATH_KEYS,
+  getLearningPathKeys,
   getPreferenceQuestions,
-  isFrontendFocusedRole,
+  roleHasLearningPath,
 } from '../data/onboarding-data'
 import { useWizardStore } from '../onboarding-store'
 import { useCompleteOnboarding } from '../hooks/use-complete-onboarding'
@@ -46,13 +46,13 @@ const OnboardingMain = () => {
         return !!answers?.level
       case 5:
         if (subStep === 1) {
-          return getPreferenceQuestions(role).every((q) => {
+          return getPreferenceQuestions().every((q) => {
             if (q.required === false) return true
             const val = answers?.[q.id]
             return typeof val === 'string' ? val.trim().length > 0 : !!val
           })
         }
-        return LEARNING_PATH_KEYS.every((key) => !!answers?.[key])
+        return getLearningPathKeys(role).every((key) => !!answers?.[key])
       default:
         return true
     }
@@ -67,9 +67,10 @@ const OnboardingMain = () => {
 
     if (currentStep === 5 && subStep === 1) {
       setDirection('next')
-      // Frontend/Fullstack get the frontend learning-path substep; other roles skip
-      // straight to the generating step (H11 — no frontend questions for backend).
-      if (isFrontendFocusedRole(role)) {
+      // Every role with a learning-path step advances to it: frontend/fullstack pick
+      // framework + styling + project, backend picks a database. An unknown role
+      // skips straight to the generating step.
+      if (roleHasLearningPath(role)) {
         setSubStep(2)
       } else {
         nextStep()
@@ -89,11 +90,11 @@ const OnboardingMain = () => {
   const handleBack = () => {
     setErrorStepKey(null)
     if (currentStep === 7) {
-      // Gate: back to the last user-input step, before AI generation. Frontend roles
-      // land on the learning-path substep; others on the preferences substep (H11).
+      // Gate: back to the last user-input step, before AI generation. Roles with a
+      // learning-path step land on that substep; an unknown role on preferences.
       setDirection('back')
       goToStep(5)
-      setSubStep(isFrontendFocusedRole(role) ? 2 : 1)
+      setSubStep(roleHasLearningPath(role) ? 2 : 1)
     } else if (currentStep === 5 && subStep === 2) {
       setDirection('back')
       setSubStep(1)
@@ -101,7 +102,7 @@ const OnboardingMain = () => {
       setDirection('back')
       prevStep()
       if (currentStep - 1 === 5) {
-        setSubStep(isFrontendFocusedRole(role) ? 2 : 1)
+        setSubStep(roleHasLearningPath(role) ? 2 : 1)
       }
     }
   }

@@ -22,7 +22,7 @@ export function resolveBranchSelectionFromAnswers(
 ): string[] {
   const { ungrouped, groups } = groupBranches(branches)
 
-  const choices = [answers.learningFramework, answers.framework, answers.styling, answers.database]
+  const choices = [answers.learningFramework, answers.styling, answers.database]
     .filter((v): v is string => typeof v === 'string' && v.trim().length > 0)
     .map((v) => v.toLowerCase().trim())
 

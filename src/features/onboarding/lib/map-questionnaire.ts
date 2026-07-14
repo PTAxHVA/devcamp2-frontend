@@ -80,9 +80,9 @@ export function mapAnswersToQuestionnaire(
     currentComfortLevel: str(answers.level),
     timePerWeekHours: weeklyTime ? WEEKLY_TIME_HOURS[weeklyTime] : undefined,
     learningStyle: str(answers.learningStyle),
-    // The learning-path step (learningFramework) is the more specific choice;
-    // fall back to the preferences-step framework question.
-    frameworkPreference: preference(answers.learningFramework) ?? preference(answers.framework),
+    // Framework is chosen on the learning-path step (a card), not the preferences
+    // table — the duplicate "Framework preference" dropdown was removed.
+    frameworkPreference: preference(answers.learningFramework),
     projectType: str(answers.projectType),
     cliComfort: str(answers.cliComfort),
     timelineGoal: str(answers.targetTimeline),

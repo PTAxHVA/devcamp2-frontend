@@ -3,7 +3,6 @@ import {
   RiBriefcaseLine,
   RiBookOpenLine,
   RiCloudLine,
-  RiStackLine,
   RiGlobalLine,
   RiTerminalBoxLine,
   RiQuestionnaireLine,
@@ -22,7 +21,6 @@ export const steps = ['Welcome', 'Role', 'Goal', 'Level', 'Preferences', 'Roadma
 // check passes) but matches no branch name, so resolveBranchSelectionFromAnswers
 // falls back to that group's default branch — no backend/resolver change needed.
 export const RECOMMEND_CHOICE_VALUE = 'auto'
-export const RECOMMEND_CHOICE_LABEL = 'Not sure yet — recommend one'
 
 export const roles = [
   {
@@ -159,34 +157,6 @@ export const PREFERENCE_QUESTIONS = [
     ],
   },
   {
-    id: 'framework',
-    icon: <RiStackLine className="h-6 w-6" />,
-    label: 'Framework preference',
-    desc: 'Which frontend framework would you like to focus on?',
-    type: 'select',
-    placeholder: 'Select framework...',
-    options: [
-      { value: 'react', label: 'React' },
-      { value: 'vue', label: 'Vue' },
-      { value: 'angular', label: 'Angular' },
-      { value: RECOMMEND_CHOICE_VALUE, label: RECOMMEND_CHOICE_LABEL },
-    ],
-  },
-  {
-    id: 'database',
-    icon: <LuDatabase className="h-6 w-6" />,
-    label: 'Database preference',
-    desc: 'Which database would you like to focus on?',
-    type: 'select',
-    placeholder: 'Select database...',
-    options: [
-      { value: 'mongodb', label: 'MongoDB' },
-      { value: 'postgresql', label: 'PostgreSQL' },
-      { value: 'mysql', label: 'MySQL (with Prisma)' },
-      { value: RECOMMEND_CHOICE_VALUE, label: RECOMMEND_CHOICE_LABEL },
-    ],
-  },
-  {
     id: 'os',
     icon: <RiGlobalLine className="h-6 w-6" />,
     label: 'Operating system',
@@ -223,20 +193,25 @@ export const PREFERENCE_QUESTIONS = [
   },
 ]
 
-export const LEARNING_PATH_KEYS = ['learningFramework', 'styling', 'projectDirection'] as const
-
-// Frontend + Fullstack get the frontend-specific questions (Fullstack starts on the
-// Frontend roadmap). Backend does not — so a Backend learner is never asked which
-// frontend framework/styling/path to use (H11).
+// Frontend + Fullstack are frontend-focused (Fullstack starts on the Frontend
+// roadmap); Backend is not.
 export const isFrontendFocusedRole = (role: string | undefined | null): boolean =>
   role === 'frontend' || role === 'fullstack'
 
-// Preference questions for a given role. The framework question is frontend-only and
-// the database question is backend-only, so each learner is asked exactly the fork
-// choice that applies to their roadmap (its answer selects the enrolled branch).
-export const getPreferenceQuestions = (role: string | undefined | null) =>
-  PREFERENCE_QUESTIONS.filter((q) => {
-    if (q.id === 'framework') return isFrontendFocusedRole(role)
-    if (q.id === 'database') return role === 'backend'
-    return true
-  })
+// Every current role has a "Choose your learning path" card step: frontend/fullstack
+// pick a framework + styling + project direction, backend picks a database. Unknown
+// roles skip straight to generating (the pre-existing behavior for backend).
+export const roleHasLearningPath = (role: string | undefined | null): boolean =>
+  isFrontendFocusedRole(role) || role === 'backend'
+
+const FRONTEND_LEARNING_PATH_KEYS = ['learningFramework', 'styling', 'projectDirection'] as const
+const BACKEND_LEARNING_PATH_KEYS = ['database'] as const
+
+// The learning-path answers a role must provide before leaving the path step — the
+// backend picks a database, everyone else picks framework + styling + project.
+export const getLearningPathKeys = (role: string | undefined | null): readonly string[] =>
+  role === 'backend' ? BACKEND_LEARNING_PATH_KEYS : FRONTEND_LEARNING_PATH_KEYS
+
+// Preferences are the same for every role now that the fork choices (framework for
+// frontend, database for backend) are picked as cards on the learning-path step.
+export const getPreferenceQuestions = () => PREFERENCE_QUESTIONS

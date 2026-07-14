@@ -50,7 +50,6 @@ describe('mapAnswersToQuestionnaire', () => {
     level: 'beginner',
     weeklyTime: '5-10',
     learningStyle: 'video',
-    framework: 'react',
     projectType: 'web',
     cliComfort: 'beginner',
     targetTimeline: '3-6',
@@ -78,9 +77,17 @@ describe('mapAnswersToQuestionnaire', () => {
     expect(payload.selectedBranchIds).toBeUndefined()
   })
 
-  it('prefers learningFramework over framework for frameworkPreference', () => {
-    const payload = mapAnswersToQuestionnaire({ ...base, learningFramework: 'vue' }, [])
-    expect(payload.frameworkPreference).toBe('vue')
+  it('derives frameworkPreference only from the learning-path framework card', () => {
+    // The learning-path card stores learningFramework.
+    expect(
+      mapAnswersToQuestionnaire({ ...base, learningFramework: 'vue' }, []).frameworkPreference,
+    ).toBe('vue')
+    // The old "Framework preference" dropdown (answers.framework) is gone — a lone
+    // framework value must not leak into the payload.
+    expect(
+      mapAnswersToQuestionnaire({ role: 'frontend', goal: 'job', framework: 'react' }, [])
+        .frameworkPreference,
+    ).toBeUndefined()
   })
 
   it('never sends the "auto" recommend sentinel to the saved profile', () => {

@@ -4,7 +4,7 @@ import { useWizardStore } from '../../onboarding-store'
 
 export const StepPreferences = () => {
   const { answers, setAnswer } = useWizardStore()
-  const questions = getPreferenceQuestions(answers?.role as string | undefined)
+  const questions = getPreferenceQuestions()
   return (
     <div className="w-full">
       <div className="mb-10 text-left">
