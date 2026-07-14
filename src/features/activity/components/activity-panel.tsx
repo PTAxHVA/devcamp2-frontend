@@ -5,6 +5,10 @@ import { useActivity } from '../hooks/use-activity'
 // so it stays out of the initial bundle (dashboard + profile share this panel).
 const ActivityChart = lazy(() => import('./activity-chart'))
 
+// Mirrors --color-brand-purple-500 in src/index.css `@theme` (recharts fills
+// can't read Tailwind classes, so the chart duplicates this same hex).
+const BAR_SWATCH = '#7c3aed'
+
 function ChartSkeleton() {
   return (
     <div className="flex h-[260px] items-center justify-center">
@@ -15,15 +19,9 @@ function ChartSkeleton() {
 
 function Legend() {
   return (
-    <div className="text-text-secondary mb-2 flex flex-wrap gap-4 text-xs">
-      <span className="inline-flex items-center gap-1.5">
-        <span className="h-2.5 w-2.5 rounded-sm" style={{ background: '#8b5cf6', opacity: 0.5 }} />
-        Sections / day
-      </span>
-      <span className="inline-flex items-center gap-1.5">
-        <span className="h-0.5 w-4 rounded" style={{ background: '#003b71' }} />
-        <span className="text-text-primary font-semibold">Total</span> (cumulative)
-      </span>
+    <div className="text-text-secondary mb-2 flex items-center gap-1.5 text-xs">
+      <span className="h-2.5 w-2.5 rounded-sm" style={{ background: BAR_SWATCH }} />
+      Sections completed per day
     </div>
   )
 }
