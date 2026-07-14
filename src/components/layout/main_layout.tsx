@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Outlet } from 'react-router'
 import { Sidebar, Navbar } from '@/components/shared/'
 import { useIsMobile } from '@/hooks/use-is-mobile'
+import { useRouteFade } from '@/hooks/use-route-fade'
 import { SidebarContext } from './sidebar-context'
 
 const SIDEBAR_COLLAPSED_KEY = 'vora:sidebar-collapsed'
@@ -12,6 +13,7 @@ export const MainLayout = () => {
     () => localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1',
   )
   const isMobile = useIsMobile()
+  const mainRef = useRouteFade<HTMLElement>()
   const effectiveCollapsed = isCollapsed && !isMobile
 
   const setIsCollapsed = (collapsed: boolean) => {
@@ -33,7 +35,7 @@ export const MainLayout = () => {
         )}
         <div className="relative flex flex-1 flex-col overflow-hidden">
           <Navbar onMenuClick={() => setMobileOpen(true)} />
-          <main className="flex-1 overflow-x-hidden overflow-y-auto">
+          <main ref={mainRef} className="flex-1 overflow-x-hidden overflow-y-auto">
             <Outlet />
           </main>
         </div>
