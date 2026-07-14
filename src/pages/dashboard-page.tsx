@@ -83,13 +83,18 @@ const DashboardPage = () => {
           </div>
 
           {/* CỘT PHẢI (Chiếm 5/12 chiều rộng) */}
-          <div className="flex flex-col gap-6 xl:col-span-5">
-            <StatsGrid
-              roadmapProgress={data.stats.roadmapProgress}
-              completedTopics={data.stats.completedTopics}
-              daysStreak={data.streak.currentStreak}
-              quizAvg={data.stats.quizAvg}
-            />
+          <div className="flex flex-col gap-8 xl:col-span-5">
+            {/* Heading matches the left column's first block so both columns start
+                at the same top edge (was un-headed, sitting ~28px higher). */}
+            <div className="animate-fade-in-up flex flex-col gap-3 [animation-delay:80ms]">
+              <h2 className="text-text-primary text-xl font-bold">Overview</h2>
+              <StatsGrid
+                roadmapProgress={data.stats.roadmapProgress}
+                completedTopics={data.stats.completedTopics}
+                daysStreak={data.streak.currentStreak}
+                quizAvg={data.stats.quizAvg}
+              />
+            </div>
 
             {/* Always shown now (was hidden on an empty/streak-lost week). An empty
                 week draws the axis + a hint; "View full" opens the 30-day chart. */}
