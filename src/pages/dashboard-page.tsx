@@ -30,11 +30,11 @@ const DashboardPage = () => {
   if (!data) return null
 
   return (
-    <div className="fade-in animate-in mx-auto h-full w-full max-w-[1400px] p-6 duration-500 lg:p-8">
+    <div className="mx-auto min-h-full w-full max-w-[1400px] p-6 pb-12 lg:p-8 lg:pb-16">
       {/* 1. Header — the personal "Welcome back, name" greeting lives in the top
           bar (nav-bar); repeating it here stacked the same message twice within
           ~100px (BN2a). */}
-      <div className="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+      <div className="animate-fade-in-up mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <div>
           <h1 className="text-text-primary text-3xl font-extrabold tracking-tight">
             Your learning dashboard
@@ -59,13 +59,13 @@ const DashboardPage = () => {
           {/* CỘT TRÁI (Chiếm 7/12 chiều rộng) */}
           <div className="flex flex-col gap-8 xl:col-span-7">
             {data.continueLearning && (
-              <div className="flex flex-col gap-3">
+              <div className="animate-fade-in-up flex flex-col gap-3 [animation-delay:80ms]">
                 <h2 className="text-text-primary text-xl font-bold">Continue Learning</h2>
                 <ContinueLearningCard continueLearning={data.continueLearning} />
               </div>
             )}
 
-            <div className="flex flex-col gap-3">
+            <div className="animate-fade-in-up flex flex-col gap-3 [animation-delay:160ms]">
               <div className="flex items-end justify-between">
                 <h2 className="text-text-primary text-xl font-bold">My Roadmaps</h2>
                 <Link
@@ -93,14 +93,14 @@ const DashboardPage = () => {
 
             {/* Always shown now (was hidden on an empty/streak-lost week). An empty
                 week draws the axis + a hint; "View full" opens the 30-day chart. */}
-            <div className="flex flex-col gap-3">
+            <div className="animate-fade-in-up flex flex-col gap-3 [animation-delay:200ms]">
               <WeeklyProgressChart
                 counts={data.weeklyProgressCounts ?? [0, 0, 0, 0, 0, 0, 0]}
                 onViewFull={() => setActivityOpen(true)}
               />
             </div>
 
-            <div className="flex flex-col gap-3">
+            <div className="animate-fade-in-up flex flex-col gap-3 [animation-delay:280ms]">
               <div className="flex items-center justify-between">
                 <h2 className="text-text-primary text-xl font-bold">Learning Streak</h2>
                 <div className="flex items-center gap-2 text-sm font-bold">

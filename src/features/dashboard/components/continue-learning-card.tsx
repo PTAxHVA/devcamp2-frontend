@@ -27,7 +27,7 @@ export function ContinueLearningCard({
   const total = continueLearning.totalSections || 0
 
   return (
-    <div className="card overflow-hidden rounded-2xl border-none bg-[#F4F0FF] shadow-sm">
+    <div className="card overflow-hidden rounded-2xl border-none bg-[#F4F0FF] shadow-sm transition-shadow duration-300 hover:shadow-md">
       <div className="flex flex-col items-center gap-6 p-6 md:flex-row">
         {/* Vòng tròn Progress */}
         <div className="flex-shrink-0">
@@ -91,14 +91,15 @@ export function ContinueLearningCard({
       {/* Footer chứa Nút bấm */}
       <div className="flex flex-wrap gap-3 bg-[#EBE4FF] px-6 py-4">
         <button
-          className="btn btn-primary focus-visible:ring-brand-purple-300 rounded-lg border-none px-6 shadow-sm transition-colors duration-200 focus-visible:ring-2"
+          className="btn btn-primary focus-visible:ring-brand-purple-300 group rounded-lg border-none px-6 shadow-sm transition-colors duration-200 focus-visible:ring-2"
           onClick={() =>
             navigate(
               `/my-learning/topics/${continueLearning.topicId}/sections/${continueLearning.sectionId}?roadmapId=${continueLearning.userRoadmapId}`,
             )
           }
         >
-          Continue Learning <FiArrowRight className="ml-1 h-4 w-4" />
+          Continue Learning{' '}
+          <FiArrowRight className="ml-1 h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
         </button>
         <button
           className="btn btn-outline border-border-soft text-text-secondary hover:border-border-input hover:bg-bg-section bg-bg-card focus-visible:ring-brand-purple-300 rounded-lg px-5 transition-colors duration-200 focus-visible:ring-2"

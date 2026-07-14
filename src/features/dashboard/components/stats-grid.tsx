@@ -50,13 +50,17 @@ export function StatsGrid({
 
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-      {stats.map((stat) => {
+      {stats.map((stat, i) => {
         const { Icon } = stat
         return (
-          <div key={stat.id} className="card bg-base-100 border-base-200 border shadow-sm">
+          <div
+            key={stat.id}
+            className="card bg-base-100 border-base-200 animate-fade-in-up group hover:border-primary/30 border shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
+            style={{ animationDelay: `${80 + i * 70}ms` }}
+          >
             <div className="card-body items-center p-5 text-center">
               <div
-                className={`mb-2 flex h-12 w-12 items-center justify-center rounded-full ${stat.bgClass}`}
+                className={`mb-2 flex h-12 w-12 items-center justify-center rounded-full transition-transform duration-200 group-hover:scale-110 ${stat.bgClass}`}
               >
                 <Icon className={`h-6 w-6 ${stat.textClass}`} />
               </div>

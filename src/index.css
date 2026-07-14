@@ -161,6 +161,71 @@
   animation: caret-blink 1s step-end infinite;
 }
 
+/* Entrance micro-animations (dashboard & cards). `both` fill keeps delayed items
+   invisible until their animation starts, so staggered sequences don't flash. */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out both;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Chart bars rise from the baseline. */
+@keyframes bar-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.animate-bar-grow {
+  transform-origin: bottom;
+  animation: bar-grow 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Springy pop for small tiles (streak days, stat icons). */
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-pop-in {
+  animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
 /* Global reduced-motion safety net: neutralize all animations/transitions (incl.
    hover lifts and scroll-behavior) for users who ask for reduced motion. The
    landing already JS-gates its major motion; this catches any CSS-only transitions

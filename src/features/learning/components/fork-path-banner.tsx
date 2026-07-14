@@ -30,6 +30,7 @@ export default function ForkPathBanner({
 
   const enrolledTopicIds = [...topics]
     .sort((a, b) => a.orderIndex - b.orderIndex)
+
     .map((t) => t.masterTopicId)
   const fork = deriveForkContext(master?.branches ?? [], enrolledTopicIds)
 

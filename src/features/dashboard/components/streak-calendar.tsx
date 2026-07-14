@@ -50,11 +50,12 @@ export function StreakCalendar({
             <div key={i} className="flex min-w-0 flex-col items-center gap-1">
               <span className="text-base-content/40 text-xs font-medium">{short}</span>
               <div
-                className={`flex aspect-square w-full max-w-[40px] items-center justify-center rounded-lg ${
+                className={`animate-pop-in flex aspect-square w-full max-w-[40px] items-center justify-center rounded-lg transition-transform duration-200 hover:scale-110 ${
                   isActive
                     ? 'bg-primary text-primary-content shadow-md'
                     : 'bg-base-200 text-base-content/40'
                 } ${isToday ? 'ring-primary ring-2 ring-offset-1' : ''}`}
+                style={{ animationDelay: `${300 + i * 50}ms` }}
               >
                 {isActive ? (
                   <FaFire className="h-4 w-4 animate-pulse" />
