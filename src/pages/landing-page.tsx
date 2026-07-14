@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import {
   CtaBand,
   FaqSection,
+  FloatingStickers,
   Footer,
   HeroSection,
   HowItWorksSection,
@@ -44,7 +45,8 @@ const LandingPage = () => {
   }, [])
 
   return (
-    <div className="bg-bg-soft text-text-primary flex min-h-screen flex-col overflow-x-clip">
+    <div className="bg-bg-soft text-text-primary relative flex min-h-screen flex-col overflow-x-clip">
+      <FloatingStickers reducedMotion={reduced} />
       <Navbar />
       <main>
         <HeroSection />
