@@ -267,6 +267,65 @@
   mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
 }
 
+/* Auth roadmap preview (login/signup): soft ambient glow pulsing behind the mock UI
+   screenshot, since the mock is a flat image and can't be animated internally.
+   Opacity-only (no transform/scale) — animating the size of a large blurred layer
+   forces the browser to re-rasterize the blur every frame, which is what caused the
+   visible stutter; a plain alpha fade lets the compositor cross-fade a cached bitmap. */
+@keyframes glow-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.65;
+  }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 4.5s ease-in-out infinite;
+}
+
+/* Gentle vertical drift for the roadmap preview image — smaller amplitude than
+   .animate-float so it stays put on a bordered card instead of drifting off it. */
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-bob {
+  animation: bob 5s ease-in-out infinite;
+}
+
+/* Diagonal light glint that sweeps across the roadmap preview, then pauses before
+   looping — a single translateX+skew keyframe so it works over a plain <img>. */
+@keyframes shimmer-sweep {
+  0% {
+    transform: translateX(-130%) skewX(-12deg);
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.55;
+  }
+  24% {
+    opacity: 0.55;
+  }
+  38%,
+  100% {
+    transform: translateX(150%) skewX(-12deg);
+    opacity: 0;
+  }
+}
+
+.animate-shimmer-sweep {
+  animation: shimmer-sweep 5s ease-in-out infinite;
+}
+
 /* Global reduced-motion safety net: neutralize all animations/transitions (incl.
    hover lifts and scroll-behavior) for users who ask for reduced motion. The
    landing already JS-gates its major motion; this catches any CSS-only transitions

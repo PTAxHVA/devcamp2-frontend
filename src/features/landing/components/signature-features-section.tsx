@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import type { IconType } from 'react-icons'
 import { RiIdCardLine, RiLightbulbLine, RiPauseLine, RiPlayLine, RiTimeLine } from 'react-icons/ri'
 import { cn } from '@/lib/utils'
@@ -66,6 +66,67 @@ export const SignatureFeaturesSection = () => {
   const reduced = usePrefersReducedMotion()
   const [paused, setPaused] = useState(false)
 
+  // Click-and-drag scroll: dragging hands control to a manual translateX (written
+  // straight to the DOM via ref, not React state, so a fast drag never re-renders).
+  // The two rendered FEATURES sets are identical, so wrapping the offset by one set's
+  // width keeps the drag feeling infinite in both directions, same trick the CSS loop
+  // uses at -50%. Releasing the drag leaves it paused; the Play button hands control
+  // back to the CSS animation (restarting the drift from 0 — a deliberate, acceptable
+  // jump rather than trying to splice a manual offset into a keyframe animation).
+  const trackRef = useRef<HTMLDivElement>(null)
+  const offsetRef = useRef(0)
+  const dragRef = useRef<{ startX: number; startOffset: number; setWidth: number } | null>(null)
+  const [manualDrag, setManualDrag] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+
+  const wrapOffset = (value: number, setWidth: number) => {
+    if (setWidth <= 0) return value
+    const wrapped = value % setWidth
+    return wrapped > 0 ? wrapped - setWidth : wrapped
+  }
+
+  const handlePointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    const track = trackRef.current
+    if (!track || e.button === 2) return
+    const setWidth = track.scrollWidth / 2
+    // Grab wherever the CSS drift actually is right now (not offsetRef, which only
+    // tracks manual drags) so taking over from a running loop doesn't snap to 0 first.
+    const computed = getComputedStyle(track).transform
+    const currentX = computed && computed !== 'none' ? new DOMMatrixReadOnly(computed).m41 : 0
+    offsetRef.current = currentX
+    track.style.transform = `translateX(${currentX}px)`
+    dragRef.current = { startX: e.clientX, startOffset: currentX, setWidth }
+    setIsDragging(true)
+    setManualDrag(true)
+    setPaused(true)
+    track.setPointerCapture(e.pointerId)
+  }
+
+  const handlePointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = dragRef.current
+    const track = trackRef.current
+    if (!drag || !track) return
+    const next = wrapOffset(drag.startOffset + (e.clientX - drag.startX), drag.setWidth)
+    offsetRef.current = next
+    track.style.transform = `translateX(${next}px)`
+  }
+
+  const endDrag = () => {
+    dragRef.current = null
+    setIsDragging(false)
+  }
+
+  const togglePlay = () => {
+    if (paused) {
+      setManualDrag(false)
+      offsetRef.current = 0
+      if (trackRef.current) trackRef.current.style.transform = ''
+      setPaused(false)
+    } else {
+      setPaused(true)
+    }
+  }
+
   return (
     <section id="features" className="scroll-mt-[84px] py-18 lg:py-24">
       <div className={WRAP}>
@@ -89,8 +150,22 @@ export const SignatureFeaturesSection = () => {
                 Two identical sets: the first is the accessible content, the second is
                 aria-hidden and exists only so the -50% loop lands exactly on the copy.
                 Each card owns its trailing gap (mr-5) so the wrap-around has no jump.
+                The same duplication lets a manual drag wrap seamlessly (see wrapOffset).
               */}
-              <div className={cn('animate-marquee flex w-max', paused && 'is-paused')}>
+              <div
+                ref={trackRef}
+                className={cn(
+                  'flex w-max touch-pan-y select-none [-webkit-user-drag:none]',
+                  !manualDrag && 'animate-marquee',
+                  paused && !manualDrag && 'is-paused',
+                  isDragging ? 'cursor-grabbing' : 'cursor-grab',
+                )}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={endDrag}
+                onPointerCancel={endDrag}
+                onDragStart={(e) => e.preventDefault()}
+              >
                 {[...FEATURES, ...FEATURES].map((feature, index) => (
                   <div
                     key={`${feature.title}-${index}`}
@@ -105,7 +180,7 @@ export const SignatureFeaturesSection = () => {
             <div className="mt-4 flex justify-center">
               <button
                 type="button"
-                onClick={() => setPaused((prev) => !prev)}
+                onClick={togglePlay}
                 aria-pressed={paused}
                 aria-label={
                   paused
