@@ -44,6 +44,9 @@ export function AppRoutes() {
       <Route path="/demo-roadmap" element={<DemoRoadmapPage />} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
+      {/* Help & Support — self-help only (FAQ, no contact form), so it's public:
+          reachable from the landing footer without an account. */}
+      <Route path="/support" element={<SupportPage />} />
       {/* Verified Skill Passport — PUBLIC on purpose (shared link/QR), no auth guard */}
       <Route path="/p/:shareToken" element={<PublicPassportPage />} />
 
@@ -94,7 +97,6 @@ export function AppRoutes() {
           <Route path="/settings" element={<SettingsPage />} />
 
           <Route path="/goals" element={<GapAnalyzerPage />} />
-          <Route path="/support" element={<SupportPage />} />
           <Route path="/dashboard/add-role" element={<AddAnotherRolePage />} />
         </Route>
       </Route>
