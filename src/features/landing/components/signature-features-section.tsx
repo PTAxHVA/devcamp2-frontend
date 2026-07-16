@@ -76,24 +76,37 @@ export const SignatureFeaturesSection = () => {
   // jump rather than trying to splice a manual offset into a keyframe animation).
   const trackRef = useRef<HTMLDivElement>(null)
   const offsetRef = useRef(0)
-  const dragRef = useRef<{ startX: number; startOffset: number; setWidth: number } | null>(null)
+  // `committed` only flips true once the pointer has moved past DRAG_THRESHOLD — until
+  // then this could still be a plain click/tap or the start of a vertical scroll (the
+  // track is touch-pan-y), so we hold off entering manual mode. `wasPaused` remembers
+  // whether the Play/Pause button had already paused it before this pointerdown, so a
+  // non-drag release restores that instead of always resuming.
+  const dragRef = useRef<{
+    startX: number
+    startOffset: number
+    setWidth: number
+    committed: boolean
+    wasPaused: boolean
+  } | null>(null)
   const [manualDrag, setManualDrag] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
+
+  // Horizontal px of pointer movement required before a pointerdown commits to a
+  // manual drag — below this it's treated as a tap or a vertical scroll.
+  const DRAG_THRESHOLD = 4
 
   const handlePointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     const track = trackRef.current
     if (!track || e.button === 2) return
-    const setWidth = track.scrollWidth / 2
-    // Grab wherever the CSS drift actually is right now (not offsetRef, which only
-    // tracks manual drags) so taking over from a running loop doesn't snap to 0 first.
-    const computed = getComputedStyle(track).transform
-    const currentX = computed && computed !== 'none' ? new DOMMatrixReadOnly(computed).m41 : 0
-    offsetRef.current = currentX
-    track.style.transform = `translateX(${currentX}px)`
-    dragRef.current = { startX: e.clientX, startOffset: currentX, setWidth }
-    setIsDragging(true)
-    setManualDrag(true)
-    setPaused(true)
+    // Position/offset get filled in on commit (see handlePointerMove) — reading them
+    // now would go stale if the CSS loop keeps drifting during the pre-threshold hold.
+    dragRef.current = {
+      startX: e.clientX,
+      startOffset: 0,
+      setWidth: track.scrollWidth / 2,
+      committed: false,
+      wasPaused: paused,
+    }
     track.setPointerCapture(e.pointerId)
   }
 
@@ -101,14 +114,35 @@ export const SignatureFeaturesSection = () => {
     const drag = dragRef.current
     const track = trackRef.current
     if (!drag || !track) return
+    if (!drag.committed) {
+      if (Math.abs(e.clientX - drag.startX) < DRAG_THRESHOLD) return
+      // Rebase to wherever the CSS drift actually is right NOW (not when the pointer
+      // first went down) so taking over from a running loop doesn't snap backwards.
+      const computed = getComputedStyle(track).transform
+      const currentX = computed && computed !== 'none' ? new DOMMatrixReadOnly(computed).m41 : 0
+      drag.startOffset = currentX
+      drag.startX = e.clientX
+      drag.committed = true
+      setIsDragging(true)
+      setManualDrag(true)
+      setPaused(true)
+    }
     const next = wrapOffset(drag.startOffset + (e.clientX - drag.startX), drag.setWidth)
     offsetRef.current = next
     track.style.transform = `translateX(${next}px)`
   }
 
   const endDrag = () => {
+    const drag = dragRef.current
     dragRef.current = null
     setIsDragging(false)
+    // A release/cancel before the threshold was crossed was a tap or a vertical
+    // scroll starting on the track, not a drag — hand control straight back instead
+    // of leaving the marquee frozen in manual/paused mode (only Play could recover it).
+    if (drag && !drag.committed) {
+      setManualDrag(false)
+      setPaused(drag.wasPaused)
+    }
   }
 
   const togglePlay = () => {
