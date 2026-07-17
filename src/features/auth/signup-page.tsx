@@ -263,10 +263,13 @@ export default function SignupPage() {
               className="animate-glow-pulse pointer-events-none absolute -inset-8 -z-10 rounded-[28px] bg-[radial-gradient(closest-side,rgba(124,58,237,0.4),transparent)] blur-2xl will-change-[opacity]"
             />
             <div className="animate-bob relative overflow-hidden rounded-xl will-change-transform">
+              {/* Visible immediately on desktop (md+), so it loads eagerly; the intrinsic
+                  768x530 reserves its box up front instead of shifting the panel on arrival. */}
               <img
                 src={RoadmapSignup}
                 alt="Dashboard preview"
-                loading="lazy"
+                width={768}
+                height={530}
                 decoding="async"
                 className="border-border-soft w-full rounded-xl border object-cover shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-lg"
               />

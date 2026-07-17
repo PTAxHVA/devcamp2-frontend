@@ -81,7 +81,10 @@ export const SignatureFeaturesSection = () => {
   // track is touch-pan-y), so we hold off entering manual mode. `wasPaused` remembers
   // whether the Play/Pause button had already paused it before this pointerdown, so a
   // non-drag release restores that instead of always resuming.
+  // `pointerId` pins the drag to the pointer that started it, so a second finger's
+  // move/up can't re-seat the offset math or end someone else's drag.
   const dragRef = useRef<{
+    pointerId: number
     startX: number
     startOffset: number
     setWidth: number
@@ -97,10 +100,12 @@ export const SignatureFeaturesSection = () => {
 
   const handlePointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     const track = trackRef.current
-    if (!track || e.button === 2) return
+    // Ignore a right-click, and any second pointer while one is already down.
+    if (!track || e.button === 2 || dragRef.current) return
     // Position/offset get filled in on commit (see handlePointerMove) — reading them
     // now would go stale if the CSS loop keeps drifting during the pre-threshold hold.
     dragRef.current = {
+      pointerId: e.pointerId,
       startX: e.clientX,
       startOffset: 0,
       setWidth: track.scrollWidth / 2,
@@ -113,7 +118,7 @@ export const SignatureFeaturesSection = () => {
   const handlePointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
     const drag = dragRef.current
     const track = trackRef.current
-    if (!drag || !track) return
+    if (!drag || !track || e.pointerId !== drag.pointerId) return
     if (!drag.committed) {
       if (Math.abs(e.clientX - drag.startX) < DRAG_THRESHOLD) return
       // Rebase to wherever the CSS drift actually is right NOW (not when the pointer
@@ -132,14 +137,16 @@ export const SignatureFeaturesSection = () => {
     track.style.transform = `translateX(${next}px)`
   }
 
-  const endDrag = () => {
+  const endDrag = (e: ReactPointerEvent<HTMLDivElement>) => {
     const drag = dragRef.current
+    // Only the pointer that owns the drag may end it.
+    if (!drag || e.pointerId !== drag.pointerId) return
     dragRef.current = null
     setIsDragging(false)
     // A release/cancel before the threshold was crossed was a tap or a vertical
     // scroll starting on the track, not a drag — hand control straight back instead
     // of leaving the marquee frozen in manual/paused mode (only Play could recover it).
-    if (drag && !drag.committed) {
+    if (!drag.committed) {
       setManualDrag(false)
       setPaused(drag.wasPaused)
     }
