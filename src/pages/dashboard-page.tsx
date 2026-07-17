@@ -10,6 +10,7 @@ import { WeeklyProgressChart } from '@/features/dashboard/components/weekly-prog
 import { StreakCalendar } from '@/features/dashboard/components/streak-calendar'
 import { Link } from 'react-router'
 import { FiExternalLink } from 'react-icons/fi'
+import Fire from '@/assets/Fire.gif'
 
 const DashboardPage = () => {
   const { data, isLoading, isError } = useDashboard()
@@ -109,7 +110,18 @@ const DashboardPage = () => {
               <div className="flex items-center justify-between">
                 <h2 className="text-text-primary text-xl font-bold">Learning Streak</h2>
                 <div className="flex items-center gap-2 text-sm font-bold">
-                  This week <span className="text-warning text-lg">🔥</span>
+                  This week
+                  {/* Decorative streak flame — width/height are the gif's intrinsic 108x150
+                      so the reserved box keeps its aspect ratio (h-5 renders ~14px wide). */}
+                  <img
+                    src={Fire}
+                    alt=""
+                    width={108}
+                    height={150}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-5 w-auto"
+                  />
                 </div>
               </div>
               <StreakCalendar streak={data.streak} />

@@ -417,7 +417,7 @@ export default function EditCurrentRoadmapPage() {
   })
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 bg-bg-card flex h-full w-full flex-col p-6 duration-500 ease-out lg:p-8">
+    <div className="animate-in fade-in slide-in-from-bottom-4 bg-bg-card flex min-h-full w-full flex-col p-6 duration-500 ease-out lg:p-8">
       {/* Header */}
       <div className="mb-6">
         <button

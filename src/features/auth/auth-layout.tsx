@@ -14,8 +14,13 @@ export default function AuthLayout() {
         </Link>
       </header>
 
-      {/* Page content */}
-      <div ref={contentRef} className="flex flex-1 items-center justify-center px-4 py-10">
+      {/* Page content — overflow-x-hidden because the login/signup glow effects use a
+          negative inset (see roadmap-login/-signup panels) that extends past this
+          wrapper's edges on narrow viewports. */}
+      <div
+        ref={contentRef}
+        className="flex flex-1 items-center justify-center overflow-x-hidden px-4 py-10"
+      >
         <Outlet />
       </div>
     </div>

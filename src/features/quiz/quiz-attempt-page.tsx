@@ -160,7 +160,7 @@ export function QuizAttemptPage() {
   }
 
   return (
-    <div className="fade-in mx-auto flex h-full max-w-7xl flex-col p-6">
+    <div className="fade-in mx-auto flex min-h-full max-w-7xl flex-col p-6">
       {/* Header */}
       <div className="mb-6 flex items-end justify-between">
         <div>

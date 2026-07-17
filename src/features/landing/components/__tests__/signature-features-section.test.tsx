@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest'
 import { render, fireEvent } from '@testing-library/react'
 
 const reduced = vi.fn(() => false)
@@ -7,6 +7,11 @@ vi.mock('../../lib/use-prefers-reduced-motion', () => ({
 }))
 
 import { SignatureFeaturesSection } from '../signature-features-section'
+
+// jsdom doesn't implement the Pointer Events capture API the drag handlers call.
+beforeAll(() => {
+  Element.prototype.setPointerCapture = vi.fn()
+})
 
 describe('SignatureFeaturesSection', () => {
   beforeEach(() => {
@@ -44,5 +49,57 @@ describe('SignatureFeaturesSection', () => {
 
     fireEvent.click(getByRole('button', { name: /play/i }))
     expect(track.classList.contains('is-paused')).toBe(false)
+  })
+
+  it('a plain click/tap (no movement) does not leave the marquee frozen', () => {
+    reduced.mockReturnValue(false)
+    const { container } = render(<SignatureFeaturesSection />)
+    const track = container.querySelector('.animate-marquee') as HTMLElement
+
+    fireEvent.pointerDown(track, { clientX: 100, pointerId: 1 })
+    fireEvent.pointerUp(track, { clientX: 100, pointerId: 1 })
+
+    expect(track.classList.contains('animate-marquee')).toBe(true)
+    expect(track.classList.contains('is-paused')).toBe(false)
+  })
+
+  it('a pointercancel before the drag threshold (vertical scroll start) does not freeze it', () => {
+    reduced.mockReturnValue(false)
+    const { container } = render(<SignatureFeaturesSection />)
+    const track = container.querySelector('.animate-marquee') as HTMLElement
+
+    fireEvent.pointerDown(track, { clientX: 100, pointerId: 1 })
+    fireEvent.pointerCancel(track, { pointerId: 1 })
+
+    expect(track.classList.contains('animate-marquee')).toBe(true)
+    expect(track.classList.contains('is-paused')).toBe(false)
+  })
+
+  it('a horizontal drag past the threshold commits to manual mode and stays paused after release', () => {
+    reduced.mockReturnValue(false)
+    const { container } = render(<SignatureFeaturesSection />)
+    const track = container.querySelector('.animate-marquee') as HTMLElement
+
+    fireEvent.pointerDown(track, { clientX: 100, pointerId: 1 })
+    fireEvent.pointerMove(track, { clientX: 88, pointerId: 1 }) // 12px, past the threshold
+    // Manual mode engaged — the CSS loop class drops off in favor of the inline transform.
+    expect(track.classList.contains('animate-marquee')).toBe(false)
+
+    fireEvent.pointerUp(track, { clientX: 88, pointerId: 1 })
+    // Releasing a real drag leaves it paused (Play hands control back) — unchanged behavior.
+    expect(track.classList.contains('animate-marquee')).toBe(false)
+  })
+
+  it('does not resume an explicitly paused marquee on a plain tap', () => {
+    reduced.mockReturnValue(false)
+    const { container, getByRole } = render(<SignatureFeaturesSection />)
+    const track = container.querySelector('.animate-marquee') as HTMLElement
+    fireEvent.click(getByRole('button', { name: /pause/i }))
+    expect(track.classList.contains('is-paused')).toBe(true)
+
+    fireEvent.pointerDown(track, { clientX: 50, pointerId: 2 })
+    fireEvent.pointerUp(track, { clientX: 50, pointerId: 2 })
+
+    expect(track.classList.contains('is-paused')).toBe(true)
   })
 })

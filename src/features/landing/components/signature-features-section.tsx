@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import type { IconType } from 'react-icons'
 import { RiIdCardLine, RiLightbulbLine, RiPauseLine, RiPlayLine, RiTimeLine } from 'react-icons/ri'
 import { cn } from '@/lib/utils'
 import { CARD_HOVER, SHADOW_SOFT, WRAP } from '../lib/landing-styles'
+import { wrapOffset } from '../lib/marquee-drag'
 import { usePrefersReducedMotion } from '../lib/use-prefers-reduced-motion'
 import { SectionHead } from './section-head'
 
@@ -66,6 +67,102 @@ export const SignatureFeaturesSection = () => {
   const reduced = usePrefersReducedMotion()
   const [paused, setPaused] = useState(false)
 
+  // Click-and-drag scroll: dragging hands control to a manual translateX (written
+  // straight to the DOM via ref, not React state, so a fast drag never re-renders).
+  // The two rendered FEATURES sets are identical, so wrapping the offset by one set's
+  // width keeps the drag feeling infinite in both directions, same trick the CSS loop
+  // uses at -50%. Releasing the drag leaves it paused; the Play button hands control
+  // back to the CSS animation (restarting the drift from 0 — a deliberate, acceptable
+  // jump rather than trying to splice a manual offset into a keyframe animation).
+  const trackRef = useRef<HTMLDivElement>(null)
+  const offsetRef = useRef(0)
+  // `committed` only flips true once the pointer has moved past DRAG_THRESHOLD — until
+  // then this could still be a plain click/tap or the start of a vertical scroll (the
+  // track is touch-pan-y), so we hold off entering manual mode. `wasPaused` remembers
+  // whether the Play/Pause button had already paused it before this pointerdown, so a
+  // non-drag release restores that instead of always resuming.
+  // `pointerId` pins the drag to the pointer that started it, so a second finger's
+  // move/up can't re-seat the offset math or end someone else's drag.
+  const dragRef = useRef<{
+    pointerId: number
+    startX: number
+    startOffset: number
+    setWidth: number
+    committed: boolean
+    wasPaused: boolean
+  } | null>(null)
+  const [manualDrag, setManualDrag] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+
+  // Horizontal px of pointer movement required before a pointerdown commits to a
+  // manual drag — below this it's treated as a tap or a vertical scroll.
+  const DRAG_THRESHOLD = 4
+
+  const handlePointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    const track = trackRef.current
+    // Ignore a right-click, and any second pointer while one is already down.
+    if (!track || e.button === 2 || dragRef.current) return
+    // Position/offset get filled in on commit (see handlePointerMove) — reading them
+    // now would go stale if the CSS loop keeps drifting during the pre-threshold hold.
+    dragRef.current = {
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      startOffset: 0,
+      setWidth: track.scrollWidth / 2,
+      committed: false,
+      wasPaused: paused,
+    }
+    track.setPointerCapture(e.pointerId)
+  }
+
+  const handlePointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = dragRef.current
+    const track = trackRef.current
+    if (!drag || !track || e.pointerId !== drag.pointerId) return
+    if (!drag.committed) {
+      if (Math.abs(e.clientX - drag.startX) < DRAG_THRESHOLD) return
+      // Rebase to wherever the CSS drift actually is right NOW (not when the pointer
+      // first went down) so taking over from a running loop doesn't snap backwards.
+      const computed = getComputedStyle(track).transform
+      const currentX = computed && computed !== 'none' ? new DOMMatrixReadOnly(computed).m41 : 0
+      drag.startOffset = currentX
+      drag.startX = e.clientX
+      drag.committed = true
+      setIsDragging(true)
+      setManualDrag(true)
+      setPaused(true)
+    }
+    const next = wrapOffset(drag.startOffset + (e.clientX - drag.startX), drag.setWidth)
+    offsetRef.current = next
+    track.style.transform = `translateX(${next}px)`
+  }
+
+  const endDrag = (e: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = dragRef.current
+    // Only the pointer that owns the drag may end it.
+    if (!drag || e.pointerId !== drag.pointerId) return
+    dragRef.current = null
+    setIsDragging(false)
+    // A release/cancel before the threshold was crossed was a tap or a vertical
+    // scroll starting on the track, not a drag — hand control straight back instead
+    // of leaving the marquee frozen in manual/paused mode (only Play could recover it).
+    if (!drag.committed) {
+      setManualDrag(false)
+      setPaused(drag.wasPaused)
+    }
+  }
+
+  const togglePlay = () => {
+    if (paused) {
+      setManualDrag(false)
+      offsetRef.current = 0
+      if (trackRef.current) trackRef.current.style.transform = ''
+      setPaused(false)
+    } else {
+      setPaused(true)
+    }
+  }
+
   return (
     <section id="features" className="scroll-mt-[84px] py-18 lg:py-24">
       <div className={WRAP}>
@@ -89,8 +186,22 @@ export const SignatureFeaturesSection = () => {
                 Two identical sets: the first is the accessible content, the second is
                 aria-hidden and exists only so the -50% loop lands exactly on the copy.
                 Each card owns its trailing gap (mr-5) so the wrap-around has no jump.
+                The same duplication lets a manual drag wrap seamlessly (see wrapOffset).
               */}
-              <div className={cn('animate-marquee flex w-max', paused && 'is-paused')}>
+              <div
+                ref={trackRef}
+                className={cn(
+                  'flex w-max touch-pan-y select-none [-webkit-user-drag:none]',
+                  !manualDrag && 'animate-marquee',
+                  paused && !manualDrag && 'is-paused',
+                  isDragging ? 'cursor-grabbing' : 'cursor-grab',
+                )}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={endDrag}
+                onPointerCancel={endDrag}
+                onDragStart={(e) => e.preventDefault()}
+              >
                 {[...FEATURES, ...FEATURES].map((feature, index) => (
                   <div
                     key={`${feature.title}-${index}`}
@@ -105,7 +216,7 @@ export const SignatureFeaturesSection = () => {
             <div className="mt-4 flex justify-center">
               <button
                 type="button"
-                onClick={() => setPaused((prev) => !prev)}
+                onClick={togglePlay}
                 aria-pressed={paused}
                 aria-label={
                   paused
